@@ -27,19 +27,19 @@ public class ServerRow {
     private String ip;
 
     @Column(name = "core_count")
-    private int coreCount;
+    private Integer coreCount;
 
     @Column(name = "thread_count")
-    private int threadCount;
+    private Integer threadCount;
 
     @Column(name = "cpu_model")
     private String cpuModel;
 
     @Column(name = "socket_count")
-    private int socketCount;
+    private Integer socketCount;
 
     @Column(name = "cpu_clock_mhz")
-    private double cpuClockMhz;
+    private Double cpuClockMhz;
 
     @Column(name = "os_name")
     private String osName;
@@ -54,7 +54,7 @@ public class ServerRow {
     private Instant lastUpdated;
 
     @Column(name = "last_uptime_seconds")
-    private long lastUptimeSeconds;
+    private Long lastUptimeSeconds;
 
     @Column(name = "created_at", nullable = false)
     @Setter(AccessLevel.NONE)
