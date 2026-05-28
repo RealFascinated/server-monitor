@@ -3,6 +3,7 @@ package cc.fascinated.monitor.model.dto.request.server.ingest.data;
 public record ServerMetrics(
         double cpuUsage,
         double memoryUsage,
+        double memoryAvailable,
         double memoryTotal,
         double load1,
         double load5,
@@ -14,5 +15,9 @@ public record ServerMetrics(
         long memoryBuffers,
         long memoryCached,
         long swapUsed,
-        long swapTotal
+        long swapTotal,
+        long processCount,
+        long runningProcesses,
+        long contextSwitchesPerSecond,
+        long interruptsPerSecond
 ) {}

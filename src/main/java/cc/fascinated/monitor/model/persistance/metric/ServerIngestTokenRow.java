@@ -1,10 +1,8 @@
-package cc.fascinated.monitor.model.persistance;
+package cc.fascinated.monitor.model.persistance.metric;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 @Entity
 @Table(name = "server_ingest_tokens")

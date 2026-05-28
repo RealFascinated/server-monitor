@@ -1,10 +1,9 @@
-package cc.fascinated.monitor.model.persistance;
+package cc.fascinated.monitor.model.persistance.metric;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.Instant;
 
 @Entity

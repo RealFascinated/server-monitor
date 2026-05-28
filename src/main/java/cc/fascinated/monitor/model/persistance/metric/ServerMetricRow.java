@@ -1,4 +1,4 @@
-package cc.fascinated.monitor.model.persistance;
+package cc.fascinated.monitor.model.persistance.metric;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -23,6 +23,9 @@ public class ServerMetricRow {
 
     @Column(name = "mem_usage")
     private double memoryUsage;
+
+    @Column(name = "mem_available")
+    private double memoryAvailable;
 
     @Column(name = "mem_total")
     private double memoryTotal;
@@ -60,30 +63,30 @@ public class ServerMetricRow {
     @Column(name = "swap_total")
     private long swapTotal;
 
+    @Column(name = "process_count")
+    private long processCount;
+
+    @Column(name = "running_processes")
+    private long runningProcesses;
+
+    @Column(name = "ctx_switches_per_second")
+    private long contextSwitchesPerSecond;
+
+    @Column(name = "interrupts_per_second")
+    private long interruptsPerSecond;
+
     @Column(name = "timestamp")
     private Instant timestamp;
 
-    public ServerMetricRow(
-            Long serverId,
-            double cpuUsage,
-            double memoryUsage,
-            double memoryTotal,
-            double load1,
-            double load5,
-            double load15,
-            double cpuUserPercent,
-            double cpuSystemPercent,
-            double cpuIowaitPercent,
-            double cpuStealPercent,
-            long memoryBuffers,
-            long memoryCached,
-            long swapUsed,
-            long swapTotal,
-            Instant timestamp
-    ) {
+    public ServerMetricRow(Long serverId, double cpuUsage, double memoryUsage, double memoryAvailable, double memoryTotal,
+                           double load1, double load5, double load15, double cpuUserPercent, double cpuSystemPercent,
+                           double cpuIowaitPercent, double cpuStealPercent, long memoryBuffers, long memoryCached, long swapUsed,
+                           long swapTotal, long processCount, long runningProcesses, long contextSwitchesPerSecond,
+                           long interruptsPerSecond, Instant timestamp) {
         this.serverId = serverId;
         this.cpuUsage = cpuUsage;
         this.memoryUsage = memoryUsage;
+        this.memoryAvailable = memoryAvailable;
         this.memoryTotal = memoryTotal;
         this.load1 = load1;
         this.load5 = load5;
@@ -96,6 +99,10 @@ public class ServerMetricRow {
         this.memoryCached = memoryCached;
         this.swapUsed = swapUsed;
         this.swapTotal = swapTotal;
+        this.processCount = processCount;
+        this.runningProcesses = runningProcesses;
+        this.contextSwitchesPerSecond = contextSwitchesPerSecond;
+        this.interruptsPerSecond = interruptsPerSecond;
         this.timestamp = timestamp;
     }
 }

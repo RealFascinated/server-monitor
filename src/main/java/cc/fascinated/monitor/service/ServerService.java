@@ -12,6 +12,10 @@ import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerDetails;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerMetrics;
 import cc.fascinated.monitor.model.dto.response.server.CreatedServerResponse;
 import cc.fascinated.monitor.model.persistance.*;
+import cc.fascinated.monitor.model.persistance.metric.ServerDiskMetricRow;
+import cc.fascinated.monitor.model.persistance.metric.ServerIngestTokenRow;
+import cc.fascinated.monitor.model.persistance.metric.ServerInterfaceMetricRow;
+import cc.fascinated.monitor.model.persistance.metric.ServerMetricRow;
 import cc.fascinated.monitor.repository.*;
 import cc.fascinated.monitor.util.AuthUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -76,7 +80,7 @@ public class ServerService {
     @Transactional
     public void ingestMetrics(ServerRow server, IngestServerMetrics metrics) {
         Instant now = Instant.now();
-
+        
         // todo: verify agent version
         server.setAgentVersion(metrics.agentVersion());
 
@@ -98,6 +102,7 @@ public class ServerService {
                 server.getId(),
                 serverMetrics.cpuUsage(),
                 serverMetrics.memoryUsage(),
+                serverMetrics.memoryAvailable(),
                 serverMetrics.memoryTotal(),
                 serverMetrics.load1(),
                 serverMetrics.load5(),
@@ -110,6 +115,10 @@ public class ServerService {
                 serverMetrics.memoryCached(),
                 serverMetrics.swapUsed(),
                 serverMetrics.swapTotal(),
+                serverMetrics.processCount(),
+                serverMetrics.runningProcesses(),
+                serverMetrics.contextSwitchesPerSecond(),
+                serverMetrics.interruptsPerSecond(),
                 now
         ));
 
@@ -138,6 +147,12 @@ public class ServerService {
                     diskMetric.ioWriteBytesPerSecond(),
                     diskMetric.ioUsagePercent(),
                     diskMetric.ioWaitMilliseconds(),
+                    diskMetric.inodeUsed(),
+                    diskMetric.inodeTotal(),
+                    diskMetric.readIops(),
+                    diskMetric.writeIops(),
+                    diskMetric.readLatencyMs(),
+                    diskMetric.writeLatencyMs(),
                     now
             ));
         }

@@ -1,10 +1,9 @@
-package cc.fascinated.monitor.model.persistance;
+package cc.fascinated.monitor.model.persistance.metric;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.Instant;
 
 @Entity
@@ -43,12 +42,31 @@ public class ServerDiskMetricRow {
     @Column(name = "io_wait_ms")
     private double ioWaitMilliseconds;
 
+    @Column(name = "inode_used")
+    private long inodeUsed;
+
+    @Column(name = "inode_total")
+    private long inodeTotal;
+
+    @Column(name = "read_iops")
+    private long readIops;
+
+    @Column(name = "write_iops")
+    private long writeIops;
+
+    @Column(name = "read_latency_ms")
+    private long readLatencyMs;
+
+    @Column(name = "write_latency_ms")
+    private long writeLatencyMs;
+
     @Column(name = "timestamp")
     private Instant timestamp;
 
     public ServerDiskMetricRow(Long serverId, String diskName, double usagePercent, long usedBytes, long totalBytes,
-                               long ioReadBytesPerSecond, long ioWriteBytesPerSecond, double ioUsagePercent,
-                               double ioWaitMilliseconds, Instant timestamp) {
+                               long ioReadBytesPerSecond, long ioWriteBytesPerSecond, double ioUsagePercent, double ioWaitMilliseconds,
+                               long inodeUsed, long inodeTotal, long readIops, long writeIops, long readLatencyMs, long writeLatencyMs,
+                               Instant timestamp) {
         this.serverId = serverId;
         this.diskName = diskName;
         this.usagePercent = usagePercent;
@@ -58,6 +76,12 @@ public class ServerDiskMetricRow {
         this.ioWriteBytesPerSecond = ioWriteBytesPerSecond;
         this.ioUsagePercent = ioUsagePercent;
         this.ioWaitMilliseconds = ioWaitMilliseconds;
+        this.inodeUsed = inodeUsed;
+        this.inodeTotal = inodeTotal;
+        this.readIops = readIops;
+        this.writeIops = writeIops;
+        this.readLatencyMs = readLatencyMs;
+        this.writeLatencyMs = writeLatencyMs;
         this.timestamp = timestamp;
     }
 }

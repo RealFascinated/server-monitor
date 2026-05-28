@@ -10,5 +10,11 @@ public record DiskMetric(
         long ioReadBytesPerSecond,
         long ioWriteBytesPerSecond,
         double ioUsagePercent,
-        double ioWaitMilliseconds
+        double ioWaitMilliseconds,
+        long inodeUsed,
+        long inodeTotal,
+        long readIops,
+        long writeIops,
+        long readLatencyMs,
+        long writeLatencyMs
 ) {}
