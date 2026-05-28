@@ -1,0 +1,17 @@
+package cc.fascinated.monitor.model.dto.response.error;
+
+import org.springframework.http.HttpStatus;
+
+import java.time.Instant;
+
+/**
+ * @param status    The status code of this error.
+ * @param code      The HTTP code of this error.
+ * @param message   The message of this error.
+ * @param timestamp The timestamp this error occurred.
+ */
+public record ErrorResponse(HttpStatus status, int code, String message, Instant timestamp) {
+    public ErrorResponse(HttpStatus status, String message) {
+        this(status, status.value(), message, Instant.now());
+    }
+}

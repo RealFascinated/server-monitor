@@ -1,0 +1,59 @@
+package cc.fascinated.monitor.exception;
+
+import cc.fascinated.monitor.model.dto.response.error.ErrorResponse;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+@RestControllerAdvice
+@Slf4j
+public final class ExceptionControllerAdvice {
+
+    /**
+     * Async request took longer than the configured timeout (e.g. slow skin/cape/server lookup).
+     * Return 503 so clients can retry; log at WARN since this is an expected condition under load.
+     */
+    @ExceptionHandler(AsyncRequestTimeoutException.class)
+    public ResponseEntity<ErrorResponse> handleAsyncRequestTimeout(AsyncRequestTimeoutException ex) {
+        log.warn("Async request timed out: {}", ex.getMessage());
+        return new ResponseEntity<>(new ErrorResponse(HttpStatus.SERVICE_UNAVAILABLE, "Request timed out. Please try again."), HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    /**
+     * Handle a raised exception.
+     *
+     * @param ex the raised exception
+     * @return the error response
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleException(@NonNull Exception ex) {
+        HttpStatus status = null; // Get the HTTP status
+        if (ex instanceof NoResourceFoundException) { // Not found
+            status = HttpStatus.NOT_FOUND;
+        }
+        else if (ex instanceof UnsupportedOperationException) { // Not implemented
+            status = HttpStatus.NOT_IMPLEMENTED;
+        }
+        if (ex.getClass().isAnnotationPresent(ResponseStatus.class)) { // Get from the @ResponseStatus annotation
+            status = ex.getClass().getAnnotation(ResponseStatus.class).value();
+        }
+        String message = ex.getLocalizedMessage(); // Get the error message
+        if (message == null) { // Fallback
+            message = "An internal error has occurred.";
+        }
+        // Print the stack trace if no response status is present
+        if (status == null) {
+            log.error("An internal error has occurred.", ex);
+        }
+        if (status == null) { // Fallback to 500
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        return new ResponseEntity<>(new ErrorResponse(status, message), status);
+    }
+}
