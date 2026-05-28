@@ -5,10 +5,10 @@ import jakarta.validation.constraints.NotBlank;
 public record InterfaceMetrics(
         @NotBlank(message = "Interface name must not be empty")
         String interfaceName,
-        long rxBytesPerSecond,
-        long txBytesPerSecond,
-        long rxPacketsPerSecond,
-        long txPacketsPerSecond,
-        long rxErrorsPerSecond,
-        long txErrorsPerSecond
+        Long rxBytesPerSecond,
+        Long txBytesPerSecond,
+        Long rxPacketsPerSecond,
+        Long txPacketsPerSecond,
+        Long rxErrorsPerSecond,
+        Long txErrorsPerSecond
 ) {}

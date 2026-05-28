@@ -5,15 +5,15 @@ import jakarta.validation.constraints.NotBlank;
 public record ServerDetails(
         @NotBlank(message = "IP must not be empty")
         String ip,
-        int coreCount,
-        int threadCount,
+        Integer coreCount,
+        Integer threadCount,
         @NotBlank(message = "OS name must not be empty")
         String osName,
         @NotBlank(message = "OS version must not be empty")
         String osVersion,
-        long uptimeSeconds,
+        Long uptimeSeconds,
         @NotBlank(message = "CPU model must not be empty")
         String cpuModel,
-        int socketCount,
-        double cpuClockMhz
+        Integer socketCount,
+        Double cpuClockMhz
 ) {}

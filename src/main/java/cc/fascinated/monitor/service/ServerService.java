@@ -10,12 +10,16 @@ import cc.fascinated.monitor.model.dto.request.server.ingest.data.DiskMetric;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.InterfaceMetrics;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerDetails;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerMetrics;
+import cc.fascinated.monitor.model.dto.request.server.ingest.data.ZfsArcMetrics;
+import cc.fascinated.monitor.model.dto.request.server.ingest.data.ZfsPoolMetric;
 import cc.fascinated.monitor.model.dto.response.server.CreatedServerResponse;
 import cc.fascinated.monitor.model.persistance.*;
 import cc.fascinated.monitor.model.persistance.metric.ServerDiskMetricRow;
 import cc.fascinated.monitor.model.persistance.metric.ServerIngestTokenRow;
 import cc.fascinated.monitor.model.persistance.metric.ServerInterfaceMetricRow;
 import cc.fascinated.monitor.model.persistance.metric.ServerMetricRow;
+import cc.fascinated.monitor.model.persistance.metric.ServerZfsArcMetricRow;
+import cc.fascinated.monitor.model.persistance.metric.ServerZfsPoolMetricRow;
 import cc.fascinated.monitor.repository.*;
 import cc.fascinated.monitor.util.AuthUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -34,15 +38,21 @@ public class ServerService {
     private final ServerMetricsRepository serverMetricsRepository;
     private final ServerInterfaceMetricsRepository serverInterfaceMetricsRepository;
     private final ServerDiskMetricsRepository serverDiskMetricsRepository;
+    private final ServerZfsArcMetricsRepository serverZfsArcMetricsRepository;
+    private final ServerZfsPoolMetricsRepository serverZfsPoolMetricsRepository;
 
     public ServerService(ServerRepository serverRepository, ServerIngestTokenRepository serverIngestTokenRepository,
                          ServerMetricsRepository serverMetricsRepository, ServerInterfaceMetricsRepository serverInterfaceMetricsRepository,
-                         ServerDiskMetricsRepository serverDiskMetricsRepository) {
+                         ServerDiskMetricsRepository serverDiskMetricsRepository,
+                         ServerZfsArcMetricsRepository serverZfsArcMetricsRepository,
+                         ServerZfsPoolMetricsRepository serverZfsPoolMetricsRepository) {
         this.serverRepository = serverRepository;
         this.serverIngestTokenRepository = serverIngestTokenRepository;
         this.serverMetricsRepository = serverMetricsRepository;
         this.serverInterfaceMetricsRepository = serverInterfaceMetricsRepository;
         this.serverDiskMetricsRepository = serverDiskMetricsRepository;
+        this.serverZfsArcMetricsRepository = serverZfsArcMetricsRepository;
+        this.serverZfsPoolMetricsRepository = serverZfsPoolMetricsRepository;
     }
 
     public CreatedServerResponse createServer(ServerCreateRequest createRequest) {
@@ -121,6 +131,46 @@ public class ServerService {
                 serverMetrics.interruptsPerSecond(),
                 now
         ));
+
+        ZfsArcMetrics zfsArcMetrics = metrics.zfsArcMetrics();
+        if (zfsArcMetrics != null) {
+            this.serverZfsArcMetricsRepository.save(new ServerZfsArcMetricRow(
+                    server.getId(),
+                    zfsArcMetrics.arcSizeBytes(),
+                    zfsArcMetrics.arcTargetBytes(),
+                    zfsArcMetrics.arcMaxBytes(),
+                    zfsArcMetrics.arcMinBytes(),
+                    zfsArcMetrics.arcDataBytes(),
+                    zfsArcMetrics.arcMetadataBytes(),
+                    zfsArcMetrics.l2arcSizeBytes(),
+                    zfsArcMetrics.arcHitRatio(),
+                    zfsArcMetrics.arcMissesPerSecond(),
+                    now
+            ));
+        }
+
+        if (metrics.zfsPoolMetrics() != null) {
+            for (ZfsPoolMetric poolMetric : metrics.zfsPoolMetrics()) {
+                this.serverZfsPoolMetricsRepository.save(new ServerZfsPoolMetricRow(
+                        server.getId(),
+                        poolMetric.poolName(),
+                        poolMetric.health(),
+                        poolMetric.capacityPercent(),
+                        poolMetric.allocatedBytes(),
+                        poolMetric.freeBytes(),
+                        poolMetric.totalBytes(),
+                        poolMetric.fragmentationPercent(),
+                        poolMetric.scanState(),
+                        poolMetric.scanPercent(),
+                        poolMetric.readBps(),
+                        poolMetric.writeBps(),
+                        poolMetric.readIops(),
+                        poolMetric.writeIops(),
+                        poolMetric.checksumErrors(),
+                        now
+                ));
+            }
+        }
 
         for (InterfaceMetrics interfaceMetric : metrics.interfaceMetrics()) {
             this.serverInterfaceMetricsRepository.save(new ServerInterfaceMetricRow(
