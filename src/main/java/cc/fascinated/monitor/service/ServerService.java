@@ -77,6 +77,9 @@ public class ServerService {
     public void ingestMetrics(ServerRow server, IngestServerMetrics metrics) {
         Instant now = Instant.now();
 
+        // todo: verify agent version
+        server.setAgentVersion(metrics.agentVersion());
+
         ServerDetails serverDetails = metrics.serverDetails();
         server.setIp(serverDetails.ip());
         server.setCoreCount(serverDetails.coreCount());

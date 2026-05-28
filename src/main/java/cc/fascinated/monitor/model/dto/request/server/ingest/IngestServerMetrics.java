@@ -8,6 +8,7 @@ import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerMetrics;
 import java.util.List;
 
 public record IngestServerMetrics(
+        String agentVersion,
         ServerDetails serverDetails,
         ServerMetrics serverMetrics,
         List<InterfaceMetrics> interfaceMetrics,

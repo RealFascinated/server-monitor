@@ -56,6 +56,9 @@ public class ServerRow {
     @Column(name = "last_uptime_seconds")
     private Long lastUptimeSeconds;
 
+    @Column(name = "agent_version")
+    private String agentVersion;
+
     @Column(name = "created_at", nullable = false)
     @Setter(AccessLevel.NONE)
     private Instant createdAt;

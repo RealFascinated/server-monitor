@@ -166,11 +166,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": ["lastNotNull", "mean", "max"],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -238,18 +234,10 @@
                                 "field": "id",
                                 "fieldSrc": "field",
                                 "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
+                                "value": [null],
+                                "valueError": [null],
+                                "valueSrc": ["value"],
+                                "valueType": ["number"]
                               },
                               "type": "rule"
                             },
@@ -320,18 +308,10 @@
                                 "field": "id",
                                 "fieldSrc": "field",
                                 "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
+                                "value": [null],
+                                "valueError": [null],
+                                "valueSrc": ["value"],
+                                "valueType": ["number"]
                               },
                               "type": "rule"
                             },
@@ -437,11 +417,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": ["lastNotNull", "mean", "max"],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -578,9 +554,7 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": ["lastNotNull"],
                 "fields": "",
                 "values": false
               },
@@ -693,9 +667,7 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": ["lastNotNull"],
                 "fields": "",
                 "values": false
               },
@@ -813,9 +785,7 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": ["lastNotNull"],
                 "fields": "/^server_ip$/",
                 "values": false
               },
@@ -933,9 +903,7 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": ["lastNotNull"],
                 "fields": "/^server_os$/",
                 "values": false
               },
@@ -1026,9 +994,7 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": ["lastNotNull"],
                 "fields": "",
                 "values": false
               },
@@ -1119,9 +1085,7 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": ["lastNotNull"],
                 "fields": "",
                 "values": false
               },
@@ -1237,11 +1201,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": ["lastNotNull", "mean", "max"],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -1382,11 +1342,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": ["lastNotNull", "mean", "max"],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -1505,11 +1461,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": ["lastNotNull", "mean", "max"],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -1668,11 +1620,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": ["lastNotNull", "mean", "max"],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -1813,11 +1761,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": ["lastNotNull", "mean", "max"],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -1936,11 +1880,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": ["lastNotNull", "mean", "max"],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -2095,11 +2035,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": ["lastNotNull", "mean", "max"],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -2240,11 +2176,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": ["lastNotNull", "mean", "max"],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -2385,11 +2317,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": ["lastNotNull", "mean", "max"],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -2457,18 +2385,10 @@
                                 "field": "id",
                                 "fieldSrc": "field",
                                 "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
+                                "value": [null],
+                                "valueError": [null],
+                                "valueSrc": ["value"],
+                                "valueType": ["number"]
                               },
                               "type": "rule"
                             },
@@ -2575,11 +2495,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": ["lastNotNull", "mean", "max"],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -2647,18 +2563,10 @@
                                 "field": "id",
                                 "fieldSrc": "field",
                                 "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
+                                "value": [null],
+                                "valueError": [null],
+                                "valueSrc": ["value"],
+                                "valueType": ["number"]
                               },
                               "type": "rule"
                             },
@@ -2729,18 +2637,10 @@
                                 "field": "id",
                                 "fieldSrc": "field",
                                 "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
+                                "value": [null],
+                                "valueError": [null],
+                                "valueSrc": ["value"],
+                                "valueType": ["number"]
                               },
                               "type": "rule"
                             },
@@ -2838,11 +2738,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": ["lastNotNull", "mean", "max"],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -2910,18 +2806,10 @@
                                 "field": "id",
                                 "fieldSrc": "field",
                                 "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
+                                "value": [null],
+                                "valueError": [null],
+                                "valueSrc": ["value"],
+                                "valueType": ["number"]
                               },
                               "type": "rule"
                             },
@@ -2992,18 +2880,10 @@
                                 "field": "id",
                                 "fieldSrc": "field",
                                 "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
+                                "value": [null],
+                                "valueError": [null],
+                                "valueSrc": ["value"],
+                                "valueType": ["number"]
                               },
                               "type": "rule"
                             },
@@ -3101,11 +2981,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": ["lastNotNull", "mean", "max"],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -3173,18 +3049,10 @@
                                 "field": "id",
                                 "fieldSrc": "field",
                                 "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
+                                "value": [null],
+                                "valueError": [null],
+                                "valueSrc": ["value"],
+                                "valueType": ["number"]
                               },
                               "type": "rule"
                             },
@@ -3291,11 +3159,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": ["lastNotNull", "mean", "max"],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -3363,18 +3227,10 @@
                                 "field": "id",
                                 "fieldSrc": "field",
                                 "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
+                                "value": [null],
+                                "valueError": [null],
+                                "valueSrc": ["value"],
+                                "valueType": ["number"]
                               },
                               "type": "rule"
                             },
@@ -3481,11 +3337,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": ["lastNotNull", "mean", "max"],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -3553,18 +3405,10 @@
                                 "field": "id",
                                 "fieldSrc": "field",
                                 "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
+                                "value": [null],
+                                "valueError": [null],
+                                "valueSrc": ["value"],
+                                "valueType": ["number"]
                               },
                               "type": "rule"
                             },
@@ -3635,18 +3479,10 @@
                                 "field": "id",
                                 "fieldSrc": "field",
                                 "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
+                                "value": [null],
+                                "valueError": [null],
+                                "valueSrc": ["value"],
+                                "valueType": ["number"]
                               },
                               "type": "rule"
                             },
@@ -3757,11 +3593,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": ["lastNotNull", "mean", "max"],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -3829,18 +3661,10 @@
                                 "field": "id",
                                 "fieldSrc": "field",
                                 "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
+                                "value": [null],
+                                "valueError": [null],
+                                "valueSrc": ["value"],
+                                "valueType": ["number"]
                               },
                               "type": "rule"
                             },
@@ -3911,18 +3735,10 @@
                                 "field": "id",
                                 "fieldSrc": "field",
                                 "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
+                                "value": [null],
+                                "valueError": [null],
+                                "valueSrc": ["value"],
+                                "valueType": ["number"]
                               },
                               "type": "rule"
                             },
@@ -4028,11 +3844,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": ["lastNotNull", "mean", "max"],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -4150,11 +3962,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": ["lastNotNull", "mean", "max"],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -4192,7 +4000,7 @@
                       "editorMode": "code",
                       "format": "table",
                       "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(cpu_user_pct) AS \"User\", avg(cpu_system_pct) AS \"System\", avg(cpu_iowait_pct) AS \"IO Wait\", avg(cpu_steal_pct) AS \"Steal\" FROM server_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
+                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(cpu_usage) AS \"Used\", avg(cpu_user_pct) AS \"User\", avg(cpu_system_pct) AS \"System\", avg(cpu_iowait_pct) AS \"IO Wait\", avg(cpu_steal_pct) AS \"Steal\" FROM server_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
                       "table": "server_metrics"
                     },
                     "version": "v0"
@@ -4265,7 +4073,32 @@
                 },
                 "unit": "percent"
               },
-              "overrides": []
+              "overrides": [
+                {
+                  "matcher": {
+                    "id": "byName",
+                    "options": "Used",
+                    "scope": "series"
+                  },
+                  "properties": [
+                    {
+                      "id": "custom.stacking",
+                      "value": {
+                        "group": "A",
+                        "mode": "none"
+                      }
+                    },
+                    {
+                      "id": "custom.fillOpacity",
+                      "value": 0
+                    },
+                    {
+                      "id": "custom.lineWidth",
+                      "value": 2
+                    }
+                  ]
+                }
+              ]
             },
             "options": {
               "annotations": {
@@ -4273,11 +4106,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": ["lastNotNull", "mean", "max"],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -4315,7 +4144,7 @@
                       "editorMode": "code",
                       "format": "table",
                       "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(mem_buffers / mem_total * 100) AS \"Buffers\", avg(mem_cached / mem_total * 100) AS \"Cache\", avg(swap_used / swap_total * 100) AS \"Swap\" FROM server_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
+                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(mem_usage) AS \"Used\", avg(mem_total) AS \"Total\", avg(mem_buffers) AS \"Buffers\", avg(mem_cached) AS \"Cache\" FROM server_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
                       "table": "server_metrics"
                     },
                     "version": "v0"
@@ -4376,7 +4205,6 @@
                   }
                 },
                 "min": 0,
-                "max": 100,
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
@@ -4386,7 +4214,7 @@
                     }
                   ]
                 },
-                "unit": "percent"
+                "unit": "bytes"
               },
               "overrides": []
             },
@@ -4396,11 +4224,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": ["lastNotNull", "mean", "max"],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -4485,9 +4309,7 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": ["lastNotNull"],
                 "fields": "/^cpu_model$/",
                 "values": false
               },
@@ -4569,9 +4391,7 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": ["lastNotNull"],
                 "fields": "/^socket_count$/",
                 "values": false
               },
@@ -4653,9 +4473,7 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": ["lastNotNull"],
                 "fields": "/^cpu_clock_mhz$/",
                 "values": false
               },
@@ -4737,15 +4555,131 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": ["lastNotNull"],
                 "fields": "/^cpu_cores$/",
                 "values": false
               },
               "showPercentChange": false,
               "textMode": "value",
               "wideLayout": true
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
+    "panel-32": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "ffnexhw0yascgf"
+                    },
+                    "group": "grafana-postgresql-datasource",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "dataset": "monitor",
+                      "editorMode": "code",
+                      "format": "table",
+                      "rawQuery": true,
+                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(swap_used) AS \"Used\", avg(swap_total) AS \"Total\" FROM server_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
+                      "table": "server_metrics"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 32,
+        "links": [],
+        "title": "Swap",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "axisBorderShow": false,
+                  "axisCenteredZero": false,
+                  "axisColorMode": "text",
+                  "axisLabel": "",
+                  "axisPlacement": "auto",
+                  "barAlignment": 0,
+                  "barWidthFactor": 0.6,
+                  "drawStyle": "line",
+                  "fillOpacity": 0,
+                  "gradientMode": "none",
+                  "hideFrom": {
+                    "legend": false,
+                    "tooltip": false,
+                    "viz": false
+                  },
+                  "insertNulls": false,
+                  "lineInterpolation": "linear",
+                  "lineWidth": 1,
+                  "pointSize": 5,
+                  "scaleDistribution": {
+                    "type": "linear"
+                  },
+                  "showPoints": "auto",
+                  "showValues": false,
+                  "spanNulls": false,
+                  "stacking": {
+                    "group": "A",
+                    "mode": "none"
+                  },
+                  "thresholdsStyle": {
+                    "mode": "dashed"
+                  }
+                },
+                "min": 0,
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    }
+                  ]
+                },
+                "unit": "bytes"
+              },
+              "overrides": []
+            },
+            "options": {
+              "annotations": {
+                "clustering": -1,
+                "multiLane": false
+              },
+              "legend": {
+                "calcs": ["lastNotNull", "mean", "max"],
+                "displayMode": "list",
+                "placement": "bottom",
+                "showLegend": true
+              },
+              "tooltip": {
+                "hideZeros": false,
+                "mode": "multi",
+                "sort": "none"
+              }
             }
           },
           "version": "13.0.1+security-01"
@@ -5000,6 +4934,19 @@
                       "width": 8,
                       "x": 16,
                       "y": 0
+                    }
+                  },
+                  {
+                    "kind": "GridLayoutItem",
+                    "spec": {
+                      "element": {
+                        "kind": "ElementReference",
+                        "name": "panel-32"
+                      },
+                      "height": 8,
+                      "width": 8,
+                      "x": 0,
+                      "y": 8
                     }
                   }
                 ]
@@ -5320,10 +5267,7 @@
     }
   },
   "preload": false,
-  "tags": [
-    "monitor",
-    "servers"
-  ],
+  "tags": ["monitor", "servers"],
   "timeSettings": {
     "autoRefresh": "30s",
     "autoRefreshIntervals": [
@@ -5418,9 +5362,7 @@
         "allowCustomValue": true,
         "current": {
           "text": "All",
-          "value": [
-            "$__all"
-          ]
+          "value": ["$__all"]
         },
         "definition": "SELECT disk_name AS __text, disk_name AS __value FROM server_disk_metrics WHERE server_id = '${server}' GROUP BY disk_name ORDER BY disk_name",
         "hide": "dontHide",
@@ -5476,15 +5418,9 @@
                       "field": "server_id",
                       "fieldSrc": "field",
                       "operator": "equal",
-                      "value": [
-                        null
-                      ],
-                      "valueSrc": [
-                        "value"
-                      ],
-                      "valueType": [
-                        "number"
-                      ]
+                      "value": [null],
+                      "valueSrc": ["value"],
+                      "valueType": ["number"]
                     },
                     "type": "rule"
                   }
@@ -5510,9 +5446,7 @@
         "allowCustomValue": true,
         "current": {
           "text": "All",
-          "value": [
-            "$__all"
-          ]
+          "value": ["$__all"]
         },
         "definition": "SELECT interface_name AS __text, interface_name AS __value FROM server_network_metrics WHERE server_id = '${server}' GROUP BY interface_name ORDER BY CASE WHEN interface_name LIKE 'eth%' THEN 0 WHEN interface_name LIKE 'en%' THEN 1 WHEN interface_name LIKE 'wlan%' THEN 2 WHEN interface_name LIKE 'wlp%' THEN 3 ELSE 4 END, interface_name",
         "hide": "dontHide",
@@ -5568,15 +5502,9 @@
                       "field": "server_id",
                       "fieldSrc": "field",
                       "operator": "equal",
-                      "value": [
-                        null
-                      ],
-                      "valueSrc": [
-                        "value"
-                      ],
-                      "valueType": [
-                        "number"
-                      ]
+                      "value": [null],
+                      "valueSrc": ["value"],
+                      "valueType": ["number"]
                     },
                     "type": "rule"
                   }
