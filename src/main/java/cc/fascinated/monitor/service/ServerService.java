@@ -84,6 +84,9 @@ public class ServerService {
         server.setOsName(serverDetails.osName());
         server.setOsVersion(serverDetails.osVersion());
         server.setLastUptimeSeconds(serverDetails.uptimeSeconds());
+        server.setCpuModel(serverDetails.cpuModel());
+        server.setSocketCount(serverDetails.socketCount());
+        server.setCpuClockMhz(serverDetails.cpuClockMhz());
         server.setLastUpdated(now);
         server.setStatus(ServerStatus.ONLINE);
 
@@ -93,6 +96,17 @@ public class ServerService {
                 serverMetrics.cpuUsage(),
                 serverMetrics.memoryUsage(),
                 serverMetrics.memoryTotal(),
+                serverMetrics.load1(),
+                serverMetrics.load5(),
+                serverMetrics.load15(),
+                serverMetrics.cpuUserPercent(),
+                serverMetrics.cpuSystemPercent(),
+                serverMetrics.cpuIowaitPercent(),
+                serverMetrics.cpuStealPercent(),
+                serverMetrics.memoryBuffers(),
+                serverMetrics.memoryCached(),
+                serverMetrics.swapUsed(),
+                serverMetrics.swapTotal(),
                 now
         ));
 

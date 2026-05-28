@@ -32,6 +32,15 @@ public class ServerRow {
     @Column(name = "thread_count")
     private int threadCount;
 
+    @Column(name = "cpu_model")
+    private String cpuModel;
+
+    @Column(name = "socket_count")
+    private int socketCount;
+
+    @Column(name = "cpu_clock_mhz")
+    private double cpuClockMhz;
+
     @Column(name = "os_name")
     private String osName;
 
