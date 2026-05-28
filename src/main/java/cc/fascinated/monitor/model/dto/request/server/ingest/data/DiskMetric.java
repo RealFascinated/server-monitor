@@ -8,6 +8,7 @@ public record DiskMetric(
         long usedBytes,
         long totalBytes,
         long ioReadBytesPerSecond,
+        long ioWriteBytesPerSecond,
         double ioUsagePercent,
         double ioWaitMilliseconds
 ) {}

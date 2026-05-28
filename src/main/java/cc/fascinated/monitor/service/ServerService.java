@@ -118,7 +118,7 @@ public class ServerService {
                     diskMetric.usedBytes(),
                     diskMetric.totalBytes(),
                     diskMetric.ioReadBytesPerSecond(),
-                    diskMetric.ioReadBytesPerSecond(),
+                    diskMetric.ioWriteBytesPerSecond(),
                     diskMetric.ioUsagePercent(),
                     diskMetric.ioWaitMilliseconds(),
                     now
