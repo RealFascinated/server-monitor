@@ -137,6 +137,41 @@ public class ServerService {
                 now
         ));
 
+        for (InterfaceMetrics interfaceMetric : metrics.interfaceMetrics()) {
+            this.serverInterfaceMetricsRepository.save(new InterfaceMetricRow(
+                    server.getId(),
+                    interfaceMetric.interfaceName(),
+                    interfaceMetric.rxBytesPerSecond(),
+                    interfaceMetric.txBytesPerSecond(),
+                    interfaceMetric.rxPacketsPerSecond(),
+                    interfaceMetric.txPacketsPerSecond(),
+                    interfaceMetric.rxErrorsPerSecond(),
+                    interfaceMetric.txErrorsPerSecond(),
+                    now
+            ));
+        }
+
+        for (DiskMetric diskMetric : metrics.diskMetrics()) {
+            this.serverDiskMetricsRepository.save(new DiskMetricRow(
+                    server.getId(),
+                    diskMetric.diskName(),
+                    ((double) diskMetric.usedBytes() / diskMetric.totalBytes()) * 100,
+                    diskMetric.usedBytes(),
+                    diskMetric.totalBytes(),
+                    diskMetric.ioReadBytesPerSecond(),
+                    diskMetric.ioWriteBytesPerSecond(),
+                    diskMetric.ioUsagePercent(),
+                    diskMetric.ioWaitMilliseconds(),
+                    diskMetric.inodeUsed(),
+                    diskMetric.inodeTotal(),
+                    diskMetric.readIops(),
+                    diskMetric.writeIops(),
+                    diskMetric.readLatencyMs(),
+                    diskMetric.writeLatencyMs(),
+                    now
+            ));
+        }
+
         ZfsArcMetrics zfsArcMetrics = metrics.zfsArcMetrics();
         if (zfsArcMetrics != null) {
             this.serverZfsArcMetricsRepository.save(new ZfsArcMetricRow(
@@ -177,41 +212,6 @@ public class ServerService {
             }
         }
 
-        for (InterfaceMetrics interfaceMetric : metrics.interfaceMetrics()) {
-            this.serverInterfaceMetricsRepository.save(new InterfaceMetricRow(
-                    server.getId(),
-                    interfaceMetric.interfaceName(),
-                    interfaceMetric.rxBytesPerSecond(),
-                    interfaceMetric.txBytesPerSecond(),
-                    interfaceMetric.rxPacketsPerSecond(),
-                    interfaceMetric.txPacketsPerSecond(),
-                    interfaceMetric.rxErrorsPerSecond(),
-                    interfaceMetric.txErrorsPerSecond(),
-                    now
-            ));
-        }
-
-        for (DiskMetric diskMetric : metrics.diskMetrics()) {
-            this.serverDiskMetricsRepository.save(new DiskMetricRow(
-                    server.getId(),
-                    diskMetric.diskName(),
-                    ((double) diskMetric.usedBytes() / diskMetric.totalBytes()) * 100,
-                    diskMetric.usedBytes(),
-                    diskMetric.totalBytes(),
-                    diskMetric.ioReadBytesPerSecond(),
-                    diskMetric.ioWriteBytesPerSecond(),
-                    diskMetric.ioUsagePercent(),
-                    diskMetric.ioWaitMilliseconds(),
-                    diskMetric.inodeUsed(),
-                    diskMetric.inodeTotal(),
-                    diskMetric.readIops(),
-                    diskMetric.writeIops(),
-                    diskMetric.readLatencyMs(),
-                    diskMetric.writeLatencyMs(),
-                    now
-            ));
-        }
-
         if (metrics.dockerContainers() != null) {
             for (DockerContainerMetric containerMetric : metrics.dockerContainers()) {
                 this.serverDockerContainerMetricsRepository.save(new DockerContainerMetricRow(
@@ -225,6 +225,5 @@ public class ServerService {
         }
 
         this.serverRepository.save(server);
-        // log.info("Ingested metrics for {} in {}ms", server.getId(), System.currentTimeMillis() - now.toEpochMilli());
     }
 }
