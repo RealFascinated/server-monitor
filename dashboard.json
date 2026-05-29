@@ -66,44 +66,7 @@
                             "type": "groupBy"
                           }
                         ],
-                        "limit": 50,
-                        "whereJsonTree": {
-                          "children1": [
-                            {
-                              "id": "b9998a9b-89ab-4cde-b012-319e6e0417ba",
-                              "properties": {
-                                "field": "id",
-                                "fieldSrc": "field",
-                                "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
-                              },
-                              "type": "rule"
-                            },
-                            {
-                              "id": "a99aab99-4567-489a-bcde-f19e6e044a8e",
-                              "properties": {
-                                "fieldSrc": "field",
-                                "value": [],
-                                "valueSrc": []
-                              },
-                              "type": "rule"
-                            }
-                          ],
-                          "id": "a89999ab-0123-4456-b89a-b19e6dfe0af6",
-                          "type": "group"
-                        },
-                        "whereString": "id = NaN"
+                        "limit": 50
                       },
                       "table": "server_network_metrics"
                     },
@@ -148,44 +111,7 @@
                             "type": "groupBy"
                           }
                         ],
-                        "limit": 50,
-                        "whereJsonTree": {
-                          "children1": [
-                            {
-                              "id": "b9998a9b-89ab-4cde-b012-319e6e0417ba",
-                              "properties": {
-                                "field": "id",
-                                "fieldSrc": "field",
-                                "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
-                              },
-                              "type": "rule"
-                            },
-                            {
-                              "id": "a99aab99-4567-489a-bcde-f19e6e044a8e",
-                              "properties": {
-                                "fieldSrc": "field",
-                                "value": [],
-                                "valueSrc": []
-                              },
-                              "type": "rule"
-                            }
-                          ],
-                          "id": "a89999ab-0123-4456-b89a-b19e6dfe0af6",
-                          "type": "group"
-                        },
-                        "whereString": "id = NaN"
+                        "limit": 50
                       },
                       "table": "server_network_metrics"
                     },
@@ -900,7 +826,7 @@
                       "editorMode": "code",
                       "format": "table",
                       "rawQuery": true,
-                      "rawSql": "SELECT (mem_usage / mem_total) * 100 AS memory_used FROM server_metrics WHERE server_id = '${server}' ORDER BY timestamp DESC LIMIT 1",
+                      "rawSql": "SELECT mem_usage AS memory_used FROM server_metrics WHERE server_id = '${server}' ORDER BY timestamp DESC LIMIT 1",
                       "table": "server_metrics"
                     },
                     "version": "v0"
@@ -1116,7 +1042,7 @@
                       "editorMode": "code",
                       "format": "table",
                       "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), SUM(used_bytes) AS \"Used\" FROM server_disk_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
+                      "rawSql": "SELECT time, SUM(used_bytes) AS \"Used\" FROM (SELECT $__timeGroupAlias(timestamp, $__interval), disk_name, AVG(used_bytes) AS used_bytes FROM server_disk_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1, disk_name) per_disk GROUP BY time ORDER BY time",
                       "table": "server_disk_metrics"
                     },
                     "version": "v0"
@@ -1261,7 +1187,7 @@
                       "editorMode": "code",
                       "format": "table",
                       "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), SUM(io_usage_pct) AS \"IO Usage %\" FROM server_disk_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
+                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), AVG(io_usage_pct) AS \"IO Usage %\" FROM server_disk_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
                       "table": "server_disk_metrics"
                     },
                     "version": "v0"
@@ -1650,7 +1576,7 @@
                     "spec": {
                       "dataset": "monitor",
                       "editorMode": "code",
-                      "format": "table",
+                      "format": "time_series",
                       "rawQuery": true,
                       "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), SUM(rx_bps) AS \"In\" FROM server_network_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
                       "table": "server_network_metrics"
@@ -1673,7 +1599,7 @@
                     "spec": {
                       "dataset": "monitor",
                       "editorMode": "code",
-                      "format": "table",
+                      "format": "time_series",
                       "rawQuery": true,
                       "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), SUM(tx_bps) AS \"Out\" FROM server_network_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
                       "table": "server_network_metrics"
@@ -1688,7 +1614,7 @@
             "transformations": []
           }
         },
-        "description": "",
+        "description": "TX is plotted on negative Y; legend min/mean/max still reflect raw positive values.",
         "id": 22,
         "links": [],
         "title": "Interface Traffic",
@@ -1850,151 +1776,6 @@
         "id": 23,
         "links": [],
         "title": "Interface Packets",
-        "vizConfig": {
-          "group": "timeseries",
-          "kind": "VizConfig",
-          "spec": {
-            "fieldConfig": {
-              "defaults": {
-                "color": {
-                  "mode": "palette-classic"
-                },
-                "custom": {
-                  "axisBorderShow": false,
-                  "axisCenteredZero": false,
-                  "axisColorMode": "text",
-                  "axisLabel": "",
-                  "axisPlacement": "auto",
-                  "barAlignment": 0,
-                  "barWidthFactor": 0.6,
-                  "drawStyle": "line",
-                  "fillOpacity": 0,
-                  "gradientMode": "none",
-                  "hideFrom": {
-                    "legend": false,
-                    "tooltip": false,
-                    "viz": false
-                  },
-                  "insertNulls": false,
-                  "lineInterpolation": "linear",
-                  "lineWidth": 1,
-                  "pointSize": 5,
-                  "scaleDistribution": {
-                    "type": "linear"
-                  },
-                  "showPoints": "auto",
-                  "showValues": false,
-                  "spanNulls": false,
-                  "stacking": {
-                    "group": "A",
-                    "mode": "none"
-                  },
-                  "thresholdsStyle": {
-                    "mode": "dashed"
-                  }
-                },
-                "min": 0,
-                "thresholds": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": 0
-                    }
-                  ]
-                },
-                "unit": "pps"
-              },
-              "overrides": []
-            },
-            "options": {
-              "annotations": {
-                "clustering": -1,
-                "multiLane": false
-              },
-              "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
-                "displayMode": "list",
-                "placement": "bottom",
-                "showLegend": true
-              },
-              "tooltip": {
-                "hideZeros": false,
-                "mode": "multi",
-                "sort": "none"
-              }
-            }
-          },
-          "version": "13.0.1+security-01"
-        }
-      }
-    },
-    "panel-24": {
-      "kind": "Panel",
-      "spec": {
-        "data": {
-          "kind": "QueryGroup",
-          "spec": {
-            "queries": [
-              {
-                "kind": "PanelQuery",
-                "spec": {
-                  "hidden": false,
-                  "query": {
-                    "datasource": {
-                      "name": "ffnexhw0yascgf"
-                    },
-                    "group": "grafana-postgresql-datasource",
-                    "kind": "DataQuery",
-                    "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), SUM(rx_errors_per_second) AS \"RX Errors\" FROM server_network_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_network_metrics"
-                    },
-                    "version": "v0"
-                  },
-                  "refId": "A"
-                }
-              },
-              {
-                "kind": "PanelQuery",
-                "spec": {
-                  "hidden": false,
-                  "query": {
-                    "datasource": {
-                      "name": "ffnexhw0yascgf"
-                    },
-                    "group": "grafana-postgresql-datasource",
-                    "kind": "DataQuery",
-                    "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), SUM(tx_errors_per_second) AS \"TX Errors\" FROM server_network_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_network_metrics"
-                    },
-                    "version": "v0"
-                  },
-                  "refId": "B"
-                }
-              }
-            ],
-            "queryOptions": {},
-            "transformations": []
-          }
-        },
-        "description": "",
-        "id": 24,
-        "links": [],
-        "title": "Interface Errors",
         "vizConfig": {
           "group": "timeseries",
           "kind": "VizConfig",
@@ -2681,44 +2462,7 @@
                             "type": "groupBy"
                           }
                         ],
-                        "limit": 50,
-                        "whereJsonTree": {
-                          "children1": [
-                            {
-                              "id": "b9998a9b-89ab-4cde-b012-319e6e0417ba",
-                              "properties": {
-                                "field": "id",
-                                "fieldSrc": "field",
-                                "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
-                              },
-                              "type": "rule"
-                            },
-                            {
-                              "id": "a99aab99-4567-489a-bcde-f19e6e044a8e",
-                              "properties": {
-                                "fieldSrc": "field",
-                                "value": [],
-                                "valueSrc": []
-                              },
-                              "type": "rule"
-                            }
-                          ],
-                          "id": "a89999ab-0123-4456-b89a-b19e6dfe0af6",
-                          "type": "group"
-                        },
-                        "whereString": "id = NaN"
+                        "limit": 50
                       },
                       "table": "server_disk_metrics"
                     },
@@ -2850,7 +2594,7 @@
                       "editorMode": "code",
                       "format": "table",
                       "rawQuery": true,
-                      "rawSql": "SELECT cpu_clock_mhz FROM servers WHERE id = '${server}'",
+                      "rawSql": "SELECT cpu_clock_mhz * 1000000 AS cpu_clock_hz FROM servers WHERE id = '${server}'",
                       "table": "servers"
                     },
                     "version": "v0"
@@ -2886,7 +2630,7 @@
                     }
                   ]
                 },
-                "unit": "MHz"
+                "unit": "hertz"
               },
               "overrides": []
             },
@@ -2900,7 +2644,7 @@
                 "calcs": [
                   "lastNotNull"
                 ],
-                "fields": "/^cpu_clock_mhz$/",
+                "fields": "/^cpu_clock_hz$/",
                 "values": false
               },
               "showPercentChange": false,
@@ -3977,44 +3721,7 @@
                             "type": "groupBy"
                           }
                         ],
-                        "limit": 50,
-                        "whereJsonTree": {
-                          "children1": [
-                            {
-                              "id": "b9998a9b-89ab-4cde-b012-319e6e0417ba",
-                              "properties": {
-                                "field": "id",
-                                "fieldSrc": "field",
-                                "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
-                              },
-                              "type": "rule"
-                            },
-                            {
-                              "id": "a99aab99-4567-489a-bcde-f19e6e044a8e",
-                              "properties": {
-                                "fieldSrc": "field",
-                                "value": [],
-                                "valueSrc": []
-                              },
-                              "type": "rule"
-                            }
-                          ],
-                          "id": "a89999ab-0123-4456-b89a-b19e6dfe0af6",
-                          "type": "group"
-                        },
-                        "whereString": "id = NaN"
+                        "limit": 50
                       },
                       "table": "server_disk_metrics"
                     },
@@ -4059,44 +3766,7 @@
                             "type": "groupBy"
                           }
                         ],
-                        "limit": 50,
-                        "whereJsonTree": {
-                          "children1": [
-                            {
-                              "id": "b9998a9b-89ab-4cde-b012-319e6e0417ba",
-                              "properties": {
-                                "field": "id",
-                                "fieldSrc": "field",
-                                "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
-                              },
-                              "type": "rule"
-                            },
-                            {
-                              "id": "a99aab99-4567-489a-bcde-f19e6e044a8e",
-                              "properties": {
-                                "fieldSrc": "field",
-                                "value": [],
-                                "valueSrc": []
-                              },
-                              "type": "rule"
-                            }
-                          ],
-                          "id": "a89999ab-0123-4456-b89a-b19e6dfe0af6",
-                          "type": "group"
-                        },
-                        "whereString": "id = NaN"
+                        "limit": 50
                       },
                       "table": "server_disk_metrics"
                     },
@@ -4435,89 +4105,6 @@
                 "mode": "multi",
                 "sort": "none"
               }
-            }
-          },
-          "version": "13.0.1+security-01"
-        }
-      }
-    },
-    "panel-42": {
-      "kind": "Panel",
-      "spec": {
-        "data": {
-          "kind": "QueryGroup",
-          "spec": {
-            "queries": [
-              {
-                "kind": "PanelQuery",
-                "spec": {
-                  "hidden": false,
-                  "query": {
-                    "datasource": {
-                      "name": "ffnexhw0yascgf"
-                    },
-                    "group": "grafana-postgresql-datasource",
-                    "kind": "DataQuery",
-                    "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT arc_hit_ratio FROM server_zfs_arc_metrics WHERE server_id = '${server}' ORDER BY timestamp DESC LIMIT 1",
-                      "table": "server_zfs_arc_metrics"
-                    },
-                    "version": "v0"
-                  },
-                  "refId": "A"
-                }
-              }
-            ],
-            "queryOptions": {},
-            "transformations": []
-          }
-        },
-        "description": "",
-        "id": 42,
-        "links": [],
-        "title": "ARC Hit Ratio",
-        "vizConfig": {
-          "group": "stat",
-          "kind": "VizConfig",
-          "spec": {
-            "fieldConfig": {
-              "defaults": {
-                "color": {
-                  "mode": "thresholds"
-                },
-                "thresholds": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": 0
-                    }
-                  ]
-                },
-                "unit": "percent"
-              },
-              "overrides": []
-            },
-            "options": {
-              "colorMode": "value",
-              "graphMode": "none",
-              "justifyMode": "auto",
-              "orientation": "auto",
-              "percentChangeColorMode": "standard",
-              "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
-                "fields": "",
-                "values": false
-              },
-              "showPercentChange": false,
-              "textMode": "auto",
-              "wideLayout": true
             }
           },
           "version": "13.0.1+security-01"
@@ -4978,16 +4565,20 @@
                   "mode": "absolute",
                   "steps": [
                     {
-                      "color": "green",
-                      "value": 0
+                      "color": "red",
+                      "value": null
                     },
                     {
                       "color": "red",
-                      "value": 20
+                      "value": 0
                     },
                     {
                       "color": "yellow",
-                      "value": 40
+                      "value": 60
+                    },
+                    {
+                      "color": "green",
+                      "value": 80
                     }
                   ]
                 },
@@ -5452,44 +5043,7 @@
                             "type": "groupBy"
                           }
                         ],
-                        "limit": 50,
-                        "whereJsonTree": {
-                          "children1": [
-                            {
-                              "id": "b9998a9b-89ab-4cde-b012-319e6e0417ba",
-                              "properties": {
-                                "field": "id",
-                                "fieldSrc": "field",
-                                "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
-                              },
-                              "type": "rule"
-                            },
-                            {
-                              "id": "a99aab99-4567-489a-bcde-f19e6e044a8e",
-                              "properties": {
-                                "fieldSrc": "field",
-                                "value": [],
-                                "valueSrc": []
-                              },
-                              "type": "rule"
-                            }
-                          ],
-                          "id": "a89999ab-0123-4456-b89a-b19e6dfe0af6",
-                          "type": "group"
-                        },
-                        "whereString": "id = NaN"
+                        "limit": 50
                       },
                       "table": "server_disk_metrics"
                     },
@@ -5534,44 +5088,7 @@
                             "type": "groupBy"
                           }
                         ],
-                        "limit": 50,
-                        "whereJsonTree": {
-                          "children1": [
-                            {
-                              "id": "b9998a9b-89ab-4cde-b012-319e6e0417ba",
-                              "properties": {
-                                "field": "id",
-                                "fieldSrc": "field",
-                                "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
-                              },
-                              "type": "rule"
-                            },
-                            {
-                              "id": "a99aab99-4567-489a-bcde-f19e6e044a8e",
-                              "properties": {
-                                "fieldSrc": "field",
-                                "value": [],
-                                "valueSrc": []
-                              },
-                              "type": "rule"
-                            }
-                          ],
-                          "id": "a89999ab-0123-4456-b89a-b19e6dfe0af6",
-                          "type": "group"
-                        },
-                        "whereString": "id = NaN"
+                        "limit": 50
                       },
                       "table": "server_disk_metrics"
                     },
@@ -6918,44 +6435,7 @@
                             "type": "groupBy"
                           }
                         ],
-                        "limit": 50,
-                        "whereJsonTree": {
-                          "children1": [
-                            {
-                              "id": "b9998a9b-89ab-4cde-b012-319e6e0417ba",
-                              "properties": {
-                                "field": "id",
-                                "fieldSrc": "field",
-                                "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
-                              },
-                              "type": "rule"
-                            },
-                            {
-                              "id": "a99aab99-4567-489a-bcde-f19e6e044a8e",
-                              "properties": {
-                                "fieldSrc": "field",
-                                "value": [],
-                                "valueSrc": []
-                              },
-                              "type": "rule"
-                            }
-                          ],
-                          "id": "a89999ab-0123-4456-b89a-b19e6dfe0af6",
-                          "type": "group"
-                        },
-                        "whereString": "id = NaN"
+                        "limit": 50
                       },
                       "table": "server_disk_metrics"
                     },
@@ -7065,6 +6545,271 @@
         }
       }
     },
+    "panel-60": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "ffnexhw0yascgf"
+                    },
+                    "group": "grafana-postgresql-datasource",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "dataset": "monitor",
+                      "editorMode": "code",
+                      "format": "time_series",
+                      "rawQuery": true,
+                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(cpu_usage) AS value, container_name AS metric FROM server_docker_container_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1, container_name ORDER BY 1",
+                      "sql": {
+                        "columns": [
+                          {
+                            "parameters": [],
+                            "type": "function"
+                          }
+                        ],
+                        "groupBy": [
+                          {
+                            "property": {
+                              "type": "string"
+                            },
+                            "type": "groupBy"
+                          }
+                        ],
+                        "limit": 50
+                      },
+                      "table": "server_docker_container_metrics"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 60,
+        "links": [],
+        "title": "Container CPU",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "axisBorderShow": false,
+                  "axisCenteredZero": false,
+                  "axisColorMode": "text",
+                  "axisLabel": "",
+                  "axisPlacement": "auto",
+                  "barAlignment": 0,
+                  "barWidthFactor": 0.6,
+                  "drawStyle": "line",
+                  "fillOpacity": 0,
+                  "gradientMode": "none",
+                  "hideFrom": {
+                    "legend": false,
+                    "tooltip": false,
+                    "viz": false
+                  },
+                  "insertNulls": false,
+                  "lineInterpolation": "linear",
+                  "lineWidth": 1,
+                  "pointSize": 5,
+                  "scaleDistribution": {
+                    "type": "linear"
+                  },
+                  "showPoints": "auto",
+                  "showValues": false,
+                  "spanNulls": false,
+                  "stacking": {
+                    "group": "A",
+                    "mode": "none"
+                  },
+                  "thresholdsStyle": {
+                    "mode": "dashed"
+                  }
+                },
+                "min": 0,
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    }
+                  ]
+                },
+                "unit": "percent"
+              },
+              "overrides": []
+            },
+            "options": {
+              "annotations": {
+                "clustering": -1,
+                "multiLane": false
+              },
+              "legend": {
+                "calcs": [
+                  "lastNotNull",
+                  "mean",
+                  "max"
+                ],
+                "displayMode": "table",
+                "placement": "right",
+                "showLegend": true,
+                "sortBy": "Last *",
+                "sortDesc": true
+              },
+              "tooltip": {
+                "hideZeros": false,
+                "mode": "multi",
+                "sort": "desc"
+              }
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
+    "panel-61": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "ffnexhw0yascgf"
+                    },
+                    "group": "grafana-postgresql-datasource",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "dataset": "monitor",
+                      "editorMode": "code",
+                      "format": "time_series",
+                      "rawQuery": true,
+                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(memory_usage) AS value, container_name AS metric FROM server_docker_container_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1, container_name ORDER BY 1",
+                      "table": "server_docker_container_metrics"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 61,
+        "links": [],
+        "title": "Container Memory",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "axisBorderShow": false,
+                  "axisCenteredZero": false,
+                  "axisColorMode": "text",
+                  "axisLabel": "",
+                  "axisPlacement": "auto",
+                  "barAlignment": 0,
+                  "barWidthFactor": 0.6,
+                  "drawStyle": "line",
+                  "fillOpacity": 0,
+                  "gradientMode": "none",
+                  "hideFrom": {
+                    "legend": false,
+                    "tooltip": false,
+                    "viz": false
+                  },
+                  "insertNulls": false,
+                  "lineInterpolation": "linear",
+                  "lineWidth": 1,
+                  "pointSize": 5,
+                  "scaleDistribution": {
+                    "type": "linear"
+                  },
+                  "showPoints": "auto",
+                  "showValues": false,
+                  "spanNulls": false,
+                  "stacking": {
+                    "group": "A",
+                    "mode": "none"
+                  },
+                  "thresholdsStyle": {
+                    "mode": "dashed"
+                  }
+                },
+                "min": 0,
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    }
+                  ]
+                },
+                "unit": "bytes"
+              },
+              "overrides": []
+            },
+            "options": {
+              "annotations": {
+                "clustering": -1,
+                "multiLane": false
+              },
+              "legend": {
+                "calcs": [
+                  "lastNotNull",
+                  "mean",
+                  "max"
+                ],
+                "displayMode": "table",
+                "placement": "right",
+                "showLegend": true,
+                "sortBy": "Last *",
+                "sortDesc": true
+              },
+              "tooltip": {
+                "hideZeros": false,
+                "mode": "multi",
+                "sort": "desc"
+              }
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
     "panel-7": {
       "kind": "Panel",
       "spec": {
@@ -7108,44 +6853,7 @@
                             "type": "groupBy"
                           }
                         ],
-                        "limit": 50,
-                        "whereJsonTree": {
-                          "children1": [
-                            {
-                              "id": "b9998a9b-89ab-4cde-b012-319e6e0417ba",
-                              "properties": {
-                                "field": "id",
-                                "fieldSrc": "field",
-                                "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
-                              },
-                              "type": "rule"
-                            },
-                            {
-                              "id": "a99aab99-4567-489a-bcde-f19e6e044a8e",
-                              "properties": {
-                                "fieldSrc": "field",
-                                "value": [],
-                                "valueSrc": []
-                              },
-                              "type": "rule"
-                            }
-                          ],
-                          "id": "a89999ab-0123-4456-b89a-b19e6dfe0af6",
-                          "type": "group"
-                        },
-                        "whereString": "id = NaN"
+                        "limit": 50
                       },
                       "table": "server_disk_metrics"
                     },
@@ -7275,7 +6983,7 @@
                     "spec": {
                       "dataset": "monitor",
                       "editorMode": "code",
-                      "format": "table",
+                      "format": "time_series",
                       "rawQuery": true,
                       "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(rx_bps) AS \"In\" FROM server_network_metrics WHERE server_id = '${server}' AND interface_name = '$interface' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
                       "sql": {
@@ -7298,44 +7006,7 @@
                             "type": "groupBy"
                           }
                         ],
-                        "limit": 50,
-                        "whereJsonTree": {
-                          "children1": [
-                            {
-                              "id": "b9998a9b-89ab-4cde-b012-319e6e0417ba",
-                              "properties": {
-                                "field": "id",
-                                "fieldSrc": "field",
-                                "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
-                              },
-                              "type": "rule"
-                            },
-                            {
-                              "id": "a99aab99-4567-489a-bcde-f19e6e044a8e",
-                              "properties": {
-                                "fieldSrc": "field",
-                                "value": [],
-                                "valueSrc": []
-                              },
-                              "type": "rule"
-                            }
-                          ],
-                          "id": "a89999ab-0123-4456-b89a-b19e6dfe0af6",
-                          "type": "group"
-                        },
-                        "whereString": "id = NaN"
+                        "limit": 50
                       },
                       "table": "server_network_metrics"
                     },
@@ -7357,7 +7028,7 @@
                     "spec": {
                       "dataset": "monitor",
                       "editorMode": "code",
-                      "format": "table",
+                      "format": "time_series",
                       "rawQuery": true,
                       "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(tx_bps) AS \"Out\" FROM server_network_metrics WHERE server_id = '${server}' AND interface_name = '$interface' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
                       "sql": {
@@ -7380,44 +7051,7 @@
                             "type": "groupBy"
                           }
                         ],
-                        "limit": 50,
-                        "whereJsonTree": {
-                          "children1": [
-                            {
-                              "id": "b9998a9b-89ab-4cde-b012-319e6e0417ba",
-                              "properties": {
-                                "field": "id",
-                                "fieldSrc": "field",
-                                "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
-                              },
-                              "type": "rule"
-                            },
-                            {
-                              "id": "a99aab99-4567-489a-bcde-f19e6e044a8e",
-                              "properties": {
-                                "fieldSrc": "field",
-                                "value": [],
-                                "valueSrc": []
-                              },
-                              "type": "rule"
-                            }
-                          ],
-                          "id": "a89999ab-0123-4456-b89a-b19e6dfe0af6",
-                          "type": "group"
-                        },
-                        "whereString": "id = NaN"
+                        "limit": 50
                       },
                       "table": "server_network_metrics"
                     },
@@ -7431,7 +7065,7 @@
             "transformations": []
           }
         },
-        "description": "",
+        "description": "TX is plotted on negative Y; legend min/mean/max still reflect raw positive values.",
         "id": 8,
         "links": [],
         "title": "Interface Traffic",
@@ -7574,44 +7208,7 @@
                             "type": "groupBy"
                           }
                         ],
-                        "limit": 50,
-                        "whereJsonTree": {
-                          "children1": [
-                            {
-                              "id": "b9998a9b-89ab-4cde-b012-319e6e0417ba",
-                              "properties": {
-                                "field": "id",
-                                "fieldSrc": "field",
-                                "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
-                              },
-                              "type": "rule"
-                            },
-                            {
-                              "id": "a99aab99-4567-489a-bcde-f19e6e044a8e",
-                              "properties": {
-                                "fieldSrc": "field",
-                                "value": [],
-                                "valueSrc": []
-                              },
-                              "type": "rule"
-                            }
-                          ],
-                          "id": "a89999ab-0123-4456-b89a-b19e6dfe0af6",
-                          "type": "group"
-                        },
-                        "whereString": "id = NaN"
+                        "limit": 50
                       },
                       "table": "server_network_metrics"
                     },
@@ -7656,44 +7253,7 @@
                             "type": "groupBy"
                           }
                         ],
-                        "limit": 50,
-                        "whereJsonTree": {
-                          "children1": [
-                            {
-                              "id": "b9998a9b-89ab-4cde-b012-319e6e0417ba",
-                              "properties": {
-                                "field": "id",
-                                "fieldSrc": "field",
-                                "operator": "equal",
-                                "value": [
-                                  null
-                                ],
-                                "valueError": [
-                                  null
-                                ],
-                                "valueSrc": [
-                                  "value"
-                                ],
-                                "valueType": [
-                                  "number"
-                                ]
-                              },
-                              "type": "rule"
-                            },
-                            {
-                              "id": "a99aab99-4567-489a-bcde-f19e6e044a8e",
-                              "properties": {
-                                "fieldSrc": "field",
-                                "value": [],
-                                "valueSrc": []
-                              },
-                              "type": "rule"
-                            }
-                          ],
-                          "id": "a89999ab-0123-4456-b89a-b19e6dfe0af6",
-                          "type": "group"
-                        },
-                        "whereString": "id = NaN"
+                        "limit": 50
                       },
                       "table": "server_network_metrics"
                     },
@@ -7802,7 +7362,7 @@
         }
       }
     },
-    "panel-60": {
+    "panel-62": {
       "kind": "Panel",
       "spec": {
         "data": {
@@ -7822,10 +7382,10 @@
                     "spec": {
                       "dataset": "monitor",
                       "editorMode": "code",
-                      "format": "time_series",
+                      "format": "table",
                       "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), container_name, avg(cpu_usage) AS \"CPU\" FROM server_docker_container_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1, 2 ORDER BY 1, 2",
-                      "table": "server_docker_container_metrics"
+                      "rawSql": "SELECT string_agg(pool_name || ': ' || health, ' | ' ORDER BY pool_name) AS pool_health FROM (SELECT DISTINCT ON (pool_name) pool_name, health FROM server_zfs_pool_metrics WHERE server_id = '${server}' ORDER BY pool_name, timestamp DESC) latest",
+                      "table": "server_zfs_pool_metrics"
                     },
                     "version": "v0"
                   },
@@ -7838,53 +7398,18 @@
           }
         },
         "description": "",
-        "id": 60,
+        "id": 62,
         "links": [],
-        "title": "Container CPU",
+        "title": "ZFS Pool Health",
         "vizConfig": {
-          "group": "timeseries",
+          "group": "stat",
           "kind": "VizConfig",
           "spec": {
             "fieldConfig": {
               "defaults": {
                 "color": {
-                  "mode": "palette-classic"
+                  "mode": "thresholds"
                 },
-                "custom": {
-                  "axisBorderShow": false,
-                  "axisCenteredZero": false,
-                  "axisColorMode": "text",
-                  "axisLabel": "",
-                  "axisPlacement": "auto",
-                  "barAlignment": 0,
-                  "barWidthFactor": 0.6,
-                  "drawStyle": "line",
-                  "fillOpacity": 0,
-                  "gradientMode": "none",
-                  "hideFrom": {
-                    "legend": false,
-                    "tooltip": false,
-                    "viz": false
-                  },
-                  "insertNulls": false,
-                  "lineInterpolation": "linear",
-                  "lineWidth": 1,
-                  "pointSize": 5,
-                  "scaleDistribution": {
-                    "type": "linear"
-                  },
-                  "showPoints": "auto",
-                  "showValues": false,
-                  "spanNulls": false,
-                  "stacking": {
-                    "group": "A",
-                    "mode": "none"
-                  },
-                  "thresholdsStyle": {
-                    "mode": "dashed"
-                  }
-                },
-                "min": 0,
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
@@ -7894,153 +7419,28 @@
                     }
                   ]
                 },
-                "unit": "percent"
+                "unit": "none"
               },
               "overrides": []
             },
             "options": {
-              "annotations": {
-                "clustering": -1,
-                "multiLane": false
-              },
-              "legend": {
+              "colorMode": "value",
+              "graphMode": "none",
+              "justifyMode": "auto",
+              "orientation": "auto",
+              "percentChangeColorMode": "standard",
+              "reduceOptions": {
                 "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
+                  "lastNotNull"
                 ],
-                "displayMode": "list",
-                "placement": "bottom",
-                "showLegend": true
+                "fields": "",
+                "values": false
               },
-              "tooltip": {
-                "hideZeros": false,
-                "mode": "multi",
-                "sort": "desc"
-              }
-            }
-          },
-          "version": "13.0.1+security-01"
-        }
-      }
-    },
-    "panel-61": {
-      "kind": "Panel",
-      "spec": {
-        "data": {
-          "kind": "QueryGroup",
-          "spec": {
-            "queries": [
-              {
-                "kind": "PanelQuery",
-                "spec": {
-                  "hidden": false,
-                  "query": {
-                    "datasource": {
-                      "name": "ffnexhw0yascgf"
-                    },
-                    "group": "grafana-postgresql-datasource",
-                    "kind": "DataQuery",
-                    "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "time_series",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), container_name, avg(memory_usage) AS \"Memory\" FROM server_docker_container_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1, 2 ORDER BY 1, 2",
-                      "table": "server_docker_container_metrics"
-                    },
-                    "version": "v0"
-                  },
-                  "refId": "A"
-                }
-              }
-            ],
-            "queryOptions": {},
-            "transformations": []
-          }
-        },
-        "description": "",
-        "id": 61,
-        "links": [],
-        "title": "Container Memory",
-        "vizConfig": {
-          "group": "timeseries",
-          "kind": "VizConfig",
-          "spec": {
-            "fieldConfig": {
-              "defaults": {
-                "color": {
-                  "mode": "palette-classic"
-                },
-                "custom": {
-                  "axisBorderShow": false,
-                  "axisCenteredZero": false,
-                  "axisColorMode": "text",
-                  "axisLabel": "",
-                  "axisPlacement": "auto",
-                  "barAlignment": 0,
-                  "barWidthFactor": 0.6,
-                  "drawStyle": "line",
-                  "fillOpacity": 0,
-                  "gradientMode": "none",
-                  "hideFrom": {
-                    "legend": false,
-                    "tooltip": false,
-                    "viz": false
-                  },
-                  "insertNulls": false,
-                  "lineInterpolation": "linear",
-                  "lineWidth": 1,
-                  "pointSize": 5,
-                  "scaleDistribution": {
-                    "type": "linear"
-                  },
-                  "showPoints": "auto",
-                  "showValues": false,
-                  "spanNulls": false,
-                  "stacking": {
-                    "group": "A",
-                    "mode": "none"
-                  },
-                  "thresholdsStyle": {
-                    "mode": "dashed"
-                  }
-                },
-                "min": 0,
-                "thresholds": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": 0
-                    }
-                  ]
-                },
-                "unit": "bytes"
-              },
-              "overrides": []
+              "showPercentChange": false,
+              "textMode": "auto",
+              "wideLayout": true
             },
-            "options": {
-              "annotations": {
-                "clustering": -1,
-                "multiLane": false
-              },
-              "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
-                "displayMode": "list",
-                "placement": "bottom",
-                "showLegend": true
-              },
-              "tooltip": {
-                "hideZeros": false,
-                "mode": "multi",
-                "sort": "desc"
-              }
-            }
+            "version": "13.0.1+security-01"
           },
           "version": "13.0.1+security-01"
         }
@@ -8202,7 +7602,21 @@
                       "x": 18,
                       "y": 0
                     }
-                  },
+                  }
+                ]
+              }
+            },
+            "title": "Hardware"
+          }
+        },
+        {
+          "kind": "RowsLayoutRow",
+          "spec": {
+            "collapse": true,
+            "layout": {
+              "kind": "GridLayout",
+              "spec": {
+                "items": [
                   {
                     "kind": "GridLayoutItem",
                     "spec": {
@@ -8213,13 +7627,13 @@
                       "height": 4,
                       "width": 8,
                       "x": 0,
-                      "y": 4
+                      "y": 0
                     }
                   }
                 ]
               }
             },
-            "title": "Hardware"
+            "title": "Agent"
           }
         },
         {
@@ -8425,6 +7839,32 @@
                       "x": 16,
                       "y": 16
                     }
+                  },
+                  {
+                    "kind": "GridLayoutItem",
+                    "spec": {
+                      "element": {
+                        "kind": "ElementReference",
+                        "name": "panel-62"
+                      },
+                      "height": 8,
+                      "width": 6,
+                      "x": 0,
+                      "y": 24
+                    }
+                  },
+                  {
+                    "kind": "GridLayoutItem",
+                    "spec": {
+                      "element": {
+                        "kind": "ElementReference",
+                        "name": "panel-52"
+                      },
+                      "height": 8,
+                      "width": 18,
+                      "x": 6,
+                      "y": 24
+                    }
                   }
                 ]
               }
@@ -8461,21 +7901,8 @@
                         "name": "panel-23"
                       },
                       "height": 8,
-                      "width": 12,
+                      "width": 24,
                       "x": 0,
-                      "y": 8
-                    }
-                  },
-                  {
-                    "kind": "GridLayoutItem",
-                    "spec": {
-                      "element": {
-                        "kind": "ElementReference",
-                        "name": "panel-24"
-                      },
-                      "height": 8,
-                      "width": 12,
-                      "x": 12,
                       "y": 8
                     }
                   }
@@ -8693,6 +8120,46 @@
         {
           "kind": "RowsLayoutRow",
           "spec": {
+            "collapse": false,
+            "layout": {
+              "kind": "GridLayout",
+              "spec": {
+                "items": [
+                  {
+                    "kind": "GridLayoutItem",
+                    "spec": {
+                      "element": {
+                        "kind": "ElementReference",
+                        "name": "panel-60"
+                      },
+                      "height": 10,
+                      "width": 24,
+                      "x": 0,
+                      "y": 0
+                    }
+                  },
+                  {
+                    "kind": "GridLayoutItem",
+                    "spec": {
+                      "element": {
+                        "kind": "ElementReference",
+                        "name": "panel-61"
+                      },
+                      "height": 10,
+                      "width": 24,
+                      "x": 0,
+                      "y": 10
+                    }
+                  }
+                ]
+              }
+            },
+            "title": "Docker"
+          }
+        },
+        {
+          "kind": "RowsLayoutRow",
+          "spec": {
             "collapse": true,
             "layout": {
               "kind": "GridLayout",
@@ -8703,24 +8170,11 @@
                     "spec": {
                       "element": {
                         "kind": "ElementReference",
-                        "name": "panel-42"
-                      },
-                      "height": 8,
-                      "width": 6,
-                      "x": 0,
-                      "y": 0
-                    }
-                  },
-                  {
-                    "kind": "GridLayoutItem",
-                    "spec": {
-                      "element": {
-                        "kind": "ElementReference",
                         "name": "panel-43"
                       },
                       "height": 8,
-                      "width": 6,
-                      "x": 6,
+                      "width": 8,
+                      "x": 0,
                       "y": 0
                     }
                   },
@@ -8732,8 +8186,8 @@
                         "name": "panel-44"
                       },
                       "height": 8,
-                      "width": 6,
-                      "x": 12,
+                      "width": 8,
+                      "x": 8,
                       "y": 0
                     }
                   },
@@ -8745,8 +8199,8 @@
                         "name": "panel-45"
                       },
                       "height": 8,
-                      "width": 6,
-                      "x": 18,
+                      "width": 8,
+                      "x": 16,
                       "y": 0
                     }
                   },
@@ -8824,7 +8278,7 @@
                         "name": "panel-50"
                       },
                       "height": 8,
-                      "width": 8,
+                      "width": 12,
                       "x": 0,
                       "y": 8
                     }
@@ -8837,21 +8291,8 @@
                         "name": "panel-51"
                       },
                       "height": 8,
-                      "width": 8,
-                      "x": 8,
-                      "y": 8
-                    }
-                  },
-                  {
-                    "kind": "GridLayoutItem",
-                    "spec": {
-                      "element": {
-                        "kind": "ElementReference",
-                        "name": "panel-52"
-                      },
-                      "height": 8,
-                      "width": 8,
-                      "x": 16,
+                      "width": 12,
+                      "x": 12,
                       "y": 8
                     }
                   }
@@ -8982,46 +8423,6 @@
             },
             "title": "Pool"
           }
-        },
-        {
-          "kind": "RowsLayoutRow",
-          "spec": {
-            "collapse": true,
-            "layout": {
-              "kind": "GridLayout",
-              "spec": {
-                "items": [
-                  {
-                    "kind": "GridLayoutItem",
-                    "spec": {
-                      "element": {
-                        "kind": "ElementReference",
-                        "name": "panel-60"
-                      },
-                      "height": 8,
-                      "width": 12,
-                      "x": 0,
-                      "y": 0
-                    }
-                  },
-                  {
-                    "kind": "GridLayoutItem",
-                    "spec": {
-                      "element": {
-                        "kind": "ElementReference",
-                        "name": "panel-61"
-                      },
-                      "height": 8,
-                      "width": 12,
-                      "x": 12,
-                      "y": 0
-                    }
-                  }
-                ]
-              }
-            },
-            "title": "Docker"
-          }
         }
       ]
     }
@@ -9042,7 +8443,7 @@
     "servers"
   ],
   "timeSettings": {
-    "autoRefresh": "30s",
+    "autoRefresh": "1m",
     "autoRefreshIntervals": [
       "5s",
       "10s",
@@ -9068,8 +8469,8 @@
       "spec": {
         "allowCustomValue": false,
         "current": {
-          "text": "Wild OVH",
-          "value": "5"
+          "text": "Unraid",
+          "value": "4"
         },
         "definition": "SELECT server_name AS __text, id AS __value FROM servers ORDER BY server_name",
         "hide": "dontHide",
@@ -9134,16 +8535,14 @@
       "spec": {
         "allowCustomValue": true,
         "current": {
-          "text": "All",
-          "value": [
-            "$__all"
-          ]
+          "text": "",
+          "value": ""
         },
         "definition": "SELECT disk_name AS __text, disk_name AS __value FROM server_disk_metrics WHERE server_id = '${server}' GROUP BY disk_name ORDER BY disk_name",
         "hide": "dontHide",
-        "includeAll": true,
+        "includeAll": false,
         "label": "Drive",
-        "multi": true,
+        "multi": false,
         "name": "drive",
         "options": [],
         "query": {
@@ -9184,31 +8583,7 @@
                   "type": "groupBy"
                 }
               ],
-              "limit": 50,
-              "whereJsonTree": {
-                "children1": [
-                  {
-                    "id": "b988a99b-cdef-4012-b456-719e6dfeb505",
-                    "properties": {
-                      "field": "server_id",
-                      "fieldSrc": "field",
-                      "operator": "equal",
-                      "value": [
-                        null
-                      ],
-                      "valueSrc": [
-                        "value"
-                      ],
-                      "valueType": [
-                        "number"
-                      ]
-                    },
-                    "type": "rule"
-                  }
-                ],
-                "id": "a89999ab-0123-4456-b89a-b19e6dfe0af6",
-                "type": "group"
-              }
+              "limit": 50
             },
             "table": "server_disk_metrics"
           },
@@ -9276,31 +8651,7 @@
                   "type": "groupBy"
                 }
               ],
-              "limit": 50,
-              "whereJsonTree": {
-                "children1": [
-                  {
-                    "id": "b988a99b-cdef-4012-b456-719e6dfeb505",
-                    "properties": {
-                      "field": "server_id",
-                      "fieldSrc": "field",
-                      "operator": "equal",
-                      "value": [
-                        null
-                      ],
-                      "valueSrc": [
-                        "value"
-                      ],
-                      "valueType": [
-                        "number"
-                      ]
-                    },
-                    "type": "rule"
-                  }
-                ],
-                "id": "a89999ab-0123-4456-b89a-b19e6dfe0af6",
-                "type": "group"
-              }
+              "limit": 50
             },
             "table": "server_network_metrics"
           },
