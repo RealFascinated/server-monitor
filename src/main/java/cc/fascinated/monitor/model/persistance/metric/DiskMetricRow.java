@@ -10,7 +10,7 @@ import java.time.Instant;
 @Table(name = "server_disk_metrics")
 @NoArgsConstructor
 @Getter
-public class ServerDiskMetricRow {
+public class DiskMetricRow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -63,10 +63,10 @@ public class ServerDiskMetricRow {
     @Column(name = "timestamp")
     private Instant timestamp;
 
-    public ServerDiskMetricRow(Long serverId, String diskName, double usagePercent, long usedBytes, long totalBytes,
-                               long ioReadBytesPerSecond, long ioWriteBytesPerSecond, double ioUsagePercent, double ioWaitMilliseconds,
-                               long inodeUsed, long inodeTotal, long readIops, long writeIops, long readLatencyMs, long writeLatencyMs,
-                               Instant timestamp) {
+    public DiskMetricRow(Long serverId, String diskName, double usagePercent, long usedBytes, long totalBytes,
+                         long ioReadBytesPerSecond, long ioWriteBytesPerSecond, double ioUsagePercent, double ioWaitMilliseconds,
+                         long inodeUsed, long inodeTotal, long readIops, long writeIops, long readLatencyMs, long writeLatencyMs,
+                         Instant timestamp) {
         this.serverId = serverId;
         this.diskName = diskName;
         this.usagePercent = usagePercent;

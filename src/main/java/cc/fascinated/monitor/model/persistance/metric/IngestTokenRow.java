@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "server_ingest_tokens")
 @NoArgsConstructor
 @Getter
-public class ServerIngestTokenRow {
+public class IngestTokenRow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,7 +22,7 @@ public class ServerIngestTokenRow {
     @Column(name = "server_id")
     private Long serverId;
 
-    public ServerIngestTokenRow(String tokenHash, Long serverId) {
+    public IngestTokenRow(String tokenHash, Long serverId) {
         this.tokenHash = tokenHash;
         this.serverId = serverId;
     }

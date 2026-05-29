@@ -7,6 +7,7 @@ import cc.fascinated.monitor.model.domain.server.ServerStatus;
 import cc.fascinated.monitor.model.dto.request.server.ServerCreateRequest;
 import cc.fascinated.monitor.model.dto.request.server.ingest.IngestServerMetrics;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.DiskMetric;
+import cc.fascinated.monitor.model.dto.request.server.ingest.data.DockerContainerMetric;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.InterfaceMetrics;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerDetails;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerMetrics;
@@ -14,12 +15,13 @@ import cc.fascinated.monitor.model.dto.request.server.ingest.data.ZfsArcMetrics;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ZfsPoolMetric;
 import cc.fascinated.monitor.model.dto.response.server.CreatedServerResponse;
 import cc.fascinated.monitor.model.persistance.*;
-import cc.fascinated.monitor.model.persistance.metric.ServerDiskMetricRow;
-import cc.fascinated.monitor.model.persistance.metric.ServerIngestTokenRow;
-import cc.fascinated.monitor.model.persistance.metric.ServerInterfaceMetricRow;
+import cc.fascinated.monitor.model.persistance.metric.DiskMetricRow;
+import cc.fascinated.monitor.model.persistance.metric.DockerContainerMetricRow;
+import cc.fascinated.monitor.model.persistance.metric.IngestTokenRow;
+import cc.fascinated.monitor.model.persistance.metric.InterfaceMetricRow;
 import cc.fascinated.monitor.model.persistance.metric.ServerMetricRow;
-import cc.fascinated.monitor.model.persistance.metric.ServerZfsArcMetricRow;
-import cc.fascinated.monitor.model.persistance.metric.ServerZfsPoolMetricRow;
+import cc.fascinated.monitor.model.persistance.metric.ZfsArcMetricRow;
+import cc.fascinated.monitor.model.persistance.metric.ZfsPoolMetricRow;
 import cc.fascinated.monitor.repository.*;
 import cc.fascinated.monitor.util.AuthUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -40,12 +42,14 @@ public class ServerService {
     private final ServerDiskMetricsRepository serverDiskMetricsRepository;
     private final ServerZfsArcMetricsRepository serverZfsArcMetricsRepository;
     private final ServerZfsPoolMetricsRepository serverZfsPoolMetricsRepository;
+    private final ServerDockerContainerMetricsRepository serverDockerContainerMetricsRepository;
 
     public ServerService(ServerRepository serverRepository, ServerIngestTokenRepository serverIngestTokenRepository,
                          ServerMetricsRepository serverMetricsRepository, ServerInterfaceMetricsRepository serverInterfaceMetricsRepository,
                          ServerDiskMetricsRepository serverDiskMetricsRepository,
                          ServerZfsArcMetricsRepository serverZfsArcMetricsRepository,
-                         ServerZfsPoolMetricsRepository serverZfsPoolMetricsRepository) {
+                         ServerZfsPoolMetricsRepository serverZfsPoolMetricsRepository,
+                         ServerDockerContainerMetricsRepository serverDockerContainerMetricsRepository) {
         this.serverRepository = serverRepository;
         this.serverIngestTokenRepository = serverIngestTokenRepository;
         this.serverMetricsRepository = serverMetricsRepository;
@@ -53,13 +57,14 @@ public class ServerService {
         this.serverDiskMetricsRepository = serverDiskMetricsRepository;
         this.serverZfsArcMetricsRepository = serverZfsArcMetricsRepository;
         this.serverZfsPoolMetricsRepository = serverZfsPoolMetricsRepository;
+        this.serverDockerContainerMetricsRepository = serverDockerContainerMetricsRepository;
     }
 
     public CreatedServerResponse createServer(ServerCreateRequest createRequest) {
         try {
             ServerRow serverRow = this.serverRepository.save(new ServerRow(createRequest.name(), Instant.now()));
             UUID ingestToken = UUID.randomUUID();
-            this.serverIngestTokenRepository.save(new ServerIngestTokenRow(AuthUtils.hash(ingestToken.toString()), serverRow.getId()));
+            this.serverIngestTokenRepository.save(new IngestTokenRow(AuthUtils.hash(ingestToken.toString()), serverRow.getId()));
 
             return new CreatedServerResponse(
                     serverRow.getServerName(),
@@ -82,7 +87,7 @@ public class ServerService {
 
     public ServerRow authenticateIngestRequest(String authorizationHeader) {
         UUID token = AuthUtils.parseBearerToken(authorizationHeader);
-        ServerIngestTokenRow tokenRow = this.serverIngestTokenRepository.findByTokenHash(AuthUtils.hash(token.toString()))
+        IngestTokenRow tokenRow = this.serverIngestTokenRepository.findByTokenHash(AuthUtils.hash(token.toString()))
                 .orElseThrow(() -> new UnauthorizedException("Invalid ingest token"));
         return findServerRowById(tokenRow.getServerId());
     }
@@ -134,7 +139,7 @@ public class ServerService {
 
         ZfsArcMetrics zfsArcMetrics = metrics.zfsArcMetrics();
         if (zfsArcMetrics != null) {
-            this.serverZfsArcMetricsRepository.save(new ServerZfsArcMetricRow(
+            this.serverZfsArcMetricsRepository.save(new ZfsArcMetricRow(
                     server.getId(),
                     zfsArcMetrics.arcSizeBytes(),
                     zfsArcMetrics.arcTargetBytes(),
@@ -151,7 +156,7 @@ public class ServerService {
 
         if (metrics.zfsPoolMetrics() != null) {
             for (ZfsPoolMetric poolMetric : metrics.zfsPoolMetrics()) {
-                this.serverZfsPoolMetricsRepository.save(new ServerZfsPoolMetricRow(
+                this.serverZfsPoolMetricsRepository.save(new ZfsPoolMetricRow(
                         server.getId(),
                         poolMetric.poolName(),
                         poolMetric.health(),
@@ -173,7 +178,7 @@ public class ServerService {
         }
 
         for (InterfaceMetrics interfaceMetric : metrics.interfaceMetrics()) {
-            this.serverInterfaceMetricsRepository.save(new ServerInterfaceMetricRow(
+            this.serverInterfaceMetricsRepository.save(new InterfaceMetricRow(
                     server.getId(),
                     interfaceMetric.interfaceName(),
                     interfaceMetric.rxBytesPerSecond(),
@@ -187,7 +192,7 @@ public class ServerService {
         }
 
         for (DiskMetric diskMetric : metrics.diskMetrics()) {
-            this.serverDiskMetricsRepository.save(new ServerDiskMetricRow(
+            this.serverDiskMetricsRepository.save(new DiskMetricRow(
                     server.getId(),
                     diskMetric.diskName(),
                     ((double) diskMetric.usedBytes() / diskMetric.totalBytes()) * 100,
@@ -207,7 +212,19 @@ public class ServerService {
             ));
         }
 
+        if (metrics.dockerContainers() != null) {
+            for (DockerContainerMetric containerMetric : metrics.dockerContainers()) {
+                this.serverDockerContainerMetricsRepository.save(new DockerContainerMetricRow(
+                        server.getId(),
+                        containerMetric.containerName(),
+                        containerMetric.cpuUsage(),
+                        containerMetric.memoryUsage(),
+                        now
+                ));
+            }
+        }
+
         this.serverRepository.save(server);
-        log.info("Ingested metrics for {} in {}ms", server.getId(), System.currentTimeMillis() - now.toEpochMilli());
+        // log.info("Ingested metrics for {} in {}ms", server.getId(), System.currentTimeMillis() - now.toEpochMilli());
     }
 }

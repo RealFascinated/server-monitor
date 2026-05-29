@@ -1,11 +1,6 @@
 package cc.fascinated.monitor.model.dto.request.server.ingest;
 
-import cc.fascinated.monitor.model.dto.request.server.ingest.data.DiskMetric;
-import cc.fascinated.monitor.model.dto.request.server.ingest.data.InterfaceMetrics;
-import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerDetails;
-import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerMetrics;
-import cc.fascinated.monitor.model.dto.request.server.ingest.data.ZfsArcMetrics;
-import cc.fascinated.monitor.model.dto.request.server.ingest.data.ZfsPoolMetric;
+import cc.fascinated.monitor.model.dto.request.server.ingest.data.*;
 
 import java.util.List;
 
@@ -16,5 +11,6 @@ public record IngestServerMetrics(
         ZfsArcMetrics zfsArcMetrics,
         List<ZfsPoolMetric> zfsPoolMetrics,
         List<InterfaceMetrics> interfaceMetrics,
-        List<DiskMetric> diskMetrics
+        List<DiskMetric> diskMetrics,
+        List<DockerContainerMetric> dockerContainers
 ) {}

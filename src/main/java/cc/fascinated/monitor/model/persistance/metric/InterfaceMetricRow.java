@@ -10,7 +10,7 @@ import java.time.Instant;
 @Table(name = "server_network_metrics")
 @NoArgsConstructor
 @Getter
-public class ServerInterfaceMetricRow {
+public class InterfaceMetricRow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -42,8 +42,8 @@ public class ServerInterfaceMetricRow {
     @Column(name = "timestamp")
     private Instant timestamp;
 
-    public ServerInterfaceMetricRow(Long serverId, String interfaceName, long rxBytesPerSecond, long txBytesPerSecond, long rxPacketsPerSecond,
-                                    long txPacketsPerSecond, long rxErrorsPerSecond, long txErrorsPerSecond, Instant timestamp) {
+    public InterfaceMetricRow(Long serverId, String interfaceName, long rxBytesPerSecond, long txBytesPerSecond, long rxPacketsPerSecond,
+                              long txPacketsPerSecond, long rxErrorsPerSecond, long txErrorsPerSecond, Instant timestamp) {
         this.serverId = serverId;
         this.interfaceName = interfaceName;
         this.rxBytesPerSecond = rxBytesPerSecond;

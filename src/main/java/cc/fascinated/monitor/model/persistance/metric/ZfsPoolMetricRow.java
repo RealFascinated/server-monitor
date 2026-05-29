@@ -10,7 +10,7 @@ import java.time.Instant;
 @Table(name = "server_zfs_pool_metrics")
 @NoArgsConstructor
 @Getter
-public class ServerZfsPoolMetricRow {
+public class ZfsPoolMetricRow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -63,7 +63,7 @@ public class ServerZfsPoolMetricRow {
     @Column(name = "timestamp")
     private Instant timestamp;
 
-    public ServerZfsPoolMetricRow(
+    public ZfsPoolMetricRow(
             Long serverId,
             String poolName,
             String health,

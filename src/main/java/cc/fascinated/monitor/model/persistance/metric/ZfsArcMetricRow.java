@@ -10,7 +10,7 @@ import java.time.Instant;
 @Table(name = "server_zfs_arc_metrics")
 @NoArgsConstructor
 @Getter
-public class ServerZfsArcMetricRow {
+public class ZfsArcMetricRow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -48,7 +48,7 @@ public class ServerZfsArcMetricRow {
     @Column(name = "timestamp")
     private Instant timestamp;
 
-    public ServerZfsArcMetricRow(
+    public ZfsArcMetricRow(
             Long serverId,
             long arcSizeBytes,
             long arcTargetBytes,
