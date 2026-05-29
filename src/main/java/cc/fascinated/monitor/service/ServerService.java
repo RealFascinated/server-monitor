@@ -217,7 +217,7 @@ public class ServerService {
                 this.serverDockerContainerMetricsRepository.save(new DockerContainerMetricRow(
                         server.getId(),
                         containerMetric.containerName(),
-                        containerMetric.cpuUsage(),
+                        containerMetric.cpuUsage().doubleValue(),
                         containerMetric.memoryUsage(),
                         now
                 ));

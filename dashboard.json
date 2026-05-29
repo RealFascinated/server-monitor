@@ -7822,9 +7822,9 @@
                     "spec": {
                       "dataset": "monitor",
                       "editorMode": "code",
-                      "format": "table",
+                      "format": "time_series",
                       "rawQuery": true,
-                      "rawSql": "SELECT time, SUM(cpu_usage) AS \"CPU\" FROM (SELECT $__timeGroupAlias(timestamp, $__interval), container_name, AVG(cpu_usage) AS cpu_usage FROM server_docker_container_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1, container_name) per_container GROUP BY time ORDER BY time",
+                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), container_name, avg(cpu_usage) AS \"CPU\" FROM server_docker_container_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1, 2 ORDER BY 1, 2",
                       "table": "server_docker_container_metrics"
                     },
                     "version": "v0"
@@ -7916,7 +7916,7 @@
               "tooltip": {
                 "hideZeros": false,
                 "mode": "multi",
-                "sort": "none"
+                "sort": "desc"
               }
             }
           },
@@ -7944,9 +7944,9 @@
                     "spec": {
                       "dataset": "monitor",
                       "editorMode": "code",
-                      "format": "table",
+                      "format": "time_series",
                       "rawQuery": true,
-                      "rawSql": "SELECT time, SUM(memory_usage) AS \"Memory\" FROM (SELECT $__timeGroupAlias(timestamp, $__interval), container_name, AVG(memory_usage) AS memory_usage FROM server_docker_container_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1, container_name) per_container GROUP BY time ORDER BY time",
+                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), container_name, avg(memory_usage) AS \"Memory\" FROM server_docker_container_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1, 2 ORDER BY 1, 2",
                       "table": "server_docker_container_metrics"
                     },
                     "version": "v0"
@@ -8038,7 +8038,7 @@
               "tooltip": {
                 "hideZeros": false,
                 "mode": "multi",
-                "sort": "none"
+                "sort": "desc"
               }
             }
           },
