@@ -2,7 +2,7 @@ CREATE TABLE server_docker_container_metrics (
     id              BIGSERIAL PRIMARY KEY,
     server_id       BIGINT REFERENCES servers (id),
     container_name  TEXT,
-    cpu_usage       BIGINT,
+    cpu_usage       DOUBLE PRECISION,
     memory_usage    BIGINT,
     timestamp       TIMESTAMPTZ
 );
