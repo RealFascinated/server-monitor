@@ -15,12 +15,20 @@ public class AuthUtils {
      * @param authorizationHeader the header to use
      * @return the auth token
      */
-    public static UUID parseBearerToken(String authorizationHeader) {
+    public static String extractBearerValue(String authorizationHeader) {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             throw new UnauthorizedException("Missing or invalid Authorization header");
         }
+        String token = authorizationHeader.substring("Bearer ".length()).trim();
+        if (token.isEmpty()) {
+            throw new UnauthorizedException("Missing or invalid Authorization header");
+        }
+        return token;
+    }
+
+    public static UUID parseBearerToken(String authorizationHeader) {
         try {
-            return UUID.fromString(authorizationHeader.substring("Bearer ".length()).trim());
+            return UUID.fromString(extractBearerValue(authorizationHeader));
         } catch (IllegalArgumentException ex) {
             throw new UnauthorizedException("Invalid ingest token");
         }

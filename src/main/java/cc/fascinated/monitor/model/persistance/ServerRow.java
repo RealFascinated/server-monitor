@@ -23,6 +23,9 @@ public class ServerRow {
     @Column(name = "server_name", nullable = false)
     private String serverName;
 
+    @Column(name = "owner_id", nullable = false)
+    private Long ownerId;
+
     @Column(name = "ip")
     private String ip;
 
@@ -63,8 +66,9 @@ public class ServerRow {
     @Setter(AccessLevel.NONE)
     private Instant createdAt;
 
-    public ServerRow(String serverName, Instant createdAt) {
+    public ServerRow(String serverName, Long ownerId, Instant createdAt) {
         this.serverName = serverName;
+        this.ownerId = ownerId;
         this.createdAt = createdAt;
     }
 }

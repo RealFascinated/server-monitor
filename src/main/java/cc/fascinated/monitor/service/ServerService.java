@@ -60,9 +60,9 @@ public class ServerService {
         this.serverDockerContainerMetricsRepository = serverDockerContainerMetricsRepository;
     }
 
-    public CreatedServerResponse createServer(ServerCreateRequest createRequest) {
+    public CreatedServerResponse createServer(UserRow user, ServerCreateRequest createRequest) {
         try {
-            ServerRow serverRow = this.serverRepository.save(new ServerRow(createRequest.name(), Instant.now()));
+            ServerRow serverRow = this.serverRepository.save(new ServerRow(createRequest.name(), user.getId(), Instant.now()));
             UUID ingestToken = UUID.randomUUID();
             this.serverIngestTokenRepository.save(new IngestTokenRow(AuthUtils.hash(ingestToken.toString()), serverRow.getId()));
 

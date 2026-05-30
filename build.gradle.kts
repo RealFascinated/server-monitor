@@ -34,6 +34,8 @@ dependencies {
     implementation("org.postgresql:postgresql")
     implementation("org.springframework.boot:spring-boot-flyway")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.security:spring-security-crypto")
 
     // Libraries
     implementation("com.pngencoder:pngencoder:0.16.0")

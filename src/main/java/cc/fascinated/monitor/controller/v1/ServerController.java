@@ -4,8 +4,10 @@ import cc.fascinated.monitor.model.dto.request.server.ServerCreateRequest;
 import cc.fascinated.monitor.model.dto.request.server.ingest.IngestServerMetrics;
 import cc.fascinated.monitor.model.dto.response.server.CreatedServerResponse;
 import cc.fascinated.monitor.model.persistance.ServerRow;
+import cc.fascinated.monitor.model.persistance.UserRow;
 import cc.fascinated.monitor.service.ServerService;
 import cc.fascinated.monitor.web.auth.AuthenticatedServer;
+import cc.fascinated.monitor.web.auth.AuthenticatedUser;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,8 +23,8 @@ public class ServerController {
     }
 
     @PostMapping(value = "/create")
-    public CreatedServerResponse createServer(@RequestBody ServerCreateRequest createRequest) {
-        return this.serverService.createServer(createRequest);
+    public CreatedServerResponse createServer(@AuthenticatedUser UserRow user, @RequestBody ServerCreateRequest createRequest) {
+        return this.serverService.createServer(user, createRequest);
     }
 
     @PostMapping(value = "/ingest")

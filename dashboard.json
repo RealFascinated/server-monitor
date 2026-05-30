@@ -200,11 +200,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -341,9 +337,7 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": [],
                 "fields": "",
                 "values": false
               },
@@ -456,9 +450,7 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": [],
                 "fields": "",
                 "values": false
               },
@@ -576,9 +568,7 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": [],
                 "fields": "/^server_ip$/",
                 "values": false
               },
@@ -696,9 +686,7 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": [],
                 "fields": "/^server_os$/",
                 "values": false
               },
@@ -789,9 +777,7 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": [],
                 "fields": "",
                 "values": false
               },
@@ -882,9 +868,7 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": [],
                 "fields": "",
                 "values": false
               },
@@ -1000,11 +984,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -1145,11 +1125,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -1268,11 +1244,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -1413,11 +1385,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -1536,11 +1504,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -1614,7 +1578,7 @@
             "transformations": []
           }
         },
-        "description": "TX is plotted on negative Y; legend min/mean/max still reflect raw positive values.",
+        "description": "TX is plotted on negative Y.",
         "id": 22,
         "links": [],
         "title": "Interface Traffic",
@@ -1694,11 +1658,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -1839,11 +1799,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -1961,11 +1917,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -2109,11 +2061,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -2231,11 +2179,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -2320,9 +2264,7 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": [],
                 "fields": "/^cpu_model$/",
                 "values": false
               },
@@ -2404,9 +2346,7 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": [],
                 "fields": "/^socket_count$/",
                 "values": false
               },
@@ -2552,11 +2492,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -2641,9 +2577,7 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": [],
                 "fields": "/^cpu_clock_hz$/",
                 "values": false
               },
@@ -2725,9 +2659,7 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": [],
                 "fields": "/^cpu_cores$/",
                 "values": false
               },
@@ -2842,11 +2774,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -2964,11 +2892,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -3086,11 +3010,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -3175,9 +3095,7 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": [],
                 "fields": "/^agent_version$/",
                 "values": false
               },
@@ -3292,11 +3210,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -3414,11 +3328,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -3536,11 +3446,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -3658,11 +3564,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -3774,6 +3676,29 @@
                   },
                   "refId": "B"
                 }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "ffnexhw0yascgf"
+                    },
+                    "group": "grafana-postgresql-datasource",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "dataset": "monitor",
+                      "editorMode": "code",
+                      "format": "table",
+                      "rawQuery": true,
+                      "rawSql": "WITH day_starts AS (SELECT date_trunc('day', timestamp) AS day, (array_agg(used_bytes ORDER BY timestamp ASC))[1] AS day_start_used FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' GROUP BY 1), in_range AS (SELECT timestamp, used_bytes, date_trunc('day', timestamp) AS day FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND $__timeFilter(timestamp)) SELECT max(r.timestamp) AS time, max(r.used_bytes) - max(d.day_start_used) AS \"Daily Change\" FROM in_range r JOIN day_starts d ON r.day = d.day GROUP BY r.day ORDER BY time",
+                      "table": "server_disk_metrics"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "C"
+                }
               }
             ],
             "queryOptions": {},
@@ -3839,7 +3764,36 @@
                 },
                 "unit": "bytes"
               },
-              "overrides": []
+              "overrides": [
+                {
+                  "matcher": {
+                    "id": "byName",
+                    "options": "Daily Change",
+                    "scope": "series"
+                  },
+                  "properties": [
+                    {
+                      "id": "custom.axisPlacement",
+                      "value": "right"
+                    },
+                    {
+                      "id": "custom.axisCenteredZero",
+                      "value": false
+                    },
+                    {
+                      "id": "custom.drawStyle",
+                      "value": "line"
+                    },
+                    {
+                      "id": "custom.fillOpacity",
+                      "value": 50
+                    },
+                    {
+                      "id": "min"
+                    }
+                  ]
+                }
+              ]
             },
             "options": {
               "annotations": {
@@ -3847,11 +3801,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -3969,11 +3919,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -4091,11 +4037,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -4213,11 +4155,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -4335,11 +4273,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -4457,11 +4391,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -4566,7 +4496,7 @@
                   "steps": [
                     {
                       "color": "red",
-                      "value": null
+                      "value": 0
                     },
                     {
                       "color": "red",
@@ -4592,11 +4522,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -4723,11 +4649,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -4845,11 +4767,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -4980,11 +4898,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -5169,11 +5083,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -5291,11 +5201,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -5413,11 +5319,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -5535,11 +5437,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -5666,11 +5564,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -5754,9 +5648,7 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": [],
                 "fields": "/^health$/",
                 "values": false
               },
@@ -5871,11 +5763,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -6006,11 +5894,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -6128,11 +6012,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -6250,11 +6130,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -6372,11 +6248,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -6507,11 +6379,11 @@
                     },
                     {
                       "color": "yellow",
-                      "value": 10
+                      "value": 75
                     },
                     {
                       "color": "red",
-                      "value": 20
+                      "value": 90
                     }
                   ]
                 },
@@ -6525,11 +6397,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -6664,11 +6532,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "table",
                 "placement": "right",
                 "showLegend": true,
@@ -6788,11 +6652,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "table",
                 "placement": "right",
                 "showLegend": true,
@@ -6804,6 +6664,87 @@
                 "mode": "multi",
                 "sort": "desc"
               }
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
+    "panel-62": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "ffnexhw0yascgf"
+                    },
+                    "group": "grafana-postgresql-datasource",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "dataset": "monitor",
+                      "editorMode": "code",
+                      "format": "table",
+                      "rawQuery": true,
+                      "rawSql": "SELECT string_agg(pool_name || ': ' || health, ' | ' ORDER BY pool_name) AS pool_health FROM (SELECT DISTINCT ON (pool_name) pool_name, health FROM server_zfs_pool_metrics WHERE server_id = '${server}' ORDER BY pool_name, timestamp DESC) latest",
+                      "table": "server_zfs_pool_metrics"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 62,
+        "links": [],
+        "title": "ZFS Pool Health",
+        "vizConfig": {
+          "group": "stat",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "thresholds"
+                },
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    }
+                  ]
+                },
+                "unit": "none"
+              },
+              "overrides": []
+            },
+            "options": {
+              "colorMode": "value",
+              "graphMode": "none",
+              "justifyMode": "auto",
+              "orientation": "auto",
+              "percentChangeColorMode": "standard",
+              "reduceOptions": {
+                "calcs": [],
+                "fields": "",
+                "values": false
+              },
+              "showPercentChange": false,
+              "textMode": "auto",
+              "wideLayout": true
             }
           },
           "version": "13.0.1+security-01"
@@ -6943,11 +6884,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -7065,7 +7002,7 @@
             "transformations": []
           }
         },
-        "description": "TX is plotted on negative Y; legend min/mean/max still reflect raw positive values.",
+        "description": "TX is plotted on negative Y.",
         "id": 8,
         "links": [],
         "title": "Interface Traffic",
@@ -7145,11 +7082,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -7342,11 +7275,7 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [
-                  "lastNotNull",
-                  "mean",
-                  "max"
-                ],
+                "calcs": [],
                 "displayMode": "list",
                 "placement": "bottom",
                 "showLegend": true
@@ -7362,7 +7291,7 @@
         }
       }
     },
-    "panel-62": {
+    "panel-63": {
       "kind": "Panel",
       "spec": {
         "data": {
@@ -7384,8 +7313,8 @@
                       "editorMode": "code",
                       "format": "table",
                       "rawQuery": true,
-                      "rawSql": "SELECT string_agg(pool_name || ': ' || health, ' | ' ORDER BY pool_name) AS pool_health FROM (SELECT DISTINCT ON (pool_name) pool_name, health FROM server_zfs_pool_metrics WHERE server_id = '${server}' ORDER BY pool_name, timestamp DESC) latest",
-                      "table": "server_zfs_pool_metrics"
+                      "rawSql": "SELECT usage_pct FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1",
+                      "table": "server_disk_metrics"
                     },
                     "version": "v0"
                   },
@@ -7398,9 +7327,100 @@
           }
         },
         "description": "",
-        "id": 62,
+        "id": 63,
         "links": [],
-        "title": "ZFS Pool Health",
+        "title": "Used %",
+        "vizConfig": {
+          "group": "stat",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "thresholds"
+                },
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 80
+                    },
+                    {
+                      "color": "red",
+                      "value": 90
+                    }
+                  ]
+                },
+                "unit": "percent",
+                "max": 100,
+                "min": 0
+              },
+              "overrides": []
+            },
+            "options": {
+              "colorMode": "value",
+              "graphMode": "none",
+              "justifyMode": "auto",
+              "orientation": "auto",
+              "percentChangeColorMode": "standard",
+              "reduceOptions": {
+                "calcs": ["lastNotNull"],
+                "fields": "",
+                "values": false
+              },
+              "showPercentChange": false,
+              "textMode": "auto",
+              "wideLayout": true
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
+    "panel-64": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "ffnexhw0yascgf"
+                    },
+                    "group": "grafana-postgresql-datasource",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "dataset": "monitor",
+                      "editorMode": "code",
+                      "format": "table",
+                      "rawQuery": true,
+                      "rawSql": "SELECT used_bytes FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1",
+                      "table": "server_disk_metrics"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 64,
+        "links": [],
+        "title": "Used",
         "vizConfig": {
           "group": "stat",
           "kind": "VizConfig",
@@ -7419,7 +7439,7 @@
                     }
                   ]
                 },
-                "unit": "none"
+                "unit": "decbytes"
               },
               "overrides": []
             },
@@ -7430,17 +7450,354 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [
-                  "lastNotNull"
-                ],
+                "calcs": ["lastNotNull"],
                 "fields": "",
                 "values": false
               },
               "showPercentChange": false,
               "textMode": "auto",
               "wideLayout": true
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
+    "panel-65": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "ffnexhw0yascgf"
+                    },
+                    "group": "grafana-postgresql-datasource",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "dataset": "monitor",
+                      "editorMode": "code",
+                      "format": "table",
+                      "rawQuery": true,
+                      "rawSql": "SELECT total_bytes - used_bytes AS free_bytes FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1",
+                      "table": "server_disk_metrics"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 65,
+        "links": [],
+        "title": "Free",
+        "vizConfig": {
+          "group": "stat",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "thresholds"
+                },
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    }
+                  ]
+                },
+                "unit": "decbytes"
+              },
+              "overrides": []
             },
-            "version": "13.0.1+security-01"
+            "options": {
+              "colorMode": "value",
+              "graphMode": "none",
+              "justifyMode": "auto",
+              "orientation": "auto",
+              "percentChangeColorMode": "standard",
+              "reduceOptions": {
+                "calcs": ["lastNotNull"],
+                "fields": "",
+                "values": false
+              },
+              "showPercentChange": false,
+              "textMode": "auto",
+              "wideLayout": true
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
+    "panel-66": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "ffnexhw0yascgf"
+                    },
+                    "group": "grafana-postgresql-datasource",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "dataset": "monitor",
+                      "editorMode": "code",
+                      "format": "table",
+                      "rawQuery": true,
+                      "rawSql": "SELECT latest.used_bytes - day_start.used_bytes AS change_today FROM (SELECT used_bytes FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1) latest, (SELECT used_bytes FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND timestamp >= date_trunc('day', now()) ORDER BY timestamp ASC LIMIT 1) day_start",
+                      "table": "server_disk_metrics"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 66,
+        "links": [],
+        "title": "Change Today",
+        "vizConfig": {
+          "group": "stat",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "thresholds"
+                },
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    }
+                  ]
+                },
+                "unit": "decbytes"
+              },
+              "overrides": []
+            },
+            "options": {
+              "colorMode": "value",
+              "graphMode": "none",
+              "justifyMode": "auto",
+              "orientation": "auto",
+              "percentChangeColorMode": "standard",
+              "reduceOptions": {
+                "calcs": ["lastNotNull"],
+                "fields": "",
+                "values": false
+              },
+              "showPercentChange": false,
+              "textMode": "auto",
+              "wideLayout": true
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
+    "panel-67": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "ffnexhw0yascgf"
+                    },
+                    "group": "grafana-postgresql-datasource",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "dataset": "monitor",
+                      "editorMode": "code",
+                      "format": "table",
+                      "rawQuery": true,
+                      "rawSql": "SELECT io_wait_ms FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1",
+                      "table": "server_disk_metrics"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 67,
+        "links": [],
+        "title": "IO Wait",
+        "vizConfig": {
+          "group": "stat",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "thresholds"
+                },
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 10
+                    },
+                    {
+                      "color": "red",
+                      "value": 20
+                    }
+                  ]
+                },
+                "unit": "ms"
+              },
+              "overrides": []
+            },
+            "options": {
+              "colorMode": "value",
+              "graphMode": "none",
+              "justifyMode": "auto",
+              "orientation": "auto",
+              "percentChangeColorMode": "standard",
+              "reduceOptions": {
+                "calcs": ["lastNotNull"],
+                "fields": "",
+                "values": false
+              },
+              "showPercentChange": false,
+              "textMode": "auto",
+              "wideLayout": true
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
+    "panel-68": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "ffnexhw0yascgf"
+                    },
+                    "group": "grafana-postgresql-datasource",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "dataset": "monitor",
+                      "editorMode": "code",
+                      "format": "table",
+                      "rawQuery": true,
+                      "rawSql": "SELECT (COALESCE(read_latency_ms, 0) + COALESCE(write_latency_ms, 0)) / 2.0 AS io_delay FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1",
+                      "table": "server_disk_metrics"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 68,
+        "links": [],
+        "title": "IO Delay",
+        "vizConfig": {
+          "group": "stat",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "thresholds"
+                },
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 10
+                    },
+                    {
+                      "color": "red",
+                      "value": 20
+                    }
+                  ]
+                },
+                "unit": "ms"
+              },
+              "overrides": []
+            },
+            "options": {
+              "colorMode": "value",
+              "graphMode": "none",
+              "justifyMode": "auto",
+              "orientation": "auto",
+              "percentChangeColorMode": "standard",
+              "reduceOptions": {
+                "calcs": ["lastNotNull"],
+                "fields": "",
+                "values": false
+              },
+              "showPercentChange": false,
+              "textMode": "auto",
+              "wideLayout": true
+            }
           },
           "version": "13.0.1+security-01"
         }
@@ -7924,111 +8281,216 @@
                     "kind": "TabsLayoutTab",
                     "spec": {
                       "layout": {
-                        "kind": "GridLayout",
+                        "kind": "RowsLayout",
                         "spec": {
-                          "items": [
+                          "rows": [
                             {
-                              "kind": "GridLayoutItem",
+                              "kind": "RowsLayoutRow",
                               "spec": {
-                                "element": {
-                                  "kind": "ElementReference",
-                                  "name": "panel-3"
-                                },
-                                "height": 8,
-                                "width": 8,
-                                "x": 0,
-                                "y": 0
+                                "collapse": false,
+                                "title": "Overview",
+                                "layout": {
+                                  "kind": "GridLayout",
+                                  "spec": {
+                                    "items": [
+                                      {
+                                        "kind": "GridLayoutItem",
+                                        "spec": {
+                                          "element": {
+                                            "kind": "ElementReference",
+                                            "name": "panel-63"
+                                          },
+                                          "height": 4,
+                                          "width": 4,
+                                          "x": 0,
+                                          "y": 0
+                                        }
+                                      },
+                                      {
+                                        "kind": "GridLayoutItem",
+                                        "spec": {
+                                          "element": {
+                                            "kind": "ElementReference",
+                                            "name": "panel-64"
+                                          },
+                                          "height": 4,
+                                          "width": 4,
+                                          "x": 4,
+                                          "y": 0
+                                        }
+                                      },
+                                      {
+                                        "kind": "GridLayoutItem",
+                                        "spec": {
+                                          "element": {
+                                            "kind": "ElementReference",
+                                            "name": "panel-65"
+                                          },
+                                          "height": 4,
+                                          "width": 4,
+                                          "x": 8,
+                                          "y": 0
+                                        }
+                                      },
+                                      {
+                                        "kind": "GridLayoutItem",
+                                        "spec": {
+                                          "element": {
+                                            "kind": "ElementReference",
+                                            "name": "panel-66"
+                                          },
+                                          "height": 4,
+                                          "width": 4,
+                                          "x": 12,
+                                          "y": 0
+                                        }
+                                      },
+                                      {
+                                        "kind": "GridLayoutItem",
+                                        "spec": {
+                                          "element": {
+                                            "kind": "ElementReference",
+                                            "name": "panel-67"
+                                          },
+                                          "height": 4,
+                                          "width": 4,
+                                          "x": 16,
+                                          "y": 0
+                                        }
+                                      },
+                                      {
+                                        "kind": "GridLayoutItem",
+                                        "spec": {
+                                          "element": {
+                                            "kind": "ElementReference",
+                                            "name": "panel-68"
+                                          },
+                                          "height": 4,
+                                          "width": 4,
+                                          "x": 20,
+                                          "y": 0
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
                               }
                             },
                             {
-                              "kind": "GridLayoutItem",
+                              "kind": "RowsLayoutRow",
                               "spec": {
-                                "element": {
-                                  "kind": "ElementReference",
-                                  "name": "panel-4"
-                                },
-                                "height": 8,
-                                "width": 8,
-                                "x": 8,
-                                "y": 0
-                              }
-                            },
-                            {
-                              "kind": "GridLayoutItem",
-                              "spec": {
-                                "element": {
-                                  "kind": "ElementReference",
-                                  "name": "panel-6"
-                                },
-                                "height": 8,
-                                "width": 8,
-                                "x": 16,
-                                "y": 0
-                              }
-                            },
-                            {
-                              "kind": "GridLayoutItem",
-                              "spec": {
-                                "element": {
-                                  "kind": "ElementReference",
-                                  "name": "panel-5"
-                                },
-                                "height": 8,
-                                "width": 12,
-                                "x": 0,
-                                "y": 8
-                              }
-                            },
-                            {
-                              "kind": "GridLayoutItem",
-                              "spec": {
-                                "element": {
-                                  "kind": "ElementReference",
-                                  "name": "panel-7"
-                                },
-                                "height": 8,
-                                "width": 12,
-                                "x": 12,
-                                "y": 8
-                              }
-                            },
-                            {
-                              "kind": "GridLayoutItem",
-                              "spec": {
-                                "element": {
-                                  "kind": "ElementReference",
-                                  "name": "panel-39"
-                                },
-                                "height": 8,
-                                "width": 8,
-                                "x": 0,
-                                "y": 16
-                              }
-                            },
-                            {
-                              "kind": "GridLayoutItem",
-                              "spec": {
-                                "element": {
-                                  "kind": "ElementReference",
-                                  "name": "panel-40"
-                                },
-                                "height": 8,
-                                "width": 8,
-                                "x": 8,
-                                "y": 16
-                              }
-                            },
-                            {
-                              "kind": "GridLayoutItem",
-                              "spec": {
-                                "element": {
-                                  "kind": "ElementReference",
-                                  "name": "panel-41"
-                                },
-                                "height": 8,
-                                "width": 8,
-                                "x": 16,
-                                "y": 16
+                                "collapse": false,
+                                "layout": {
+                                  "kind": "GridLayout",
+                                  "spec": {
+                                    "items": [
+                                      {
+                                        "kind": "GridLayoutItem",
+                                        "spec": {
+                                          "element": {
+                                            "kind": "ElementReference",
+                                            "name": "panel-3"
+                                          },
+                                          "height": 8,
+                                          "width": 8,
+                                          "x": 0,
+                                          "y": 0
+                                        }
+                                      },
+                                      {
+                                        "kind": "GridLayoutItem",
+                                        "spec": {
+                                          "element": {
+                                            "kind": "ElementReference",
+                                            "name": "panel-4"
+                                          },
+                                          "height": 8,
+                                          "width": 8,
+                                          "x": 8,
+                                          "y": 0
+                                        }
+                                      },
+                                      {
+                                        "kind": "GridLayoutItem",
+                                        "spec": {
+                                          "element": {
+                                            "kind": "ElementReference",
+                                            "name": "panel-6"
+                                          },
+                                          "height": 8,
+                                          "width": 8,
+                                          "x": 16,
+                                          "y": 0
+                                        }
+                                      },
+                                      {
+                                        "kind": "GridLayoutItem",
+                                        "spec": {
+                                          "element": {
+                                            "kind": "ElementReference",
+                                            "name": "panel-5"
+                                          },
+                                          "height": 8,
+                                          "width": 12,
+                                          "x": 0,
+                                          "y": 8
+                                        }
+                                      },
+                                      {
+                                        "kind": "GridLayoutItem",
+                                        "spec": {
+                                          "element": {
+                                            "kind": "ElementReference",
+                                            "name": "panel-7"
+                                          },
+                                          "height": 8,
+                                          "width": 12,
+                                          "x": 12,
+                                          "y": 8
+                                        }
+                                      },
+                                      {
+                                        "kind": "GridLayoutItem",
+                                        "spec": {
+                                          "element": {
+                                            "kind": "ElementReference",
+                                            "name": "panel-39"
+                                          },
+                                          "height": 8,
+                                          "width": 8,
+                                          "x": 0,
+                                          "y": 16
+                                        }
+                                      },
+                                      {
+                                        "kind": "GridLayoutItem",
+                                        "spec": {
+                                          "element": {
+                                            "kind": "ElementReference",
+                                            "name": "panel-40"
+                                          },
+                                          "height": 8,
+                                          "width": 8,
+                                          "x": 8,
+                                          "y": 16
+                                        }
+                                      },
+                                      {
+                                        "kind": "GridLayoutItem",
+                                        "spec": {
+                                          "element": {
+                                            "kind": "ElementReference",
+                                            "name": "panel-41"
+                                          },
+                                          "height": 8,
+                                          "width": 8,
+                                          "x": 16,
+                                          "y": 16
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
                               }
                             }
                           ]
@@ -8438,12 +8900,9 @@
     }
   },
   "preload": false,
-  "tags": [
-    "monitor",
-    "servers"
-  ],
+  "tags": ["monitor", "servers"],
   "timeSettings": {
-    "autoRefresh": "1m",
+    "autoRefresh": "30s",
     "autoRefreshIntervals": [
       "5s",
       "10s",
@@ -8457,7 +8916,7 @@
       "1d"
     ],
     "fiscalYearStartMonth": 0,
-    "from": "now-1h",
+    "from": "now-7d",
     "hideTimepicker": false,
     "timezone": "browser",
     "to": "now"
@@ -8469,8 +8928,8 @@
       "spec": {
         "allowCustomValue": false,
         "current": {
-          "text": "Unraid",
-          "value": "4"
+          "text": "Wild OVH",
+          "value": "5"
         },
         "definition": "SELECT server_name AS __text, id AS __value FROM servers ORDER BY server_name",
         "hide": "dontHide",
@@ -8535,8 +8994,8 @@
       "spec": {
         "allowCustomValue": true,
         "current": {
-          "text": "",
-          "value": ""
+          "text": "/",
+          "value": "/"
         },
         "definition": "SELECT disk_name AS __text, disk_name AS __value FROM server_disk_metrics WHERE server_id = '${server}' GROUP BY disk_name ORDER BY disk_name",
         "hide": "dontHide",
@@ -8602,9 +9061,7 @@
         "allowCustomValue": true,
         "current": {
           "text": "All",
-          "value": [
-            "$__all"
-          ]
+          "value": ["$__all"]
         },
         "definition": "SELECT interface_name AS __text, interface_name AS __value FROM server_network_metrics WHERE server_id = '${server}' GROUP BY interface_name ORDER BY CASE WHEN interface_name LIKE 'eth%' THEN 0 WHEN interface_name LIKE 'en%' THEN 1 WHEN interface_name LIKE 'wlan%' THEN 2 WHEN interface_name LIKE 'wlp%' THEN 3 ELSE 4 END, interface_name",
         "hide": "dontHide",
@@ -8670,9 +9127,7 @@
         "allowCustomValue": true,
         "current": {
           "text": "All",
-          "value": [
-            "$__all"
-          ]
+          "value": ["$__all"]
         },
         "definition": "SELECT pool_name AS __text, pool_name AS __value FROM server_zfs_pool_metrics WHERE server_id = '${server}' GROUP BY pool_name ORDER BY pool_name",
         "hide": "dontHide",
