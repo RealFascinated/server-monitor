@@ -36,17 +36,16 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$prometheus"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT COUNT(*)::bigint AS value FROM users",
-                      "table": "servers"
+                      "expr": "monitor_users",
+                      "refId": "A",
+                      "instant": true,
+                      "range": false,
+                      "legendFormat": "__auto"
                     },
                     "version": "v0"
                   },
@@ -76,7 +75,7 @@
                   "steps": [
                     {
                       "color": "green",
-                      "value": null
+                      "value": 0
                     }
                   ]
                 },
@@ -119,17 +118,16 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$prometheus"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT COUNT(*)::bigint AS value FROM servers",
-                      "table": "servers"
+                      "expr": "monitor_servers",
+                      "refId": "A",
+                      "instant": true,
+                      "range": false,
+                      "legendFormat": "__auto"
                     },
                     "version": "v0"
                   },
@@ -159,7 +157,7 @@
                   "steps": [
                     {
                       "color": "green",
-                      "value": null
+                      "value": 0
                     }
                   ]
                 },
@@ -202,17 +200,16 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$prometheus"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT COUNT(*)::bigint AS value FROM servers WHERE last_updated > NOW() - INTERVAL '5 minutes'",
-                      "table": "servers"
+                      "expr": "sum(monitor_servers_reporting)",
+                      "refId": "A",
+                      "instant": true,
+                      "range": false,
+                      "legendFormat": "__auto"
                     },
                     "version": "v0"
                   },
@@ -242,7 +239,7 @@
                   "steps": [
                     {
                       "color": "green",
-                      "value": null
+                      "value": 0
                     }
                   ]
                 },
@@ -285,17 +282,16 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$prometheus"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT COUNT(*)::bigint AS value FROM servers WHERE status = 1",
-                      "table": "servers"
+                      "expr": "monitor_servers_offline",
+                      "refId": "A",
+                      "instant": true,
+                      "range": false,
+                      "legendFormat": "__auto"
                     },
                     "version": "v0"
                   },
@@ -325,7 +321,7 @@
                   "steps": [
                     {
                       "color": "green",
-                      "value": null
+                      "value": 0
                     }
                   ]
                 },
@@ -368,17 +364,16 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$prometheus"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT COUNT(*)::bigint AS value FROM servers WHERE last_updated IS NOT NULL AND last_updated <= NOW() - INTERVAL '5 minutes'",
-                      "table": "servers"
+                      "expr": "monitor_servers_stale",
+                      "refId": "A",
+                      "instant": true,
+                      "range": false,
+                      "legendFormat": "__auto"
                     },
                     "version": "v0"
                   },
@@ -408,7 +403,7 @@
                   "steps": [
                     {
                       "color": "green",
-                      "value": null
+                      "value": 0
                     }
                   ]
                 },
@@ -451,17 +446,16 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$prometheus"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT COUNT(*)::bigint AS value FROM servers WHERE last_updated IS NULL",
-                      "table": "servers"
+                      "expr": "monitor_servers_never_reported",
+                      "refId": "A",
+                      "instant": true,
+                      "range": false,
+                      "legendFormat": "__auto"
                     },
                     "version": "v0"
                   },
@@ -491,7 +485,7 @@
                   "steps": [
                     {
                       "color": "green",
-                      "value": null
+                      "value": 0
                     }
                   ]
                 },
@@ -534,7 +528,7 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "prometheus"
+                      "name": "$prometheus"
                     },
                     "group": "prometheus",
                     "kind": "DataQuery",
@@ -555,7 +549,7 @@
             "transformations": []
           }
         },
-        "description": "Requires Prometheus scraping GET /metrics",
+        "description": "",
         "id": 7,
         "links": [],
         "title": "Ingests / min",
@@ -573,7 +567,7 @@
                   "steps": [
                     {
                       "color": "green",
-                      "value": null
+                      "value": 0
                     }
                   ]
                 },
@@ -616,7 +610,7 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "prometheus"
+                      "name": "$prometheus"
                     },
                     "group": "prometheus",
                     "kind": "DataQuery",
@@ -655,7 +649,7 @@
                   "steps": [
                     {
                       "color": "green",
-                      "value": null
+                      "value": 0
                     }
                   ]
                 },
@@ -698,17 +692,16 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$prometheus"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT pg_database_size(current_database())::bigint AS value",
-                      "table": "servers"
+                      "expr": "monitor_database_size_bytes",
+                      "refId": "A",
+                      "instant": true,
+                      "range": false,
+                      "legendFormat": "__auto"
                     },
                     "version": "v0"
                   },
@@ -738,7 +731,7 @@
                   "steps": [
                     {
                       "color": "green",
-                      "value": null
+                      "value": 0
                     }
                   ]
                 },
@@ -781,17 +774,16 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$prometheus"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT COUNT(*)::bigint AS value FROM users WHERE created_at > NOW() - INTERVAL '24 hours'",
-                      "table": "servers"
+                      "expr": "monitor_users_new_24h",
+                      "refId": "A",
+                      "instant": true,
+                      "range": false,
+                      "legendFormat": "__auto"
                     },
                     "version": "v0"
                   },
@@ -821,7 +813,7 @@
                   "steps": [
                     {
                       "color": "green",
-                      "value": null
+                      "value": 0
                     }
                   ]
                 },
@@ -864,17 +856,16 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$prometheus"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT COUNT(*)::bigint AS value FROM servers WHERE created_at > NOW() - INTERVAL '24 hours'",
-                      "table": "servers"
+                      "expr": "monitor_servers_new_24h",
+                      "refId": "A",
+                      "instant": true,
+                      "range": false,
+                      "legendFormat": "__auto"
                     },
                     "version": "v0"
                   },
@@ -904,7 +895,7 @@
                   "steps": [
                     {
                       "color": "green",
-                      "value": null
+                      "value": 0
                     }
                   ]
                 },
@@ -947,17 +938,16 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$prometheus"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT COUNT(DISTINCT server_id)::bigint AS value FROM server_docker_container_metrics WHERE timestamp > NOW() - INTERVAL '5 minutes'",
-                      "table": "servers"
+                      "expr": "monitor_servers_docker_enabled",
+                      "refId": "A",
+                      "instant": true,
+                      "range": false,
+                      "legendFormat": "__auto"
                     },
                     "version": "v0"
                   },
@@ -987,7 +977,7 @@
                   "steps": [
                     {
                       "color": "green",
-                      "value": null
+                      "value": 0
                     }
                   ]
                 },
@@ -1030,17 +1020,16 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$prometheus"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT COUNT(*)::bigint AS value FROM (SELECT DISTINCT server_id FROM server_zfs_arc_metrics WHERE timestamp > NOW() - INTERVAL '5 minutes' UNION SELECT DISTINCT server_id FROM server_zfs_pool_metrics WHERE timestamp > NOW() - INTERVAL '5 minutes') t",
-                      "table": "servers"
+                      "expr": "monitor_servers_zfs_enabled",
+                      "refId": "A",
+                      "instant": true,
+                      "range": false,
+                      "legendFormat": "__auto"
                     },
                     "version": "v0"
                   },
@@ -1070,7 +1059,7 @@
                   "steps": [
                     {
                       "color": "green",
-                      "value": null
+                      "value": 0
                     }
                   ]
                 },
@@ -1113,7 +1102,7 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "prometheus"
+                      "name": "$prometheus"
                     },
                     "group": "prometheus",
                     "kind": "DataQuery",
@@ -1122,7 +1111,7 @@
                       "refId": "A",
                       "instant": false,
                       "range": true,
-                      "legendFormat": "__auto"
+                      "legendFormat": "ingests/min"
                     },
                     "version": "v0"
                   },
@@ -1217,7 +1206,7 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "prometheus"
+                      "name": "$prometheus"
                     },
                     "group": "prometheus",
                     "kind": "DataQuery",
@@ -1226,7 +1215,7 @@
                       "refId": "A",
                       "instant": false,
                       "range": true,
-                      "legendFormat": "__auto"
+                      "legendFormat": "{{table}}"
                     },
                     "version": "v0"
                   },
@@ -1321,7 +1310,7 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "prometheus"
+                      "name": "$prometheus"
                     },
                     "group": "prometheus",
                     "kind": "DataQuery",
@@ -1330,7 +1319,7 @@
                       "refId": "A",
                       "instant": false,
                       "range": true,
-                      "legendFormat": "__auto"
+                      "legendFormat": "p50"
                     },
                     "version": "v0"
                   },
@@ -1343,7 +1332,7 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "prometheus"
+                      "name": "$prometheus"
                     },
                     "group": "prometheus",
                     "kind": "DataQuery",
@@ -1352,7 +1341,7 @@
                       "refId": "B",
                       "instant": false,
                       "range": true,
-                      "legendFormat": "__auto"
+                      "legendFormat": "p95"
                     },
                     "version": "v0"
                   },
@@ -1365,7 +1354,7 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "prometheus"
+                      "name": "$prometheus"
                     },
                     "group": "prometheus",
                     "kind": "DataQuery",
@@ -1374,7 +1363,7 @@
                       "refId": "C",
                       "instant": false,
                       "range": true,
-                      "legendFormat": "__auto"
+                      "legendFormat": "p99"
                     },
                     "version": "v0"
                   },
@@ -1469,7 +1458,7 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "prometheus"
+                      "name": "$prometheus"
                     },
                     "group": "prometheus",
                     "kind": "DataQuery",
@@ -1478,7 +1467,7 @@
                       "refId": "A",
                       "instant": false,
                       "range": true,
-                      "legendFormat": "__auto"
+                      "legendFormat": "failures/min"
                     },
                     "version": "v0"
                   },
@@ -1573,17 +1562,16 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$prometheus"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT COALESCE(NULLIF(agent_version, ''), 'unknown') AS metric, COUNT(*)::bigint AS value FROM servers GROUP BY agent_version ORDER BY value DESC",
-                      "table": "servers"
+                      "expr": "monitor_servers_by_agent_version",
+                      "refId": "A",
+                      "instant": true,
+                      "range": false,
+                      "legendFormat": "{{version}}"
                     },
                     "version": "v0"
                   },
@@ -1613,12 +1601,17 @@
               "overrides": []
             },
             "options": {
+              "displayLabels": [
+                "name",
+                "percent"
+              ],
               "legend": {
                 "displayMode": "table",
                 "placement": "right",
                 "showLegend": true,
                 "values": [
-                  "value"
+                  "value",
+                  "percent"
                 ]
               },
               "pieType": "pie",
@@ -1652,17 +1645,16 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$prometheus"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT COALESCE(NULLIF(si.os_name, ''), 'unknown') AS metric, COUNT(*)::bigint AS value FROM servers s LEFT JOIN server_inventory si ON si.server_id = s.id GROUP BY si.os_name ORDER BY value DESC",
-                      "table": "servers"
+                      "expr": "monitor_servers_by_os",
+                      "refId": "A",
+                      "instant": true,
+                      "range": false,
+                      "legendFormat": "{{os}}"
                     },
                     "version": "v0"
                   },
@@ -1692,12 +1684,17 @@
               "overrides": []
             },
             "options": {
+              "displayLabels": [
+                "name",
+                "percent"
+              ],
               "legend": {
                 "displayMode": "table",
                 "placement": "right",
                 "showLegend": true,
                 "values": [
-                  "value"
+                  "value",
+                  "percent"
                 ]
               },
               "pieType": "pie",
@@ -1731,17 +1728,16 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$prometheus"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT 'server_metrics' AS metric, COUNT(*)::bigint AS value FROM server_metrics UNION ALL SELECT 'server_disk_metrics', COUNT(*)::bigint FROM server_disk_metrics UNION ALL SELECT 'server_network_metrics', COUNT(*)::bigint FROM server_network_metrics UNION ALL SELECT 'server_zfs_arc_metrics', COUNT(*)::bigint FROM server_zfs_arc_metrics UNION ALL SELECT 'server_zfs_pool_metrics', COUNT(*)::bigint FROM server_zfs_pool_metrics UNION ALL SELECT 'server_docker_container_metrics', COUNT(*)::bigint FROM server_docker_container_metrics ORDER BY value DESC",
-                      "table": "servers"
+                      "expr": "monitor_table_rows",
+                      "refId": "A",
+                      "instant": true,
+                      "range": false,
+                      "legendFormat": "{{table}}"
                     },
                     "version": "v0"
                   },
@@ -1799,17 +1795,16 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$prometheus"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT 'server_metrics' AS metric, pg_total_relation_size('server_metrics')::bigint AS value UNION ALL SELECT 'server_disk_metrics', pg_total_relation_size('server_disk_metrics')::bigint UNION ALL SELECT 'server_network_metrics', pg_total_relation_size('server_network_metrics')::bigint UNION ALL SELECT 'server_zfs_arc_metrics', pg_total_relation_size('server_zfs_arc_metrics')::bigint UNION ALL SELECT 'server_zfs_pool_metrics', pg_total_relation_size('server_zfs_pool_metrics')::bigint UNION ALL SELECT 'server_docker_container_metrics', pg_total_relation_size('server_docker_container_metrics')::bigint ORDER BY value DESC",
-                      "table": "servers"
+                      "expr": "monitor_table_size_bytes",
+                      "refId": "A",
+                      "instant": true,
+                      "range": false,
+                      "legendFormat": "{{table}}"
                     },
                     "version": "v0"
                   },
@@ -1848,6 +1843,406 @@
               "showValue": "auto",
               "stacking": "none",
               "xTickLabelRotation": 0
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
+    "panel-22": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$prometheus"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "monitor_servers",
+                      "refId": "A",
+                      "instant": false,
+                      "range": true,
+                      "legendFormat": "total"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$prometheus"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "sum(monitor_servers_reporting)",
+                      "refId": "B",
+                      "instant": false,
+                      "range": true,
+                      "legendFormat": "reporting"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$prometheus"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "monitor_servers_offline",
+                      "refId": "C",
+                      "instant": false,
+                      "range": true,
+                      "legendFormat": "offline"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "C"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$prometheus"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "monitor_servers_stale",
+                      "refId": "D",
+                      "instant": false,
+                      "range": true,
+                      "legendFormat": "stale"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "D"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$prometheus"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "monitor_servers_never_reported",
+                      "refId": "E",
+                      "instant": false,
+                      "range": true,
+                      "legendFormat": "never reported"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "E"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 22,
+        "links": [],
+        "title": "Fleet Health",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "axisBorderShow": false,
+                  "axisCenteredZero": false,
+                  "axisColorMode": "text",
+                  "axisLabel": "",
+                  "axisPlacement": "auto",
+                  "barAlignment": 0,
+                  "barWidthFactor": 0.6,
+                  "drawStyle": "line",
+                  "fillOpacity": 10,
+                  "gradientMode": "none",
+                  "hideFrom": {
+                    "legend": false,
+                    "tooltip": false,
+                    "viz": false
+                  },
+                  "insertNulls": false,
+                  "lineInterpolation": "linear",
+                  "lineWidth": 1,
+                  "pointSize": 5,
+                  "scaleDistribution": {
+                    "type": "linear"
+                  },
+                  "showPoints": "never",
+                  "showValues": false,
+                  "spanNulls": false,
+                  "stacking": {
+                    "group": "A",
+                    "mode": "none"
+                  },
+                  "thresholdsStyle": {
+                    "mode": "off"
+                  }
+                },
+                "min": 0,
+                "unit": "short"
+              },
+              "overrides": []
+            },
+            "options": {
+              "legend": {
+                "calcs": [],
+                "displayMode": "list",
+                "placement": "bottom",
+                "showLegend": true
+              },
+              "tooltip": {
+                "hideZeros": false,
+                "mode": "single",
+                "sort": "none"
+              }
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
+    "panel-23": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$prometheus"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "monitor_database_size_bytes",
+                      "refId": "A",
+                      "instant": false,
+                      "range": true,
+                      "legendFormat": "database"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 23,
+        "links": [],
+        "title": "Database Size Trend",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "axisBorderShow": false,
+                  "axisCenteredZero": false,
+                  "axisColorMode": "text",
+                  "axisLabel": "",
+                  "axisPlacement": "auto",
+                  "barAlignment": 0,
+                  "barWidthFactor": 0.6,
+                  "drawStyle": "line",
+                  "fillOpacity": 10,
+                  "gradientMode": "none",
+                  "hideFrom": {
+                    "legend": false,
+                    "tooltip": false,
+                    "viz": false
+                  },
+                  "insertNulls": false,
+                  "lineInterpolation": "linear",
+                  "lineWidth": 1,
+                  "pointSize": 5,
+                  "scaleDistribution": {
+                    "type": "linear"
+                  },
+                  "showPoints": "never",
+                  "showValues": false,
+                  "spanNulls": false,
+                  "stacking": {
+                    "group": "A",
+                    "mode": "none"
+                  },
+                  "thresholdsStyle": {
+                    "mode": "off"
+                  }
+                },
+                "min": 0,
+                "unit": "bytes"
+              },
+              "overrides": []
+            },
+            "options": {
+              "legend": {
+                "calcs": [],
+                "displayMode": "list",
+                "placement": "bottom",
+                "showLegend": true
+              },
+              "tooltip": {
+                "hideZeros": false,
+                "mode": "single",
+                "sort": "none"
+              }
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
+    "panel-24": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$prometheus"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "sum by (table) (rate(monitor_ingest_rows_total[5m]))",
+                      "refId": "A",
+                      "instant": false,
+                      "range": true,
+                      "legendFormat": "{{table}}"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 24,
+        "links": [],
+        "title": "Ingest Rows by Table",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "axisBorderShow": false,
+                  "axisCenteredZero": false,
+                  "axisColorMode": "text",
+                  "axisLabel": "",
+                  "axisPlacement": "auto",
+                  "barAlignment": 0,
+                  "barWidthFactor": 0.6,
+                  "drawStyle": "line",
+                  "fillOpacity": 10,
+                  "gradientMode": "none",
+                  "hideFrom": {
+                    "legend": false,
+                    "tooltip": false,
+                    "viz": false
+                  },
+                  "insertNulls": false,
+                  "lineInterpolation": "linear",
+                  "lineWidth": 1,
+                  "pointSize": 5,
+                  "scaleDistribution": {
+                    "type": "linear"
+                  },
+                  "showPoints": "never",
+                  "showValues": false,
+                  "spanNulls": false,
+                  "stacking": {
+                    "group": "A",
+                    "mode": "none"
+                  },
+                  "thresholdsStyle": {
+                    "mode": "off"
+                  }
+                },
+                "min": 0,
+                "unit": "wps"
+              },
+              "overrides": []
+            },
+            "options": {
+              "legend": {
+                "calcs": [],
+                "displayMode": "list",
+                "placement": "bottom",
+                "showLegend": true
+              },
+              "tooltip": {
+                "hideZeros": false,
+                "mode": "single",
+                "sort": "none"
+              }
             }
           },
           "version": "13.0.1+security-01"
@@ -2115,6 +2510,19 @@
                       "x": 12,
                       "y": 8
                     }
+                  },
+                  {
+                    "kind": "GridLayoutItem",
+                    "spec": {
+                      "element": {
+                        "kind": "ElementReference",
+                        "name": "panel-24"
+                      },
+                      "height": 8,
+                      "width": 24,
+                      "x": 0,
+                      "y": 16
+                    }
                   }
                 ]
               }
@@ -2155,6 +2563,19 @@
                       "x": 12,
                       "y": 0
                     }
+                  },
+                  {
+                    "kind": "GridLayoutItem",
+                    "spec": {
+                      "element": {
+                        "kind": "ElementReference",
+                        "name": "panel-22"
+                      },
+                      "height": 8,
+                      "width": 24,
+                      "x": 0,
+                      "y": 10
+                    }
                   }
                 ]
               }
@@ -2194,6 +2615,19 @@
                       "width": 12,
                       "x": 12,
                       "y": 0
+                    }
+                  },
+                  {
+                    "kind": "GridLayoutItem",
+                    "spec": {
+                      "element": {
+                        "kind": "ElementReference",
+                        "name": "panel-23"
+                      },
+                      "height": 8,
+                      "width": 24,
+                      "x": 0,
+                      "y": 8
                     }
                   }
                 ]
@@ -2241,5 +2675,26 @@
     "to": "now"
   },
   "title": "Monitor API",
-  "variables": []
+  "variables": [
+    {
+      "kind": "DatasourceVariable",
+      "spec": {
+        "name": "prometheus",
+        "label": "Prometheus",
+        "pluginId": "prometheus",
+        "refresh": "onDashboardLoad",
+        "hide": "dontHide",
+        "includeAll": false,
+        "multi": false,
+        "options": [],
+        "current": {
+          "text": "Prometheus",
+          "value": "Prometheus"
+        },
+        "regex": "",
+        "skipUrlSync": false,
+        "allowCustomValue": true
+      }
+    }
+  ]
 }

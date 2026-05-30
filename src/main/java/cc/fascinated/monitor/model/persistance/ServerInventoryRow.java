@@ -35,9 +35,6 @@ public class ServerInventoryRow {
     @Column(name = "socket_count")
     private Integer socketCount;
 
-    @Column(name = "cpu_clock_mhz")
-    private Double cpuClockMhz;
-
     @Column(name = "os_name")
     private String osName;
 

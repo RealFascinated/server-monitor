@@ -12,15 +12,6 @@ import java.util.Map;
 
 @Service
 public class PlatformMetricsQueryService {
-    private static final String[] METRIC_TABLES = {
-            "server_metrics",
-            "server_disk_metrics",
-            "server_network_metrics",
-            "server_zfs_arc_metrics",
-            "server_zfs_pool_metrics",
-            "server_docker_container_metrics"
-    };
-
     private final UserRepository userRepository;
     private final ServerRepository serverRepository;
     private final JdbcTemplate jdbcTemplate;
@@ -89,51 +80,6 @@ public class PlatformMetricsQueryService {
 
     public long databaseSizeBytes() {
         return queryLong("SELECT pg_database_size(current_database())");
-    }
-
-    public long tableRowCount(String table) {
-        return queryLong("SELECT COUNT(*)::bigint FROM " + table);
-    }
-
-    public long tableSizeBytes(String table) {
-        return queryLong("""
-                SELECT CASE
-                    WHEN EXISTS (
-                        SELECT 1 FROM timescaledb_information.hypertables h
-                        WHERE h.hypertable_schema = 'public' AND h.hypertable_name = ?
-                    ) THEN hypertable_size(?::regclass)
-                    ELSE pg_total_relation_size(?::regclass)
-                END
-                """, table, table, table);
-    }
-
-    public String[] metricTables() {
-        return METRIC_TABLES;
-    }
-
-    public long dockerEnabledServers() {
-        return countServersWithRecentMetrics("server_docker_container_metrics");
-    }
-
-    public long zfsEnabledServers() {
-        return queryLong("""
-                SELECT COUNT(*)::bigint FROM (
-                    SELECT DISTINCT server_id FROM server_zfs_arc_metrics WHERE timestamp > NOW() - (? || ' seconds')::interval
-                    UNION
-                    SELECT DISTINCT server_id FROM server_zfs_pool_metrics WHERE timestamp > NOW() - (? || ' seconds')::interval
-                ) AS enabled
-                """, reportingThresholdSeconds(), reportingThresholdSeconds());
-    }
-
-    private long countServersWithRecentMetrics(String table) {
-        return queryLong(
-                "SELECT COUNT(DISTINCT server_id)::bigint FROM " + table + " WHERE timestamp > NOW() - (? || ' seconds')::interval",
-                reportingThresholdSeconds()
-        );
-    }
-
-    private long reportingThresholdSeconds() {
-        return this.metricsProperties.getReportingThreshold().getSeconds();
     }
 
     private long queryLong(String sql, Object... args) {

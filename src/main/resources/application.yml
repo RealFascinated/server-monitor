@@ -40,6 +40,8 @@ spring:
     locations: classpath:db/migration
 
 monitor:
+  victoriametrics:
+    import-url: http://localhost:8428/api/v1/import/prometheus
   servers:
     offline-threshold: 2m
   metrics:

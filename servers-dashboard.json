@@ -172,6 +172,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -190,7 +191,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "pps"
               },
               "overrides": []
@@ -431,6 +431,7 @@
                 "color": {
                   "mode": "thresholds"
                 },
+                "decimals": 2,
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
@@ -440,7 +441,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "s"
               },
               "overrides": []
@@ -631,6 +631,7 @@
                 "color": {
                   "mode": "thresholds"
                 },
+                "decimals": 2,
                 "max": 100,
                 "min": 0,
                 "thresholds": {
@@ -650,7 +651,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -740,6 +740,7 @@
                 "color": {
                   "mode": "thresholds"
                 },
+                "decimals": 2,
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
@@ -749,7 +750,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "bytes"
               },
               "overrides": []
@@ -856,6 +856,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "max": 100,
                 "min": 0,
                 "thresholds": {
@@ -867,7 +868,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -999,6 +999,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -1009,7 +1010,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "bytes"
               },
               "overrides": []
@@ -1118,6 +1118,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "max": 100,
                 "min": 0,
                 "thresholds": {
@@ -1129,7 +1130,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -1261,6 +1261,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -1271,7 +1272,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "binBps"
               },
               "overrides": []
@@ -1381,6 +1381,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -1391,7 +1392,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "ms"
               },
               "overrides": []
@@ -1557,6 +1557,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
@@ -1566,7 +1567,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "binbps"
               },
               "overrides": [
@@ -1712,6 +1712,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -1722,7 +1723,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "pps"
               },
               "overrides": []
@@ -1831,6 +1831,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -1841,7 +1842,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "short"
               },
               "overrides": []
@@ -1950,6 +1950,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "max": 100,
                 "min": 0,
                 "thresholds": {
@@ -1961,7 +1962,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": [
@@ -2095,6 +2095,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -2105,7 +2106,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "bytes"
               },
               "overrides": []
@@ -2263,6 +2263,7 @@
                   "fixedColor": "green",
                   "mode": "fixed"
                 },
+                "decimals": 2,
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
@@ -2272,7 +2273,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "short"
               },
               "overrides": []
@@ -2401,6 +2401,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "max": 100,
                 "min": 0,
                 "thresholds": {
@@ -2420,7 +2421,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -2496,6 +2496,7 @@
                   "fixedColor": "green",
                   "mode": "fixed"
                 },
+                "decimals": 2,
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
@@ -2505,7 +2506,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "hertz"
               },
               "overrides": []
@@ -2694,6 +2694,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -2704,7 +2705,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "bytes"
               },
               "overrides": []
@@ -2813,6 +2813,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -2823,7 +2824,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "short"
               },
               "overrides": []
@@ -2932,6 +2932,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -2942,7 +2943,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "ops"
               },
               "overrides": []
@@ -3133,6 +3133,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -3143,7 +3144,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "short"
               },
               "overrides": []
@@ -3252,6 +3252,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -3262,7 +3263,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "iops"
               },
               "overrides": []
@@ -3371,6 +3371,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -3381,7 +3382,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "ms"
               },
               "overrides": []
@@ -3490,6 +3490,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -3500,7 +3501,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "short"
               },
               "overrides": []
@@ -3639,7 +3639,24 @@
                       "editorMode": "code",
                       "format": "table",
                       "rawQuery": true,
-                      "rawSql": "WITH day_starts AS (SELECT date_trunc('day', timestamp) AS day, (array_agg(used_bytes ORDER BY timestamp ASC))[1] AS day_start_used FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' GROUP BY 1), in_range AS (SELECT timestamp, used_bytes, date_trunc('day', timestamp) AS day, date_trunc('hour', timestamp) AS hour FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND $__timeFilter(timestamp)), hourly AS (SELECT r.hour AS time, max(r.used_bytes) - d.day_start_used AS \"Daily Change\" FROM in_range r JOIN day_starts d ON r.day = d.day GROUP BY r.hour, d.day_start_used), latest AS (SELECT max(timestamp) AS time, (array_agg(used_bytes ORDER BY timestamp DESC))[1] AS used_bytes, date_trunc('day', max(timestamp)) AS day FROM in_range) SELECT time, \"Daily Change\" FROM hourly UNION ALL SELECT l.time, l.used_bytes - d.day_start_used FROM latest l JOIN day_starts d ON l.day = d.day WHERE l.time > COALESCE((SELECT max(time) FROM hourly), '-infinity'::timestamptz) ORDER BY time",
+                      "rawSql": "WITH day_starts AS (\r\n  SELECT\r\n    date_trunc('day', timestamp) AS day,\r\n    (array_agg(used_bytes ORDER BY timestamp ASC))[1] AS day_start_used\r\n  FROM server_disk_metrics\r\n  WHERE server_id = '${server}'\r\n    AND disk_name = '$drive'\r\n  GROUP BY 1\r\n),\r\nin_range AS (\r\n  SELECT\r\n    timestamp,\r\n    used_bytes,\r\n    date_trunc('day', timestamp)  AS day,\r\n    date_trunc('hour', timestamp) AS hour\r\n  FROM server_disk_metrics\r\n  WHERE server_id = '${server}'\r\n    AND disk_name = '$drive'\r\n    AND $__timeFilter(timestamp)\r\n),\r\nhourly AS (\r\n  SELECT\r\n    r.hour AS time,\r\n    (array_agg(r.used_bytes ORDER BY r.timestamp DESC))[1] - d.day_start_used AS \"Daily Change\"\r\n  FROM in_range r\r\n  JOIN day_starts d ON r.day = d.day\r\n  WHERE r.hour < date_trunc('hour', now())\r\n  GROUP BY r.day, r.hour, d.day_start_used\r\n),\r\nlatest AS (\r\n  SELECT\r\n    max(timestamp) AS time,\r\n    (array_agg(used_bytes ORDER BY timestamp DESC))[1] AS used_bytes,\r\n    date_trunc('day', max(timestamp)) AS day\r\n  FROM in_range\r\n)\r\nSELECT time, \"Daily Change\" FROM hourly\r\n\r\nUNION ALL\r\n\r\nSELECT l.time, l.used_bytes - d.day_start_used\r\nFROM latest l\r\nJOIN day_starts d ON l.day = d.day\r\nWHERE l.time > COALESCE((SELECT max(time) FROM hourly), '-infinity'::timestamptz)\r\n\r\nORDER BY time",
+                      "sql": {
+                        "columns": [
+                          {
+                            "parameters": [],
+                            "type": "function"
+                          }
+                        ],
+                        "groupBy": [
+                          {
+                            "property": {
+                              "type": "string"
+                            },
+                            "type": "groupBy"
+                          }
+                        ],
+                        "limit": 50
+                      },
                       "table": "server_disk_metrics"
                     },
                     "version": "v0"
@@ -3699,6 +3716,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -3709,7 +3727,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "bytes"
               },
               "overrides": [
@@ -3847,6 +3864,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -3857,7 +3875,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "iops"
               },
               "overrides": []
@@ -3966,6 +3983,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -3976,7 +3994,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "ms"
               },
               "overrides": []
@@ -4085,6 +4102,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -4095,7 +4113,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "ops"
               },
               "overrides": []
@@ -4204,6 +4221,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -4214,7 +4232,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "bytes"
               },
               "overrides": []
@@ -4323,6 +4340,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -4333,7 +4351,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "bytes"
               },
               "overrides": []
@@ -4442,6 +4459,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "max": 100,
                 "min": 0,
                 "thresholds": {
@@ -4465,7 +4483,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -4574,6 +4591,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "max": 100,
                 "min": 0,
                 "thresholds": {
@@ -4593,7 +4611,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -4702,6 +4719,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -4712,7 +4730,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "bytes"
               },
               "overrides": []
@@ -4821,6 +4838,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
@@ -4830,7 +4848,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "binBps"
               },
               "overrides": [
@@ -5020,6 +5037,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -5030,7 +5048,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "binBps"
               },
               "overrides": []
@@ -5139,6 +5156,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -5149,7 +5167,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "iops"
               },
               "overrides": []
@@ -5258,6 +5275,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -5268,7 +5286,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -5377,6 +5394,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "max": 100,
                 "min": 0,
                 "thresholds": {
@@ -5396,7 +5414,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -5586,6 +5603,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -5596,7 +5614,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "bytes"
               },
               "overrides": []
@@ -5705,6 +5722,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
@@ -5714,7 +5732,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "binBps"
               },
               "overrides": [
@@ -5837,6 +5854,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -5847,7 +5865,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "iops"
               },
               "overrides": []
@@ -5956,6 +5973,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -5966,7 +5984,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -6075,6 +6092,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -6085,7 +6103,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "short"
               },
               "overrides": []
@@ -6216,6 +6233,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "max": 100,
                 "min": 0,
                 "thresholds": {
@@ -6235,7 +6253,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -6361,6 +6378,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -6371,7 +6389,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -6482,6 +6499,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -6492,7 +6510,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "bytes"
               },
               "overrides": []
@@ -6569,6 +6586,7 @@
                 "color": {
                   "mode": "thresholds"
                 },
+                "decimals": 2,
                 "max": 100,
                 "min": 0,
                 "thresholds": {
@@ -6588,7 +6606,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -6661,6 +6678,7 @@
                 "color": {
                   "mode": "thresholds"
                 },
+                "decimals": 2,
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
@@ -6670,7 +6688,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "decbytes"
               },
               "overrides": []
@@ -6743,6 +6760,7 @@
                 "color": {
                   "mode": "thresholds"
                 },
+                "decimals": 2,
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
@@ -6752,7 +6770,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "decbytes"
               },
               "overrides": []
@@ -6825,6 +6842,7 @@
                 "color": {
                   "mode": "thresholds"
                 },
+                "decimals": 2,
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
@@ -6834,7 +6852,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "decbytes"
               },
               "overrides": []
@@ -6907,6 +6924,7 @@
                 "color": {
                   "mode": "thresholds"
                 },
+                "decimals": 2,
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
@@ -6924,7 +6942,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "ms"
               },
               "overrides": []
@@ -6997,6 +7014,7 @@
                 "color": {
                   "mode": "thresholds"
                 },
+                "decimals": 2,
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
@@ -7014,7 +7032,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "ms"
               },
               "overrides": []
@@ -7087,6 +7104,7 @@
                 "color": {
                   "mode": "thresholds"
                 },
+                "decimals": 2,
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
@@ -7096,7 +7114,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "bytes"
               },
               "overrides": []
@@ -7115,125 +7132,6 @@
               "showPercentChange": false,
               "textMode": "auto",
               "wideLayout": true
-            }
-          },
-          "version": "13.0.1+security-01"
-        }
-      }
-    },
-    "panel-70": {
-      "kind": "Panel",
-      "spec": {
-        "data": {
-          "kind": "QueryGroup",
-          "spec": {
-            "queries": [
-              {
-                "kind": "PanelQuery",
-                "spec": {
-                  "hidden": false,
-                  "query": {
-                    "datasource": {
-                      "name": "ffnexhw0yascgf"
-                    },
-                    "group": "grafana-postgresql-datasource",
-                    "kind": "DataQuery",
-                    "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "WITH visible_buckets AS (SELECT $__timeGroupAlias(timestamp, $__interval) FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND $__timeFilter(timestamp) GROUP BY 1) SELECT vb.time, CASE WHEN day_sample.used_bytes IS NOT NULL AND now_sample.used_bytes > day_sample.used_bytes AND (now_sample.total_bytes - now_sample.used_bytes) > 0 AND now_sample.timestamp - day_sample.timestamp >= INTERVAL '18 hours' THEN (now_sample.total_bytes - now_sample.used_bytes) / ((now_sample.used_bytes - day_sample.used_bytes) / 86400.0) ELSE NULL END AS \"ETA until full\" FROM visible_buckets vb CROSS JOIN LATERAL (SELECT used_bytes, total_bytes, timestamp FROM server_disk_metrics m WHERE m.server_id = '${server}' AND m.disk_name = '$drive' AND m.timestamp <= vb.time ORDER BY m.timestamp DESC LIMIT 1) now_sample LEFT JOIN LATERAL (SELECT used_bytes, timestamp FROM server_disk_metrics m WHERE m.server_id = '${server}' AND m.disk_name = '$drive' AND m.timestamp <= vb.time - INTERVAL '1 day' ORDER BY m.timestamp DESC LIMIT 1) day_sample ON true ORDER BY vb.time",
-                      "table": "server_disk_metrics"
-                    },
-                    "version": "v0"
-                  },
-                  "refId": "A"
-                }
-              }
-            ],
-            "queryOptions": {},
-            "transformations": []
-          }
-        },
-        "description": "Estimated time until the disk is full: free space divided by a 1-day fill rate (used now minus used ~24h ago, over 86400s), evaluated at each chart point from raw samples. Works for any dashboard time range; needs at least ~18h of metric history.",
-        "id": 70,
-        "links": [],
-        "title": "ETA Until Full",
-        "vizConfig": {
-          "group": "timeseries",
-          "kind": "VizConfig",
-          "spec": {
-            "fieldConfig": {
-              "defaults": {
-                "color": {
-                  "mode": "palette-classic"
-                },
-                "custom": {
-                  "axisBorderShow": false,
-                  "axisCenteredZero": false,
-                  "axisColorMode": "text",
-                  "axisLabel": "",
-                  "axisPlacement": "auto",
-                  "barAlignment": 0,
-                  "barWidthFactor": 0.6,
-                  "drawStyle": "line",
-                  "fillOpacity": 0,
-                  "gradientMode": "none",
-                  "hideFrom": {
-                    "legend": false,
-                    "tooltip": false,
-                    "viz": false
-                  },
-                  "insertNulls": false,
-                  "lineInterpolation": "linear",
-                  "lineWidth": 1,
-                  "pointSize": 5,
-                  "scaleDistribution": {
-                    "type": "linear"
-                  },
-                  "showPoints": "auto",
-                  "showValues": false,
-                  "spanNulls": false,
-                  "stacking": {
-                    "group": "A",
-                    "mode": "none"
-                  },
-                  "thresholdsStyle": {
-                    "mode": "dashed"
-                  }
-                },
-                "min": 0,
-                "thresholds": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": 0
-                    }
-                  ]
-                },
-                "decimals": 2,
-                "unit": "dtdurations"
-              },
-              "overrides": []
-            },
-            "options": {
-              "annotations": {
-                "clustering": -1,
-                "multiLane": false
-              },
-              "legend": {
-                "calcs": [],
-                "displayMode": "list",
-                "placement": "bottom",
-                "showLegend": true
-              },
-              "tooltip": {
-                "hideZeros": false,
-                "mode": "multi",
-                "sort": "none"
-              }
             }
           },
           "version": "13.0.1+security-01"
@@ -7345,6 +7243,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -7363,8 +7262,126 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "ms"
+              },
+              "overrides": []
+            },
+            "options": {
+              "annotations": {
+                "clustering": -1,
+                "multiLane": false
+              },
+              "legend": {
+                "calcs": [],
+                "displayMode": "list",
+                "placement": "bottom",
+                "showLegend": true
+              },
+              "tooltip": {
+                "hideZeros": false,
+                "mode": "multi",
+                "sort": "none"
+              }
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
+    "panel-70": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "ffnexhw0yascgf"
+                    },
+                    "group": "grafana-postgresql-datasource",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "dataset": "monitor",
+                      "editorMode": "code",
+                      "format": "table",
+                      "rawQuery": true,
+                      "rawSql": "WITH visible_buckets AS (SELECT $__timeGroupAlias(timestamp, $__interval) FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND $__timeFilter(timestamp) GROUP BY 1) SELECT vb.time, CASE WHEN day_sample.used_bytes IS NOT NULL AND now_sample.used_bytes > day_sample.used_bytes AND (now_sample.total_bytes - now_sample.used_bytes) > 0 AND now_sample.timestamp - day_sample.timestamp >= INTERVAL '18 hours' THEN (now_sample.total_bytes - now_sample.used_bytes) / ((now_sample.used_bytes - day_sample.used_bytes) / 86400.0) ELSE NULL END AS \"ETA until full\" FROM visible_buckets vb CROSS JOIN LATERAL (SELECT used_bytes, total_bytes, timestamp FROM server_disk_metrics m WHERE m.server_id = '${server}' AND m.disk_name = '$drive' AND m.timestamp <= vb.time ORDER BY m.timestamp DESC LIMIT 1) now_sample LEFT JOIN LATERAL (SELECT used_bytes, timestamp FROM server_disk_metrics m WHERE m.server_id = '${server}' AND m.disk_name = '$drive' AND m.timestamp <= vb.time - INTERVAL '1 day' ORDER BY m.timestamp DESC LIMIT 1) day_sample ON true ORDER BY vb.time",
+                      "table": "server_disk_metrics"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Estimated time until the disk is full: free space divided by a 1-day fill rate (used now minus used ~24h ago, over 86400s), evaluated at each chart point from raw samples. Works for any dashboard time range; needs at least ~18h of metric history.",
+        "id": 70,
+        "links": [],
+        "title": "ETA Until Full",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "axisBorderShow": false,
+                  "axisCenteredZero": false,
+                  "axisColorMode": "text",
+                  "axisLabel": "",
+                  "axisPlacement": "auto",
+                  "barAlignment": 0,
+                  "barWidthFactor": 0.6,
+                  "drawStyle": "line",
+                  "fillOpacity": 0,
+                  "gradientMode": "none",
+                  "hideFrom": {
+                    "legend": false,
+                    "tooltip": false,
+                    "viz": false
+                  },
+                  "insertNulls": false,
+                  "lineInterpolation": "linear",
+                  "lineWidth": 1,
+                  "pointSize": 5,
+                  "scaleDistribution": {
+                    "type": "linear"
+                  },
+                  "showPoints": "auto",
+                  "showValues": false,
+                  "spanNulls": false,
+                  "stacking": {
+                    "group": "A",
+                    "mode": "none"
+                  },
+                  "thresholdsStyle": {
+                    "mode": "dashed"
+                  }
+                },
+                "decimals": 2,
+                "min": 0,
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    }
+                  ]
+                },
+                "unit": "dtdurations"
               },
               "overrides": []
             },
@@ -7539,6 +7556,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
@@ -7548,7 +7566,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "binbps"
               },
               "overrides": [
@@ -7738,6 +7755,7 @@
                     "mode": "dashed"
                   }
                 },
+                "decimals": 2,
                 "min": 0,
                 "thresholds": {
                   "mode": "absolute",
@@ -7756,7 +7774,6 @@
                     }
                   ]
                 },
-                "decimals": 2,
                 "unit": "pps"
               },
               "overrides": []
@@ -8891,6 +8908,26 @@
   },
   "title": "Monitor",
   "variables": [
+    {
+      "kind": "DatasourceVariable",
+      "spec": {
+        "allowCustomValue": true,
+        "current": {
+          "text": "monitor-vm",
+          "value": "dfnn4ltxv2fwgf"
+        },
+        "description": "Datasource",
+        "hide": "dontHide",
+        "includeAll": false,
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "pluginId": "victoriametrics-metrics-datasource",
+        "refresh": "onDashboardLoad",
+        "regex": "",
+        "skipUrlSync": false
+      }
+    },
     {
       "kind": "QueryVariable",
       "spec": {

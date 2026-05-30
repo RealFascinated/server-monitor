@@ -315,42 +315,7 @@ def main() -> None:
         ],
         stat_viz(),
     )
-    add(
-        12,
-        "Docker Enabled",
-        [
-            pg_query(
-                f"SELECT COUNT(DISTINCT server_id)::bigint AS value "
-                f"FROM server_docker_container_metrics "
-                f"WHERE timestamp > NOW() - INTERVAL '{five_min}'"
-            )
-        ],
-        stat_viz(),
-    )
-    add(
-        13,
-        "ZFS Enabled",
-        [
-            pg_query(
-                f"SELECT COUNT(*)::bigint AS value FROM ("
-                f"SELECT DISTINCT server_id FROM server_zfs_arc_metrics "
-                f"WHERE timestamp > NOW() - INTERVAL '{five_min}' "
-                f"UNION "
-                f"SELECT DISTINCT server_id FROM server_zfs_pool_metrics "
-                f"WHERE timestamp > NOW() - INTERVAL '{five_min}'"
-                f") t"
-            )
-        ],
-        stat_viz(),
-    )
-
     add(14, "Ingest Rate", [prom_query("rate(monitor_ingests_total[1m]) * 60")], timeseries_viz("rpm"))
-    add(
-        15,
-        "Metric Rows / sec",
-        [prom_query("sum by (table) (rate(monitor_ingest_rows_total[1m]))")],
-        timeseries_viz("wps"),
-    )
     add(
         16,
         "Ingest Duration",
@@ -403,43 +368,6 @@ def main() -> None:
         pie_viz(),
     )
 
-    add(
-        20,
-        "Table Rows",
-        [
-            pg_query(
-                "SELECT 'server_metrics' AS metric, COUNT(*)::bigint AS value FROM server_metrics "
-                "UNION ALL SELECT 'server_disk_metrics', COUNT(*)::bigint FROM server_disk_metrics "
-                "UNION ALL SELECT 'server_network_metrics', COUNT(*)::bigint FROM server_network_metrics "
-                "UNION ALL SELECT 'server_zfs_arc_metrics', COUNT(*)::bigint FROM server_zfs_arc_metrics "
-                "UNION ALL SELECT 'server_zfs_pool_metrics', COUNT(*)::bigint FROM server_zfs_pool_metrics "
-                "UNION ALL SELECT 'server_docker_container_metrics', COUNT(*)::bigint "
-                "FROM server_docker_container_metrics ORDER BY value DESC"
-            )
-        ],
-        barchart_viz(),
-    )
-    add(
-        21,
-        "Table Size",
-        [
-            pg_query(
-                "SELECT 'server_metrics' AS metric, pg_total_relation_size('server_metrics')::bigint AS value "
-                "UNION ALL SELECT 'server_disk_metrics', pg_total_relation_size('server_disk_metrics')::bigint "
-                "UNION ALL SELECT 'server_network_metrics', "
-                "pg_total_relation_size('server_network_metrics')::bigint "
-                "UNION ALL SELECT 'server_zfs_arc_metrics', "
-                "pg_total_relation_size('server_zfs_arc_metrics')::bigint "
-                "UNION ALL SELECT 'server_zfs_pool_metrics', "
-                "pg_total_relation_size('server_zfs_pool_metrics')::bigint "
-                "UNION ALL SELECT 'server_docker_container_metrics', "
-                "pg_total_relation_size('server_docker_container_metrics')::bigint "
-                "ORDER BY value DESC"
-            )
-        ],
-        barchart_viz("bytes"),
-    )
-
     layout_rows = [
         row(
             "Overview",
@@ -458,19 +386,16 @@ def main() -> None:
         row(
             "Growth",
             [
-                grid_item("panel-10", 0, 0, 6, 4),
-                grid_item("panel-11", 6, 0, 6, 4),
-                grid_item("panel-12", 12, 0, 6, 4),
-                grid_item("panel-13", 18, 0, 6, 4),
+                grid_item("panel-10", 0, 0, 12, 4),
+                grid_item("panel-11", 12, 0, 12, 4),
             ],
         ),
         row(
             "Ingest",
             [
                 grid_item("panel-14", 0, 0, 12, 8),
-                grid_item("panel-15", 12, 0, 12, 8),
-                grid_item("panel-16", 0, 8, 12, 8),
-                grid_item("panel-17", 12, 8, 12, 8),
+                grid_item("panel-16", 12, 0, 12, 8),
+                grid_item("panel-17", 0, 8, 24, 8),
             ],
         ),
         row(
@@ -478,13 +403,6 @@ def main() -> None:
             [
                 grid_item("panel-18", 0, 0, 12, 10),
                 grid_item("panel-19", 12, 0, 12, 10),
-            ],
-        ),
-        row(
-            "Storage",
-            [
-                grid_item("panel-20", 0, 0, 12, 8),
-                grid_item("panel-21", 12, 0, 12, 8),
             ],
         ),
     ]
