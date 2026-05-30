@@ -39,6 +39,14 @@ spring:
     enabled: true
     locations: classpath:db/migration
 
+monitor:
+  servers:
+    offline-threshold: 2m
+  metrics:
+    bearer-token: "" # empty = no auth on /metrics
+    refresh-interval: 30s
+    reporting-threshold: 5m
+
 logging:
   pattern:
     console: "%level %logger{36} - %msg%n"

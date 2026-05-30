@@ -487,7 +487,7 @@
                       "editorMode": "code",
                       "format": "table",
                       "rawQuery": true,
-                      "rawSql": "SELECT ip AS server_ip FROM servers WHERE id = '${server}'",
+                      "rawSql": "SELECT ip AS server_ip FROM server_inventory WHERE server_id = '${server}'",
                       "sql": {
                         "columns": [
                           {
@@ -520,7 +520,7 @@
                         ],
                         "limit": 50
                       },
-                      "table": "servers"
+                      "table": "server_inventory"
                     },
                     "version": "v0"
                   },
@@ -2154,8 +2154,8 @@
                       "editorMode": "code",
                       "format": "table",
                       "rawQuery": true,
-                      "rawSql": "SELECT cpu_model FROM servers WHERE id = '${server}'",
-                      "table": "servers"
+                      "rawSql": "SELECT cpu_model FROM server_inventory WHERE server_id = '${server}'",
+                      "table": "server_inventory"
                     },
                     "version": "v0"
                   },
@@ -2236,8 +2236,8 @@
                       "editorMode": "code",
                       "format": "table",
                       "rawQuery": true,
-                      "rawSql": "SELECT socket_count FROM servers WHERE id = '${server}'",
-                      "table": "servers"
+                      "rawSql": "SELECT socket_count FROM server_inventory WHERE server_id = '${server}'",
+                      "table": "server_inventory"
                     },
                     "version": "v0"
                   },
@@ -2469,8 +2469,8 @@
                       "editorMode": "code",
                       "format": "table",
                       "rawQuery": true,
-                      "rawSql": "SELECT cpu_clock_mhz * 1000000 AS cpu_clock_hz FROM servers WHERE id = '${server}'",
-                      "table": "servers"
+                      "rawSql": "SELECT cpu_clock_mhz * 1000000 AS cpu_clock_hz FROM server_inventory WHERE server_id = '${server}'",
+                      "table": "server_inventory"
                     },
                     "version": "v0"
                   },
@@ -2552,8 +2552,8 @@
                       "editorMode": "code",
                       "format": "table",
                       "rawQuery": true,
-                      "rawSql": "SELECT core_count || ' / ' || thread_count AS cpu_cores FROM servers WHERE id = '${server}'",
-                      "table": "servers"
+                      "rawSql": "SELECT core_count || ' / ' || thread_count AS cpu_cores FROM server_inventory WHERE server_id = '${server}'",
+                      "table": "server_inventory"
                     },
                     "version": "v0"
                   },

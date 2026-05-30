@@ -63,4 +63,28 @@ public class AuthUtils {
                 hash.getBytes(StandardCharsets.UTF_8)
         );
     }
+
+    /**
+     * Constant-time comparison of a configured bearer token against an Authorization header.
+     *
+     * @param expected            the expected bearer token value
+     * @param authorizationHeader the Authorization header, or null
+     * @return true if the bearer token matches
+     */
+    public static boolean bearerTokensEqual(String expected, String authorizationHeader) {
+        if (expected == null || expected.isEmpty()) {
+            return false;
+        }
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            return false;
+        }
+        String token = authorizationHeader.substring("Bearer ".length()).trim();
+        if (token.isEmpty()) {
+            return false;
+        }
+        return MessageDigest.isEqual(
+                expected.getBytes(StandardCharsets.UTF_8),
+                token.getBytes(StandardCharsets.UTF_8)
+        );
+    }
 }

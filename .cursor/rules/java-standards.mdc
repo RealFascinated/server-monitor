@@ -1,0 +1,103 @@
+---
+description: Java and SQL coding standards for Monitor API
+globs: "**/*.java,**/*.sql"
+alwaysApply: false
+---
+
+# Code Style
+
+## Fields
+
+Fields go at the top of the class, always. Order: static fields first, then instance fields.
+
+```java
+private static final int SESSION_TOKEN_BYTES = 32;
+
+private final ServerRepository serverRepository;
+@Setter(AccessLevel.NONE) private Long id;
+private String serverName;
+```
+
+## Method Order
+
+1. Constructors
+2. `@Override` methods
+3. Event handler methods
+4. Public methods
+5. Protected methods
+6. Private methods
+7. Public static methods
+8. Protected static methods
+9. Private static methods
+
+## Lombok
+
+Use Lombok to eliminate boilerplate. Apply annotations at class level where uniform, field level where access needs to differ.
+
+```java
+@Entity
+@Table(name = "servers")
+@NoArgsConstructor
+@Getter @Setter
+public class ServerRow {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE)
+    private Long id;
+
+    @Column(name = "created_at", nullable = false)
+    @Setter(AccessLevel.NONE)
+    private Instant createdAt;
+}
+```
+
+- Use `@Getter` / `@Setter` at class level when all fields share the same access.
+- Use field-level `@Setter(AccessLevel.NONE)` for identity or immutable fields.
+- Use `@UtilityClass` for static-only utility classes.
+- Use `@Slf4j` for logging (not a manual logger or `@Log4j2`).
+- Use `@SneakyThrows` when a checked exception can't realistically occur and wrapping it adds noise.
+
+## Nullability
+
+Only use `@Nullable` from JetBrains (`org.jetbrains.annotations.Nullable`) on fields or parameters that may be null.
+
+Don't use `@NonNull`, `@NotNull`, or any other non-null annotation in our own code. The only exception is overriding a third-party API that already uses them.
+
+## No Useless Variables or Methods
+
+Don't assign a value to a variable if it's only used once immediately after. Don't extract a method if it's only called from one place and adds no clarity — inline it.
+
+## Static Methods and Constants
+
+Move general-purpose static methods to a `@UtilityClass` in `util`. Access `public static` fields directly — no getters.
+
+```java
+// bad
+AuthUtils.getHashAlgorithm()
+
+// good
+AuthUtils.hash(value)
+```
+
+## Spring Conventions
+
+- Constructor injection for services and controllers; no field injection.
+- DTOs are Java `record`s with Jakarta validation annotations where needed.
+- Services throw typed exceptions from `exception.impl`; `ExceptionControllerAdvice` maps them to HTTP responses.
+- Use `@Transactional` on service methods that perform multiple writes.
+- Controllers stay thin — delegate to services, no business logic.
+
+## JPA and Migrations
+
+- Entity table/column names use snake_case via `@Column(name = "...")`.
+- One Flyway migration per schema change: `V{n}__short_description.sql`. Never edit applied migrations.
+- Metric time-series rows live in `model.persistance.metric`; server/user rows in `model.persistance`.
+
+## Performance
+
+Metrics ingest is a hot path. Performance is not an afterthought.
+
+- Prefer `HashMap` over `LinkedHashMap`, arrays over lists, primitives over boxed types where order and boxing don't matter.
+- Avoid unnecessary object allocation in ingest handlers and frequently called service methods.
+- Don't iterate a collection multiple times when one pass will do.
+- Cache lookups repeated within the same operation rather than re-fetching.
+- If two approaches are otherwise equal, pick the faster one.

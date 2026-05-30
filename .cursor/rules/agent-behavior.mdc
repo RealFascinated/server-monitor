@@ -1,0 +1,51 @@
+---
+description: Agent behavior and workflow for Monitor API
+alwaysApply: true
+---
+
+# Agent Guidelines
+
+## Behavior
+
+**Think before coding, but don't over-plan. Just do the task.**
+
+- State assumptions explicitly. If uncertain about something critical, ask — don't guess silently.
+- If multiple valid approaches exist, pick the simplest and say why.
+- Don't produce step-by-step plans or loop structures unless the task is genuinely complex and multi-phase.
+
+**Minimum code that solves the problem. Nothing speculative.**
+
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
+
+**Never commit automatically. Let the user commit their own changes.**
+
+After completing changes, suggest a short commit message the user can use — but don't run `git commit`. No conventional commit prefixes. Just the message itself.
+
+**Touch only what you must.**
+
+- Don't "improve" adjacent code, formatting, or comments.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- Remove imports/variables/methods that *your* changes made unused — leave pre-existing dead code alone unless asked.
+
+## Project Overview
+
+Spring Boot REST API (`cc.fascinated.monitor`) for server monitoring: user auth, server registration, and agent metrics ingestion into PostgreSQL.
+
+| Layer | Package | Naming |
+|-------|---------|--------|
+| Controllers | `controller`, `controller.v1` | `*Controller` |
+| Services | `service` | `*Service` |
+| Repositories | `repository` | `*Repository` extends `JpaRepository` |
+| JPA entities | `model.persistance`, `model.persistance.metric` | `*Row` |
+| DTOs | `model.dto.request`, `model.dto.response` | Java `record` |
+| Domain types | `model.domain` | enums, value types |
+| Exceptions | `exception.impl` | `@StandardException` + `@ResponseStatus` |
+| Auth resolvers | `web.auth` | `@AuthenticatedUser`, `@AuthenticatedServer` |
+| Utilities | `util` | `@UtilityClass` |
+| Migrations | `src/main/resources/db/migration` | `V{n}__description.sql` |
+
+Auth uses Bearer tokens parsed via `AuthUtils`. User sessions and ingest tokens are stored as SHA-256 hashes — never persist raw tokens.
