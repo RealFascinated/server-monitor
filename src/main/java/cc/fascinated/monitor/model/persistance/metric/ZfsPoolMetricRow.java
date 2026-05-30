@@ -13,7 +13,8 @@ import java.time.Instant;
 @Getter
 public class ZfsPoolMetricRow {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "server_zfs_pool_metrics_id_seq")
+    @SequenceGenerator(name = "server_zfs_pool_metrics_id_seq", sequenceName = "server_zfs_pool_metrics_id_seq", allocationSize = 50)
     private Long id;
 
     @Column(name = "server_id")

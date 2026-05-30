@@ -13,7 +13,8 @@ import java.time.Instant;
 @Getter
 public class InterfaceMetricRow {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "server_network_metrics_id_seq")
+    @SequenceGenerator(name = "server_network_metrics_id_seq", sequenceName = "server_network_metrics_id_seq", allocationSize = 50)
     private Long id;
 
     @Column(name = "server_id")

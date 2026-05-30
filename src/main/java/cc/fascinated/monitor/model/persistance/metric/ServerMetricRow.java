@@ -13,7 +13,8 @@ import java.time.Instant;
 @Getter
 public class ServerMetricRow {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "server_metrics_id_seq")
+    @SequenceGenerator(name = "server_metrics_id_seq", sequenceName = "server_metrics_id_seq", allocationSize = 50)
     private Long id;
 
     @Column(name = "server_id")
