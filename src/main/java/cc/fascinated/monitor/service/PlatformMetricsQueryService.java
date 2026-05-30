@@ -96,7 +96,15 @@ public class PlatformMetricsQueryService {
     }
 
     public long tableSizeBytes(String table) {
-        return queryLong("SELECT pg_total_relation_size(?::regclass)", table);
+        return queryLong("""
+                SELECT CASE
+                    WHEN EXISTS (
+                        SELECT 1 FROM timescaledb_information.hypertables h
+                        WHERE h.hypertable_schema = 'public' AND h.hypertable_name = ?
+                    ) THEN hypertable_size(?::regclass)
+                    ELSE pg_total_relation_size(?::regclass)
+                END
+                """, table, table, table);
     }
 
     public String[] metricTables() {
