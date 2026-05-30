@@ -8,6 +8,7 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "server_metrics")
+@IdClass(MetricRowId.class)
 @NoArgsConstructor
 @Getter
 public class ServerMetricRow {
@@ -75,7 +76,8 @@ public class ServerMetricRow {
     @Column(name = "interrupts_per_second")
     private long interruptsPerSecond;
 
-    @Column(name = "timestamp")
+    @Id
+    @Column(name = "timestamp", nullable = false)
     private Instant timestamp;
 
     public ServerMetricRow(Long serverId, double cpuUsage, double memoryUsage, double memoryAvailable, double memoryTotal,

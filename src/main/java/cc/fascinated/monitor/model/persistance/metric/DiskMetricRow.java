@@ -8,6 +8,7 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "server_disk_metrics")
+@IdClass(MetricRowId.class)
 @NoArgsConstructor
 @Getter
 public class DiskMetricRow {
@@ -60,7 +61,8 @@ public class DiskMetricRow {
     @Column(name = "write_latency_ms")
     private long writeLatencyMs;
 
-    @Column(name = "timestamp")
+    @Id
+    @Column(name = "timestamp", nullable = false)
     private Instant timestamp;
 
     public DiskMetricRow(Long serverId, String diskName, double usagePercent, long usedBytes, long totalBytes,

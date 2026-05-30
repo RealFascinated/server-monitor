@@ -8,6 +8,7 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "server_zfs_pool_metrics")
+@IdClass(MetricRowId.class)
 @NoArgsConstructor
 @Getter
 public class ZfsPoolMetricRow {
@@ -60,7 +61,8 @@ public class ZfsPoolMetricRow {
     @Column(name = "checksum_errors")
     private long checksumErrors;
 
-    @Column(name = "timestamp")
+    @Id
+    @Column(name = "timestamp", nullable = false)
     private Instant timestamp;
 
     public ZfsPoolMetricRow(

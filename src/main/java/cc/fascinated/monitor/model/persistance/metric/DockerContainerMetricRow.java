@@ -8,6 +8,7 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "server_docker_container_metrics")
+@IdClass(MetricRowId.class)
 @NoArgsConstructor
 @Getter
 public class DockerContainerMetricRow {
@@ -27,7 +28,8 @@ public class DockerContainerMetricRow {
     @Column(name = "memory_usage")
     private Long memoryUsage;
 
-    @Column(name = "timestamp")
+    @Id
+    @Column(name = "timestamp", nullable = false)
     private Instant timestamp;
 
     public DockerContainerMetricRow(

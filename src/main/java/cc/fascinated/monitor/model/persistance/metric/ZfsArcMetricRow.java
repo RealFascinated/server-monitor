@@ -8,6 +8,7 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "server_zfs_arc_metrics")
+@IdClass(MetricRowId.class)
 @NoArgsConstructor
 @Getter
 public class ZfsArcMetricRow {
@@ -45,7 +46,8 @@ public class ZfsArcMetricRow {
     @Column(name = "arc_misses_per_second")
     private long arcMissesPerSecond;
 
-    @Column(name = "timestamp")
+    @Id
+    @Column(name = "timestamp", nullable = false)
     private Instant timestamp;
 
     public ZfsArcMetricRow(

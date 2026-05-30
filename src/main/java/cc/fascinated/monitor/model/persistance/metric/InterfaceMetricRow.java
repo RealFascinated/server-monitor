@@ -8,6 +8,7 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "server_network_metrics")
+@IdClass(MetricRowId.class)
 @NoArgsConstructor
 @Getter
 public class InterfaceMetricRow {
@@ -39,7 +40,8 @@ public class InterfaceMetricRow {
     @Column(name = "tx_errors_per_second")
     private long txErrorsPerSecond;
 
-    @Column(name = "timestamp")
+    @Id
+    @Column(name = "timestamp", nullable = false)
     private Instant timestamp;
 
     public InterfaceMetricRow(Long serverId, String interfaceName, long rxBytesPerSecond, long txBytesPerSecond, long rxPacketsPerSecond,
