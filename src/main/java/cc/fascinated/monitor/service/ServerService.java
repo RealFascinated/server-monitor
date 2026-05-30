@@ -100,15 +100,16 @@ public class ServerService {
         server.setAgentVersion(metrics.agentVersion());
 
         ServerDetails serverDetails = metrics.serverDetails();
-        server.setIp(serverDetails.ip());
-        server.setCoreCount(serverDetails.coreCount());
-        server.setThreadCount(serverDetails.threadCount());
-        server.setOsName(serverDetails.osName());
-        server.setOsVersion(serverDetails.osVersion());
+        ServerInventoryRow inventory = getOrCreateInventory(server);
+        inventory.setIp(serverDetails.ip());
+        inventory.setCoreCount(serverDetails.coreCount());
+        inventory.setThreadCount(serverDetails.threadCount());
+        inventory.setOsName(serverDetails.osName());
+        inventory.setOsVersion(serverDetails.osVersion());
+        inventory.setCpuModel(serverDetails.cpuModel());
+        inventory.setSocketCount(serverDetails.socketCount());
+        inventory.setCpuClockMhz(serverDetails.cpuClockMhz());
         server.setLastUptimeSeconds(serverDetails.uptimeSeconds());
-        server.setCpuModel(serverDetails.cpuModel());
-        server.setSocketCount(serverDetails.socketCount());
-        server.setCpuClockMhz(serverDetails.cpuClockMhz());
         server.setLastUpdated(now);
         server.setStatus(ServerStatus.ONLINE);
 
@@ -225,5 +226,14 @@ public class ServerService {
         }
 
         this.serverRepository.save(server);
+    }
+
+    private static ServerInventoryRow getOrCreateInventory(ServerRow server) {
+        ServerInventoryRow inventory = server.getInventory();
+        if (inventory == null) {
+            inventory = new ServerInventoryRow(server);
+            server.setInventory(inventory);
+        }
+        return inventory;
     }
 }

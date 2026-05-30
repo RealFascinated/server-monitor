@@ -26,29 +26,8 @@ public class ServerRow {
     @Column(name = "owner_id", nullable = false)
     private Long ownerId;
 
-    @Column(name = "ip")
-    private String ip;
-
-    @Column(name = "core_count")
-    private Integer coreCount;
-
-    @Column(name = "thread_count")
-    private Integer threadCount;
-
-    @Column(name = "cpu_model")
-    private String cpuModel;
-
-    @Column(name = "socket_count")
-    private Integer socketCount;
-
-    @Column(name = "cpu_clock_mhz")
-    private Double cpuClockMhz;
-
-    @Column(name = "os_name")
-    private String osName;
-
-    @Column(name = "os_version")
-    private String osVersion;
+    @OneToOne(mappedBy = "server", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private ServerInventoryRow inventory;
 
     @Column(name = "status")
     private ServerStatus status;

@@ -190,6 +190,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "pps"
               },
               "overrides": []
@@ -439,6 +440,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "s"
               },
               "overrides": []
@@ -581,124 +583,6 @@
         }
       }
     },
-    "panel-14": {
-      "kind": "Panel",
-      "spec": {
-        "data": {
-          "kind": "QueryGroup",
-          "spec": {
-            "queries": [
-              {
-                "kind": "PanelQuery",
-                "spec": {
-                  "hidden": false,
-                  "query": {
-                    "datasource": {
-                      "name": "ffnexhw0yascgf"
-                    },
-                    "group": "grafana-postgresql-datasource",
-                    "kind": "DataQuery",
-                    "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT os_name || ' ' || os_version AS server_os FROM servers WHERE id = '${server}'",
-                      "sql": {
-                        "columns": [
-                          {
-                            "alias": "\"CPU Usage\"",
-                            "parameters": [
-                              {
-                                "name": "cpu_usage",
-                                "type": "functionParameter"
-                              }
-                            ],
-                            "type": "function"
-                          },
-                          {
-                            "parameters": [
-                              {
-                                "name": "\"timestamp\"",
-                                "type": "functionParameter"
-                              }
-                            ],
-                            "type": "function"
-                          }
-                        ],
-                        "groupBy": [
-                          {
-                            "property": {
-                              "type": "string"
-                            },
-                            "type": "groupBy"
-                          }
-                        ],
-                        "limit": 50
-                      },
-                      "table": "servers"
-                    },
-                    "version": "v0"
-                  },
-                  "refId": "A"
-                }
-              }
-            ],
-            "queryOptions": {},
-            "transformations": []
-          }
-        },
-        "description": "",
-        "id": 14,
-        "links": [],
-        "title": "OS",
-        "vizConfig": {
-          "group": "stat",
-          "kind": "VizConfig",
-          "spec": {
-            "fieldConfig": {
-              "defaults": {
-                "color": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                },
-                "thresholds": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": 0
-                    },
-                    {
-                      "color": "red",
-                      "value": 80
-                    }
-                  ]
-                },
-                "unit": "none"
-              },
-              "overrides": []
-            },
-            "options": {
-              "colorMode": "value",
-              "graphMode": "none",
-              "justifyMode": "auto",
-              "orientation": "auto",
-              "percentChangeColorMode": "standard",
-              "reduceOptions": {
-                "calcs": [],
-                "fields": "/^server_os$/",
-                "values": false
-              },
-              "showPercentChange": false,
-              "textMode": "value",
-              "wideLayout": true
-            }
-          },
-          "version": "13.0.1+security-01"
-        }
-      }
-    },
     "panel-15": {
       "kind": "Panel",
       "spec": {
@@ -766,6 +650,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -812,7 +697,24 @@
                       "editorMode": "code",
                       "format": "table",
                       "rawQuery": true,
-                      "rawSql": "SELECT mem_usage AS memory_used FROM server_metrics WHERE server_id = '${server}' ORDER BY timestamp DESC LIMIT 1",
+                      "rawSql": "SELECT mem_available AS memory_used FROM server_metrics WHERE server_id = '${server}' ORDER BY timestamp DESC LIMIT 1",
+                      "sql": {
+                        "columns": [
+                          {
+                            "parameters": [],
+                            "type": "function"
+                          }
+                        ],
+                        "groupBy": [
+                          {
+                            "property": {
+                              "type": "string"
+                            },
+                            "type": "groupBy"
+                          }
+                        ],
+                        "limit": 50
+                      },
                       "table": "server_metrics"
                     },
                     "version": "v0"
@@ -828,7 +730,7 @@
         "description": "",
         "id": 16,
         "links": [],
-        "title": "Memory",
+        "title": "Memory Available",
         "vizConfig": {
           "group": "stat",
           "kind": "VizConfig",
@@ -838,26 +740,17 @@
                 "color": {
                   "mode": "thresholds"
                 },
-                "max": 100,
-                "min": 0,
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
                     {
                       "color": "green",
                       "value": 0
-                    },
-                    {
-                      "color": "yellow",
-                      "value": 80
-                    },
-                    {
-                      "color": "red",
-                      "value": 90
                     }
                   ]
                 },
-                "unit": "percent"
+                "decimals": 2,
+                "unit": "bytes"
               },
               "overrides": []
             },
@@ -974,6 +867,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -1115,6 +1009,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "bytes"
               },
               "overrides": []
@@ -1234,6 +1129,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -1375,6 +1271,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "binBps"
               },
               "overrides": []
@@ -1494,6 +1391,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "ms"
               },
               "overrides": []
@@ -1542,7 +1440,24 @@
                       "editorMode": "code",
                       "format": "time_series",
                       "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), SUM(rx_bps) AS \"In\" FROM server_network_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
+                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), SUM(rx_bps) * 8 AS \"In\" FROM server_network_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
+                      "sql": {
+                        "columns": [
+                          {
+                            "parameters": [],
+                            "type": "function"
+                          }
+                        ],
+                        "groupBy": [
+                          {
+                            "property": {
+                              "type": "string"
+                            },
+                            "type": "groupBy"
+                          }
+                        ],
+                        "limit": 50
+                      },
                       "table": "server_network_metrics"
                     },
                     "version": "v0"
@@ -1565,7 +1480,24 @@
                       "editorMode": "code",
                       "format": "time_series",
                       "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), SUM(tx_bps) AS \"Out\" FROM server_network_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
+                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), SUM(tx_bps) * 8 AS \"Out\" FROM server_network_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
+                      "sql": {
+                        "columns": [
+                          {
+                            "parameters": [],
+                            "type": "function"
+                          }
+                        ],
+                        "groupBy": [
+                          {
+                            "property": {
+                              "type": "string"
+                            },
+                            "type": "groupBy"
+                          }
+                        ],
+                        "limit": 50
+                      },
                       "table": "server_network_metrics"
                     },
                     "version": "v0"
@@ -1634,7 +1566,8 @@
                     }
                   ]
                 },
-                "unit": "binBps"
+                "decimals": 2,
+                "unit": "binbps"
               },
               "overrides": [
                 {
@@ -1789,6 +1722,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "pps"
               },
               "overrides": []
@@ -1907,6 +1841,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "short"
               },
               "overrides": []
@@ -2026,6 +1961,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": [
@@ -2169,6 +2105,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "bytes"
               },
               "overrides": []
@@ -2335,6 +2272,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "short"
               },
               "overrides": []
@@ -2482,6 +2420,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -2566,6 +2505,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "hertz"
               },
               "overrides": []
@@ -2764,6 +2704,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "bytes"
               },
               "overrides": []
@@ -2882,6 +2823,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "short"
               },
               "overrides": []
@@ -3000,6 +2942,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "ops"
               },
               "overrides": []
@@ -3200,6 +3143,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "short"
               },
               "overrides": []
@@ -3318,6 +3262,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "iops"
               },
               "overrides": []
@@ -3436,6 +3381,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "ms"
               },
               "overrides": []
@@ -3554,6 +3500,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "short"
               },
               "overrides": []
@@ -3692,7 +3639,7 @@
                       "editorMode": "code",
                       "format": "table",
                       "rawQuery": true,
-                      "rawSql": "WITH day_starts AS (SELECT date_trunc('day', timestamp) AS day, (array_agg(used_bytes ORDER BY timestamp ASC))[1] AS day_start_used FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' GROUP BY 1), in_range AS (SELECT timestamp, used_bytes, date_trunc('day', timestamp) AS day FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND $__timeFilter(timestamp)) SELECT max(r.timestamp) AS time, max(r.used_bytes) - max(d.day_start_used) AS \"Daily Change\" FROM in_range r JOIN day_starts d ON r.day = d.day GROUP BY r.day ORDER BY time",
+                      "rawSql": "WITH day_starts AS (SELECT date_trunc('day', timestamp) AS day, (array_agg(used_bytes ORDER BY timestamp ASC))[1] AS day_start_used FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' GROUP BY 1), in_range AS (SELECT timestamp, used_bytes, date_trunc('day', timestamp) AS day, date_trunc('hour', timestamp) AS hour FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND $__timeFilter(timestamp)), hourly AS (SELECT r.hour AS time, max(r.used_bytes) - d.day_start_used AS \"Daily Change\" FROM in_range r JOIN day_starts d ON r.day = d.day GROUP BY r.hour, d.day_start_used), latest AS (SELECT max(timestamp) AS time, (array_agg(used_bytes ORDER BY timestamp DESC))[1] AS used_bytes, date_trunc('day', max(timestamp)) AS day FROM in_range) SELECT time, \"Daily Change\" FROM hourly UNION ALL SELECT l.time, l.used_bytes - d.day_start_used FROM latest l JOIN day_starts d ON l.day = d.day WHERE l.time > COALESCE((SELECT max(time) FROM hourly), '-infinity'::timestamptz) ORDER BY time",
                       "table": "server_disk_metrics"
                     },
                     "version": "v0"
@@ -3762,6 +3709,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "bytes"
               },
               "overrides": [
@@ -3909,6 +3857,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "iops"
               },
               "overrides": []
@@ -4027,6 +3976,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "ms"
               },
               "overrides": []
@@ -4145,6 +4095,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "ops"
               },
               "overrides": []
@@ -4263,6 +4214,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "bytes"
               },
               "overrides": []
@@ -4381,6 +4333,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "bytes"
               },
               "overrides": []
@@ -4512,6 +4465,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -4639,6 +4593,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -4757,6 +4712,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "bytes"
               },
               "overrides": []
@@ -4874,6 +4830,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "binBps"
               },
               "overrides": [
@@ -5073,6 +5030,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "binBps"
               },
               "overrides": []
@@ -5191,6 +5149,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "iops"
               },
               "overrides": []
@@ -5309,125 +5268,8 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "percent"
-              },
-              "overrides": []
-            },
-            "options": {
-              "annotations": {
-                "clustering": -1,
-                "multiLane": false
-              },
-              "legend": {
-                "calcs": [],
-                "displayMode": "list",
-                "placement": "bottom",
-                "showLegend": true
-              },
-              "tooltip": {
-                "hideZeros": false,
-                "mode": "multi",
-                "sort": "none"
-              }
-            }
-          },
-          "version": "13.0.1+security-01"
-        }
-      }
-    },
-    "panel-52": {
-      "kind": "Panel",
-      "spec": {
-        "data": {
-          "kind": "QueryGroup",
-          "spec": {
-            "queries": [
-              {
-                "kind": "PanelQuery",
-                "spec": {
-                  "hidden": false,
-                  "query": {
-                    "datasource": {
-                      "name": "ffnexhw0yascgf"
-                    },
-                    "group": "grafana-postgresql-datasource",
-                    "kind": "DataQuery",
-                    "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT time, SUM(checksum_errors) AS \"Checksum Errors\" FROM (SELECT $__timeGroupAlias(timestamp, $__interval), pool_name, AVG(checksum_errors) AS checksum_errors FROM server_zfs_pool_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1, pool_name) per_pool GROUP BY time ORDER BY time",
-                      "table": "server_zfs_pool_metrics"
-                    },
-                    "version": "v0"
-                  },
-                  "refId": "A"
-                }
-              }
-            ],
-            "queryOptions": {},
-            "transformations": []
-          }
-        },
-        "description": "",
-        "id": 52,
-        "links": [],
-        "title": "Checksum Errors",
-        "vizConfig": {
-          "group": "timeseries",
-          "kind": "VizConfig",
-          "spec": {
-            "fieldConfig": {
-              "defaults": {
-                "color": {
-                  "mode": "palette-classic"
-                },
-                "custom": {
-                  "axisBorderShow": false,
-                  "axisCenteredZero": false,
-                  "axisColorMode": "text",
-                  "axisLabel": "",
-                  "axisPlacement": "auto",
-                  "barAlignment": 0,
-                  "barWidthFactor": 0.6,
-                  "drawStyle": "line",
-                  "fillOpacity": 0,
-                  "gradientMode": "none",
-                  "hideFrom": {
-                    "legend": false,
-                    "tooltip": false,
-                    "viz": false
-                  },
-                  "insertNulls": false,
-                  "lineInterpolation": "linear",
-                  "lineWidth": 1,
-                  "pointSize": 5,
-                  "scaleDistribution": {
-                    "type": "linear"
-                  },
-                  "showPoints": "auto",
-                  "showValues": false,
-                  "spanNulls": false,
-                  "stacking": {
-                    "group": "A",
-                    "mode": "none"
-                  },
-                  "thresholdsStyle": {
-                    "mode": "dashed"
-                  }
-                },
-                "min": 0,
-                "thresholds": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": 0
-                    }
-                  ]
-                },
-                "unit": "short"
               },
               "overrides": []
             },
@@ -5554,6 +5396,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -5753,6 +5596,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "bytes"
               },
               "overrides": []
@@ -5870,6 +5714,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "binBps"
               },
               "overrides": [
@@ -6002,6 +5847,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "iops"
               },
               "overrides": []
@@ -6120,6 +5966,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -6238,6 +6085,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "short"
               },
               "overrides": []
@@ -6387,6 +6235,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -6506,7 +6355,7 @@
                   "spanNulls": false,
                   "stacking": {
                     "group": "A",
-                    "mode": "none"
+                    "mode": "normal"
                   },
                   "thresholdsStyle": {
                     "mode": "dashed"
@@ -6522,6 +6371,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "percent"
               },
               "overrides": []
@@ -6626,7 +6476,7 @@
                   "spanNulls": false,
                   "stacking": {
                     "group": "A",
-                    "mode": "none"
+                    "mode": "normal"
                   },
                   "thresholdsStyle": {
                     "mode": "dashed"
@@ -6642,6 +6492,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "bytes"
               },
               "overrides": []
@@ -6670,7 +6521,7 @@
         }
       }
     },
-    "panel-62": {
+    "panel-63": {
       "kind": "Panel",
       "spec": {
         "data": {
@@ -6692,8 +6543,8 @@
                       "editorMode": "code",
                       "format": "table",
                       "rawQuery": true,
-                      "rawSql": "SELECT string_agg(pool_name || ': ' || health, ' | ' ORDER BY pool_name) AS pool_health FROM (SELECT DISTINCT ON (pool_name) pool_name, health FROM server_zfs_pool_metrics WHERE server_id = '${server}' ORDER BY pool_name, timestamp DESC) latest",
-                      "table": "server_zfs_pool_metrics"
+                      "rawSql": "SELECT usage_pct FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1",
+                      "table": "server_disk_metrics"
                     },
                     "version": "v0"
                   },
@@ -6706,9 +6557,101 @@
           }
         },
         "description": "",
-        "id": 62,
+        "id": 63,
         "links": [],
-        "title": "ZFS Pool Health",
+        "title": "Used %",
+        "vizConfig": {
+          "group": "stat",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "thresholds"
+                },
+                "max": 100,
+                "min": 0,
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 80
+                    },
+                    {
+                      "color": "red",
+                      "value": 90
+                    }
+                  ]
+                },
+                "decimals": 2,
+                "unit": "percent"
+              },
+              "overrides": []
+            },
+            "options": {
+              "colorMode": "value",
+              "graphMode": "none",
+              "justifyMode": "auto",
+              "orientation": "auto",
+              "percentChangeColorMode": "standard",
+              "reduceOptions": {
+                "calcs": ["lastNotNull"],
+                "fields": "",
+                "values": false
+              },
+              "showPercentChange": false,
+              "textMode": "auto",
+              "wideLayout": true
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
+    "panel-64": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "ffnexhw0yascgf"
+                    },
+                    "group": "grafana-postgresql-datasource",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "dataset": "monitor",
+                      "editorMode": "code",
+                      "format": "table",
+                      "rawQuery": true,
+                      "rawSql": "SELECT used_bytes FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1",
+                      "table": "server_disk_metrics"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 64,
+        "links": [],
+        "title": "Used",
         "vizConfig": {
           "group": "stat",
           "kind": "VizConfig",
@@ -6727,7 +6670,434 @@
                     }
                   ]
                 },
-                "unit": "none"
+                "decimals": 2,
+                "unit": "decbytes"
+              },
+              "overrides": []
+            },
+            "options": {
+              "colorMode": "value",
+              "graphMode": "none",
+              "justifyMode": "auto",
+              "orientation": "auto",
+              "percentChangeColorMode": "standard",
+              "reduceOptions": {
+                "calcs": ["lastNotNull"],
+                "fields": "",
+                "values": false
+              },
+              "showPercentChange": false,
+              "textMode": "auto",
+              "wideLayout": true
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
+    "panel-65": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "ffnexhw0yascgf"
+                    },
+                    "group": "grafana-postgresql-datasource",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "dataset": "monitor",
+                      "editorMode": "code",
+                      "format": "table",
+                      "rawQuery": true,
+                      "rawSql": "SELECT total_bytes - used_bytes AS free_bytes FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1",
+                      "table": "server_disk_metrics"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 65,
+        "links": [],
+        "title": "Free",
+        "vizConfig": {
+          "group": "stat",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "thresholds"
+                },
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    }
+                  ]
+                },
+                "decimals": 2,
+                "unit": "decbytes"
+              },
+              "overrides": []
+            },
+            "options": {
+              "colorMode": "value",
+              "graphMode": "none",
+              "justifyMode": "auto",
+              "orientation": "auto",
+              "percentChangeColorMode": "standard",
+              "reduceOptions": {
+                "calcs": ["lastNotNull"],
+                "fields": "",
+                "values": false
+              },
+              "showPercentChange": false,
+              "textMode": "auto",
+              "wideLayout": true
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
+    "panel-66": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "ffnexhw0yascgf"
+                    },
+                    "group": "grafana-postgresql-datasource",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "dataset": "monitor",
+                      "editorMode": "code",
+                      "format": "table",
+                      "rawQuery": true,
+                      "rawSql": "SELECT latest.used_bytes - day_start.used_bytes AS change_today FROM (SELECT used_bytes FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1) latest, (SELECT used_bytes FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND timestamp >= date_trunc('day', now()) ORDER BY timestamp ASC LIMIT 1) day_start",
+                      "table": "server_disk_metrics"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 66,
+        "links": [],
+        "title": "Change Today",
+        "vizConfig": {
+          "group": "stat",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "thresholds"
+                },
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    }
+                  ]
+                },
+                "decimals": 2,
+                "unit": "decbytes"
+              },
+              "overrides": []
+            },
+            "options": {
+              "colorMode": "value",
+              "graphMode": "none",
+              "justifyMode": "auto",
+              "orientation": "auto",
+              "percentChangeColorMode": "standard",
+              "reduceOptions": {
+                "calcs": ["lastNotNull"],
+                "fields": "",
+                "values": false
+              },
+              "showPercentChange": false,
+              "textMode": "auto",
+              "wideLayout": true
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
+    "panel-67": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "ffnexhw0yascgf"
+                    },
+                    "group": "grafana-postgresql-datasource",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "dataset": "monitor",
+                      "editorMode": "code",
+                      "format": "table",
+                      "rawQuery": true,
+                      "rawSql": "SELECT io_wait_ms FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1",
+                      "table": "server_disk_metrics"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 67,
+        "links": [],
+        "title": "IO Wait",
+        "vizConfig": {
+          "group": "stat",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "thresholds"
+                },
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 10
+                    },
+                    {
+                      "color": "red",
+                      "value": 20
+                    }
+                  ]
+                },
+                "decimals": 2,
+                "unit": "ms"
+              },
+              "overrides": []
+            },
+            "options": {
+              "colorMode": "value",
+              "graphMode": "none",
+              "justifyMode": "auto",
+              "orientation": "auto",
+              "percentChangeColorMode": "standard",
+              "reduceOptions": {
+                "calcs": ["lastNotNull"],
+                "fields": "",
+                "values": false
+              },
+              "showPercentChange": false,
+              "textMode": "auto",
+              "wideLayout": true
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
+    "panel-68": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "ffnexhw0yascgf"
+                    },
+                    "group": "grafana-postgresql-datasource",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "dataset": "monitor",
+                      "editorMode": "code",
+                      "format": "table",
+                      "rawQuery": true,
+                      "rawSql": "SELECT (COALESCE(read_latency_ms, 0) + COALESCE(write_latency_ms, 0)) / 2.0 AS io_delay FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1",
+                      "table": "server_disk_metrics"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 68,
+        "links": [],
+        "title": "IO Delay",
+        "vizConfig": {
+          "group": "stat",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "thresholds"
+                },
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 10
+                    },
+                    {
+                      "color": "red",
+                      "value": 20
+                    }
+                  ]
+                },
+                "decimals": 2,
+                "unit": "ms"
+              },
+              "overrides": []
+            },
+            "options": {
+              "colorMode": "value",
+              "graphMode": "none",
+              "justifyMode": "auto",
+              "orientation": "auto",
+              "percentChangeColorMode": "standard",
+              "reduceOptions": {
+                "calcs": ["lastNotNull"],
+                "fields": "",
+                "values": false
+              },
+              "showPercentChange": false,
+              "textMode": "auto",
+              "wideLayout": true
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
+    "panel-69": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "ffnexhw0yascgf"
+                    },
+                    "group": "grafana-postgresql-datasource",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "dataset": "monitor",
+                      "editorMode": "code",
+                      "format": "table",
+                      "rawQuery": true,
+                      "rawSql": "SELECT mem_usage AS memory_used FROM server_metrics WHERE server_id = '${server}' ORDER BY timestamp DESC LIMIT 1",
+                      "table": "server_metrics"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 69,
+        "links": [],
+        "title": "Memory Usage",
+        "vizConfig": {
+          "group": "stat",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "thresholds"
+                },
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    }
+                  ]
+                },
+                "decimals": 2,
+                "unit": "bytes"
               },
               "overrides": []
             },
@@ -6745,6 +7115,125 @@
               "showPercentChange": false,
               "textMode": "auto",
               "wideLayout": true
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
+    "panel-70": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "ffnexhw0yascgf"
+                    },
+                    "group": "grafana-postgresql-datasource",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "dataset": "monitor",
+                      "editorMode": "code",
+                      "format": "table",
+                      "rawQuery": true,
+                      "rawSql": "WITH visible_buckets AS (SELECT $__timeGroupAlias(timestamp, $__interval) FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND $__timeFilter(timestamp) GROUP BY 1) SELECT vb.time, CASE WHEN day_sample.used_bytes IS NOT NULL AND now_sample.used_bytes > day_sample.used_bytes AND (now_sample.total_bytes - now_sample.used_bytes) > 0 AND now_sample.timestamp - day_sample.timestamp >= INTERVAL '18 hours' THEN (now_sample.total_bytes - now_sample.used_bytes) / ((now_sample.used_bytes - day_sample.used_bytes) / 86400.0) ELSE NULL END AS \"ETA until full\" FROM visible_buckets vb CROSS JOIN LATERAL (SELECT used_bytes, total_bytes, timestamp FROM server_disk_metrics m WHERE m.server_id = '${server}' AND m.disk_name = '$drive' AND m.timestamp <= vb.time ORDER BY m.timestamp DESC LIMIT 1) now_sample LEFT JOIN LATERAL (SELECT used_bytes, timestamp FROM server_disk_metrics m WHERE m.server_id = '${server}' AND m.disk_name = '$drive' AND m.timestamp <= vb.time - INTERVAL '1 day' ORDER BY m.timestamp DESC LIMIT 1) day_sample ON true ORDER BY vb.time",
+                      "table": "server_disk_metrics"
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Estimated time until the disk is full: free space divided by a 1-day fill rate (used now minus used ~24h ago, over 86400s), evaluated at each chart point from raw samples. Works for any dashboard time range; needs at least ~18h of metric history.",
+        "id": 70,
+        "links": [],
+        "title": "ETA Until Full",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "axisBorderShow": false,
+                  "axisCenteredZero": false,
+                  "axisColorMode": "text",
+                  "axisLabel": "",
+                  "axisPlacement": "auto",
+                  "barAlignment": 0,
+                  "barWidthFactor": 0.6,
+                  "drawStyle": "line",
+                  "fillOpacity": 0,
+                  "gradientMode": "none",
+                  "hideFrom": {
+                    "legend": false,
+                    "tooltip": false,
+                    "viz": false
+                  },
+                  "insertNulls": false,
+                  "lineInterpolation": "linear",
+                  "lineWidth": 1,
+                  "pointSize": 5,
+                  "scaleDistribution": {
+                    "type": "linear"
+                  },
+                  "showPoints": "auto",
+                  "showValues": false,
+                  "spanNulls": false,
+                  "stacking": {
+                    "group": "A",
+                    "mode": "none"
+                  },
+                  "thresholdsStyle": {
+                    "mode": "dashed"
+                  }
+                },
+                "min": 0,
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    }
+                  ]
+                },
+                "decimals": 2,
+                "unit": "dtdurations"
+              },
+              "overrides": []
+            },
+            "options": {
+              "annotations": {
+                "clustering": -1,
+                "multiLane": false
+              },
+              "legend": {
+                "calcs": [],
+                "displayMode": "list",
+                "placement": "bottom",
+                "showLegend": true
+              },
+              "tooltip": {
+                "hideZeros": false,
+                "mode": "multi",
+                "sort": "none"
+              }
             }
           },
           "version": "13.0.1+security-01"
@@ -6874,6 +7363,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "ms"
               },
               "overrides": []
@@ -6922,7 +7412,7 @@
                       "editorMode": "code",
                       "format": "time_series",
                       "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(rx_bps) AS \"In\" FROM server_network_metrics WHERE server_id = '${server}' AND interface_name = '$interface' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
+                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(rx_bps) * 8 AS \"In\" FROM server_network_metrics WHERE server_id = '${server}' AND interface_name = '$interface' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
                       "sql": {
                         "columns": [
                           {
@@ -6967,7 +7457,7 @@
                       "editorMode": "code",
                       "format": "time_series",
                       "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(tx_bps) AS \"Out\" FROM server_network_metrics WHERE server_id = '${server}' AND interface_name = '$interface' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
+                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(tx_bps) * 8 AS \"Out\" FROM server_network_metrics WHERE server_id = '${server}' AND interface_name = '$interface' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
                       "sql": {
                         "columns": [
                           {
@@ -7058,7 +7548,8 @@
                     }
                   ]
                 },
-                "unit": "binBps"
+                "decimals": 2,
+                "unit": "binbps"
               },
               "overrides": [
                 {
@@ -7265,6 +7756,7 @@
                     }
                   ]
                 },
+                "decimals": 2,
                 "unit": "pps"
               },
               "overrides": []
@@ -7285,518 +7777,6 @@
                 "mode": "multi",
                 "sort": "none"
               }
-            }
-          },
-          "version": "13.0.1+security-01"
-        }
-      }
-    },
-    "panel-63": {
-      "kind": "Panel",
-      "spec": {
-        "data": {
-          "kind": "QueryGroup",
-          "spec": {
-            "queries": [
-              {
-                "kind": "PanelQuery",
-                "spec": {
-                  "hidden": false,
-                  "query": {
-                    "datasource": {
-                      "name": "ffnexhw0yascgf"
-                    },
-                    "group": "grafana-postgresql-datasource",
-                    "kind": "DataQuery",
-                    "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT usage_pct FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1",
-                      "table": "server_disk_metrics"
-                    },
-                    "version": "v0"
-                  },
-                  "refId": "A"
-                }
-              }
-            ],
-            "queryOptions": {},
-            "transformations": []
-          }
-        },
-        "description": "",
-        "id": 63,
-        "links": [],
-        "title": "Used %",
-        "vizConfig": {
-          "group": "stat",
-          "kind": "VizConfig",
-          "spec": {
-            "fieldConfig": {
-              "defaults": {
-                "color": {
-                  "mode": "thresholds"
-                },
-                "thresholds": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": 0
-                    },
-                    {
-                      "color": "yellow",
-                      "value": 80
-                    },
-                    {
-                      "color": "red",
-                      "value": 90
-                    }
-                  ]
-                },
-                "unit": "percent",
-                "max": 100,
-                "min": 0
-              },
-              "overrides": []
-            },
-            "options": {
-              "colorMode": "value",
-              "graphMode": "none",
-              "justifyMode": "auto",
-              "orientation": "auto",
-              "percentChangeColorMode": "standard",
-              "reduceOptions": {
-                "calcs": ["lastNotNull"],
-                "fields": "",
-                "values": false
-              },
-              "showPercentChange": false,
-              "textMode": "auto",
-              "wideLayout": true
-            }
-          },
-          "version": "13.0.1+security-01"
-        }
-      }
-    },
-    "panel-64": {
-      "kind": "Panel",
-      "spec": {
-        "data": {
-          "kind": "QueryGroup",
-          "spec": {
-            "queries": [
-              {
-                "kind": "PanelQuery",
-                "spec": {
-                  "hidden": false,
-                  "query": {
-                    "datasource": {
-                      "name": "ffnexhw0yascgf"
-                    },
-                    "group": "grafana-postgresql-datasource",
-                    "kind": "DataQuery",
-                    "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT used_bytes FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1",
-                      "table": "server_disk_metrics"
-                    },
-                    "version": "v0"
-                  },
-                  "refId": "A"
-                }
-              }
-            ],
-            "queryOptions": {},
-            "transformations": []
-          }
-        },
-        "description": "",
-        "id": 64,
-        "links": [],
-        "title": "Used",
-        "vizConfig": {
-          "group": "stat",
-          "kind": "VizConfig",
-          "spec": {
-            "fieldConfig": {
-              "defaults": {
-                "color": {
-                  "mode": "thresholds"
-                },
-                "thresholds": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": 0
-                    }
-                  ]
-                },
-                "unit": "decbytes"
-              },
-              "overrides": []
-            },
-            "options": {
-              "colorMode": "value",
-              "graphMode": "none",
-              "justifyMode": "auto",
-              "orientation": "auto",
-              "percentChangeColorMode": "standard",
-              "reduceOptions": {
-                "calcs": ["lastNotNull"],
-                "fields": "",
-                "values": false
-              },
-              "showPercentChange": false,
-              "textMode": "auto",
-              "wideLayout": true
-            }
-          },
-          "version": "13.0.1+security-01"
-        }
-      }
-    },
-    "panel-65": {
-      "kind": "Panel",
-      "spec": {
-        "data": {
-          "kind": "QueryGroup",
-          "spec": {
-            "queries": [
-              {
-                "kind": "PanelQuery",
-                "spec": {
-                  "hidden": false,
-                  "query": {
-                    "datasource": {
-                      "name": "ffnexhw0yascgf"
-                    },
-                    "group": "grafana-postgresql-datasource",
-                    "kind": "DataQuery",
-                    "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT total_bytes - used_bytes AS free_bytes FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1",
-                      "table": "server_disk_metrics"
-                    },
-                    "version": "v0"
-                  },
-                  "refId": "A"
-                }
-              }
-            ],
-            "queryOptions": {},
-            "transformations": []
-          }
-        },
-        "description": "",
-        "id": 65,
-        "links": [],
-        "title": "Free",
-        "vizConfig": {
-          "group": "stat",
-          "kind": "VizConfig",
-          "spec": {
-            "fieldConfig": {
-              "defaults": {
-                "color": {
-                  "mode": "thresholds"
-                },
-                "thresholds": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": 0
-                    }
-                  ]
-                },
-                "unit": "decbytes"
-              },
-              "overrides": []
-            },
-            "options": {
-              "colorMode": "value",
-              "graphMode": "none",
-              "justifyMode": "auto",
-              "orientation": "auto",
-              "percentChangeColorMode": "standard",
-              "reduceOptions": {
-                "calcs": ["lastNotNull"],
-                "fields": "",
-                "values": false
-              },
-              "showPercentChange": false,
-              "textMode": "auto",
-              "wideLayout": true
-            }
-          },
-          "version": "13.0.1+security-01"
-        }
-      }
-    },
-    "panel-66": {
-      "kind": "Panel",
-      "spec": {
-        "data": {
-          "kind": "QueryGroup",
-          "spec": {
-            "queries": [
-              {
-                "kind": "PanelQuery",
-                "spec": {
-                  "hidden": false,
-                  "query": {
-                    "datasource": {
-                      "name": "ffnexhw0yascgf"
-                    },
-                    "group": "grafana-postgresql-datasource",
-                    "kind": "DataQuery",
-                    "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT latest.used_bytes - day_start.used_bytes AS change_today FROM (SELECT used_bytes FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1) latest, (SELECT used_bytes FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND timestamp >= date_trunc('day', now()) ORDER BY timestamp ASC LIMIT 1) day_start",
-                      "table": "server_disk_metrics"
-                    },
-                    "version": "v0"
-                  },
-                  "refId": "A"
-                }
-              }
-            ],
-            "queryOptions": {},
-            "transformations": []
-          }
-        },
-        "description": "",
-        "id": 66,
-        "links": [],
-        "title": "Change Today",
-        "vizConfig": {
-          "group": "stat",
-          "kind": "VizConfig",
-          "spec": {
-            "fieldConfig": {
-              "defaults": {
-                "color": {
-                  "mode": "thresholds"
-                },
-                "thresholds": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": 0
-                    }
-                  ]
-                },
-                "unit": "decbytes"
-              },
-              "overrides": []
-            },
-            "options": {
-              "colorMode": "value",
-              "graphMode": "none",
-              "justifyMode": "auto",
-              "orientation": "auto",
-              "percentChangeColorMode": "standard",
-              "reduceOptions": {
-                "calcs": ["lastNotNull"],
-                "fields": "",
-                "values": false
-              },
-              "showPercentChange": false,
-              "textMode": "auto",
-              "wideLayout": true
-            }
-          },
-          "version": "13.0.1+security-01"
-        }
-      }
-    },
-    "panel-67": {
-      "kind": "Panel",
-      "spec": {
-        "data": {
-          "kind": "QueryGroup",
-          "spec": {
-            "queries": [
-              {
-                "kind": "PanelQuery",
-                "spec": {
-                  "hidden": false,
-                  "query": {
-                    "datasource": {
-                      "name": "ffnexhw0yascgf"
-                    },
-                    "group": "grafana-postgresql-datasource",
-                    "kind": "DataQuery",
-                    "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT io_wait_ms FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1",
-                      "table": "server_disk_metrics"
-                    },
-                    "version": "v0"
-                  },
-                  "refId": "A"
-                }
-              }
-            ],
-            "queryOptions": {},
-            "transformations": []
-          }
-        },
-        "description": "",
-        "id": 67,
-        "links": [],
-        "title": "IO Wait",
-        "vizConfig": {
-          "group": "stat",
-          "kind": "VizConfig",
-          "spec": {
-            "fieldConfig": {
-              "defaults": {
-                "color": {
-                  "mode": "thresholds"
-                },
-                "thresholds": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": 0
-                    },
-                    {
-                      "color": "yellow",
-                      "value": 10
-                    },
-                    {
-                      "color": "red",
-                      "value": 20
-                    }
-                  ]
-                },
-                "unit": "ms"
-              },
-              "overrides": []
-            },
-            "options": {
-              "colorMode": "value",
-              "graphMode": "none",
-              "justifyMode": "auto",
-              "orientation": "auto",
-              "percentChangeColorMode": "standard",
-              "reduceOptions": {
-                "calcs": ["lastNotNull"],
-                "fields": "",
-                "values": false
-              },
-              "showPercentChange": false,
-              "textMode": "auto",
-              "wideLayout": true
-            }
-          },
-          "version": "13.0.1+security-01"
-        }
-      }
-    },
-    "panel-68": {
-      "kind": "Panel",
-      "spec": {
-        "data": {
-          "kind": "QueryGroup",
-          "spec": {
-            "queries": [
-              {
-                "kind": "PanelQuery",
-                "spec": {
-                  "hidden": false,
-                  "query": {
-                    "datasource": {
-                      "name": "ffnexhw0yascgf"
-                    },
-                    "group": "grafana-postgresql-datasource",
-                    "kind": "DataQuery",
-                    "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT (COALESCE(read_latency_ms, 0) + COALESCE(write_latency_ms, 0)) / 2.0 AS io_delay FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1",
-                      "table": "server_disk_metrics"
-                    },
-                    "version": "v0"
-                  },
-                  "refId": "A"
-                }
-              }
-            ],
-            "queryOptions": {},
-            "transformations": []
-          }
-        },
-        "description": "",
-        "id": 68,
-        "links": [],
-        "title": "IO Delay",
-        "vizConfig": {
-          "group": "stat",
-          "kind": "VizConfig",
-          "spec": {
-            "fieldConfig": {
-              "defaults": {
-                "color": {
-                  "mode": "thresholds"
-                },
-                "thresholds": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": 0
-                    },
-                    {
-                      "color": "yellow",
-                      "value": 10
-                    },
-                    {
-                      "color": "red",
-                      "value": 20
-                    }
-                  ]
-                },
-                "unit": "ms"
-              },
-              "overrides": []
-            },
-            "options": {
-              "colorMode": "value",
-              "graphMode": "none",
-              "justifyMode": "auto",
-              "orientation": "auto",
-              "percentChangeColorMode": "standard",
-              "reduceOptions": {
-                "calcs": ["lastNotNull"],
-                "fields": "",
-                "values": false
-              },
-              "showPercentChange": false,
-              "textMode": "auto",
-              "wideLayout": true
             }
           },
           "version": "13.0.1+security-01"
@@ -7860,7 +7840,7 @@
                     "spec": {
                       "element": {
                         "kind": "ElementReference",
-                        "name": "panel-14"
+                        "name": "panel-15"
                       },
                       "height": 4,
                       "width": 4,
@@ -7873,7 +7853,7 @@
                     "spec": {
                       "element": {
                         "kind": "ElementReference",
-                        "name": "panel-15"
+                        "name": "panel-69"
                       },
                       "height": 4,
                       "width": 4,
@@ -8196,32 +8176,6 @@
                       "x": 16,
                       "y": 16
                     }
-                  },
-                  {
-                    "kind": "GridLayoutItem",
-                    "spec": {
-                      "element": {
-                        "kind": "ElementReference",
-                        "name": "panel-62"
-                      },
-                      "height": 8,
-                      "width": 6,
-                      "x": 0,
-                      "y": 24
-                    }
-                  },
-                  {
-                    "kind": "GridLayoutItem",
-                    "spec": {
-                      "element": {
-                        "kind": "ElementReference",
-                        "name": "panel-52"
-                      },
-                      "height": 8,
-                      "width": 18,
-                      "x": 6,
-                      "y": 24
-                    }
                   }
                 ]
               }
@@ -8288,7 +8242,6 @@
                               "kind": "RowsLayoutRow",
                               "spec": {
                                 "collapse": false,
-                                "title": "Overview",
                                 "layout": {
                                   "kind": "GridLayout",
                                   "spec": {
@@ -8373,7 +8326,8 @@
                                       }
                                     ]
                                   }
-                                }
+                                },
+                                "title": "Overview"
                               }
                             },
                             {
@@ -8487,10 +8441,24 @@
                                           "x": 16,
                                           "y": 16
                                         }
+                                      },
+                                      {
+                                        "kind": "GridLayoutItem",
+                                        "spec": {
+                                          "element": {
+                                            "kind": "ElementReference",
+                                            "name": "panel-70"
+                                          },
+                                          "height": 8,
+                                          "width": 24,
+                                          "x": 0,
+                                          "y": 24
+                                        }
                                       }
                                     ]
                                   }
-                                }
+                                },
+                                "title": "New row"
                               }
                             }
                           ]
@@ -8916,7 +8884,7 @@
       "1d"
     ],
     "fiscalYearStartMonth": 0,
-    "from": "now-7d",
+    "from": "now-3h",
     "hideTimepicker": false,
     "timezone": "browser",
     "to": "now"
@@ -8929,7 +8897,7 @@
         "allowCustomValue": false,
         "current": {
           "text": "Wild OVH",
-          "value": "5"
+          "value": "2"
         },
         "definition": "SELECT server_name AS __text, id AS __value FROM servers ORDER BY server_name",
         "hide": "dontHide",
@@ -8994,14 +8962,14 @@
       "spec": {
         "allowCustomValue": true,
         "current": {
-          "text": "/",
-          "value": "/"
+          "text": "All",
+          "value": ["$__all"]
         },
         "definition": "SELECT disk_name AS __text, disk_name AS __value FROM server_disk_metrics WHERE server_id = '${server}' GROUP BY disk_name ORDER BY disk_name",
         "hide": "dontHide",
-        "includeAll": false,
+        "includeAll": true,
         "label": "Drive",
-        "multi": false,
+        "multi": true,
         "name": "drive",
         "options": [],
         "query": {
@@ -9048,7 +9016,7 @@
           },
           "version": "v0"
         },
-        "refresh": "onDashboardLoad",
+        "refresh": "onTimeRangeChanged",
         "regex": "",
         "regexApplyTo": "value",
         "skipUrlSync": false,
@@ -9114,7 +9082,7 @@
           },
           "version": "v0"
         },
-        "refresh": "onDashboardLoad",
+        "refresh": "onTimeRangeChanged",
         "regex": "",
         "regexApplyTo": "value",
         "skipUrlSync": false,
@@ -9126,7 +9094,7 @@
       "spec": {
         "allowCustomValue": true,
         "current": {
-          "text": "All",
+          "text": ["All"],
           "value": ["$__all"]
         },
         "definition": "SELECT pool_name AS __text, pool_name AS __value FROM server_zfs_pool_metrics WHERE server_id = '${server}' GROUP BY pool_name ORDER BY pool_name",
@@ -9158,7 +9126,7 @@
           },
           "version": "v0"
         },
-        "refresh": "onDashboardLoad",
+        "refresh": "onTimeRangeChanged",
         "regex": "",
         "regexApplyTo": "value",
         "skipUrlSync": false,
