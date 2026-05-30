@@ -14,7 +14,7 @@ import java.time.Instant;
 public class InterfaceMetricRow {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "server_network_metrics_id_seq")
-    @SequenceGenerator(name = "server_network_metrics_id_seq", sequenceName = "server_network_metrics_id_seq", allocationSize = 50)
+    @SequenceGenerator(name = "server_network_metrics_id_seq", sequenceName = "server_network_metrics_id_seq", allocationSize = 1)
     private Long id;
 
     @Column(name = "server_id")

@@ -14,7 +14,7 @@ import java.time.Instant;
 public class DockerContainerMetricRow {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "server_docker_container_metrics_id_seq")
-    @SequenceGenerator(name = "server_docker_container_metrics_id_seq", sequenceName = "server_docker_container_metrics_id_seq", allocationSize = 50)
+    @SequenceGenerator(name = "server_docker_container_metrics_id_seq", sequenceName = "server_docker_container_metrics_id_seq", allocationSize = 1)
     private Long id;
 
     @Column(name = "server_id")
