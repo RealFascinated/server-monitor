@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface ServerIngestTokenRepository extends JpaRepository<IngestTokenRow, Long> {
     Optional<IngestTokenRow> findByTokenHash(String tokenHash);
+
+    void deleteByServerId(long serverId);
 }

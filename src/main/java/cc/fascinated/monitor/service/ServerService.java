@@ -9,6 +9,7 @@ import cc.fascinated.monitor.model.dto.request.server.ServerCreateRequest;
 import cc.fascinated.monitor.model.dto.request.server.ingest.IngestServerMetrics;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerDetails;
 import cc.fascinated.monitor.model.dto.response.server.CreatedServerResponse;
+import cc.fascinated.monitor.model.dto.response.server.IngestTokenResponse;
 import cc.fascinated.monitor.model.persistance.ServerInventoryRow;
 import cc.fascinated.monitor.model.persistance.ServerRow;
 import cc.fascinated.monitor.model.persistance.UserRow;
@@ -68,8 +69,7 @@ public class ServerService {
     public CreatedServerResponse createServer(UserRow user, ServerCreateRequest createRequest) {
         try {
             ServerRow serverRow = this.serverRepository.save(new ServerRow(createRequest.name(), user.getId(), Instant.now()));
-            UUID ingestToken = UUID.randomUUID();
-            this.serverIngestTokenRepository.save(new IngestTokenRow(AuthUtils.hash(ingestToken.toString()), serverRow.getId()));
+            UUID ingestToken = issueIngestToken(serverRow.getId());
 
             return new CreatedServerResponse(
                     serverRow.getServerName(),
@@ -92,13 +92,19 @@ public class ServerService {
 
     @Transactional
     public void deleteServer(UserRow user, long serverId) {
-        ServerRow server = findServerRowById(serverId);
-        if (!server.getOwnerId().equals(user.getId())) {
-            throw new UnauthorizedException("You do not own this server");
-        }
+        requireServerOwner(user, findServerRowById(serverId));
         this.victoriaMetricsWriteClient.deleteSeriesForServer(serverId);
         this.serverRepository.deleteById(serverId);
         log.info("Deleted server {} and its VictoriaMetrics series", serverId);
+    }
+
+    @Transactional
+    public IngestTokenResponse rotateIngestToken(UserRow user, long serverId) {
+        requireServerOwner(user, findServerRowById(serverId));
+        this.serverIngestTokenRepository.deleteByServerId(serverId);
+        UUID ingestToken = issueIngestToken(serverId);
+        log.info("Rotated ingest token for server {}", serverId);
+        return new IngestTokenResponse(serverId, ingestToken);
     }
 
     public ServerRow authenticateIngestRequest(String authorizationHeader) {
@@ -178,5 +184,17 @@ public class ServerService {
             server.setInventory(inventory);
         }
         return inventory;
+    }
+
+    private static void requireServerOwner(UserRow user, ServerRow server) {
+        if (!server.getOwnerId().equals(user.getId())) {
+            throw new UnauthorizedException("You do not own this server");
+        }
+    }
+
+    private UUID issueIngestToken(long serverId) {
+        UUID ingestToken = UUID.randomUUID();
+        this.serverIngestTokenRepository.save(new IngestTokenRow(AuthUtils.hash(ingestToken.toString()), serverId));
+        return ingestToken;
     }
 }
