@@ -36,39 +36,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(rx_errors_per_second) AS \"RX Errors\" FROM server_network_metrics WHERE server_id = '${server}' AND interface_name = '$interface' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "sql": {
-                        "columns": [
-                          {
-                            "parameters": [
-                              {
-                                "name": "disk_name",
-                                "type": "functionParameter"
-                              }
-                            ],
-                            "type": "function"
-                          }
-                        ],
-                        "groupBy": [
-                          {
-                            "property": {
-                              "type": "string"
-                            },
-                            "type": "groupBy"
-                          }
-                        ],
-                        "limit": 50
-                      },
-                      "table": "server_network_metrics"
+                      "expr": "avg(monitor_net_rx_errors_per_second{server_id=\"$server\", interface=~\"$interface\"})",
+                      "instant": false,
+                      "legendFormat": "RX Errors",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -81,39 +57,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(tx_errors_per_second) AS \"TX Errors\" FROM server_network_metrics WHERE server_id = '${server}' AND interface_name = '$interface' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "sql": {
-                        "columns": [
-                          {
-                            "parameters": [
-                              {
-                                "name": "disk_name",
-                                "type": "functionParameter"
-                              }
-                            ],
-                            "type": "function"
-                          }
-                        ],
-                        "groupBy": [
-                          {
-                            "property": {
-                              "type": "string"
-                            },
-                            "type": "groupBy"
-                          }
-                        ],
-                        "limit": 50
-                      },
-                      "table": "server_network_metrics"
+                      "expr": "avg(monitor_net_tx_errors_per_second{server_id=\"$server\", interface=~\"$interface\"})",
+                      "instant": false,
+                      "legendFormat": "TX Errors",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -596,17 +548,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT cpu_usage FROM server_metrics WHERE server_id = '${server}' ORDER BY timestamp DESC LIMIT 1",
-                      "table": "server_metrics"
+                      "expr": "last_over_time(monitor_host_cpu_usage{server_id=\"$server\"}[15m])",
+                      "instant": true,
+                      "legendFormat": "__auto",
+                      "range": false
                     },
                     "version": "v0"
                   },
@@ -688,34 +638,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT mem_available AS memory_used FROM server_metrics WHERE server_id = '${server}' ORDER BY timestamp DESC LIMIT 1",
-                      "sql": {
-                        "columns": [
-                          {
-                            "parameters": [],
-                            "type": "function"
-                          }
-                        ],
-                        "groupBy": [
-                          {
-                            "property": {
-                              "type": "string"
-                            },
-                            "type": "groupBy"
-                          }
-                        ],
-                        "limit": 50
-                      },
-                      "table": "server_metrics"
+                      "expr": "last_over_time(monitor_host_mem_available{server_id=\"$server\"}[15m])",
+                      "instant": true,
+                      "legendFormat": "__auto",
+                      "range": false
                     },
                     "version": "v0"
                   },
@@ -787,17 +718,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT time, (SUM(used_bytes)::double precision / NULLIF(SUM(total_bytes), 0)) * 100 AS \"Usage\" FROM (SELECT $__timeGroupAlias(timestamp, $__interval), disk_name, AVG(used_bytes) AS used_bytes, AVG(total_bytes) AS total_bytes FROM server_disk_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1, disk_name) per_disk GROUP BY time ORDER BY time",
-                      "table": "server_disk_metrics"
+                      "expr": "sum(monitor_disk_used_bytes{server_id=\"$server\"}) / sum(monitor_disk_total_bytes{server_id=\"$server\"}) * 100",
+                      "instant": false,
+                      "legendFormat": "Usage",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -907,17 +836,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT time, SUM(used_bytes) AS \"Used\" FROM (SELECT $__timeGroupAlias(timestamp, $__interval), disk_name, AVG(used_bytes) AS used_bytes FROM server_disk_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1, disk_name) per_disk GROUP BY time ORDER BY time",
-                      "table": "server_disk_metrics"
+                      "expr": "sum(monitor_disk_used_bytes{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Used",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -930,17 +857,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT time, SUM(total_bytes) AS \"Total\" FROM (SELECT $__timeGroupAlias(timestamp, $__interval), disk_name, AVG(total_bytes) AS total_bytes FROM server_disk_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1, disk_name) per_disk GROUP BY time ORDER BY time",
-                      "table": "server_disk_metrics"
+                      "expr": "sum(monitor_disk_total_bytes{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Total",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -1049,17 +974,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), AVG(io_usage_pct) AS \"IO Usage %\" FROM server_disk_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_disk_metrics"
+                      "expr": "avg(monitor_disk_io_usage_pct{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "IO Usage %",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -1169,17 +1092,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), SUM(io_read_bps) AS \"Read\" FROM server_disk_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_disk_metrics"
+                      "expr": "sum(monitor_disk_io_read_bps{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Read",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -1192,17 +1113,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), SUM(io_write_bps) AS \"Write\" FROM server_disk_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_disk_metrics"
+                      "expr": "sum(monitor_disk_io_write_bps{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Write",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -1311,17 +1230,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), SUM(io_wait_ms) AS \"IO Wait\" FROM server_disk_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_disk_metrics"
+                      "expr": "sum(monitor_disk_io_wait_ms{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "IO Wait",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -1431,34 +1348,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "time_series",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), SUM(rx_bps) * 8 AS \"In\" FROM server_network_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "sql": {
-                        "columns": [
-                          {
-                            "parameters": [],
-                            "type": "function"
-                          }
-                        ],
-                        "groupBy": [
-                          {
-                            "property": {
-                              "type": "string"
-                            },
-                            "type": "groupBy"
-                          }
-                        ],
-                        "limit": 50
-                      },
-                      "table": "server_network_metrics"
+                      "expr": "(sum(monitor_net_rx_bps{server_id=\"$server\"})) * 8",
+                      "instant": false,
+                      "legendFormat": "In",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -1471,34 +1369,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "time_series",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), SUM(tx_bps) * 8 AS \"Out\" FROM server_network_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "sql": {
-                        "columns": [
-                          {
-                            "parameters": [],
-                            "type": "function"
-                          }
-                        ],
-                        "groupBy": [
-                          {
-                            "property": {
-                              "type": "string"
-                            },
-                            "type": "groupBy"
-                          }
-                        ],
-                        "limit": 50
-                      },
-                      "table": "server_network_metrics"
+                      "expr": "(sum(monitor_net_tx_bps{server_id=\"$server\"})) * 8",
+                      "instant": false,
+                      "legendFormat": "Out",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -1620,17 +1499,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), SUM(rx_packets_per_second) AS \"RX Packets\" FROM server_network_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_network_metrics"
+                      "expr": "sum(monitor_net_rx_packets_per_second{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "RX Packets",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -1643,17 +1520,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), SUM(tx_packets_per_second) AS \"TX Packets\" FROM server_network_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_network_metrics"
+                      "expr": "sum(monitor_net_tx_packets_per_second{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "TX Packets",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -1762,21 +1637,61 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(load_1) AS \"1 min\", avg(load_5) AS \"5 min\", avg(load_15) AS \"15 min\" FROM server_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_metrics"
+                      "expr": "avg(monitor_host_load_1{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "1 min",
+                      "range": true
                     },
                     "version": "v0"
                   },
                   "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_host_load_5{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "5 min",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_host_load_15{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "15 min",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "C"
                 }
               }
             ],
@@ -1881,21 +1796,103 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(cpu_usage) AS \"Used\", avg(cpu_user_pct) AS \"User\", avg(cpu_system_pct) AS \"System\", avg(cpu_iowait_pct) AS \"IO Wait\", avg(cpu_steal_pct) AS \"Steal\" FROM server_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_metrics"
+                      "expr": "avg(monitor_host_cpu_usage{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Used",
+                      "range": true
                     },
                     "version": "v0"
                   },
                   "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_host_cpu_user_pct{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "User",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_host_cpu_system_pct{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "System",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "C"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_host_cpu_iowait_pct{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "IO Wait",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "D"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_host_cpu_steal_pct{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Steal",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "E"
                 }
               }
             ],
@@ -2026,21 +2023,103 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(mem_usage) AS \"Used\", avg(mem_available) AS \"Available\", avg(mem_total) AS \"Total\", avg(mem_buffers) AS \"Buffers\", avg(mem_cached) AS \"Cache\" FROM server_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_metrics"
+                      "expr": "avg(monitor_host_mem_usage{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Used",
+                      "range": true
                     },
                     "version": "v0"
                   },
                   "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_host_mem_available{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Available",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_host_mem_total{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Total",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "C"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_host_mem_buffers{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Buffers",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "D"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_host_mem_cached{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Cache",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "E"
                 }
               }
             ],
@@ -2310,39 +2389,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(usage_pct) AS \"Usage\" FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "sql": {
-                        "columns": [
-                          {
-                            "parameters": [
-                              {
-                                "name": "disk_name",
-                                "type": "functionParameter"
-                              }
-                            ],
-                            "type": "function"
-                          }
-                        ],
-                        "groupBy": [
-                          {
-                            "property": {
-                              "type": "string"
-                            },
-                            "type": "groupBy"
-                          }
-                        ],
-                        "limit": 50
-                      },
-                      "table": "server_disk_metrics"
+                      "expr": "avg(monitor_disk_usage_percent{server_id=\"$server\", disk=~\"$drive\"})",
+                      "instant": false,
+                      "legendFormat": "Usage",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -2460,17 +2515,17 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
                       "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT cpu_clock_mhz * 1000000 AS cpu_clock_hz FROM server_inventory WHERE server_id = '${server}'",
-                      "table": "server_inventory"
+                      "expr": "monitor_host_cpu_clock_mhz{server_id=\"$server\"} * 1e6",
+                      "format": "time_series",
+                      "instant": false,
+                      "legendFormat": "Clock Speed",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -2487,7 +2542,7 @@
         "links": [],
         "title": "Clock Speed",
         "vizConfig": {
-          "group": "stat",
+          "group": "timeseries",
           "kind": "VizConfig",
           "spec": {
             "fieldConfig": {
@@ -2496,7 +2551,42 @@
                   "fixedColor": "green",
                   "mode": "fixed"
                 },
+                "custom": {
+                  "axisBorderShow": false,
+                  "axisCenteredZero": false,
+                  "axisColorMode": "text",
+                  "axisLabel": "",
+                  "axisPlacement": "auto",
+                  "barAlignment": 0,
+                  "barWidthFactor": 0.6,
+                  "drawStyle": "line",
+                  "fillOpacity": 0,
+                  "gradientMode": "none",
+                  "hideFrom": {
+                    "legend": false,
+                    "tooltip": false,
+                    "viz": false
+                  },
+                  "insertNulls": false,
+                  "lineInterpolation": "linear",
+                  "lineWidth": 1,
+                  "pointSize": 5,
+                  "scaleDistribution": {
+                    "type": "linear"
+                  },
+                  "showPoints": "auto",
+                  "showValues": false,
+                  "spanNulls": false,
+                  "stacking": {
+                    "group": "A",
+                    "mode": "none"
+                  },
+                  "thresholdsStyle": {
+                    "mode": "off"
+                  }
+                },
                 "decimals": 2,
+                "min": 0,
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
@@ -2511,19 +2601,21 @@
               "overrides": []
             },
             "options": {
-              "colorMode": "value",
-              "graphMode": "none",
-              "justifyMode": "auto",
-              "orientation": "auto",
-              "percentChangeColorMode": "standard",
-              "reduceOptions": {
-                "calcs": [],
-                "fields": "/^cpu_clock_hz$/",
-                "values": false
+              "annotations": {
+                "clustering": -1,
+                "multiLane": false
               },
-              "showPercentChange": false,
-              "textMode": "value",
-              "wideLayout": true
+              "legend": {
+                "calcs": [],
+                "displayMode": "list",
+                "placement": "bottom",
+                "showLegend": true
+              },
+              "tooltip": {
+                "hideZeros": false,
+                "mode": "single",
+                "sort": "none"
+              }
             }
           },
           "version": "13.0.1+security-01"
@@ -2625,21 +2717,40 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(swap_used) AS \"Used\", avg(swap_total) AS \"Total\" FROM server_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_metrics"
+                      "expr": "avg(monitor_host_swap_used{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Used",
+                      "range": true
                     },
                     "version": "v0"
                   },
                   "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_host_swap_total{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Total",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
                 }
               }
             ],
@@ -2744,21 +2855,40 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(process_count) AS \"Total\", avg(running_processes) AS \"Running\" FROM server_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_metrics"
+                      "expr": "avg(monitor_host_process_count{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Total",
+                      "range": true
                     },
                     "version": "v0"
                   },
                   "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_host_running_processes{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Running",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
                 }
               }
             ],
@@ -2863,21 +2993,40 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(ctx_switches_per_second) AS \"Context Switches\", avg(interrupts_per_second) AS \"Interrupts\" FROM server_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_metrics"
+                      "expr": "avg(monitor_host_ctx_switches_per_second{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Context Switches",
+                      "range": true
                     },
                     "version": "v0"
                   },
                   "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_host_interrupts_per_second{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Interrupts",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
                 }
               }
             ],
@@ -3064,21 +3213,40 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT time, SUM(inode_used) AS \"Used\", SUM(inode_total) AS \"Total\" FROM (SELECT $__timeGroupAlias(timestamp, $__interval), disk_name, AVG(inode_used) AS inode_used, AVG(inode_total) AS inode_total FROM server_disk_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1, disk_name) per_disk GROUP BY time ORDER BY time",
-                      "table": "server_disk_metrics"
+                      "expr": "sum(monitor_disk_inode_used{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Used",
+                      "range": true
                     },
                     "version": "v0"
                   },
                   "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "sum(monitor_disk_inode_total{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Total",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
                 }
               }
             ],
@@ -3183,21 +3351,40 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), SUM(read_iops) AS \"Read\", SUM(write_iops) AS \"Write\" FROM server_disk_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_disk_metrics"
+                      "expr": "sum(monitor_disk_read_iops{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Read",
+                      "range": true
                     },
                     "version": "v0"
                   },
                   "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "sum(monitor_disk_write_iops{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Write",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
                 }
               }
             ],
@@ -3302,21 +3489,40 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(read_latency_ms) AS \"Read\", avg(write_latency_ms) AS \"Write\" FROM server_disk_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_disk_metrics"
+                      "expr": "avg(monitor_disk_read_latency_ms{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Read",
+                      "range": true
                     },
                     "version": "v0"
                   },
                   "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_disk_write_latency_ms{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Write",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
                 }
               }
             ],
@@ -3421,21 +3627,40 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(inode_used) AS \"Used\", avg(inode_total) AS \"Total\" FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_disk_metrics"
+                      "expr": "avg(monitor_disk_inode_used{server_id=\"$server\", disk=~\"$drive\"})",
+                      "instant": false,
+                      "legendFormat": "Used",
+                      "range": true
                     },
                     "version": "v0"
                   },
                   "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_disk_inode_total{server_id=\"$server\", disk=~\"$drive\"})",
+                      "instant": false,
+                      "legendFormat": "Total",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
                 }
               }
             ],
@@ -3540,39 +3765,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(used_bytes) AS \"Used\" FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "sql": {
-                        "columns": [
-                          {
-                            "parameters": [
-                              {
-                                "name": "disk_name",
-                                "type": "functionParameter"
-                              }
-                            ],
-                            "type": "function"
-                          }
-                        ],
-                        "groupBy": [
-                          {
-                            "property": {
-                              "type": "string"
-                            },
-                            "type": "groupBy"
-                          }
-                        ],
-                        "limit": 50
-                      },
-                      "table": "server_disk_metrics"
+                      "expr": "avg(monitor_disk_used_bytes{server_id=\"$server\", disk=~\"$drive\"})",
+                      "instant": false,
+                      "legendFormat": "Used",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -3585,39 +3786,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(total_bytes) AS \"Total\" FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "sql": {
-                        "columns": [
-                          {
-                            "parameters": [
-                              {
-                                "name": "disk_name",
-                                "type": "functionParameter"
-                              }
-                            ],
-                            "type": "function"
-                          }
-                        ],
-                        "groupBy": [
-                          {
-                            "property": {
-                              "type": "string"
-                            },
-                            "type": "groupBy"
-                          }
-                        ],
-                        "limit": 50
-                      },
-                      "table": "server_disk_metrics"
+                      "expr": "avg(monitor_disk_total_bytes{server_id=\"$server\", disk=~\"$drive\"})",
+                      "instant": false,
+                      "legendFormat": "Total",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -3630,34 +3807,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "WITH day_starts AS (\r\n  SELECT\r\n    date_trunc('day', timestamp) AS day,\r\n    (array_agg(used_bytes ORDER BY timestamp ASC))[1] AS day_start_used\r\n  FROM server_disk_metrics\r\n  WHERE server_id = '${server}'\r\n    AND disk_name = '$drive'\r\n  GROUP BY 1\r\n),\r\nin_range AS (\r\n  SELECT\r\n    timestamp,\r\n    used_bytes,\r\n    date_trunc('day', timestamp)  AS day,\r\n    date_trunc('hour', timestamp) AS hour\r\n  FROM server_disk_metrics\r\n  WHERE server_id = '${server}'\r\n    AND disk_name = '$drive'\r\n    AND $__timeFilter(timestamp)\r\n),\r\nhourly AS (\r\n  SELECT\r\n    r.hour AS time,\r\n    (array_agg(r.used_bytes ORDER BY r.timestamp DESC))[1] - d.day_start_used AS \"Daily Change\"\r\n  FROM in_range r\r\n  JOIN day_starts d ON r.day = d.day\r\n  WHERE r.hour < date_trunc('hour', now())\r\n  GROUP BY r.day, r.hour, d.day_start_used\r\n),\r\nlatest AS (\r\n  SELECT\r\n    max(timestamp) AS time,\r\n    (array_agg(used_bytes ORDER BY timestamp DESC))[1] AS used_bytes,\r\n    date_trunc('day', max(timestamp)) AS day\r\n  FROM in_range\r\n)\r\nSELECT time, \"Daily Change\" FROM hourly\r\n\r\nUNION ALL\r\n\r\nSELECT l.time, l.used_bytes - d.day_start_used\r\nFROM latest l\r\nJOIN day_starts d ON l.day = d.day\r\nWHERE l.time > COALESCE((SELECT max(time) FROM hourly), '-infinity'::timestamptz)\r\n\r\nORDER BY time",
-                      "sql": {
-                        "columns": [
-                          {
-                            "parameters": [],
-                            "type": "function"
-                          }
-                        ],
-                        "groupBy": [
-                          {
-                            "property": {
-                              "type": "string"
-                            },
-                            "type": "groupBy"
-                          }
-                        ],
-                        "limit": 50
-                      },
-                      "table": "server_disk_metrics"
+                      "expr": "monitor_disk_used_bytes{server_id=\"$server\", disk=~\"$drive\"} - min_over_time(monitor_disk_used_bytes{server_id=\"$server\", disk=~\"$drive\"}[1d])",
+                      "instant": false,
+                      "legendFormat": "Daily Change",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -3795,21 +3953,40 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(read_iops) AS \"Read\", avg(write_iops) AS \"Write\" FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_disk_metrics"
+                      "expr": "avg(monitor_disk_read_iops{server_id=\"$server\", disk=~\"$drive\"})",
+                      "instant": false,
+                      "legendFormat": "Read",
+                      "range": true
                     },
                     "version": "v0"
                   },
                   "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_disk_write_iops{server_id=\"$server\", disk=~\"$drive\"})",
+                      "instant": false,
+                      "legendFormat": "Write",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
                 }
               }
             ],
@@ -3914,21 +4091,40 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(read_latency_ms) AS \"Read\", avg(write_latency_ms) AS \"Write\" FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_disk_metrics"
+                      "expr": "avg(monitor_disk_read_latency_ms{server_id=\"$server\", disk=~\"$drive\"})",
+                      "instant": false,
+                      "legendFormat": "Read",
+                      "range": true
                     },
                     "version": "v0"
                   },
                   "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_disk_write_latency_ms{server_id=\"$server\", disk=~\"$drive\"})",
+                      "instant": false,
+                      "legendFormat": "Write",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
                 }
               }
             ],
@@ -4033,17 +4229,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(arc_misses_per_second) AS \"Misses/s\" FROM server_zfs_arc_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_zfs_arc_metrics"
+                      "expr": "avg(monitor_zfs_arc_misses_per_second{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Misses/s",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -4152,21 +4346,82 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(arc_size_bytes) AS \"Size\", avg(arc_target_bytes) AS \"Target\", avg(arc_max_bytes) AS \"Max\", avg(arc_min_bytes) AS \"Min\" FROM server_zfs_arc_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_zfs_arc_metrics"
+                      "expr": "avg(monitor_zfs_arc_size_bytes{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Size",
+                      "range": true
                     },
                     "version": "v0"
                   },
                   "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_zfs_arc_target_bytes{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Target",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_zfs_arc_max_bytes{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Max",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "C"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_zfs_arc_min_bytes{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Min",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "D"
                 }
               }
             ],
@@ -4271,21 +4526,61 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(arc_data_bytes) AS \"Data\", avg(arc_metadata_bytes) AS \"Metadata\", avg(l2arc_size_bytes) AS \"L2ARC\" FROM server_zfs_arc_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_zfs_arc_metrics"
+                      "expr": "avg(monitor_zfs_arc_data_bytes{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Data",
+                      "range": true
                     },
                     "version": "v0"
                   },
                   "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_zfs_arc_metadata_bytes{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Metadata",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_zfs_arc_l2arc_size_bytes{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "L2ARC",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "C"
                 }
               }
             ],
@@ -4390,17 +4685,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(arc_hit_ratio) AS \"Hit Ratio\" FROM server_zfs_arc_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_zfs_arc_metrics"
+                      "expr": "avg(monitor_zfs_arc_hit_ratio{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Hit Ratio",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -4522,17 +4815,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT time, AVG(capacity_percent) AS \"Capacity\" FROM (SELECT $__timeGroupAlias(timestamp, $__interval), pool_name, AVG(capacity_percent) AS capacity_percent FROM server_zfs_pool_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1, pool_name) per_pool GROUP BY time ORDER BY time",
-                      "table": "server_zfs_pool_metrics"
+                      "expr": "avg(monitor_zfs_pool_capacity_percent{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Capacity",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -4650,21 +4941,61 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT time, SUM(allocated_bytes) AS \"Allocated\", SUM(free_bytes) AS \"Free\", SUM(total_bytes) AS \"Total\" FROM (SELECT $__timeGroupAlias(timestamp, $__interval), pool_name, AVG(allocated_bytes) AS allocated_bytes, AVG(free_bytes) AS free_bytes, AVG(total_bytes) AS total_bytes FROM server_zfs_pool_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1, pool_name) per_pool GROUP BY time ORDER BY time",
-                      "table": "server_zfs_pool_metrics"
+                      "expr": "sum(monitor_zfs_pool_allocated_bytes{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Allocated",
+                      "range": true
                     },
                     "version": "v0"
                   },
                   "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "sum(monitor_zfs_pool_free_bytes{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Free",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "sum(monitor_zfs_pool_total_bytes{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Total",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "C"
                 }
               }
             ],
@@ -4769,21 +5100,40 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT time, SUM(read_bps) AS \"Read\", SUM(write_bps) AS \"Write\" FROM (SELECT $__timeGroupAlias(timestamp, $__interval), pool_name, AVG(read_bps) AS read_bps, AVG(write_bps) AS write_bps FROM server_zfs_pool_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1, pool_name) per_pool GROUP BY time ORDER BY time",
-                      "table": "server_zfs_pool_metrics"
+                      "expr": "sum(monitor_zfs_pool_read_bps{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Read",
+                      "range": true
                     },
                     "version": "v0"
                   },
                   "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "sum(monitor_zfs_pool_write_bps{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Write",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
                 }
               }
             ],
@@ -4901,39 +5251,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(io_read_bps) AS \"Read\" FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "sql": {
-                        "columns": [
-                          {
-                            "parameters": [
-                              {
-                                "name": "disk_name",
-                                "type": "functionParameter"
-                              }
-                            ],
-                            "type": "function"
-                          }
-                        ],
-                        "groupBy": [
-                          {
-                            "property": {
-                              "type": "string"
-                            },
-                            "type": "groupBy"
-                          }
-                        ],
-                        "limit": 50
-                      },
-                      "table": "server_disk_metrics"
+                      "expr": "avg(monitor_disk_io_read_bps{server_id=\"$server\", disk=~\"$drive\"})",
+                      "instant": false,
+                      "legendFormat": "Read",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -4946,39 +5272,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(io_write_bps) AS \"Write\" FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "sql": {
-                        "columns": [
-                          {
-                            "parameters": [
-                              {
-                                "name": "disk_name",
-                                "type": "functionParameter"
-                              }
-                            ],
-                            "type": "function"
-                          }
-                        ],
-                        "groupBy": [
-                          {
-                            "property": {
-                              "type": "string"
-                            },
-                            "type": "groupBy"
-                          }
-                        ],
-                        "limit": 50
-                      },
-                      "table": "server_disk_metrics"
+                      "expr": "avg(monitor_disk_io_write_bps{server_id=\"$server\", disk=~\"$drive\"})",
+                      "instant": false,
+                      "legendFormat": "Write",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -5087,21 +5389,40 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT time, SUM(read_iops) AS \"Read\", SUM(write_iops) AS \"Write\" FROM (SELECT $__timeGroupAlias(timestamp, $__interval), pool_name, AVG(read_iops) AS read_iops, AVG(write_iops) AS write_iops FROM server_zfs_pool_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1, pool_name) per_pool GROUP BY time ORDER BY time",
-                      "table": "server_zfs_pool_metrics"
+                      "expr": "sum(monitor_zfs_pool_read_iops{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Read",
+                      "range": true
                     },
                     "version": "v0"
                   },
                   "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "sum(monitor_zfs_pool_write_iops{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Write",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
                 }
               }
             ],
@@ -5206,17 +5527,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT time, AVG(fragmentation_percent) AS \"Fragmentation\" FROM (SELECT $__timeGroupAlias(timestamp, $__interval), pool_name, AVG(fragmentation_percent) AS fragmentation_percent FROM server_zfs_pool_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1, pool_name) per_pool GROUP BY time ORDER BY time",
-                      "table": "server_zfs_pool_metrics"
+                      "expr": "avg(monitor_zfs_pool_fragmentation_percent{server_id=\"$server\"})",
+                      "instant": false,
+                      "legendFormat": "Fragmentation",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -5325,17 +5644,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(capacity_percent) AS \"Capacity\" FROM server_zfs_pool_metrics WHERE server_id = '${server}' AND pool_name = '$pool' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_zfs_pool_metrics"
+                      "expr": "avg(monitor_zfs_pool_capacity_percent{server_id=\"$server\", pool=~\"$pool\"})",
+                      "instant": false,
+                      "legendFormat": "Capacity",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -5453,17 +5770,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT health FROM server_zfs_pool_metrics WHERE server_id = '${server}' AND pool_name = '$pool' ORDER BY timestamp DESC LIMIT 1",
-                      "table": "server_zfs_pool_metrics"
+                      "expr": "last_over_time(monitor_zfs_pool_total_bytes{server_id=\"$server\", pool=~\"$pool\"}[15m])",
+                      "instant": true,
+                      "legendFormat": "{{health}}",
+                      "range": false
                     },
                     "version": "v0"
                   },
@@ -5508,8 +5823,8 @@
               "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
-                "calcs": [],
-                "fields": "/^health$/",
+                "calcs": ["lastNotNull"],
+                "fields": "",
                 "values": false
               },
               "showPercentChange": false,
@@ -5534,21 +5849,61 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(allocated_bytes) AS \"Allocated\", avg(free_bytes) AS \"Free\", avg(total_bytes) AS \"Total\" FROM server_zfs_pool_metrics WHERE server_id = '${server}' AND pool_name = '$pool' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_zfs_pool_metrics"
+                      "expr": "avg(monitor_zfs_pool_allocated_bytes{server_id=\"$server\", pool=~\"$pool\"})",
+                      "instant": false,
+                      "legendFormat": "Allocated",
+                      "range": true
                     },
                     "version": "v0"
                   },
                   "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_zfs_pool_free_bytes{server_id=\"$server\", pool=~\"$pool\"})",
+                      "instant": false,
+                      "legendFormat": "Free",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_zfs_pool_total_bytes{server_id=\"$server\", pool=~\"$pool\"})",
+                      "instant": false,
+                      "legendFormat": "Total",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "C"
                 }
               }
             ],
@@ -5653,21 +6008,40 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(read_bps) AS \"Read\", avg(write_bps) AS \"Write\" FROM server_zfs_pool_metrics WHERE server_id = '${server}' AND pool_name = '$pool' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_zfs_pool_metrics"
+                      "expr": "avg(monitor_zfs_pool_read_bps{server_id=\"$server\", pool=~\"$pool\"})",
+                      "instant": false,
+                      "legendFormat": "Read",
+                      "range": true
                     },
                     "version": "v0"
                   },
                   "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_zfs_pool_write_bps{server_id=\"$server\", pool=~\"$pool\"})",
+                      "instant": false,
+                      "legendFormat": "Write",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
                 }
               }
             ],
@@ -5785,21 +6159,40 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(read_iops) AS \"Read\", avg(write_iops) AS \"Write\" FROM server_zfs_pool_metrics WHERE server_id = '${server}' AND pool_name = '$pool' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_zfs_pool_metrics"
+                      "expr": "avg(monitor_zfs_pool_read_iops{server_id=\"$server\", pool=~\"$pool\"})",
+                      "instant": false,
+                      "legendFormat": "Read",
+                      "range": true
                     },
                     "version": "v0"
                   },
                   "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_zfs_pool_write_iops{server_id=\"$server\", pool=~\"$pool\"})",
+                      "instant": false,
+                      "legendFormat": "Write",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
                 }
               }
             ],
@@ -5904,21 +6297,40 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(fragmentation_percent) AS \"Fragmentation\", avg(scan_percent) AS \"Scan\" FROM server_zfs_pool_metrics WHERE server_id = '${server}' AND pool_name = '$pool' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_zfs_pool_metrics"
+                      "expr": "avg(monitor_zfs_pool_fragmentation_percent{server_id=\"$server\", pool=~\"$pool\"})",
+                      "instant": false,
+                      "legendFormat": "Fragmentation",
+                      "range": true
                     },
                     "version": "v0"
                   },
                   "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "expr": "avg(monitor_zfs_pool_scan_percent{server_id=\"$server\", pool=~\"$pool\"})",
+                      "instant": false,
+                      "legendFormat": "Scan",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
                 }
               }
             ],
@@ -6023,17 +6435,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(checksum_errors) AS \"Checksum Errors\" FROM server_zfs_pool_metrics WHERE server_id = '${server}' AND pool_name = '$pool' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "table": "server_zfs_pool_metrics"
+                      "expr": "avg(monitor_zfs_pool_checksum_errors{server_id=\"$server\", pool=~\"$pool\"})",
+                      "instant": false,
+                      "legendFormat": "Checksum Errors",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -6142,39 +6552,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(io_usage_pct) AS \"IO Usage %\" FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "sql": {
-                        "columns": [
-                          {
-                            "parameters": [
-                              {
-                                "name": "disk_name",
-                                "type": "functionParameter"
-                              }
-                            ],
-                            "type": "function"
-                          }
-                        ],
-                        "groupBy": [
-                          {
-                            "property": {
-                              "type": "string"
-                            },
-                            "type": "groupBy"
-                          }
-                        ],
-                        "limit": 50
-                      },
-                      "table": "server_disk_metrics"
+                      "expr": "avg(monitor_disk_io_usage_pct{server_id=\"$server\", disk=~\"$drive\"})",
+                      "instant": false,
+                      "legendFormat": "IO Usage %",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -6292,34 +6678,17 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
                       "editorMode": "code",
+                      "expr": "sort(avg by (container) (monitor_container_cpu_usage{server_id=\"$server\"}))",
                       "format": "time_series",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(cpu_usage) AS value, container_name AS metric FROM server_docker_container_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1, container_name ORDER BY 1",
-                      "sql": {
-                        "columns": [
-                          {
-                            "parameters": [],
-                            "type": "function"
-                          }
-                        ],
-                        "groupBy": [
-                          {
-                            "property": {
-                              "type": "string"
-                            },
-                            "type": "groupBy"
-                          }
-                        ],
-                        "limit": 50
-                      },
-                      "table": "server_docker_container_metrics"
+                      "instant": false,
+                      "legendFormat": "{{container}}",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -6399,11 +6768,11 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [],
+                "calcs": ["min", "max", "mean"],
                 "displayMode": "table",
                 "placement": "right",
                 "showLegend": true,
-                "sortBy": "Last *",
+                "sortBy": "Mean",
                 "sortDesc": true
               },
               "tooltip": {
@@ -6430,17 +6799,17 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
                       "editorMode": "code",
+                      "expr": "sort(avg by (container) (monitor_container_memory_usage{server_id=\"$server\"}))",
                       "format": "time_series",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(memory_usage) AS value, container_name AS metric FROM server_docker_container_metrics WHERE server_id = '${server}' AND $__timeFilter(timestamp) GROUP BY 1, container_name ORDER BY 1",
-                      "table": "server_docker_container_metrics"
+                      "instant": false,
+                      "legendFormat": "{{container}}",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -6520,11 +6889,11 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [],
+                "calcs": ["min", "max", "mean"],
                 "displayMode": "table",
                 "placement": "right",
                 "showLegend": true,
-                "sortBy": "Last *",
+                "sortBy": "Mean",
                 "sortDesc": true
               },
               "tooltip": {
@@ -6551,17 +6920,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT usage_pct FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1",
-                      "table": "server_disk_metrics"
+                      "expr": "last_over_time(monitor_disk_usage_percent{server_id=\"$server\", disk=~\"$drive\"}[15m])",
+                      "instant": true,
+                      "legendFormat": "__auto",
+                      "range": false
                     },
                     "version": "v0"
                   },
@@ -6643,17 +7010,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT used_bytes FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1",
-                      "table": "server_disk_metrics"
+                      "expr": "last_over_time(monitor_disk_used_bytes{server_id=\"$server\", disk=~\"$drive\"}[15m])",
+                      "instant": true,
+                      "legendFormat": "__auto",
+                      "range": false
                     },
                     "version": "v0"
                   },
@@ -6725,17 +7090,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT total_bytes - used_bytes AS free_bytes FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1",
-                      "table": "server_disk_metrics"
+                      "expr": "last_over_time(monitor_disk_total_bytes{server_id=\"$server\", disk=~\"$drive\"}[15m]) - last_over_time(monitor_disk_used_bytes{server_id=\"$server\", disk=~\"$drive\"}[15m])",
+                      "instant": true,
+                      "legendFormat": "__auto",
+                      "range": false
                     },
                     "version": "v0"
                   },
@@ -6807,17 +7170,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT latest.used_bytes - day_start.used_bytes AS change_today FROM (SELECT used_bytes FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1) latest, (SELECT used_bytes FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND timestamp >= date_trunc('day', now()) ORDER BY timestamp ASC LIMIT 1) day_start",
-                      "table": "server_disk_metrics"
+                      "expr": "last_over_time(monitor_disk_used_bytes{server_id=\"$server\", disk=~\"$drive\"}[15m]) - min_over_time(monitor_disk_used_bytes{server_id=\"$server\", disk=~\"$drive\"}[1d])",
+                      "instant": true,
+                      "legendFormat": "__auto",
+                      "range": false
                     },
                     "version": "v0"
                   },
@@ -6889,17 +7250,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT io_wait_ms FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1",
-                      "table": "server_disk_metrics"
+                      "expr": "last_over_time(monitor_disk_io_wait_ms{server_id=\"$server\", disk=~\"$drive\"}[15m])",
+                      "instant": true,
+                      "legendFormat": "__auto",
+                      "range": false
                     },
                     "version": "v0"
                   },
@@ -6979,17 +7338,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT (COALESCE(read_latency_ms, 0) + COALESCE(write_latency_ms, 0)) / 2.0 AS io_delay FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' ORDER BY timestamp DESC LIMIT 1",
-                      "table": "server_disk_metrics"
+                      "expr": "(last_over_time(monitor_disk_read_latency_ms{server_id=\"$server\", disk=~\"$drive\"}[15m]) + last_over_time(monitor_disk_write_latency_ms{server_id=\"$server\", disk=~\"$drive\"}[15m])) / 2",
+                      "instant": true,
+                      "legendFormat": "__auto",
+                      "range": false
                     },
                     "version": "v0"
                   },
@@ -7069,17 +7426,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT mem_usage AS memory_used FROM server_metrics WHERE server_id = '${server}' ORDER BY timestamp DESC LIMIT 1",
-                      "table": "server_metrics"
+                      "expr": "last_over_time(monitor_host_mem_usage{server_id=\"$server\"}[15m])",
+                      "instant": true,
+                      "legendFormat": "__auto",
+                      "range": false
                     },
                     "version": "v0"
                   },
@@ -7151,39 +7506,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(io_wait_ms) AS \"IO Wait\" FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "sql": {
-                        "columns": [
-                          {
-                            "parameters": [
-                              {
-                                "name": "disk_name",
-                                "type": "functionParameter"
-                              }
-                            ],
-                            "type": "function"
-                          }
-                        ],
-                        "groupBy": [
-                          {
-                            "property": {
-                              "type": "string"
-                            },
-                            "type": "groupBy"
-                          }
-                        ],
-                        "limit": 50
-                      },
-                      "table": "server_disk_metrics"
+                      "expr": "avg(monitor_disk_io_wait_ms{server_id=\"$server\", disk=~\"$drive\"})",
+                      "instant": false,
+                      "legendFormat": "IO Wait",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -7301,17 +7632,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "WITH visible_buckets AS (SELECT $__timeGroupAlias(timestamp, $__interval) FROM server_disk_metrics WHERE server_id = '${server}' AND disk_name = '$drive' AND $__timeFilter(timestamp) GROUP BY 1) SELECT vb.time, CASE WHEN day_sample.used_bytes IS NOT NULL AND now_sample.used_bytes > day_sample.used_bytes AND (now_sample.total_bytes - now_sample.used_bytes) > 0 AND now_sample.timestamp - day_sample.timestamp >= INTERVAL '18 hours' THEN (now_sample.total_bytes - now_sample.used_bytes) / ((now_sample.used_bytes - day_sample.used_bytes) / 86400.0) ELSE NULL END AS \"ETA until full\" FROM visible_buckets vb CROSS JOIN LATERAL (SELECT used_bytes, total_bytes, timestamp FROM server_disk_metrics m WHERE m.server_id = '${server}' AND m.disk_name = '$drive' AND m.timestamp <= vb.time ORDER BY m.timestamp DESC LIMIT 1) now_sample LEFT JOIN LATERAL (SELECT used_bytes, timestamp FROM server_disk_metrics m WHERE m.server_id = '${server}' AND m.disk_name = '$drive' AND m.timestamp <= vb.time - INTERVAL '1 day' ORDER BY m.timestamp DESC LIMIT 1) day_sample ON true ORDER BY vb.time",
-                      "table": "server_disk_metrics"
+                      "expr": "(monitor_disk_total_bytes{server_id=\"$server\", disk=~\"$drive\"} - monitor_disk_used_bytes{server_id=\"$server\", disk=~\"$drive\"}) / clamp_min((monitor_disk_used_bytes{server_id=\"$server\", disk=~\"$drive\"} - monitor_disk_used_bytes{server_id=\"$server\", disk=~\"$drive\"} offset 1d) / 86400, 1)",
+                      "instant": false,
+                      "legendFormat": "ETA until full",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -7420,39 +7749,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "time_series",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(rx_bps) * 8 AS \"In\" FROM server_network_metrics WHERE server_id = '${server}' AND interface_name = '$interface' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "sql": {
-                        "columns": [
-                          {
-                            "parameters": [
-                              {
-                                "name": "disk_name",
-                                "type": "functionParameter"
-                              }
-                            ],
-                            "type": "function"
-                          }
-                        ],
-                        "groupBy": [
-                          {
-                            "property": {
-                              "type": "string"
-                            },
-                            "type": "groupBy"
-                          }
-                        ],
-                        "limit": 50
-                      },
-                      "table": "server_network_metrics"
+                      "expr": "(avg(monitor_net_rx_bps{server_id=\"$server\", interface=~\"$interface\"})) * 8",
+                      "instant": false,
+                      "legendFormat": "In",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -7465,39 +7770,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "time_series",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(tx_bps) * 8 AS \"Out\" FROM server_network_metrics WHERE server_id = '${server}' AND interface_name = '$interface' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "sql": {
-                        "columns": [
-                          {
-                            "parameters": [
-                              {
-                                "name": "disk_name",
-                                "type": "functionParameter"
-                              }
-                            ],
-                            "type": "function"
-                          }
-                        ],
-                        "groupBy": [
-                          {
-                            "property": {
-                              "type": "string"
-                            },
-                            "type": "groupBy"
-                          }
-                        ],
-                        "limit": 50
-                      },
-                      "table": "server_network_metrics"
+                      "expr": "(avg(monitor_net_tx_bps{server_id=\"$server\", interface=~\"$interface\"})) * 8",
+                      "instant": false,
+                      "legendFormat": "Out",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -7619,39 +7900,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(rx_packets_per_second) AS \"RX Packets\" FROM server_network_metrics WHERE server_id = '${server}' AND interface_name = '$interface' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "sql": {
-                        "columns": [
-                          {
-                            "parameters": [
-                              {
-                                "name": "disk_name",
-                                "type": "functionParameter"
-                              }
-                            ],
-                            "type": "function"
-                          }
-                        ],
-                        "groupBy": [
-                          {
-                            "property": {
-                              "type": "string"
-                            },
-                            "type": "groupBy"
-                          }
-                        ],
-                        "limit": 50
-                      },
-                      "table": "server_network_metrics"
+                      "expr": "avg(monitor_net_rx_packets_per_second{server_id=\"$server\", interface=~\"$interface\"})",
+                      "instant": false,
+                      "legendFormat": "RX Packets",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -7664,39 +7921,15 @@
                   "hidden": false,
                   "query": {
                     "datasource": {
-                      "name": "ffnexhw0yascgf"
+                      "name": "$datasource"
                     },
-                    "group": "grafana-postgresql-datasource",
+                    "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
-                      "dataset": "monitor",
-                      "editorMode": "code",
-                      "format": "table",
-                      "rawQuery": true,
-                      "rawSql": "SELECT $__timeGroupAlias(timestamp, $__interval), avg(tx_packets_per_second) AS \"TX Packets\" FROM server_network_metrics WHERE server_id = '${server}' AND interface_name = '$interface' AND $__timeFilter(timestamp) GROUP BY 1 ORDER BY 1",
-                      "sql": {
-                        "columns": [
-                          {
-                            "parameters": [
-                              {
-                                "name": "disk_name",
-                                "type": "functionParameter"
-                              }
-                            ],
-                            "type": "function"
-                          }
-                        ],
-                        "groupBy": [
-                          {
-                            "property": {
-                              "type": "string"
-                            },
-                            "type": "groupBy"
-                          }
-                        ],
-                        "limit": 50
-                      },
-                      "table": "server_network_metrics"
+                      "expr": "avg(monitor_net_tx_packets_per_second{server_id=\"$server\", interface=~\"$interface\"})",
+                      "instant": false,
+                      "legendFormat": "TX Packets",
+                      "range": true
                     },
                     "version": "v0"
                   },
@@ -7936,24 +8169,11 @@
                     "spec": {
                       "element": {
                         "kind": "ElementReference",
-                        "name": "panel-30"
-                      },
-                      "height": 4,
-                      "width": 3,
-                      "x": 15,
-                      "y": 0
-                    }
-                  },
-                  {
-                    "kind": "GridLayoutItem",
-                    "spec": {
-                      "element": {
-                        "kind": "ElementReference",
                         "name": "panel-31"
                       },
                       "height": 4,
-                      "width": 6,
-                      "x": 18,
+                      "width": 9,
+                      "x": 15,
                       "y": 0
                     }
                   }
@@ -8029,11 +8249,38 @@
                     "spec": {
                       "element": {
                         "kind": "ElementReference",
-                        "name": "panel-27"
+                        "name": "panel-30"
                       },
                       "height": 8,
                       "width": 8,
                       "x": 16,
+                      "y": 0
+                    }
+                  }
+                ]
+              }
+            },
+            "title": "CPU"
+          }
+        },
+        {
+          "kind": "RowsLayoutRow",
+          "spec": {
+            "collapse": false,
+            "layout": {
+              "kind": "GridLayout",
+              "spec": {
+                "items": [
+                  {
+                    "kind": "GridLayoutItem",
+                    "spec": {
+                      "element": {
+                        "kind": "ElementReference",
+                        "name": "panel-27"
+                      },
+                      "height": 8,
+                      "width": 8,
+                      "x": 0,
                       "y": 0
                     }
                   },
@@ -8046,8 +8293,8 @@
                       },
                       "height": 8,
                       "width": 8,
-                      "x": 0,
-                      "y": 8
+                      "x": 8,
+                      "y": 0
                     }
                   },
                   {
@@ -8059,8 +8306,8 @@
                       },
                       "height": 8,
                       "width": 8,
-                      "x": 8,
-                      "y": 8
+                      "x": 16,
+                      "y": 0
                     }
                   },
                   {
@@ -8071,15 +8318,15 @@
                         "name": "panel-34"
                       },
                       "height": 8,
-                      "width": 8,
-                      "x": 16,
+                      "width": 24,
+                      "x": 0,
                       "y": 8
                     }
                   }
                 ]
               }
             },
-            "title": "CPU & Memory"
+            "title": "Memory"
           }
         },
         {
@@ -9000,9 +9247,9 @@
         "allowCustomValue": true,
         "current": {
           "text": "All",
-          "value": ["$__all"]
+          "value": "$__all"
         },
-        "definition": "SELECT disk_name AS __text, disk_name AS __value FROM server_disk_metrics WHERE server_id = '${server}' GROUP BY disk_name ORDER BY disk_name",
+        "definition": "label_values(monitor_disk_used_bytes{server_id=\"$server\"}, disk)",
         "hide": "dontHide",
         "includeAll": true,
         "label": "Drive",
@@ -9011,45 +9258,13 @@
         "options": [],
         "query": {
           "datasource": {
-            "name": "ffnexhw0yascgf"
+            "name": "$datasource"
           },
-          "group": "grafana-postgresql-datasource",
+          "group": "prometheus",
           "kind": "DataQuery",
           "spec": {
-            "dataset": "monitor",
-            "editorMode": "code",
-            "format": "table",
-            "meta": {
-              "textField": "__text",
-              "valueField": "__value"
-            },
-            "query": "SELECT disk_name AS __text, disk_name AS __value FROM server_disk_metrics WHERE server_id = '${server}' GROUP BY disk_name ORDER BY disk_name",
-            "rawQuery": true,
-            "rawSql": "SELECT disk_name AS __text, disk_name AS __value FROM server_disk_metrics WHERE server_id = '${server}' GROUP BY disk_name ORDER BY disk_name",
-            "refId": "SQLVariableQueryEditor-VariableQuery",
-            "sql": {
-              "columns": [
-                {
-                  "parameters": [
-                    {
-                      "name": "disk_name",
-                      "type": "functionParameter"
-                    }
-                  ],
-                  "type": "function"
-                }
-              ],
-              "groupBy": [
-                {
-                  "property": {
-                    "type": "string"
-                  },
-                  "type": "groupBy"
-                }
-              ],
-              "limit": 50
-            },
-            "table": "server_disk_metrics"
+            "query": "label_values(monitor_disk_used_bytes{server_id=\"$server\"}, disk)",
+            "refId": "VariableQuery"
           },
           "version": "v0"
         },
@@ -9066,9 +9281,9 @@
         "allowCustomValue": true,
         "current": {
           "text": "All",
-          "value": ["$__all"]
+          "value": "$__all"
         },
-        "definition": "SELECT interface_name AS __text, interface_name AS __value FROM server_network_metrics WHERE server_id = '${server}' GROUP BY interface_name ORDER BY CASE WHEN interface_name LIKE 'eth%' THEN 0 WHEN interface_name LIKE 'en%' THEN 1 WHEN interface_name LIKE 'wlan%' THEN 2 WHEN interface_name LIKE 'wlp%' THEN 3 ELSE 4 END, interface_name",
+        "definition": "label_values(monitor_net_rx_bps{server_id=\"$server\"}, interface)",
         "hide": "dontHide",
         "includeAll": true,
         "label": "Interface",
@@ -9077,45 +9292,13 @@
         "options": [],
         "query": {
           "datasource": {
-            "name": "ffnexhw0yascgf"
+            "name": "$datasource"
           },
-          "group": "grafana-postgresql-datasource",
+          "group": "prometheus",
           "kind": "DataQuery",
           "spec": {
-            "dataset": "monitor",
-            "editorMode": "code",
-            "format": "table",
-            "meta": {
-              "textField": "__text",
-              "valueField": "__value"
-            },
-            "query": "SELECT interface_name AS __text, interface_name AS __value FROM server_network_metrics WHERE server_id = '${server}' GROUP BY interface_name ORDER BY CASE WHEN interface_name LIKE 'eth%' THEN 0 WHEN interface_name LIKE 'en%' THEN 1 WHEN interface_name LIKE 'wlan%' THEN 2 WHEN interface_name LIKE 'wlp%' THEN 3 ELSE 4 END, interface_name",
-            "rawQuery": true,
-            "rawSql": "SELECT interface_name AS __text, interface_name AS __value FROM server_network_metrics WHERE server_id = '${server}' GROUP BY interface_name ORDER BY CASE WHEN interface_name LIKE 'eth%' THEN 0 WHEN interface_name LIKE 'en%' THEN 1 WHEN interface_name LIKE 'wlan%' THEN 2 WHEN interface_name LIKE 'wlp%' THEN 3 ELSE 4 END, interface_name",
-            "refId": "SQLVariableQueryEditor-VariableQuery",
-            "sql": {
-              "columns": [
-                {
-                  "parameters": [
-                    {
-                      "name": "disk_name",
-                      "type": "functionParameter"
-                    }
-                  ],
-                  "type": "function"
-                }
-              ],
-              "groupBy": [
-                {
-                  "property": {
-                    "type": "string"
-                  },
-                  "type": "groupBy"
-                }
-              ],
-              "limit": 50
-            },
-            "table": "server_network_metrics"
+            "query": "label_values(monitor_net_rx_bps{server_id=\"$server\"}, interface)",
+            "refId": "VariableQuery"
           },
           "version": "v0"
         },
@@ -9131,10 +9314,10 @@
       "spec": {
         "allowCustomValue": true,
         "current": {
-          "text": ["All"],
-          "value": ["$__all"]
+          "text": "All",
+          "value": "$__all"
         },
-        "definition": "SELECT pool_name AS __text, pool_name AS __value FROM server_zfs_pool_metrics WHERE server_id = '${server}' GROUP BY pool_name ORDER BY pool_name",
+        "definition": "label_values(monitor_zfs_pool_capacity_percent{server_id=\"$server\"}, pool)",
         "hide": "dontHide",
         "includeAll": true,
         "label": "Pool",
@@ -9143,23 +9326,13 @@
         "options": [],
         "query": {
           "datasource": {
-            "name": "ffnexhw0yascgf"
+            "name": "$datasource"
           },
-          "group": "grafana-postgresql-datasource",
+          "group": "prometheus",
           "kind": "DataQuery",
           "spec": {
-            "dataset": "monitor",
-            "editorMode": "code",
-            "format": "table",
-            "meta": {
-              "textField": "__text",
-              "valueField": "__value"
-            },
-            "query": "SELECT pool_name AS __text, pool_name AS __value FROM server_zfs_pool_metrics WHERE server_id = '${server}' GROUP BY pool_name ORDER BY pool_name",
-            "rawQuery": true,
-            "rawSql": "SELECT pool_name AS __text, pool_name AS __value FROM server_zfs_pool_metrics WHERE server_id = '${server}' GROUP BY pool_name ORDER BY pool_name",
-            "refId": "SQLVariableQueryEditor-VariableQuery",
-            "table": "server_zfs_pool_metrics"
+            "query": "label_values(monitor_zfs_pool_capacity_percent{server_id=\"$server\"}, pool)",
+            "refId": "VariableQuery"
           },
           "version": "v0"
         },
