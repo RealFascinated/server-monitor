@@ -23,6 +23,7 @@ import cc.fascinated.monitor.metrics.vm.VictoriaMetricsWriteClient;
 import cc.fascinated.monitor.metrics.vm.series.impl.CpuCoreSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.DiskSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.DockerSeries;
+import cc.fascinated.monitor.metrics.vm.series.impl.GpuSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.HostSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.TemperatureSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.NetworkSeries;
@@ -151,6 +152,7 @@ public class ServerService {
             Utils.forEach(serverMetrics.temperatureMetrics(), reading -> TemperatureSeries.write(ctx, reading));
             Utils.forEach(metrics.interfaceMetrics(), iface -> NetworkSeries.write(ctx, iface));
             Utils.forEach(metrics.diskMetrics(), disk -> DiskSeries.write(ctx, disk));
+            Utils.forEach(metrics.gpuMetrics(), gpu -> GpuSeries.write(ctx, gpu));
             if (metrics.zfsArcMetrics() != null) {
                 ZfsArcSeries.write(ctx, metrics.zfsArcMetrics());
             }
