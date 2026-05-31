@@ -8,12 +8,10 @@ import cc.fascinated.monitor.model.persistance.UserRow;
 import cc.fascinated.monitor.service.ServerService;
 import cc.fascinated.monitor.web.auth.AuthenticatedServer;
 import cc.fascinated.monitor.web.auth.AuthenticatedUser;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/v1/servers")
-@Tag(name = "Index Controller")
 public class ServerController {
 
     private final ServerService serverService;

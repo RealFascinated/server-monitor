@@ -7,14 +7,12 @@ import cc.fascinated.monitor.model.dto.response.auth.UserResponse;
 import cc.fascinated.monitor.model.persistance.UserRow;
 import cc.fascinated.monitor.service.AuthService;
 import cc.fascinated.monitor.web.auth.AuthenticatedUser;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/v1/auth")
-@Tag(name = "Auth")
 public class AuthController {
     private final AuthService authService;
 
