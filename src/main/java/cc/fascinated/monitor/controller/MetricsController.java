@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 
 @RestController
 public class MetricsController {
-    private static final PrometheusTextFormatWriter WRITER = new PrometheusTextFormatWriter(false);
+    private static final PrometheusTextFormatWriter WRITER = PrometheusTextFormatWriter.create();
 
     private final PrometheusRegistry prometheusRegistry;
 
