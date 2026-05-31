@@ -19,5 +19,6 @@ public record ServerMetrics(
         Long processCount,
         Long runningProcesses,
         Long contextSwitchesPerSecond,
-        Long interruptsPerSecond
+        Long interruptsPerSecond,
+        Double cpuPowerWatts
 ) {}

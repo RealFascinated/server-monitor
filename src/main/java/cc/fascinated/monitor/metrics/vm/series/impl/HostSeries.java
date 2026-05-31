@@ -25,7 +25,8 @@ public enum HostSeries implements VmGaugeSeries {
     RUNNING_PROCESSES("monitor_host_running_processes"),
     CTX_SWITCHES_PER_SECOND("monitor_host_ctx_switches_per_second"),
     INTERRUPTS_PER_SECOND("monitor_host_interrupts_per_second"),
-    CPU_CLOCK_MHZ("monitor_host_cpu_clock_mhz");
+    CPU_CLOCK_MHZ("monitor_host_cpu_clock_mhz"),
+    CPU_POWER_WATTS("monitor_host_cpu_power_watts");
 
     private final String metricName;
 
@@ -59,5 +60,6 @@ public enum HostSeries implements VmGaugeSeries {
         CTX_SWITCHES_PER_SECOND.writeNullable(ctx, metrics.contextSwitchesPerSecond());
         INTERRUPTS_PER_SECOND.writeNullable(ctx, metrics.interruptsPerSecond());
         CPU_CLOCK_MHZ.writeNullable(ctx, details.cpuClockMhz());
+        CPU_POWER_WATTS.writeNullable(ctx, metrics.cpuPowerWatts());
     }
 }
