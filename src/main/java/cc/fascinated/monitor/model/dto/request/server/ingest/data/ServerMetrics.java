@@ -1,5 +1,9 @@
 package cc.fascinated.monitor.model.dto.request.server.ingest.data;
 
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+
 public record ServerMetrics(
         Double cpuUsage,
         Double memoryUsage,
@@ -20,5 +24,7 @@ public record ServerMetrics(
         Long runningProcesses,
         Long contextSwitchesPerSecond,
         Long interruptsPerSecond,
-        Double cpuPowerWatts
+        Double cpuPowerWatts,
+        @Nullable List<CpuCoreMetric> cpuCoreMetrics,
+        @Nullable List<TemperatureMetric> temperatureMetrics
 ) {}

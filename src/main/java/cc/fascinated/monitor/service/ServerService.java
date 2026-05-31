@@ -152,8 +152,8 @@ public class ServerService {
             }
             Utils.forEach(metrics.zfsPoolMetrics(), pool -> ZfsPoolSeries.write(ctx, pool));
             Utils.forEach(metrics.dockerContainers(), container -> DockerSeries.write(ctx, container));
-            Utils.forEach(metrics.cpuCoreMetrics(), core -> CpuCoreSeries.write(ctx, core));
-            Utils.forEach(metrics.temperatureMetrics(), reading -> TemperatureSeries.write(ctx, reading));
+            Utils.forEach(metrics.resolvedCpuCoreMetrics(), core -> CpuCoreSeries.write(ctx, core));
+            Utils.forEach(metrics.resolvedTemperatureMetrics(), reading -> TemperatureSeries.write(ctx, reading));
             this.victoriaMetricsWriteClient.flush(buffer.toString());
 
             this.serverRepository.save(server);
