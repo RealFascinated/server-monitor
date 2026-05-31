@@ -49,8 +49,8 @@ dependencies {
     implementation("org.kohsuke:github-api:2.0-rc.6")
 
     // Adventure API
-    implementation("net.kyori:adventure-text-serializer-gson:4.26.1")
-    implementation("net.kyori:adventure-text-serializer-legacy:4.26.1")
+    implementation("net.kyori:adventure-text-serializer-gson:5.1.1")
+    implementation("net.kyori:adventure-text-serializer-legacy:5.1.1")
     implementation("com.google.guava:guava:33.5.0-jre")
 
     // DNS Lookup
