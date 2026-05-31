@@ -18,9 +18,11 @@ import cc.fascinated.monitor.metrics.counter.TotalIngestsCounterMetric;
 import cc.fascinated.monitor.metrics.histogram.IngestDurationHistogramMetric;
 import cc.fascinated.monitor.metrics.vm.MetricWriteContext;
 import cc.fascinated.monitor.metrics.vm.VictoriaMetricsWriteClient;
+import cc.fascinated.monitor.metrics.vm.series.impl.CpuCoreSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.DiskSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.DockerSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.HostSeries;
+import cc.fascinated.monitor.metrics.vm.series.impl.TemperatureSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.NetworkSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.ZfsArcSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.ZfsPoolSeries;
@@ -133,6 +135,8 @@ public class ServerService {
             }
             Utils.forEach(metrics.zfsPoolMetrics(), pool -> ZfsPoolSeries.write(ctx, pool));
             Utils.forEach(metrics.dockerContainers(), container -> DockerSeries.write(ctx, container));
+            Utils.forEach(metrics.cpuCoreMetrics(), core -> CpuCoreSeries.write(ctx, core));
+            Utils.forEach(metrics.temperatureMetrics(), reading -> TemperatureSeries.write(ctx, reading));
             this.victoriaMetricsWriteClient.flush(buffer.toString());
 
             this.serverRepository.save(server);

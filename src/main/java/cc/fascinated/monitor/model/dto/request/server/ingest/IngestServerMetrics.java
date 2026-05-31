@@ -13,5 +13,7 @@ public record IngestServerMetrics(
         List<DiskMetric> diskMetrics,
         @Nullable List<ZfsPoolMetric> zfsPoolMetrics,
         @Nullable ZfsArcMetrics zfsArcMetrics,
-        @Nullable List<DockerContainerMetric> dockerContainers
+        @Nullable List<DockerContainerMetric> dockerContainers,
+        @Nullable List<CpuCoreMetric> cpuCoreMetrics,
+        @Nullable List<TemperatureMetric> temperatureMetrics
 ) {}
