@@ -1,5 +1,6 @@
 package cc.fascinated.monitor.service;
 
+import cc.fascinated.monitor.config.MonitorServerProperties;
 import cc.fascinated.monitor.exception.impl.InternalServerException;
 import cc.fascinated.monitor.exception.impl.NotFoundException;
 import cc.fascinated.monitor.exception.impl.UnauthorizedException;
@@ -28,6 +29,7 @@ import cc.fascinated.monitor.repository.ServerRepository;
 import cc.fascinated.monitor.util.AuthUtils;
 import cc.fascinated.monitor.util.Utils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,18 +46,21 @@ public class ServerService {
     private final IngestDurationHistogramMetric ingestDurationHistogramMetric;
     private final IngestAuthFailuresCounterMetric ingestAuthFailuresCounterMetric;
     private final VictoriaMetricsWriteClient victoriaMetricsWriteClient;
+    private final MonitorServerProperties serverProperties;
 
     public ServerService(ServerRepository serverRepository, ServerIngestTokenRepository serverIngestTokenRepository,
                          TotalIngestsCounterMetric totalIngestsCounterMetric,
                          IngestDurationHistogramMetric ingestDurationHistogramMetric,
                          IngestAuthFailuresCounterMetric ingestAuthFailuresCounterMetric,
-                         VictoriaMetricsWriteClient victoriaMetricsWriteClient) {
+                         VictoriaMetricsWriteClient victoriaMetricsWriteClient,
+                         MonitorServerProperties serverProperties) {
         this.serverRepository = serverRepository;
         this.serverIngestTokenRepository = serverIngestTokenRepository;
         this.totalIngestsCounterMetric = totalIngestsCounterMetric;
         this.ingestDurationHistogramMetric = ingestDurationHistogramMetric;
         this.ingestAuthFailuresCounterMetric = ingestAuthFailuresCounterMetric;
         this.victoriaMetricsWriteClient = victoriaMetricsWriteClient;
+        this.serverProperties = serverProperties;
     }
 
     public CreatedServerResponse createServer(UserRow user, ServerCreateRequest createRequest) {
@@ -138,6 +143,16 @@ public class ServerService {
             if (success) {
                 this.ingestDurationHistogramMetric.observeSeconds((System.nanoTime() - startedNanos) / 1_000_000_000.0);
             }
+        }
+    }
+
+    @Scheduled(fixedDelayString = "#{@monitorMetricsProperties.refreshIntervalMs}")
+    @Transactional
+    public void markStaleServersOffline() {
+        Instant cutoff = Instant.now().minus(this.serverProperties.getOfflineThreshold());
+        int updated = this.serverRepository.markStaleServersOffline(cutoff);
+        if (updated > 0) {
+            log.info("Marked {} server(s) offline (no update since {})", updated, cutoff);
         }
     }
 
