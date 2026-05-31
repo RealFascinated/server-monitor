@@ -51,7 +51,7 @@ dependencies {
     // Adventure API
     implementation("net.kyori:adventure-text-serializer-gson:4.26.1")
     implementation("net.kyori:adventure-text-serializer-legacy:4.26.1")
-    implementation("com.google.guava:guava:33.5.0-jre")
+    implementation("com.google.guava:guava:33.6.0-jre")
 
     // DNS Lookup
     implementation("com.github.dnsjava:dnsjava:v3.5.2")
