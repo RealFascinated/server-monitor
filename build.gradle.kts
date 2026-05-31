@@ -57,7 +57,7 @@ dependencies {
     implementation("com.github.dnsjava:dnsjava:v3.5.2")
 
     // SwaggerUI
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
 
     // GeoIP - IP Lookups
     implementation("com.maxmind.geoip2:geoip2:5.0.2")
