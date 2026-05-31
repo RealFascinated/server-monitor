@@ -90,6 +90,17 @@ public class ServerService {
         throw new NotFoundException("Server \"%s\" not found".formatted(id));
     }
 
+    @Transactional
+    public void deleteServer(UserRow user, long serverId) {
+        ServerRow server = findServerRowById(serverId);
+        if (!server.getOwnerId().equals(user.getId())) {
+            throw new UnauthorizedException("You do not own this server");
+        }
+        this.victoriaMetricsWriteClient.deleteSeriesForServer(serverId);
+        this.serverRepository.deleteById(serverId);
+        log.info("Deleted server {} and its VictoriaMetrics series", serverId);
+    }
+
     public ServerRow authenticateIngestRequest(String authorizationHeader) {
         try {
             UUID token = AuthUtils.parseBearerToken(authorizationHeader);

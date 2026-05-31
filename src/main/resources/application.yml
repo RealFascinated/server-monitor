@@ -42,6 +42,7 @@ spring:
 monitor:
   victoriametrics:
     import-url: http://localhost:8428/api/v1/import/prometheus
+    delete-token: "set_me" # VictoriaMetrics -httpAuthKey for admin/tsdb/delete_series
   servers:
     offline-threshold: 2m
   metrics:

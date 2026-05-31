@@ -8,6 +8,7 @@ import cc.fascinated.monitor.model.persistance.UserRow;
 import cc.fascinated.monitor.service.ServerService;
 import cc.fascinated.monitor.web.auth.AuthenticatedServer;
 import cc.fascinated.monitor.web.auth.AuthenticatedUser;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,6 +24,12 @@ public class ServerController {
     @PostMapping(value = "/create")
     public CreatedServerResponse createServer(@AuthenticatedUser UserRow user, @RequestBody ServerCreateRequest createRequest) {
         return this.serverService.createServer(user, createRequest);
+    }
+
+    @DeleteMapping(value = "/{serverId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteServer(@AuthenticatedUser UserRow user, @PathVariable long serverId) {
+        this.serverService.deleteServer(user, serverId);
     }
 
     @PostMapping(value = "/ingest")
