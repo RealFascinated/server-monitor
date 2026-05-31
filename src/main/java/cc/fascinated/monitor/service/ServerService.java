@@ -8,6 +8,7 @@ import cc.fascinated.monitor.model.domain.server.ServerStatus;
 import cc.fascinated.monitor.model.dto.request.server.ServerCreateRequest;
 import cc.fascinated.monitor.model.dto.request.server.ingest.IngestServerMetrics;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerDetails;
+import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerMetrics;
 import cc.fascinated.monitor.model.dto.response.server.CreatedServerResponse;
 import cc.fascinated.monitor.model.dto.response.server.IngestTokenResponse;
 import cc.fascinated.monitor.model.persistance.ServerInventoryRow;
@@ -144,7 +145,10 @@ public class ServerService {
 
             StringBuilder buffer = new StringBuilder();
             MetricWriteContext ctx = new MetricWriteContext(buffer, server.getId(), now.getEpochSecond());
-            HostSeries.write(ctx, metrics.serverMetrics(), metrics.serverDetails());
+            ServerMetrics serverMetrics = metrics.serverMetrics();
+            HostSeries.write(ctx, serverMetrics, metrics.serverDetails());
+            Utils.forEach(serverMetrics.cpuCoreMetrics(), core -> CpuCoreSeries.write(ctx, core));
+            Utils.forEach(serverMetrics.temperatureMetrics(), reading -> TemperatureSeries.write(ctx, reading));
             Utils.forEach(metrics.interfaceMetrics(), iface -> NetworkSeries.write(ctx, iface));
             Utils.forEach(metrics.diskMetrics(), disk -> DiskSeries.write(ctx, disk));
             if (metrics.zfsArcMetrics() != null) {
@@ -152,8 +156,6 @@ public class ServerService {
             }
             Utils.forEach(metrics.zfsPoolMetrics(), pool -> ZfsPoolSeries.write(ctx, pool));
             Utils.forEach(metrics.dockerContainers(), container -> DockerSeries.write(ctx, container));
-            Utils.forEach(metrics.resolvedCpuCoreMetrics(), core -> CpuCoreSeries.write(ctx, core));
-            Utils.forEach(metrics.resolvedTemperatureMetrics(), reading -> TemperatureSeries.write(ctx, reading));
             this.victoriaMetricsWriteClient.flush(buffer.toString());
 
             this.serverRepository.save(server);
