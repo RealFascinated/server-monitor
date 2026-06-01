@@ -2342,7 +2342,7 @@
                   "fixedColor": "green",
                   "mode": "fixed"
                 },
-                "decimals": 2,
+                "decimals": 0,
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
@@ -3728,7 +3728,30 @@
                 },
                 "unit": "short"
               },
-              "overrides": []
+              "overrides": [
+                {
+                  "__systemRef": "hideSeriesFrom",
+                  "matcher": {
+                    "id": "byNames",
+                    "options": {
+                      "mode": "exclude",
+                      "names": ["Used"],
+                      "prefix": "All except:",
+                      "readOnly": true
+                    }
+                  },
+                  "properties": [
+                    {
+                      "id": "custom.hideFrom",
+                      "value": {
+                        "legend": false,
+                        "tooltip": true,
+                        "viz": true
+                      }
+                    }
+                  ]
+                }
+              ]
             },
             "options": {
               "annotations": {
@@ -3813,7 +3836,7 @@
                     "kind": "DataQuery",
                     "spec": {
                       "editorMode": "code",
-                      "expr": "monitor_disk_used_bytes{server_id=\"$server\", disk=~\"$drive\"} - min_over_time(monitor_disk_used_bytes{server_id=\"$server\", disk=~\"$drive\"}[1d])",
+                      "expr": "increase(monitor_disk_used_bytes{server_id=\"$server\", disk=~\"$drive\"}[1d:1d])",
                       "format": "time_series",
                       "instant": false,
                       "interval": "1d",
@@ -7640,7 +7663,9 @@
                     "group": "prometheus",
                     "kind": "DataQuery",
                     "spec": {
+                      "editorMode": "code",
                       "expr": "(monitor_disk_total_bytes{server_id=\"$server\", disk=~\"$drive\"} - monitor_disk_used_bytes{server_id=\"$server\", disk=~\"$drive\"}) / clamp_min((monitor_disk_used_bytes{server_id=\"$server\", disk=~\"$drive\"} - monitor_disk_used_bytes{server_id=\"$server\", disk=~\"$drive\"} offset 1d) / 86400, 1)",
+                      "format": "time_series",
                       "instant": false,
                       "legendFormat": "ETA until full",
                       "range": true
@@ -7702,8 +7727,7 @@
                     "mode": "dashed"
                   }
                 },
-                "decimals": 2,
-                "min": 0,
+                "decimals": 1,
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
@@ -9182,6 +9206,414 @@
         }
       }
     },
+    "panel-83": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "editorMode": "code",
+                      "expr": "monitor_tcp_connections{server_id=\"$server\"}",
+                      "format": "time_series",
+                      "instant": false,
+                      "legendFormat": "{{state}}",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 83,
+        "links": [],
+        "title": "TCP Connections by State",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "axisBorderShow": false,
+                  "axisCenteredZero": false,
+                  "axisColorMode": "text",
+                  "axisLabel": "",
+                  "axisPlacement": "auto",
+                  "barAlignment": 0,
+                  "barWidthFactor": 0.6,
+                  "drawStyle": "line",
+                  "fillOpacity": 40,
+                  "gradientMode": "none",
+                  "hideFrom": {
+                    "legend": false,
+                    "tooltip": false,
+                    "viz": false
+                  },
+                  "insertNulls": false,
+                  "lineInterpolation": "linear",
+                  "lineWidth": 1,
+                  "pointSize": 5,
+                  "scaleDistribution": {
+                    "type": "linear"
+                  },
+                  "showPoints": "auto",
+                  "showValues": false,
+                  "spanNulls": false,
+                  "stacking": {
+                    "group": "A",
+                    "mode": "normal"
+                  },
+                  "thresholdsStyle": {
+                    "mode": "off"
+                  }
+                },
+                "decimals": 0,
+                "min": 0,
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    }
+                  ]
+                },
+                "unit": "short"
+              },
+              "overrides": []
+            },
+            "options": {
+              "annotations": {
+                "clustering": -1,
+                "multiLane": false
+              },
+              "legend": {
+                "calcs": ["min", "max", "mean", "lastNotNull"],
+                "displayMode": "table",
+                "placement": "right",
+                "showLegend": true,
+                "sortBy": "Last *",
+                "sortDesc": true
+              },
+              "tooltip": {
+                "hideZeros": false,
+                "mode": "multi",
+                "sort": "desc"
+              }
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
+    "panel-84": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "editorMode": "code",
+                      "expr": "monitor_tcp_connections{server_id=\"$server\", state=\"ESTABLISHED\"}",
+                      "format": "time_series",
+                      "instant": false,
+                      "legendFormat": "ESTABLISHED",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "editorMode": "code",
+                      "expr": "monitor_tcp_connections{server_id=\"$server\", state=\"TIME_WAIT\"}",
+                      "format": "time_series",
+                      "instant": false,
+                      "legendFormat": "TIME_WAIT",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "editorMode": "code",
+                      "expr": "monitor_tcp_connections{server_id=\"$server\", state=\"LISTEN\"}",
+                      "format": "time_series",
+                      "instant": false,
+                      "legendFormat": "LISTEN",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "C"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 84,
+        "links": [],
+        "title": "TCP Key States",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "axisBorderShow": false,
+                  "axisCenteredZero": false,
+                  "axisColorMode": "text",
+                  "axisLabel": "",
+                  "axisPlacement": "auto",
+                  "barAlignment": 0,
+                  "barWidthFactor": 0.6,
+                  "drawStyle": "line",
+                  "fillOpacity": 10,
+                  "gradientMode": "none",
+                  "hideFrom": {
+                    "legend": false,
+                    "tooltip": false,
+                    "viz": false
+                  },
+                  "insertNulls": false,
+                  "lineInterpolation": "linear",
+                  "lineWidth": 1,
+                  "pointSize": 5,
+                  "scaleDistribution": {
+                    "type": "linear"
+                  },
+                  "showPoints": "auto",
+                  "showValues": false,
+                  "spanNulls": false,
+                  "stacking": {
+                    "group": "A",
+                    "mode": "none"
+                  },
+                  "thresholdsStyle": {
+                    "mode": "off"
+                  }
+                },
+                "decimals": 0,
+                "min": 0,
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    }
+                  ]
+                },
+                "unit": "short"
+              },
+              "overrides": []
+            },
+            "options": {
+              "annotations": {
+                "clustering": -1,
+                "multiLane": false
+              },
+              "legend": {
+                "calcs": ["min", "max", "mean", "lastNotNull"],
+                "displayMode": "table",
+                "placement": "bottom",
+                "showLegend": true,
+                "sortBy": "Mean",
+                "sortDesc": true
+              },
+              "tooltip": {
+                "hideZeros": false,
+                "mode": "multi",
+                "sort": "desc"
+              }
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
+    "panel-85": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "$datasource"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "editorMode": "code",
+                      "expr": "sum(monitor_tcp_connections{server_id=\"$server\"})",
+                      "format": "time_series",
+                      "instant": false,
+                      "legendFormat": "Total",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 85,
+        "links": [],
+        "title": "TCP Connections Total",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                },
+                "custom": {
+                  "axisBorderShow": false,
+                  "axisCenteredZero": false,
+                  "axisColorMode": "text",
+                  "axisLabel": "",
+                  "axisPlacement": "auto",
+                  "barAlignment": 0,
+                  "barWidthFactor": 0.6,
+                  "drawStyle": "line",
+                  "fillOpacity": 10,
+                  "gradientMode": "none",
+                  "hideFrom": {
+                    "legend": false,
+                    "tooltip": false,
+                    "viz": false
+                  },
+                  "insertNulls": false,
+                  "lineInterpolation": "linear",
+                  "lineWidth": 1,
+                  "pointSize": 5,
+                  "scaleDistribution": {
+                    "type": "linear"
+                  },
+                  "showPoints": "auto",
+                  "showValues": false,
+                  "spanNulls": false,
+                  "stacking": {
+                    "group": "A",
+                    "mode": "none"
+                  },
+                  "thresholdsStyle": {
+                    "mode": "off"
+                  }
+                },
+                "decimals": 0,
+                "min": 0,
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    }
+                  ]
+                },
+                "unit": "short"
+              },
+              "overrides": []
+            },
+            "options": {
+              "annotations": {
+                "clustering": -1,
+                "multiLane": false
+              },
+              "legend": {
+                "calcs": ["min", "max", "mean", "lastNotNull"],
+                "displayMode": "list",
+                "placement": "bottom",
+                "showLegend": true
+              },
+              "tooltip": {
+                "hideZeros": false,
+                "mode": "multi",
+                "sort": "none"
+              }
+            }
+          },
+          "version": "13.0.1+security-01"
+        }
+      }
+    },
     "panel-9": {
       "kind": "Panel",
       "spec": {
@@ -10348,6 +10780,59 @@
                     "spec": {
                       "element": {
                         "kind": "ElementReference",
+                        "name": "panel-83"
+                      },
+                      "height": 10,
+                      "width": 24,
+                      "x": 0,
+                      "y": 0
+                    }
+                  },
+                  {
+                    "kind": "GridLayoutItem",
+                    "spec": {
+                      "element": {
+                        "kind": "ElementReference",
+                        "name": "panel-84"
+                      },
+                      "height": 8,
+                      "width": 12,
+                      "x": 0,
+                      "y": 10
+                    }
+                  },
+                  {
+                    "kind": "GridLayoutItem",
+                    "spec": {
+                      "element": {
+                        "kind": "ElementReference",
+                        "name": "panel-85"
+                      },
+                      "height": 8,
+                      "width": 12,
+                      "x": 12,
+                      "y": 10
+                    }
+                  }
+                ]
+              }
+            },
+            "title": "TCP Connections"
+          }
+        },
+        {
+          "kind": "RowsLayoutRow",
+          "spec": {
+            "collapse": false,
+            "layout": {
+              "kind": "GridLayout",
+              "spec": {
+                "items": [
+                  {
+                    "kind": "GridLayoutItem",
+                    "spec": {
+                      "element": {
+                        "kind": "ElementReference",
                         "name": "panel-60"
                       },
                       "height": 10,
@@ -10672,7 +11157,7 @@
       "1d"
     ],
     "fiscalYearStartMonth": 0,
-    "from": "now-12h",
+    "from": "now-7d",
     "hideTimepicker": false,
     "timezone": "browser",
     "to": "now"
@@ -10704,8 +11189,8 @@
       "spec": {
         "allowCustomValue": false,
         "current": {
-          "text": "Lee Desktop",
-          "value": "11"
+          "text": "Wild OVH",
+          "value": "2"
         },
         "definition": "SELECT server_name AS __text, id AS __value FROM servers ORDER BY server_name",
         "hide": "dontHide",

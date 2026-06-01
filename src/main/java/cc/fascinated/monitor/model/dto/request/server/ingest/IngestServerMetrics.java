@@ -14,5 +14,6 @@ public record IngestServerMetrics(
         @Nullable List<GpuMetric> gpuMetrics,
         @Nullable List<ZfsPoolMetric> zfsPoolMetrics,
         @Nullable ZfsArcMetrics zfsArcMetrics,
-        @Nullable List<DockerContainerMetric> dockerContainers
+        @Nullable List<DockerContainerMetric> dockerContainers,
+        @Nullable List<TcpConnectionMetric> tcpConnectionMetrics
 ) {}
