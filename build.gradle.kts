@@ -44,9 +44,9 @@ dependencies {
     implementation("com.maxmind.geoip2:geoip2:5.0.2")
 
     // Metrics
-    implementation("io.prometheus:prometheus-metrics-core:1.6.1")
-    implementation("io.prometheus:prometheus-metrics-exposition-formats:1.6.1")
-    implementation("io.prometheus:prometheus-metrics-model:1.6.1")
+    implementation("io.prometheus:prometheus-metrics-core:1.7.0")
+    implementation("io.prometheus:prometheus-metrics-exposition-formats:1.7.0")
+    implementation("io.prometheus:prometheus-metrics-model:1.7.0")
 
     // Lombok
     compileOnly("org.projectlombok:lombok:1.18.46")
