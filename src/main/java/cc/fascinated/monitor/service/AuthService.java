@@ -64,7 +64,10 @@ public class AuthService {
     }
 
     public UserRow authenticate(String authorizationHeader) {
-        String token = AuthUtils.extractBearerValue(authorizationHeader);
+        return authenticateToken(AuthUtils.extractBearerValue(authorizationHeader));
+    }
+
+    public UserRow authenticateToken(String token) {
         UserSessionRow session = this.userSessionRepository
                 .findByTokenHashAndExpiresAtAfter(AuthUtils.hash(token), Instant.now())
                 .orElseThrow(() -> new UnauthorizedException("Invalid or expired session"));

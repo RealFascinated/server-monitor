@@ -16,6 +16,7 @@ import cc.fascinated.monitor.repository.ServerRepository;
 import cc.fascinated.monitor.repository.UserRepository;
 import cc.fascinated.monitor.util.AuthUtils;
 import cc.fascinated.monitor.util.UserUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,16 +39,19 @@ public class ServerAccessService {
     private final ServerInviteRepository serverInviteRepository;
     private final ServerRepository serverRepository;
     private final UserRepository userRepository;
+    private final ServerWebSocketService serverWebSocketService;
     private final SecureRandom secureRandom = new SecureRandom();
 
     public ServerAccessService(ServerMemberRepository serverMemberRepository,
                                ServerInviteRepository serverInviteRepository,
                                ServerRepository serverRepository,
-                               UserRepository userRepository) {
+                               UserRepository userRepository,
+                               @Lazy ServerWebSocketService serverWebSocketService) {
         this.serverMemberRepository = serverMemberRepository;
         this.serverInviteRepository = serverInviteRepository;
         this.serverRepository = serverRepository;
         this.userRepository = userRepository;
+        this.serverWebSocketService = serverWebSocketService;
     }
 
     public Optional<ServerRole> findRole(long serverId, long userId) {
@@ -149,6 +153,7 @@ public class ServerAccessService {
                 now
         ));
 
+        this.serverWebSocketService.notifyInviteCreated(server, invite);
         return ServerInviteCreatedResponse.from(invite, token);
     }
 
@@ -165,6 +170,7 @@ public class ServerAccessService {
         }
 
         this.serverMemberRepository.deleteByServerIdAndUserId(server.getId(), userId);
+        this.serverWebSocketService.notifyMemberRemoved(server.getId(), userId);
     }
 
     @Transactional
@@ -176,6 +182,7 @@ public class ServerAccessService {
                 .orElseThrow(() -> new NotFoundException("Invite not found"));
 
         this.serverInviteRepository.delete(invite);
+        this.serverWebSocketService.notifyInviteRevoked(server, invite);
     }
 
     public List<UserPendingInviteResponse> listPendingInvites(UserRow user) {
@@ -216,18 +223,21 @@ public class ServerAccessService {
             throw new ConflictException("You already have access to this server");
         }
 
+        long inviteId = invite.getId();
+        long serverId = invite.getServerId();
         Instant now = Instant.now();
         ServerMemberRow member = this.serverMemberRepository.save(new ServerMemberRow(
-                invite.getServerId(),
+                serverId,
                 user.getId(),
                 invite.getRole(),
                 now
         ));
         this.serverInviteRepository.delete(invite);
 
-        ServerRow server = this.serverRepository.findById(invite.getServerId())
-                .orElseThrow(() -> new NotFoundException("Server \"%s\" not found".formatted(invite.getServerId())));
+        ServerRow server = this.serverRepository.findById(serverId)
+                .orElseThrow(() -> new NotFoundException("Server \"%s\" not found".formatted(serverId)));
 
+        this.serverWebSocketService.notifyInviteAccepted(serverId, user.getId(), inviteId);
         return ServerMemberResponse.from(server, member);
     }
 

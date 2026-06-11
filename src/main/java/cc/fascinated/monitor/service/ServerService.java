@@ -34,12 +34,15 @@ import cc.fascinated.monitor.metrics.vm.series.impl.ZfsArcSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.TcpConnectionSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.ZfsPoolSeries;
 import cc.fascinated.monitor.repository.ServerIngestTokenRepository;
+import cc.fascinated.monitor.repository.ServerMemberRepository;
 import cc.fascinated.monitor.repository.ServerRepository;
+import cc.fascinated.monitor.model.persistance.ServerMemberRow;
 import cc.fascinated.monitor.util.AuthUtils;
 import cc.fascinated.monitor.util.NumberUtils;
 import cc.fascinated.monitor.util.ServerUtils;
 import cc.fascinated.monitor.util.Utils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +58,7 @@ import java.util.UUID;
 @Slf4j
 public class ServerService {
     private final ServerRepository serverRepository;
+    private final ServerMemberRepository serverMemberRepository;
     private final ServerIngestTokenRepository serverIngestTokenRepository;
     private final TotalIngestsCounterMetric totalIngestsCounterMetric;
     private final IngestDurationHistogramMetric ingestDurationHistogramMetric;
@@ -63,16 +67,20 @@ public class ServerService {
     private final ServerMetricService serverMetricService;
     private final ServerAccessService serverAccessService;
     private final MonitorServerProperties serverProperties;
+    private final ServerWebSocketService serverWebSocketService;
 
-    public ServerService(ServerRepository serverRepository, ServerIngestTokenRepository serverIngestTokenRepository,
+    public ServerService(ServerRepository serverRepository, ServerMemberRepository serverMemberRepository,
+                         ServerIngestTokenRepository serverIngestTokenRepository,
                          TotalIngestsCounterMetric totalIngestsCounterMetric,
                          IngestDurationHistogramMetric ingestDurationHistogramMetric,
                          IngestAuthFailuresCounterMetric ingestAuthFailuresCounterMetric,
                          VictoriaMetricsWriteClient victoriaMetricsWriteClient,
                          ServerMetricService serverMetricService,
                          ServerAccessService serverAccessService,
-                         MonitorServerProperties serverProperties) {
+                         MonitorServerProperties serverProperties,
+                         @Lazy ServerWebSocketService serverWebSocketService) {
         this.serverRepository = serverRepository;
+        this.serverMemberRepository = serverMemberRepository;
         this.serverIngestTokenRepository = serverIngestTokenRepository;
         this.totalIngestsCounterMetric = totalIngestsCounterMetric;
         this.ingestDurationHistogramMetric = ingestDurationHistogramMetric;
@@ -81,15 +89,21 @@ public class ServerService {
         this.serverMetricService = serverMetricService;
         this.serverAccessService = serverAccessService;
         this.serverProperties = serverProperties;
+        this.serverWebSocketService = serverWebSocketService;
     }
 
     @Scheduled(fixedDelayString = "#{@monitorMetricsProperties.refreshIntervalMs}")
     @Transactional
     public void markStaleServersOffline() {
         Instant cutoff = Instant.now().minus(this.serverProperties.getOfflineThreshold());
+        List<Long> staleServerIds = this.serverRepository.findStaleServerIds(cutoff);
+        if (staleServerIds.isEmpty()) {
+            return;
+        }
         int updated = this.serverRepository.markStaleServersOffline(cutoff);
         if (updated > 0) {
             log.info("Marked {} server(s) offline (no update since {})", updated, cutoff);
+            this.serverWebSocketService.notifyServersOffline(staleServerIds);
         }
     }
 
@@ -124,11 +138,13 @@ public class ServerService {
             this.serverAccessService.addOwner(serverRow.getId(), user.getId(), now);
             UUID ingestToken = issueIngestToken(serverRow.getId());
 
-            return new CreatedServerResponse(
+            CreatedServerResponse response = new CreatedServerResponse(
                     serverRow.getServerName(),
                     serverRow.getId(),
                     ingestToken
             );
+            this.serverWebSocketService.notifyServerCreated(user, serverRow.getId());
+            return response;
         } catch (Exception ex) {
             log.error("Failed to create the server \"{}\"", createRequest.name(), ex);
             throw new InternalServerException("Failed to create the server \"%s\"".formatted(createRequest.name()));
@@ -160,12 +176,17 @@ public class ServerService {
         ServerRow server = requireOwnedServer(user, serverId);
         server.setServerName(request.name());
         this.serverRepository.save(server);
+        this.serverWebSocketService.notifyServerUpdated(serverId);
         return ServerResponse.from(server, ServerRole.OWNER, null, null, null);
     }
 
     @Transactional
     public void deleteServer(UserRow user, long serverId) {
         requireOwnedServer(user, serverId);
+        List<Long> memberUserIds = this.serverMemberRepository.findByServerId(serverId).stream()
+                .map(ServerMemberRow::getUserId)
+                .toList();
+        this.serverWebSocketService.notifyServerDeleted(serverId, memberUserIds);
         this.victoriaMetricsWriteClient.deleteSeriesForServer(serverId);
         this.serverRepository.deleteById(serverId);
         log.info("Deleted server {} and its VictoriaMetrics series", serverId);
@@ -233,6 +254,7 @@ public class ServerService {
             this.victoriaMetricsWriteClient.flush(buffer.toString());
 
             this.serverRepository.save(server);
+            this.serverWebSocketService.notifyIngest(server.getId());
 
             this.totalIngestsCounterMetric.recordIngest();
             success = true;
