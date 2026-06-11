@@ -1,6 +1,6 @@
 package cc.fascinated.monitor.websocket;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import cc.fascinated.monitor.util.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Configuration;
@@ -13,8 +13,6 @@ import cc.fascinated.monitor.websocket.impl.ServersWebSocket;
 @EnableWebSocket
 @Slf4j
 public class WebSocketManager implements WebSocketConfigurer {
-
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().findAndRegisterModules();
 
     private final ServersWebSocket serversWebSocket;
     private final WebSocketAuthHandshakeInterceptor authHandshakeInterceptor;
@@ -29,7 +27,7 @@ public class WebSocketManager implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(@NotNull WebSocketHandlerRegistry registry) {
-        this.serversWebSocket.setObjectMapper(OBJECT_MAPPER);
+        this.serversWebSocket.setObjectMapper(Constants.OBJECT_MAPPER);
         registry.addHandler(this.serversWebSocket, this.serversWebSocket.getPath())
                 .addInterceptors(this.authHandshakeInterceptor)
                 .setAllowedOrigins("*");

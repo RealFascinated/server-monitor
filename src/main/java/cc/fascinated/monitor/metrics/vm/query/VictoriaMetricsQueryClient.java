@@ -2,7 +2,7 @@ package cc.fascinated.monitor.metrics.vm.query;
 
 import cc.fascinated.monitor.exception.impl.InternalServerException;
 import cc.fascinated.monitor.metrics.vm.VictoriaMetricsProperties;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import cc.fascinated.monitor.util.Constants;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
@@ -15,7 +15,6 @@ import java.time.Duration;
 
 @Component
 public class VictoriaMetricsQueryClient {
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final VictoriaMetricsProperties properties;
     private final HttpClient httpClient;
@@ -41,7 +40,7 @@ public class VictoriaMetricsQueryClient {
                         "VictoriaMetrics query failed with status %d: %s".formatted(response.statusCode(), response.body())
                 );
             }
-            VmQueryResponse parsed = OBJECT_MAPPER.readValue(response.body(), VmQueryResponse.class);
+            VmQueryResponse parsed = Constants.OBJECT_MAPPER.readValue(response.body(), VmQueryResponse.class);
             if (!"success".equals(parsed.status())) {
                 throw new InternalServerException(
                         "VictoriaMetrics query failed: %s".formatted(parsed.error() != null ? parsed.error() : "unknown error")
