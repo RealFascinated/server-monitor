@@ -11,6 +11,7 @@ import cc.fascinated.monitor.model.persistance.UserSessionRow;
 import cc.fascinated.monitor.repository.UserRepository;
 import cc.fascinated.monitor.repository.UserSessionRepository;
 import cc.fascinated.monitor.util.AuthUtils;
+import cc.fascinated.monitor.util.UserUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +39,7 @@ public class AuthService {
 
     @Transactional
     public AuthTokenResponse register(RegisterRequest request) {
-        String email = normalizeEmail(request.email());
+        String email = UserUtils.normalizeEmail(request.email());
         if (this.userRepository.existsByEmailIgnoreCase(email)) {
             throw new ConflictException("An account with this email already exists");
         }
@@ -55,7 +56,7 @@ public class AuthService {
 
     @Transactional
     public AuthTokenResponse login(LoginRequest request) {
-        String email = normalizeEmail(request.email());
+        String email = UserUtils.normalizeEmail(request.email());
         UserRow user = this.userRepository.findByEmailIgnoreCase(email)
                 .filter(u -> matchesPassword(request.password(), u.getPasswordHash()))
                 .orElseThrow(() -> new UnauthorizedException("Invalid email or password"));
@@ -94,10 +95,6 @@ public class AuthService {
         byte[] bytes = new byte[SESSION_TOKEN_BYTES];
         this.secureRandom.nextBytes(bytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-    }
-
-    private static String normalizeEmail(String email) {
-        return email.trim().toLowerCase();
     }
 
     private String encodePassword(String rawPassword) {

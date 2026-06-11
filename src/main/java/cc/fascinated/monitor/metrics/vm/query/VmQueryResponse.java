@@ -29,21 +29,32 @@ public record VmQueryResponse(String status, VmQueryData data, String error) {
         return Collections.unmodifiableList(series);
     }
 
-    private static List<VmSample> parseSamples(List<Object[]> values) {
+    private static List<VmSample> parseSamples(List<?> values) {
         List<VmSample> samples = new ArrayList<>(values.size());
-        for (Object[] entry : values) {
-            samples.add(parseSample(entry));
+        for (Object row : values) {
+            samples.add(parseSample(row));
         }
         return samples;
     }
 
-    private static VmSample parseSample(Object[] entry) {
-        if (entry.length < 2) {
-            throw new IllegalArgumentException("Expected [timestamp, value] sample pair");
+    private static VmSample parseSample(Object row) {
+        if (row instanceof List<?> list) {
+            if (list.size() < 2) {
+                throw new IllegalArgumentException("Expected [timestamp, value] sample pair");
+            }
+            Instant timestamp = Instant.ofEpochSecond(toLong(list.get(0)));
+            double value = Double.parseDouble(String.valueOf(list.get(1)));
+            return new VmSample(timestamp, value);
         }
-        Instant timestamp = Instant.ofEpochSecond(toLong(entry[0]));
-        double value = Double.parseDouble(String.valueOf(entry[1]));
-        return new VmSample(timestamp, value);
+        if (row instanceof Object[] array) {
+            if (array.length < 2) {
+                throw new IllegalArgumentException("Expected [timestamp, value] sample pair");
+            }
+            Instant timestamp = Instant.ofEpochSecond(toLong(array[0]));
+            double value = Double.parseDouble(String.valueOf(array[1]));
+            return new VmSample(timestamp, value);
+        }
+        throw new IllegalArgumentException("Unexpected sample row type: " + row.getClass());
     }
 
     private static long toLong(Object timestamp) {
@@ -57,5 +68,5 @@ public record VmQueryResponse(String status, VmQueryData data, String error) {
     public record VmQueryData(String resultType, List<VmQueryResult> result) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record VmQueryResult(Map<String, String> metric, List<Object[]> values, Object[] value) {}
+    public record VmQueryResult(Map<String, String> metric, List<?> values, List<?> value) {}
 }

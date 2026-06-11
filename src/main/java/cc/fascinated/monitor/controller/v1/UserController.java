@@ -1,0 +1,68 @@
+package cc.fascinated.monitor.controller.v1;
+
+import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
+import cc.fascinated.monitor.model.dto.request.server.ServerInviteAcceptRequest;
+import cc.fascinated.monitor.model.dto.response.server.ServerResponse;
+import cc.fascinated.monitor.model.dto.response.server.access.ServerMemberResponse;
+import cc.fascinated.monitor.model.dto.response.server.access.UserPendingInviteResponse;
+import cc.fascinated.monitor.model.dto.response.server.metrics.ServerMetricsResponse;
+import cc.fascinated.monitor.model.persistance.UserRow;
+import cc.fascinated.monitor.service.ServerAccessService;
+import cc.fascinated.monitor.service.ServerMetricService;
+import cc.fascinated.monitor.service.ServerService;
+import cc.fascinated.monitor.web.auth.AuthenticatedUser;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(value = "/v1/user")
+public class UserController {
+    private final ServerService serverService;
+    private final ServerMetricService serverMetricService;
+    private final ServerAccessService serverAccessService;
+
+    public UserController(ServerService serverService, ServerMetricService serverMetricService,
+                          ServerAccessService serverAccessService) {
+        this.serverService = serverService;
+        this.serverMetricService = serverMetricService;
+        this.serverAccessService = serverAccessService;
+    }
+
+    @GetMapping(value = "/servers")
+    public List<ServerResponse> listServers(@AuthenticatedUser UserRow user) {
+        return this.serverService.listServers(user);
+    }
+
+    @GetMapping(value = "/servers/{serverId}/metrics")
+    public ServerMetricsResponse getServerMetrics(
+            @AuthenticatedUser UserRow user,
+            @PathVariable long serverId,
+            @RequestParam String range
+    ) {
+        return this.serverMetricService.getServerMetrics(
+                this.serverService.getAccessibleServer(user, serverId),
+                MetricTimeRange.fromParam(range)
+        );
+    }
+
+    @GetMapping(value = "/invites")
+    public List<UserPendingInviteResponse> listInvites(@AuthenticatedUser UserRow user) {
+        return this.serverAccessService.listPendingInvites(user);
+    }
+
+    @PostMapping(value = "/invites/accept")
+    public ServerMemberResponse acceptInvite(
+            @AuthenticatedUser UserRow user,
+            @Valid @RequestBody ServerInviteAcceptRequest request
+    ) {
+        return this.serverAccessService.acceptInvite(user, request.token());
+    }
+}

@@ -15,13 +15,13 @@ import java.time.Duration;
 
 @Component
 public class VictoriaMetricsQueryClient {
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     private final VictoriaMetricsProperties properties;
-    private final ObjectMapper objectMapper;
     private final HttpClient httpClient;
 
-    public VictoriaMetricsQueryClient(VictoriaMetricsProperties properties, ObjectMapper objectMapper) {
+    public VictoriaMetricsQueryClient(VictoriaMetricsProperties properties) {
         this.properties = properties;
-        this.objectMapper = objectMapper;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(5))
                 .build();
@@ -41,7 +41,7 @@ public class VictoriaMetricsQueryClient {
                         "VictoriaMetrics query failed with status %d: %s".formatted(response.statusCode(), response.body())
                 );
             }
-            VmQueryResponse parsed = this.objectMapper.readValue(response.body(), VmQueryResponse.class);
+            VmQueryResponse parsed = OBJECT_MAPPER.readValue(response.body(), VmQueryResponse.class);
             if (!"success".equals(parsed.status())) {
                 throw new InternalServerException(
                         "VictoriaMetrics query failed: %s".formatted(parsed.error() != null ? parsed.error() : "unknown error")

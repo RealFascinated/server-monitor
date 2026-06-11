@@ -6,6 +6,7 @@ import cc.fascinated.monitor.exception.impl.NotFoundException;
 import cc.fascinated.monitor.exception.impl.UnauthorizedException;
 import cc.fascinated.monitor.model.domain.server.ServerStatus;
 import cc.fascinated.monitor.model.dto.request.server.ServerCreateRequest;
+import cc.fascinated.monitor.model.dto.request.server.ServerRenameRequest;
 import cc.fascinated.monitor.model.dto.request.server.ingest.IngestServerMetrics;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerDetails;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerMetrics;
@@ -41,8 +42,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -54,6 +60,8 @@ public class ServerService {
     private final IngestDurationHistogramMetric ingestDurationHistogramMetric;
     private final IngestAuthFailuresCounterMetric ingestAuthFailuresCounterMetric;
     private final VictoriaMetricsWriteClient victoriaMetricsWriteClient;
+    private final ServerMetricService serverMetricService;
+    private final ServerAccessService serverAccessService;
     private final MonitorServerProperties serverProperties;
 
     public ServerService(ServerRepository serverRepository, ServerIngestTokenRepository serverIngestTokenRepository,
@@ -61,6 +69,8 @@ public class ServerService {
                          IngestDurationHistogramMetric ingestDurationHistogramMetric,
                          IngestAuthFailuresCounterMetric ingestAuthFailuresCounterMetric,
                          VictoriaMetricsWriteClient victoriaMetricsWriteClient,
+                         ServerMetricService serverMetricService,
+                         ServerAccessService serverAccessService,
                          MonitorServerProperties serverProperties) {
         this.serverRepository = serverRepository;
         this.serverIngestTokenRepository = serverIngestTokenRepository;
@@ -68,12 +78,44 @@ public class ServerService {
         this.ingestDurationHistogramMetric = ingestDurationHistogramMetric;
         this.ingestAuthFailuresCounterMetric = ingestAuthFailuresCounterMetric;
         this.victoriaMetricsWriteClient = victoriaMetricsWriteClient;
+        this.serverMetricService = serverMetricService;
+        this.serverAccessService = serverAccessService;
         this.serverProperties = serverProperties;
     }
 
     public List<ServerResponse> listServers(UserRow user) {
-        return this.serverRepository.findByOwnerIdWithInventory(user.getId()).stream()
-                .map(ServerResponse::from)
+        List<ServerRow> servers = listAccessibleServers(user);
+        if (servers.isEmpty()) {
+            return List.of();
+        }
+        List<Long> onlineServerIds = servers.stream()
+                .filter(server -> server.getStatus() == ServerStatus.ONLINE)
+                .map(ServerRow::getId)
+                .toList();
+        final Map<Long, Double> cpuByServer;
+        final Map<Long, Double> memUsageByServer;
+        final Map<Long, Double> memMaxByServer;
+        if (onlineServerIds.isEmpty()) {
+            cpuByServer = Map.of();
+            memUsageByServer = Map.of();
+            memMaxByServer = Map.of();
+        } else {
+            cpuByServer = this.serverMetricService.fetchLatestMetric(HostSeries.CPU_USAGE, onlineServerIds);
+            memUsageByServer = this.serverMetricService.fetchLatestMetric(HostSeries.MEM_USAGE, onlineServerIds);
+            memMaxByServer = this.serverMetricService.fetchLatestMetric(HostSeries.MEM_TOTAL, onlineServerIds);
+        }
+        return servers.stream()
+                .map(server -> {
+                    if (server.getStatus() != ServerStatus.ONLINE) {
+                        return ServerResponse.from(server, null, null, null);
+                    }
+                    return ServerResponse.from(
+                            server,
+                            cpuByServer.get(server.getId()),
+                            toLong(memUsageByServer.get(server.getId())),
+                            toLong(memMaxByServer.get(server.getId()))
+                    );
+                })
                 .toList();
     }
 
@@ -99,6 +141,31 @@ public class ServerService {
             return serverRowOptional.get();
         }
         throw new NotFoundException("Server \"%s\" not found".formatted(id));
+    }
+
+    public ServerRow getOwnedServer(UserRow user, long serverId) {
+        ServerRow server = findServerRowById(serverId);
+        requireServerOwner(user, server);
+        return server;
+    }
+
+    public ServerRow getAccessibleServer(UserRow user, long serverId) {
+        ServerRow server = findServerRowById(serverId);
+        if (server.getOwnerId().equals(user.getId())) {
+            return server;
+        }
+        if (this.serverAccessService.isMember(serverId, user.getId())) {
+            return server;
+        }
+        throw new UnauthorizedException("You do not have access to this server");
+    }
+
+    @Transactional
+    public ServerResponse renameServer(UserRow user, long serverId, ServerRenameRequest request) {
+        ServerRow server = getOwnedServer(user, serverId);
+        server.setServerName(request.name());
+        this.serverRepository.save(server);
+        return ServerResponse.from(server, null, null, null);
     }
 
     @Transactional
@@ -200,6 +267,32 @@ public class ServerService {
         return inventory;
     }
 
+    private List<ServerRow> listAccessibleServers(UserRow user) {
+        List<ServerRow> owned = this.serverRepository.findByOwnerIdOrderByServerNameAsc(user.getId());
+        List<Long> memberServerIds = this.serverAccessService.findMemberServerIds(user.getId());
+        if (memberServerIds.isEmpty()) {
+            return owned;
+        }
+
+        Set<Long> ownedIds = new LinkedHashSet<>();
+        for (ServerRow server : owned) {
+            ownedIds.add(server.getId());
+        }
+
+        List<ServerRow> memberServers = new ArrayList<>();
+        for (ServerRow server : this.serverRepository.findAllById(memberServerIds)) {
+            if (!ownedIds.contains(server.getId())) {
+                memberServers.add(server);
+            }
+        }
+        memberServers.sort(Comparator.comparing(ServerRow::getServerName, String.CASE_INSENSITIVE_ORDER));
+
+        List<ServerRow> combined = new ArrayList<>(owned.size() + memberServers.size());
+        combined.addAll(owned);
+        combined.addAll(memberServers);
+        return combined;
+    }
+
     private static void requireServerOwner(UserRow user, ServerRow server) {
         if (!server.getOwnerId().equals(user.getId())) {
             throw new UnauthorizedException("You do not own this server");
@@ -210,5 +303,9 @@ public class ServerService {
         UUID ingestToken = UUID.randomUUID();
         this.serverIngestTokenRepository.save(new IngestTokenRow(AuthUtils.hash(ingestToken.toString()), serverId));
         return ingestToken;
+    }
+
+    private static Long toLong(Double value) {
+        return value != null ? value.longValue() : null;
     }
 }

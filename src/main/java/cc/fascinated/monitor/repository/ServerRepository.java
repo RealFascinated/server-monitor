@@ -11,13 +11,7 @@ import java.util.List;
 
 public interface ServerRepository extends JpaRepository<ServerRow, Long> {
 
-    @Query("""
-            SELECT s FROM ServerRow s
-            LEFT JOIN FETCH s.inventory
-            WHERE s.ownerId = :ownerId
-            ORDER BY s.createdAt DESC
-            """)
-    List<ServerRow> findByOwnerIdWithInventory(@Param("ownerId") long ownerId);
+    List<ServerRow> findByOwnerIdOrderByServerNameAsc(long ownerId);
 
     @Modifying(clearAutomatically = true)
     @Query("""

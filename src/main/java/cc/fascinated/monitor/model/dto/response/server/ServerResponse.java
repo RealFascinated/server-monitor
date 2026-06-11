@@ -1,7 +1,6 @@
 package cc.fascinated.monitor.model.dto.response.server;
 
 import cc.fascinated.monitor.model.domain.server.ServerStatus;
-import cc.fascinated.monitor.model.persistance.ServerInventoryRow;
 import cc.fascinated.monitor.model.persistance.ServerRow;
 
 import java.time.Instant;
@@ -10,27 +9,24 @@ public record ServerResponse(
         long serverId,
         String serverName,
         ServerStatus status,
-        Instant lastUpdated,
-        Long lastUptimeSeconds,
+        Long uptimeSeconds,
         String agentVersion,
         Instant createdAt,
-        String ip,
-        String osName,
-        String osVersion
+        Double cpuPercent,
+        Long memUsage,
+        Long memMax
 ) {
-    public static ServerResponse from(ServerRow server) {
-        ServerInventoryRow inventory = server.getInventory();
+    public static ServerResponse from(ServerRow server, Double cpuPercent, Long memUsage, Long memMax) {
         return new ServerResponse(
                 server.getId(),
                 server.getServerName(),
                 server.getStatus(),
-                server.getLastUpdated(),
                 server.getLastUptimeSeconds(),
                 server.getAgentVersion(),
                 server.getCreatedAt(),
-                inventory != null ? inventory.getIp() : null,
-                inventory != null ? inventory.getOsName() : null,
-                inventory != null ? inventory.getOsVersion() : null
+                cpuPercent,
+                memUsage,
+                memMax
         );
     }
 }
