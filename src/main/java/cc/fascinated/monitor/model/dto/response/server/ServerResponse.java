@@ -1,6 +1,7 @@
 package cc.fascinated.monitor.model.dto.response.server;
 
 import cc.fascinated.monitor.model.domain.server.ServerStatus;
+import cc.fascinated.monitor.model.domain.server.UserServerRole;
 import cc.fascinated.monitor.model.persistance.ServerRow;
 
 import java.time.Instant;
@@ -14,9 +15,16 @@ public record ServerResponse(
         Instant createdAt,
         Double cpuPercent,
         Long memUsage,
-        Long memMax
+        Long memMax,
+        UserServerRole role
 ) {
-    public static ServerResponse from(ServerRow server, Double cpuPercent, Long memUsage, Long memMax) {
+    public static ServerResponse from(
+            ServerRow server,
+            UserServerRole role,
+            Double cpuPercent,
+            Long memUsage,
+            Long memMax
+    ) {
         return new ServerResponse(
                 server.getId(),
                 server.getServerName(),
@@ -26,7 +34,8 @@ public record ServerResponse(
                 server.getCreatedAt(),
                 cpuPercent,
                 memUsage,
-                memMax
+                memMax,
+                role
         );
     }
 }

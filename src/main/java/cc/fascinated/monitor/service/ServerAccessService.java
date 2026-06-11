@@ -4,6 +4,7 @@ import cc.fascinated.monitor.exception.impl.ConflictException;
 import cc.fascinated.monitor.exception.impl.NotFoundException;
 import cc.fascinated.monitor.exception.impl.UnauthorizedException;
 import cc.fascinated.monitor.model.domain.server.ServerMemberRole;
+import cc.fascinated.monitor.model.domain.server.UserServerRole;
 import cc.fascinated.monitor.model.dto.request.server.ServerMemberInviteRequest;
 import cc.fascinated.monitor.model.dto.response.server.access.*;
 import cc.fascinated.monitor.model.persistance.ServerInviteRow;
@@ -55,6 +56,14 @@ public class ServerAccessService {
 
     public List<Long> findMemberServerIds(long userId) {
         return this.serverMemberRepository.findServerIdsByUserId(userId);
+    }
+
+    public Map<Long, UserServerRole> findMemberRolesByUserId(long userId) {
+        return this.serverMemberRepository.findByUserId(userId).stream()
+                .collect(Collectors.toMap(
+                        ServerMemberRow::getServerId,
+                        member -> UserServerRole.valueOf(member.getRole().name())
+                ));
     }
 
     public ServerAccessListResponse listAccess(UserRow user, ServerRow server) {

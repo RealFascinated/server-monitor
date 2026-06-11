@@ -13,6 +13,8 @@ public interface ServerMemberRepository extends JpaRepository<ServerMemberRow, S
 
     List<ServerMemberRow> findByServerId(long serverId);
 
+    List<ServerMemberRow> findByUserId(long userId);
+
     @Query("SELECT sm.serverId FROM ServerMemberRow sm WHERE sm.userId = :userId")
     List<Long> findServerIdsByUserId(@Param("userId") long userId);
 

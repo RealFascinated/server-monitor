@@ -5,6 +5,7 @@ import cc.fascinated.monitor.exception.impl.InternalServerException;
 import cc.fascinated.monitor.exception.impl.NotFoundException;
 import cc.fascinated.monitor.exception.impl.UnauthorizedException;
 import cc.fascinated.monitor.model.domain.server.ServerStatus;
+import cc.fascinated.monitor.model.domain.server.UserServerRole;
 import cc.fascinated.monitor.model.dto.request.server.ServerCreateRequest;
 import cc.fascinated.monitor.model.dto.request.server.ServerRenameRequest;
 import cc.fascinated.monitor.model.dto.request.server.ingest.IngestServerMetrics;
@@ -118,13 +119,19 @@ public class ServerService {
             memUsageByServer = this.serverMetricService.fetchLatestMetric(HostSeries.MEM_USAGE, onlineServerIds);
             memMaxByServer = this.serverMetricService.fetchLatestMetric(HostSeries.MEM_TOTAL, onlineServerIds);
         }
+        Map<Long, UserServerRole> memberRolesByServerId =
+                this.serverAccessService.findMemberRolesByUserId(user.getId());
         return servers.stream()
                 .map(server -> {
+                    UserServerRole role = server.getOwnerId().equals(user.getId())
+                            ? UserServerRole.OWNER
+                            : memberRolesByServerId.get(server.getId());
                     if (server.getStatus() != ServerStatus.ONLINE) {
-                        return ServerResponse.from(server, null, null, null);
+                        return ServerResponse.from(server, role, null, null, null);
                     }
                     return ServerResponse.from(
                             server,
+                            role,
                             cpuByServer.get(server.getId()),
                             toLong(memUsageByServer.get(server.getId())),
                             toLong(memMaxByServer.get(server.getId()))
@@ -179,7 +186,7 @@ public class ServerService {
         ServerRow server = getOwnedServer(user, serverId);
         server.setServerName(request.name());
         this.serverRepository.save(server);
-        return ServerResponse.from(server, null, null, null);
+        return ServerResponse.from(server, UserServerRole.OWNER, null, null, null);
     }
 
     @Transactional
