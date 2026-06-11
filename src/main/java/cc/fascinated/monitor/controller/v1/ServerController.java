@@ -58,7 +58,7 @@ public class ServerController {
 
     @GetMapping(value = "/{serverId}/members")
     public ServerAccessListResponse listMembers(@AuthenticatedUser UserRow user, @PathVariable long serverId) {
-        return this.serverAccessService.listAccess(user, this.serverService.getOwnedServer(user, serverId));
+        return this.serverAccessService.listAccess(user, this.serverService.getAccessibleServer(user, serverId));
     }
 
     @PostMapping(value = "/{serverId}/members/invite")

@@ -57,9 +57,7 @@ public class ServerAccessService {
         return this.serverMemberRepository.findServerIdsByUserId(userId);
     }
 
-    public ServerAccessListResponse listAccess(UserRow owner, ServerRow server) {
-        requireServerOwner(owner, server);
-
+    public ServerAccessListResponse listAccess(UserRow user, ServerRow server) {
         UserRow ownerUser = this.userRepository.findById(server.getOwnerId())
                 .orElseThrow(() -> new NotFoundException("Server owner not found"));
 
@@ -70,9 +68,11 @@ public class ServerAccessService {
                 .map(member -> ServerMemberEntryResponse.from(member, usersById.get(member.getUserId())))
                 .toList();
 
-        List<PendingInviteResponse> pendingInvites = this.serverInviteRepository.findByServerId(server.getId()).stream()
-                .map(PendingInviteResponse::from)
-                .toList();
+        List<PendingInviteResponse> pendingInvites = server.getOwnerId().equals(user.getId())
+                ? this.serverInviteRepository.findByServerId(server.getId()).stream()
+                        .map(PendingInviteResponse::from)
+                        .toList()
+                : List.of();
 
         return new ServerAccessListResponse(
                 ServerAccessUserResponse.from(ownerUser),
