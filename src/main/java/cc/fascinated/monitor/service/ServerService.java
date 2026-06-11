@@ -177,7 +177,7 @@ public class ServerService {
         server.setServerName(request.name());
         this.serverRepository.save(server);
         this.serverWebSocketService.notifyServerUpdated(serverId);
-        return ServerResponse.from(server, ServerRole.OWNER, null, null, null);
+        return ServerResponse.from(server, ServerRole.OWNER, null, null, null, null, null);
     }
 
     @Transactional
@@ -284,9 +284,12 @@ public class ServerService {
         return servers;
     }
 
+    private static final String ROOT_DISK_MOUNT = "/";
+    private static final Map<String, String> ROOT_DISK_LABEL = Map.of("disk", ROOT_DISK_MOUNT);
+
     private ServerResponse toServerResponse(ServerRow server, ServerRole role, LatestHostMetrics metrics) {
         if (server.getStatus() != ServerStatus.ONLINE) {
-            return ServerResponse.from(server, role, null, null, null);
+            return ServerResponse.from(server, role, null, null, null, null, null);
         }
         long serverId = server.getId();
         return ServerResponse.from(
@@ -294,7 +297,9 @@ public class ServerService {
                 role,
                 metrics.cpu().get(serverId),
                 NumberUtils.toLong(metrics.memUsage().get(serverId)),
-                NumberUtils.toLong(metrics.memMax().get(serverId))
+                NumberUtils.toLong(metrics.memMax().get(serverId)),
+                NumberUtils.toLong(metrics.diskUsage().get(serverId)),
+                NumberUtils.toLong(metrics.diskMax().get(serverId))
         );
     }
 
@@ -305,7 +310,9 @@ public class ServerService {
         return new LatestHostMetrics(
                 this.serverMetricService.fetchLatestMetric(HostSeries.CPU_USAGE, serverIds),
                 this.serverMetricService.fetchLatestMetric(HostSeries.MEM_USAGE, serverIds),
-                this.serverMetricService.fetchLatestMetric(HostSeries.MEM_TOTAL, serverIds)
+                this.serverMetricService.fetchLatestMetric(HostSeries.MEM_TOTAL, serverIds),
+                this.serverMetricService.fetchLatestMetric(DiskSeries.USED_BYTES, serverIds, ROOT_DISK_LABEL),
+                this.serverMetricService.fetchLatestMetric(DiskSeries.TOTAL_BYTES, serverIds, ROOT_DISK_LABEL)
         );
     }
 
@@ -315,9 +322,15 @@ public class ServerService {
         return ingestToken;
     }
 
-    private record LatestHostMetrics(Map<Long, Double> cpu, Map<Long, Double> memUsage, Map<Long, Double> memMax) {
+    private record LatestHostMetrics(
+            Map<Long, Double> cpu,
+            Map<Long, Double> memUsage,
+            Map<Long, Double> memMax,
+            Map<Long, Double> diskUsage,
+            Map<Long, Double> diskMax
+    ) {
         private static LatestHostMetrics empty() {
-            return new LatestHostMetrics(Map.of(), Map.of(), Map.of());
+            return new LatestHostMetrics(Map.of(), Map.of(), Map.of(), Map.of(), Map.of());
         }
     }
 }

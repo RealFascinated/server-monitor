@@ -16,6 +16,8 @@ public record ServerResponse(
         Double cpuPercent,
         Long memUsage,
         Long memMax,
+        Long diskUsage,
+        Long diskMax,
         ServerRole role,
         ServerInventoryResponse inventory
 ) {
@@ -24,7 +26,9 @@ public record ServerResponse(
             ServerRole role,
             Double cpuPercent,
             Long memUsage,
-            Long memMax
+            Long memMax,
+            Long diskUsage,
+            Long diskMax
     ) {
         return new ServerResponse(
                 server.getId(),
@@ -36,6 +40,8 @@ public record ServerResponse(
                 cpuPercent,
                 memUsage,
                 memMax,
+                diskUsage,
+                diskMax,
                 role,
                 server.getInventory() != null
                         ? ServerInventoryResponse.from(server.getInventory())

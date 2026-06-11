@@ -48,11 +48,30 @@ public class ServerMetricService {
     }
 
     public Map<Long, Double> fetchLatestMetric(VmGaugeSeries metric, List<Long> serverIds) {
+        return fetchLatestMetric(metric, serverIds, Map.of());
+    }
+
+    public Map<Long, Double> fetchLatestMetric(
+            VmGaugeSeries metric,
+            List<Long> serverIds,
+            Map<String, String> labels
+    ) {
         if (serverIds.isEmpty()) {
             return Map.of();
         }
         String ids = serverIds.stream().map(String::valueOf).collect(Collectors.joining("|"));
-        String promql = metric.metricName() + "{server_id=~\"" + ids + "\"}";
+        StringBuilder selector = new StringBuilder("{server_id=~\"");
+        selector.append(ids);
+        selector.append('"');
+        for (Map.Entry<String, String> label : labels.entrySet()) {
+            selector.append(',');
+            selector.append(label.getKey());
+            selector.append("=\"");
+            selector.append(label.getValue());
+            selector.append('"');
+        }
+        selector.append('}');
+        String promql = metric.metricName() + selector;
         VmQueryResponse response = this.victoriaMetricsQueryClient.execute(
                 VictoriaMetricsQuery.builder().query(promql).build()
         );
