@@ -14,6 +14,8 @@ RUN ./gradlew bootJar --no-daemon -q
 
 FROM eclipse-temurin:25-jre-alpine
 
+RUN apk add --no-cache curl
+
 WORKDIR /home/container
 
 COPY --from=build /build/build/libs/monitor-0.0.1-SNAPSHOT.jar app.jar
