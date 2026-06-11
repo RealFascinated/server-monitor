@@ -32,7 +32,12 @@ public abstract class WebSocket extends TextWebSocketHandler {
             return;
         }
         String payload = message instanceof String text ? text : this.objectMapper.writeValueAsString(message);
-        session.sendMessage(new TextMessage(payload));
+        synchronized (session) {
+            if (!session.isOpen()) {
+                return;
+            }
+            session.sendMessage(new TextMessage(payload));
+        }
     }
 
     public void sendMessageToAll(Object message) {
