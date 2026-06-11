@@ -3,7 +3,11 @@ package cc.fascinated.monitor.metrics.vm.series.impl;
 import cc.fascinated.monitor.metrics.vm.MetricWriteContext;
 import cc.fascinated.monitor.metrics.vm.series.VmGaugeSeries;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.DiskMetric;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 
+@Getter
+@Accessors(fluent = true)
 public enum DiskSeries implements VmGaugeSeries {
     USAGE_PERCENT("monitor_disk_usage_percent"),
     USED_BYTES("monitor_disk_used_bytes"),
@@ -23,11 +27,6 @@ public enum DiskSeries implements VmGaugeSeries {
 
     DiskSeries(String metricName) {
         this.metricName = metricName;
-    }
-
-    @Override
-    public String metricName() {
-        return this.metricName;
     }
 
     public static void write(MetricWriteContext ctx, DiskMetric disk) {

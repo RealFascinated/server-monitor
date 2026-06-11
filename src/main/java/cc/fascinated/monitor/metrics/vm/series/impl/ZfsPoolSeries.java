@@ -3,7 +3,11 @@ package cc.fascinated.monitor.metrics.vm.series.impl;
 import cc.fascinated.monitor.metrics.vm.MetricWriteContext;
 import cc.fascinated.monitor.metrics.vm.series.VmGaugeSeries;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ZfsPoolMetric;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 
+@Getter
+@Accessors(fluent = true)
 public enum ZfsPoolSeries implements VmGaugeSeries {
     CAPACITY_PERCENT("monitor_zfs_pool_capacity_percent"),
     ALLOCATED_BYTES("monitor_zfs_pool_allocated_bytes"),
@@ -21,11 +25,6 @@ public enum ZfsPoolSeries implements VmGaugeSeries {
 
     ZfsPoolSeries(String metricName) {
         this.metricName = metricName;
-    }
-
-    @Override
-    public String metricName() {
-        return this.metricName;
     }
 
     public static void write(MetricWriteContext ctx, ZfsPoolMetric pool) {

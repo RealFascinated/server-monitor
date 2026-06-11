@@ -26,11 +26,11 @@ public final class VmMetricsAssembler {
                 continue;
             }
             if (group.mergeField() != null) {
-                ingestLabeled(grid, labeled, group.section(), series, group.identityLabels(), group.mergeField());
+                ingestLabeled(grid, labeled, group.section(), series, group.groupingLabels(), group.identityLabels(), group.mergeField());
             } else if (group.section().scalar()) {
                 ingestScalar(grid, scalars, group.section(), series);
             } else {
-                ingestLabeled(grid, labeled, group.section(), series, group.identityLabels(), null);
+                ingestLabeled(grid, labeled, group.section(), series, group.groupingLabels(), group.identityLabels(), null);
             }
         }
 
@@ -65,7 +65,8 @@ public final class VmMetricsAssembler {
     }
 
     private static void ingestLabeled(MetricTimeGrid grid, Map<MetricSection, Map<String, LabeledSeries>> labeled,
-                                    MetricSection section, List<VmTimeSeries> series, String[] identityLabels, String fieldOverride) {
+                                    MetricSection section, List<VmTimeSeries> series, String[] groupingLabels,
+                                    String[] identityLabels, String fieldOverride) {
         Map<String, LabeledSeries> entities = labeled.computeIfAbsent(section, ignored -> new LinkedHashMap<>());
         for (VmTimeSeries entry : series) {
             String name = fieldOverride;
@@ -79,8 +80,9 @@ public final class VmMetricsAssembler {
                     continue;
                 }
             }
-            String key = identityKey(entry.labels(), identityLabels);
+            String key = identityKey(entry.labels(), groupingLabels);
             LabeledSeries entity = entities.computeIfAbsent(key, ignored -> LabeledSeries.create(entry.labels(), identityLabels));
+            entity.refreshLabels(entry.labels(), identityLabels);
             entity.putSeries(name, grid.align(entry));
         }
     }

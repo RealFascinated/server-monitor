@@ -1,5 +1,10 @@
 package cc.fascinated.monitor.metrics.vm;
 
+import lombok.Getter;
+import lombok.experimental.Accessors;
+
+@Getter
+@Accessors(fluent = true)
 public enum MetricSection {
     HOST("host", true),
     CPU_CORES("cpuCores", false),
@@ -18,13 +23,5 @@ public enum MetricSection {
     MetricSection(String jsonKey, boolean scalar) {
         this.jsonKey = jsonKey;
         this.scalar = scalar;
-    }
-
-    public String jsonKey() {
-        return this.jsonKey;
-    }
-
-    public boolean scalar() {
-        return this.scalar;
     }
 }

@@ -1,12 +1,16 @@
 package cc.fascinated.monitor.metrics.vm.query;
 
 import cc.fascinated.monitor.metrics.vm.series.VmGaugeSeries;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@Getter
+@Accessors(fluent = true)
 public final class VictoriaMetricsQuery {
     private final String promql;
     private final Instant from;
@@ -26,28 +30,8 @@ public final class VictoriaMetricsQuery {
         return new Builder();
     }
 
-    public String promql() {
-        return this.promql;
-    }
-
     public boolean isRange() {
         return this.from != null && this.to != null;
-    }
-
-    public Instant from() {
-        return this.from;
-    }
-
-    public Instant to() {
-        return this.to;
-    }
-
-    public Duration step() {
-        return this.step;
-    }
-
-    public Instant at() {
-        return this.at;
     }
 
     public String stepParam() {

@@ -3,7 +3,11 @@ package cc.fascinated.monitor.metrics.vm.series.impl;
 import cc.fascinated.monitor.metrics.vm.MetricWriteContext;
 import cc.fascinated.monitor.metrics.vm.series.VmGaugeSeries;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.DockerContainerMetric;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 
+@Getter
+@Accessors(fluent = true)
 public enum DockerSeries implements VmGaugeSeries {
     CPU_USAGE("monitor_container_cpu_usage"),
     MEMORY_USAGE("monitor_container_memory_usage");
@@ -12,11 +16,6 @@ public enum DockerSeries implements VmGaugeSeries {
 
     DockerSeries(String metricName) {
         this.metricName = metricName;
-    }
-
-    @Override
-    public String metricName() {
-        return this.metricName;
     }
 
     public static void write(MetricWriteContext ctx, DockerContainerMetric container) {

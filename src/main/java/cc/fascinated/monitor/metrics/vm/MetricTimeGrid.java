@@ -3,10 +3,14 @@ package cc.fascinated.monitor.metrics.vm;
 import cc.fascinated.monitor.metrics.vm.query.VmSample;
 import cc.fascinated.monitor.metrics.vm.query.VmTimeSeries;
 import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Accessors(fluent = true)
 public final class MetricTimeGrid {
     private final List<Long> timestamps;
     private final long stepSeconds;
@@ -28,10 +32,6 @@ public final class MetricTimeGrid {
             timestamps.add(timestamp);
         }
         return new MetricTimeGrid(timestamps, step, start);
-    }
-
-    public List<Long> timestamps() {
-        return this.timestamps;
     }
 
     public List<Double> align(VmTimeSeries series) {

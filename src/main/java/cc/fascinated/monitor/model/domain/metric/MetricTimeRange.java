@@ -1,11 +1,15 @@
 package cc.fascinated.monitor.model.domain.metric;
 
 import cc.fascinated.monitor.metrics.vm.query.VictoriaMetricsQuery;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 
+@Getter
+@Accessors(fluent = true)
 public enum MetricTimeRange {
     H24("24h", Duration.ofHours(24), Duration.ofMinutes(5)),
     D3("3d", Duration.ofDays(3), Duration.ofMinutes(15)),
@@ -24,18 +28,6 @@ public enum MetricTimeRange {
         this.param = param;
         this.lookback = lookback;
         this.step = step;
-    }
-
-    public String param() {
-        return this.param;
-    }
-
-    public Duration lookback() {
-        return this.lookback;
-    }
-
-    public Duration step() {
-        return this.step;
     }
 
     public QueryWindow queryWindow() {

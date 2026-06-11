@@ -3,7 +3,11 @@ package cc.fascinated.monitor.metrics.vm.series.impl;
 import cc.fascinated.monitor.metrics.vm.MetricWriteContext;
 import cc.fascinated.monitor.metrics.vm.series.VmGaugeSeries;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.InterfaceMetrics;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 
+@Getter
+@Accessors(fluent = true)
 public enum NetworkSeries implements VmGaugeSeries {
     RX_BPS("monitor_net_rx_bps"),
     TX_BPS("monitor_net_tx_bps"),
@@ -16,11 +20,6 @@ public enum NetworkSeries implements VmGaugeSeries {
 
     NetworkSeries(String metricName) {
         this.metricName = metricName;
-    }
-
-    @Override
-    public String metricName() {
-        return this.metricName;
     }
 
     public static void write(MetricWriteContext ctx, InterfaceMetrics iface) {
