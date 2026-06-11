@@ -23,6 +23,7 @@ import cc.fascinated.monitor.metrics.counter.TotalIngestsCounterMetric;
 import cc.fascinated.monitor.metrics.histogram.IngestDurationHistogramMetric;
 import cc.fascinated.monitor.metrics.vm.MetricWriteContext;
 import cc.fascinated.monitor.metrics.vm.VictoriaMetricsWriteClient;
+import cc.fascinated.monitor.metrics.vm.series.VmGaugeSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.CpuCoreSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.DiskSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.DockerSeries;
@@ -330,12 +331,27 @@ public class ServerService {
         if (serverIds.isEmpty()) {
             return LatestHostMetrics.empty();
         }
+        Map<VmGaugeSeries, Map<Long, Double>> latest =
+                this.serverMetricService.fetchLatestMetrics(
+                        List.of(
+                                HostSeries.CPU_USAGE,
+                                HostSeries.MEM_USAGE,
+                                HostSeries.MEM_TOTAL,
+                                DiskSeries.USED_BYTES,
+                                DiskSeries.TOTAL_BYTES
+                        ),
+                        serverIds,
+                        Map.of(
+                                DiskSeries.USED_BYTES, ROOT_DISK_LABEL,
+                                DiskSeries.TOTAL_BYTES, ROOT_DISK_LABEL
+                        )
+                );
         return new LatestHostMetrics(
-                this.serverMetricService.fetchLatestMetric(HostSeries.CPU_USAGE, serverIds),
-                this.serverMetricService.fetchLatestMetric(HostSeries.MEM_USAGE, serverIds),
-                this.serverMetricService.fetchLatestMetric(HostSeries.MEM_TOTAL, serverIds),
-                this.serverMetricService.fetchLatestMetric(DiskSeries.USED_BYTES, serverIds, ROOT_DISK_LABEL),
-                this.serverMetricService.fetchLatestMetric(DiskSeries.TOTAL_BYTES, serverIds, ROOT_DISK_LABEL)
+                latest.getOrDefault(HostSeries.CPU_USAGE, Map.of()),
+                latest.getOrDefault(HostSeries.MEM_USAGE, Map.of()),
+                latest.getOrDefault(HostSeries.MEM_TOTAL, Map.of()),
+                latest.getOrDefault(DiskSeries.USED_BYTES, Map.of()),
+                latest.getOrDefault(DiskSeries.TOTAL_BYTES, Map.of())
         );
     }
 

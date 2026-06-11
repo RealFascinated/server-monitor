@@ -1,5 +1,6 @@
 package cc.fascinated.monitor.model.dto.response.server.metrics;
 
+import cc.fascinated.monitor.metrics.vm.query.Promql;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.ArrayList;
@@ -50,21 +51,6 @@ public record LabeledSeries(LinkedHashMap<String, Object> fields) {
     }
 
     private static String labelJsonKey(String label) {
-        StringBuilder builder = new StringBuilder();
-        boolean capitalizeNext = false;
-        for (int i = 0; i < label.length(); i++) {
-            char c = label.charAt(i);
-            if (c == '_') {
-                capitalizeNext = true;
-                continue;
-            }
-            if (capitalizeNext) {
-                builder.append(Character.toUpperCase(c));
-                capitalizeNext = false;
-            } else {
-                builder.append(c);
-            }
-        }
-        return builder.toString();
+        return Promql.toCamelCase(label);
     }
 }

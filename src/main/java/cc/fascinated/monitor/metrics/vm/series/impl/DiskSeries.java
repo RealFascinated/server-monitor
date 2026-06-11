@@ -1,14 +1,15 @@
 package cc.fascinated.monitor.metrics.vm.series.impl;
 
 import cc.fascinated.monitor.metrics.vm.MetricWriteContext;
-import cc.fascinated.monitor.metrics.vm.series.VmGaugeSeries;
+import cc.fascinated.monitor.metrics.vm.catalog.MetricFamily;
+import cc.fascinated.monitor.metrics.vm.catalog.VmMetricFamily;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.DiskMetric;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
 @Getter
 @Accessors(fluent = true)
-public enum DiskSeries implements VmGaugeSeries {
+public enum DiskSeries implements VmMetricFamily {
     USAGE_PERCENT("monitor_disk_usage_percent"),
     USED_BYTES("monitor_disk_used_bytes"),
     TOTAL_BYTES("monitor_disk_total_bytes"),
@@ -27,6 +28,16 @@ public enum DiskSeries implements VmGaugeSeries {
 
     DiskSeries(String metricName) {
         this.metricName = metricName;
+    }
+
+    @Override
+    public MetricFamily metricFamily() {
+        return MetricFamily.DISK;
+    }
+
+    @Override
+    public String metricPrefix() {
+        return "monitor_disk_";
     }
 
     public static void write(MetricWriteContext ctx, DiskMetric disk) {

@@ -1,5 +1,8 @@
 package cc.fascinated.monitor.metrics.vm;
 
+import cc.fascinated.monitor.metrics.vm.catalog.ComputedMetric;
+import cc.fascinated.monitor.metrics.vm.catalog.MetricFamily;
+import cc.fascinated.monitor.metrics.vm.catalog.VmMetricCatalog;
 import cc.fascinated.monitor.metrics.vm.query.VmTimeSeries;
 import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
 import cc.fascinated.monitor.model.dto.response.server.metrics.LabeledSeries;
@@ -15,22 +18,32 @@ public final class VmMetricsAssembler {
     private VmMetricsAssembler() {}
 
     public static ServerMetricsResponse assemble(long id, MetricTimeRange range, MetricTimeRange.QueryWindow window,
-                                                 Map<ServerMetricGroups, List<VmTimeSeries>> byGroup) {
+                                                 List<VmTimeSeries> gauges,
+                                                 Map<ComputedMetric, List<VmTimeSeries>> computed) {
         MetricTimeGrid grid = MetricTimeGrid.from(window);
         Map<MetricSection, Map<String, List<Double>>> scalars = new EnumMap<>(MetricSection.class);
         Map<MetricSection, Map<String, LabeledSeries>> labeled = new EnumMap<>(MetricSection.class);
 
-        for (ServerMetricGroups group : ServerMetricGroups.values()) {
-            List<VmTimeSeries> series = byGroup.get(group);
-            if (series == null || series.isEmpty()) {
+        for (VmTimeSeries entry : gauges) {
+            String metricName = entry.labels().get("__name__");
+            if (metricName == null) {
                 continue;
             }
-            if (group.mergeField() != null) {
-                ingestLabeled(grid, labeled, group.section(), series, group.groupingLabels(), group.identityLabels(), group.mergeField());
-            } else if (group.section().scalar()) {
-                ingestScalar(grid, scalars, group.section(), series);
+            MetricFamily family = VmMetricCatalog.familyOf(metricName);
+            if (family == null) {
+                continue;
+            }
+            if (family.section().scalar()) {
+                ingestScalar(grid, scalars, family, entry, metricName);
             } else {
-                ingestLabeled(grid, labeled, group.section(), series, group.groupingLabels(), group.identityLabels(), null);
+                ingestLabeled(grid, labeled, family, entry, metricName, null);
+            }
+        }
+
+        for (Map.Entry<ComputedMetric, List<VmTimeSeries>> computedEntry : computed.entrySet()) {
+            ComputedMetric metric = computedEntry.getKey();
+            for (VmTimeSeries entry : computedEntry.getValue()) {
+                ingestLabeled(grid, labeled, metric.family(), entry, null, metric.fieldName());
             }
         }
 
@@ -50,41 +63,34 @@ public final class VmMetricsAssembler {
     }
 
     private static void ingestScalar(MetricTimeGrid grid, Map<MetricSection, Map<String, List<Double>>> scalars,
-                                     MetricSection section, List<VmTimeSeries> series) {
-        Map<String, List<Double>> fields = scalars.computeIfAbsent(section, ignored -> new LinkedHashMap<>());
-        for (VmTimeSeries entry : series) {
-            String metricName = entry.labels().get("__name__");
-            if (metricName == null) {
-                continue;
-            }
-            String name = MetricFieldNames.toFieldName(metricName);
-            if (name != null) {
-                fields.put(name, grid.align(entry));
-            }
+                                     MetricFamily family, VmTimeSeries entry, String metricName) {
+        String name = VmMetricCatalog.fieldName(metricName);
+        if (name == null) {
+            return;
         }
+        Map<String, List<Double>> fields = scalars.computeIfAbsent(family.section(), ignored -> new LinkedHashMap<>());
+        fields.put(name, grid.align(entry));
     }
 
     private static void ingestLabeled(MetricTimeGrid grid, Map<MetricSection, Map<String, LabeledSeries>> labeled,
-                                    MetricSection section, List<VmTimeSeries> series, String[] groupingLabels,
-                                    String[] identityLabels, String fieldOverride) {
-        Map<String, LabeledSeries> entities = labeled.computeIfAbsent(section, ignored -> new LinkedHashMap<>());
-        for (VmTimeSeries entry : series) {
-            String name = fieldOverride;
-            if (name == null) {
-                String metricName = entry.labels().get("__name__");
-                if (metricName == null) {
-                    continue;
-                }
-                name = MetricFieldNames.toFieldName(metricName);
-                if (name == null) {
-                    continue;
-                }
+                                      MetricFamily family, VmTimeSeries entry, String metricName, String fieldOverride) {
+        String name = fieldOverride;
+        if (name == null) {
+            if (metricName == null) {
+                return;
             }
-            String key = identityKey(entry.labels(), groupingLabels);
-            LabeledSeries entity = entities.computeIfAbsent(key, ignored -> LabeledSeries.create(entry.labels(), identityLabels));
-            entity.refreshLabels(entry.labels(), identityLabels);
-            entity.putSeries(name, grid.align(entry));
+            name = VmMetricCatalog.fieldName(metricName);
+            if (name == null) {
+                return;
+            }
         }
+        String[] groupingLabels = family.groupingLabels();
+        String[] identityLabels = family.identityLabels();
+        Map<String, LabeledSeries> entities = labeled.computeIfAbsent(family.section(), ignored -> new LinkedHashMap<>());
+        String key = identityKey(entry.labels(), groupingLabels);
+        LabeledSeries entity = entities.computeIfAbsent(key, ignored -> LabeledSeries.create(entry.labels(), identityLabels));
+        entity.refreshLabels(entry.labels(), identityLabels);
+        entity.putSeries(name, grid.align(entry));
     }
 
     private static String identityKey(Map<String, String> labels, String[] identityLabels) {

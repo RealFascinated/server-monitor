@@ -1,5 +1,7 @@
 package cc.fascinated.monitor.metrics.vm;
 
+import cc.fascinated.monitor.metrics.vm.query.Promql;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -36,7 +38,7 @@ public final class MetricWriteContext {
             this.buffer.append(',');
             this.buffer.append(entry.getKey());
             this.buffer.append("=\"");
-            appendEscapedLabelValue(entry.getValue());
+            Promql.appendEscapedLabelValue(this.buffer, entry.getValue());
             this.buffer.append('"');
         }
         this.buffer.append('}');
@@ -47,13 +49,4 @@ public final class MetricWriteContext {
         this.buffer.append('\n');
     }
 
-    private void appendEscapedLabelValue(String value) {
-        for (int i = 0; i < value.length(); i++) {
-            char c = value.charAt(i);
-            if (c == '\\' || c == '"') {
-                this.buffer.append('\\');
-            }
-            this.buffer.append(c);
-        }
-    }
 }

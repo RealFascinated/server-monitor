@@ -1,14 +1,15 @@
 package cc.fascinated.monitor.metrics.vm.series.impl;
 
 import cc.fascinated.monitor.metrics.vm.MetricWriteContext;
-import cc.fascinated.monitor.metrics.vm.series.VmGaugeSeries;
+import cc.fascinated.monitor.metrics.vm.catalog.MetricFamily;
+import cc.fascinated.monitor.metrics.vm.catalog.VmMetricFamily;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ZfsPoolMetric;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
 @Getter
 @Accessors(fluent = true)
-public enum ZfsPoolSeries implements VmGaugeSeries {
+public enum ZfsPoolSeries implements VmMetricFamily {
     CAPACITY_PERCENT("monitor_zfs_pool_capacity_percent"),
     ALLOCATED_BYTES("monitor_zfs_pool_allocated_bytes"),
     FREE_BYTES("monitor_zfs_pool_free_bytes"),
@@ -25,6 +26,16 @@ public enum ZfsPoolSeries implements VmGaugeSeries {
 
     ZfsPoolSeries(String metricName) {
         this.metricName = metricName;
+    }
+
+    @Override
+    public MetricFamily metricFamily() {
+        return MetricFamily.ZFS_POOL;
+    }
+
+    @Override
+    public String metricPrefix() {
+        return "monitor_zfs_pool_";
     }
 
     public static void write(MetricWriteContext ctx, ZfsPoolMetric pool) {

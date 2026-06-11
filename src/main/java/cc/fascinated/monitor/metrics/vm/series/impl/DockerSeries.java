@@ -1,14 +1,15 @@
 package cc.fascinated.monitor.metrics.vm.series.impl;
 
 import cc.fascinated.monitor.metrics.vm.MetricWriteContext;
-import cc.fascinated.monitor.metrics.vm.series.VmGaugeSeries;
+import cc.fascinated.monitor.metrics.vm.catalog.MetricFamily;
+import cc.fascinated.monitor.metrics.vm.catalog.VmMetricFamily;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.DockerContainerMetric;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
 @Getter
 @Accessors(fluent = true)
-public enum DockerSeries implements VmGaugeSeries {
+public enum DockerSeries implements VmMetricFamily {
     CPU_USAGE("monitor_container_cpu_usage"),
     MEMORY_USAGE("monitor_container_memory_usage");
 
@@ -16,6 +17,16 @@ public enum DockerSeries implements VmGaugeSeries {
 
     DockerSeries(String metricName) {
         this.metricName = metricName;
+    }
+
+    @Override
+    public MetricFamily metricFamily() {
+        return MetricFamily.DOCKER;
+    }
+
+    @Override
+    public String metricPrefix() {
+        return "monitor_container_";
     }
 
     public static void write(MetricWriteContext ctx, DockerContainerMetric container) {

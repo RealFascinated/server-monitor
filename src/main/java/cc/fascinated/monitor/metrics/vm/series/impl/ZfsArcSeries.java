@@ -1,14 +1,15 @@
 package cc.fascinated.monitor.metrics.vm.series.impl;
 
 import cc.fascinated.monitor.metrics.vm.MetricWriteContext;
-import cc.fascinated.monitor.metrics.vm.series.VmGaugeSeries;
+import cc.fascinated.monitor.metrics.vm.catalog.MetricFamily;
+import cc.fascinated.monitor.metrics.vm.catalog.VmMetricFamily;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ZfsArcMetrics;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
 @Getter
 @Accessors(fluent = true)
-public enum ZfsArcSeries implements VmGaugeSeries {
+public enum ZfsArcSeries implements VmMetricFamily {
     ARC_SIZE_BYTES("monitor_zfs_arc_size_bytes"),
     ARC_TARGET_BYTES("monitor_zfs_arc_target_bytes"),
     ARC_MAX_BYTES("monitor_zfs_arc_max_bytes"),
@@ -23,6 +24,16 @@ public enum ZfsArcSeries implements VmGaugeSeries {
 
     ZfsArcSeries(String metricName) {
         this.metricName = metricName;
+    }
+
+    @Override
+    public MetricFamily metricFamily() {
+        return MetricFamily.ZFS_ARC;
+    }
+
+    @Override
+    public String metricPrefix() {
+        return "monitor_zfs_arc_";
     }
 
     public static void write(MetricWriteContext ctx, ZfsArcMetrics arc) {

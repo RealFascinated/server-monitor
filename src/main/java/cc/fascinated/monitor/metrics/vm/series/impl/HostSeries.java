@@ -1,7 +1,8 @@
 package cc.fascinated.monitor.metrics.vm.series.impl;
 
 import cc.fascinated.monitor.metrics.vm.MetricWriteContext;
-import cc.fascinated.monitor.metrics.vm.series.VmGaugeSeries;
+import cc.fascinated.monitor.metrics.vm.catalog.MetricFamily;
+import cc.fascinated.monitor.metrics.vm.catalog.VmMetricFamily;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerDetails;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerMetrics;
 import lombok.Getter;
@@ -9,7 +10,7 @@ import lombok.experimental.Accessors;
 
 @Getter
 @Accessors(fluent = true)
-public enum HostSeries implements VmGaugeSeries {
+public enum HostSeries implements VmMetricFamily {
     CPU_USAGE("monitor_host_cpu_usage"),
     MEM_USAGE("monitor_host_mem_usage"),
     MEM_AVAILABLE("monitor_host_mem_available"),
@@ -36,6 +37,16 @@ public enum HostSeries implements VmGaugeSeries {
 
     HostSeries(String metricName) {
         this.metricName = metricName;
+    }
+
+    @Override
+    public MetricFamily metricFamily() {
+        return MetricFamily.HOST;
+    }
+
+    @Override
+    public String metricPrefix() {
+        return "monitor_host_";
     }
 
     public static void write(MetricWriteContext ctx, ServerMetrics metrics, ServerDetails details) {

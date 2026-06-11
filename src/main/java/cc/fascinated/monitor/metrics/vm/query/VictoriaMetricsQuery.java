@@ -6,7 +6,9 @@ import lombok.experimental.Accessors;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -52,7 +54,9 @@ public final class VictoriaMetricsQuery {
     public static final class Builder {
         private String rawQuery;
         private String metricName;
+        private Collection<? extends VmGaugeSeries> metrics;
         private final Map<String, String> labels = new LinkedHashMap<>();
+        private final Map<String, String> regexLabels = new LinkedHashMap<>();
         private Instant from;
         private Instant to;
         private Duration step;
@@ -62,7 +66,9 @@ public final class VictoriaMetricsQuery {
         public Builder query(String promql) {
             this.rawQuery = promql;
             this.metricName = null;
+            this.metrics = null;
             this.labels.clear();
+            this.regexLabels.clear();
             return this;
         }
 
@@ -73,6 +79,14 @@ public final class VictoriaMetricsQuery {
         public Builder metric(String metricName) {
             this.rawQuery = null;
             this.metricName = metricName;
+            this.metrics = null;
+            return this;
+        }
+
+        public Builder metrics(Collection<? extends VmGaugeSeries> metrics) {
+            this.rawQuery = null;
+            this.metricName = null;
+            this.metrics = metrics;
             return this;
         }
 
@@ -80,8 +94,18 @@ public final class VictoriaMetricsQuery {
             return label("server_id", Long.toString(serverId));
         }
 
+        public Builder serverIds(Collection<Long> serverIds) {
+            this.regexLabels.put("server_id", Promql.serverIdsRegex(serverIds));
+            return this;
+        }
+
         public Builder label(String key, String value) {
             this.labels.put(key, value);
+            return this;
+        }
+
+        public Builder regexLabel(String key, String value) {
+            this.regexLabels.put(key, value);
             return this;
         }
 
@@ -148,27 +172,21 @@ public final class VictoriaMetricsQuery {
             if (this.rawQuery != null) {
                 return this.rawQuery;
             }
+            if (this.metrics != null) {
+                List<String> names = this.metrics.stream().map(VmGaugeSeries::metricName).toList();
+                return Promql.vectorSelectorRegex(names, this.labels, this.regexLabels);
+            }
             if (this.metricName == null) {
                 return null;
             }
-            if (this.labels.isEmpty()) {
+            if (this.labels.isEmpty() && this.regexLabels.isEmpty()) {
                 return this.metricName;
             }
-            StringBuilder builder = new StringBuilder(this.metricName);
-            builder.append('{');
-            boolean first = true;
-            for (Map.Entry<String, String> entry : this.labels.entrySet()) {
-                if (!first) {
-                    builder.append(',');
-                }
-                first = false;
-                builder.append(entry.getKey());
-                builder.append("=\"");
-                appendEscapedLabelValue(builder, entry.getValue());
-                builder.append('"');
-            }
-            builder.append('}');
-            return builder.toString();
+            return Promql.vectorSelectorRegex(
+                    List.of(this.metricName),
+                    this.labels,
+                    this.regexLabels
+            );
         }
 
         private Duration resolveStep() {
@@ -181,16 +199,6 @@ public final class VictoriaMetricsQuery {
                 return Duration.ofSeconds(stepSeconds);
             }
             return null;
-        }
-
-        private static void appendEscapedLabelValue(StringBuilder builder, String value) {
-            for (int i = 0; i < value.length(); i++) {
-                char c = value.charAt(i);
-                if (c == '\\' || c == '"') {
-                    builder.append('\\');
-                }
-                builder.append(c);
-            }
         }
     }
 }
