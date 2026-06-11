@@ -54,6 +54,20 @@ import java.util.UUID;
 @Service
 @Slf4j
 public class ServerService {
+    private static final Comparator<String> SERVER_NAME_STRING_ORDER = (left, right) -> {
+        boolean leftStartsWithLetter = startsWithLetter(left);
+        boolean rightStartsWithLetter = startsWithLetter(right);
+        if (leftStartsWithLetter != rightStartsWithLetter) {
+            return leftStartsWithLetter ? 1 : -1;
+        }
+        return String.CASE_INSENSITIVE_ORDER.compare(left, right);
+    };
+
+    private static final Comparator<ServerRow> SERVER_NAME_ORDER = Comparator.comparing(
+            ServerRow::getServerName,
+            SERVER_NAME_STRING_ORDER
+    );
+
     private final ServerRepository serverRepository;
     private final ServerIngestTokenRepository serverIngestTokenRepository;
     private final TotalIngestsCounterMetric totalIngestsCounterMetric;
@@ -268,9 +282,10 @@ public class ServerService {
     }
 
     private List<ServerRow> listAccessibleServers(UserRow user) {
-        List<ServerRow> owned = this.serverRepository.findByOwnerIdOrderByServerNameAsc(user.getId());
+        List<ServerRow> owned = this.serverRepository.findByOwnerId(user.getId());
         List<Long> memberServerIds = this.serverAccessService.findMemberServerIds(user.getId());
         if (memberServerIds.isEmpty()) {
+            owned.sort(SERVER_NAME_ORDER);
             return owned;
         }
 
@@ -279,18 +294,18 @@ public class ServerService {
             ownedIds.add(server.getId());
         }
 
-        List<ServerRow> memberServers = new ArrayList<>();
+        List<ServerRow> combined = new ArrayList<>(owned);
         for (ServerRow server : this.serverRepository.findAllById(memberServerIds)) {
             if (!ownedIds.contains(server.getId())) {
-                memberServers.add(server);
+                combined.add(server);
             }
         }
-        memberServers.sort(Comparator.comparing(ServerRow::getServerName, String.CASE_INSENSITIVE_ORDER));
-
-        List<ServerRow> combined = new ArrayList<>(owned.size() + memberServers.size());
-        combined.addAll(owned);
-        combined.addAll(memberServers);
+        combined.sort(SERVER_NAME_ORDER);
         return combined;
+    }
+
+    private static boolean startsWithLetter(String name) {
+        return !name.isEmpty() && Character.isLetter(name.charAt(0));
     }
 
     private static void requireServerOwner(UserRow user, ServerRow server) {

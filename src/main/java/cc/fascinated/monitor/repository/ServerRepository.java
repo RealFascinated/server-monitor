@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface ServerRepository extends JpaRepository<ServerRow, Long> {
 
-    List<ServerRow> findByOwnerIdOrderByServerNameAsc(long ownerId);
+    List<ServerRow> findByOwnerId(long ownerId);
 
     @Modifying(clearAutomatically = true)
     @Query("""

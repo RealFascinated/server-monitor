@@ -17,6 +17,9 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,11 +35,20 @@ public class ServerMetricService {
             return ServerMetricsResponse.empty(server.getId(), range.param());
         }
         MetricTimeRange.QueryWindow window = range.queryWindow();
-        Map<ServerMetricGroups, List<VmTimeSeries>> byGroup = new EnumMap<>(ServerMetricGroups.class);
-        for (ServerMetricGroups group : ServerMetricGroups.values()) {
-            byGroup.put(group, fetchGroup(server.getId(), range, window, group));
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            Map<ServerMetricGroups, CompletableFuture<List<VmTimeSeries>>> tasks = new EnumMap<>(ServerMetricGroups.class);
+            for (ServerMetricGroups group : ServerMetricGroups.values()) {
+                tasks.put(group, CompletableFuture.supplyAsync(
+                        () -> fetchGroup(server.getId(), range, window, group),
+                        executor
+                ));
+            }
+            Map<ServerMetricGroups, List<VmTimeSeries>> byGroup = new EnumMap<>(ServerMetricGroups.class);
+            for (ServerMetricGroups group : ServerMetricGroups.values()) {
+                byGroup.put(group, tasks.get(group).join());
+            }
+            return VmMetricsAssembler.assemble(server.getId(), range, window, byGroup);
         }
-        return VmMetricsAssembler.assemble(server.getId(), range, window, byGroup);
     }
 
     public Map<Long, Double> fetchLatestMetric(VmGaugeSeries metric, List<Long> serverIds) {
