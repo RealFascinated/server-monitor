@@ -114,24 +114,18 @@ public class ServerService {
         if (servers.isEmpty()) {
             return List.of();
         }
-        List<Long> onlineServerIds = servers.stream()
-                .filter(server -> server.getStatus() == ServerStatus.ONLINE)
-                .map(ServerRow::getId)
-                .toList();
-        List<Long> serverIds = servers.stream().map(ServerRow::getId).toList();
-        LatestHostMetrics metrics = fetchLatestHostMetrics(onlineServerIds);
-        Map<Long, Double> uptimePercent30d = this.serverMetricService.fetchUptimePercent30d(serverIds);
+        ServerResponseContext context = fetchServerResponseContext(servers);
         Map<Long, ServerRole> rolesByServerId = this.serverAccessService.findRolesByUserId(user.getId());
         return servers.stream()
-                .map(server -> toServerResponse(server, rolesByServerId.get(server.getId()), metrics, uptimePercent30d))
+                .map(server -> toServerResponse(server, rolesByServerId.get(server.getId()), context))
                 .toList();
     }
 
     public ServerResponse getServer(UserRow user, long serverId) {
         ServerRow server = getAccessibleServer(user, serverId);
         ServerRole role = this.serverAccessService.findRole(server.getId(), user.getId()).orElseThrow();
-        List<Long> serverIds = server.getStatus() == ServerStatus.ONLINE ? List.of(server.getId()) : List.of();
-        return toServerResponse(server, role, fetchLatestHostMetrics(serverIds));
+        ServerResponseContext context = fetchServerResponseContext(List.of(server));
+        return toServerResponse(server, role, context);
     }
 
     @Transactional
@@ -181,7 +175,7 @@ public class ServerService {
         server.setServerName(request.name());
         this.serverRepository.save(server);
         this.serverWebSocketService.notifyServerUpdated(serverId);
-        return ServerResponse.from(server, ServerRole.OWNER, null, null, null, null, null, null);
+        return getServer(user, serverId);
     }
 
     @Transactional
@@ -301,21 +295,25 @@ public class ServerService {
     private static final String ROOT_DISK_MOUNT = "/";
     private static final Map<String, String> ROOT_DISK_LABEL = Map.of("disk", ROOT_DISK_MOUNT);
 
-    private ServerResponse toServerResponse(ServerRow server, ServerRole role, LatestHostMetrics metrics) {
-        return toServerResponse(server, role, metrics, Map.of());
+    private ServerResponseContext fetchServerResponseContext(List<ServerRow> servers) {
+        List<Long> serverIds = servers.stream().map(ServerRow::getId).toList();
+        List<Long> onlineServerIds = servers.stream()
+                .filter(server -> server.getStatus() == ServerStatus.ONLINE)
+                .map(ServerRow::getId)
+                .toList();
+        return new ServerResponseContext(
+                fetchLatestHostMetrics(onlineServerIds),
+                this.serverMetricService.fetchUptimePercent30d(serverIds)
+        );
     }
 
-    private ServerResponse toServerResponse(
-            ServerRow server,
-            ServerRole role,
-            LatestHostMetrics metrics,
-            Map<Long, Double> uptimePercent30d
-    ) {
-        Double uptime = uptimePercent30d.get(server.getId());
+    private ServerResponse toServerResponse(ServerRow server, ServerRole role, ServerResponseContext context) {
+        Double uptime = context.uptimePercent30d().get(server.getId());
         if (server.getStatus() != ServerStatus.ONLINE) {
             return ServerResponse.from(server, role, null, null, null, null, null, uptime);
         }
         long serverId = server.getId();
+        LatestHostMetrics metrics = context.hostMetrics();
         return ServerResponse.from(
                 server,
                 role,
@@ -346,6 +344,8 @@ public class ServerService {
         this.serverIngestTokenRepository.save(new IngestTokenRow(AuthUtils.hash(ingestToken.toString()), serverId));
         return ingestToken;
     }
+
+    private record ServerResponseContext(LatestHostMetrics hostMetrics, Map<Long, Double> uptimePercent30d) {}
 
     private record LatestHostMetrics(
             Map<Long, Double> cpu,
