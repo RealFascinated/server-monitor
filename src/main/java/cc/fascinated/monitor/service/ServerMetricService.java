@@ -7,6 +7,7 @@ import cc.fascinated.monitor.metrics.vm.query.VictoriaMetricsQueryClient;
 import cc.fascinated.monitor.metrics.vm.query.VmQueryResponse;
 import cc.fascinated.monitor.metrics.vm.query.VmTimeSeries;
 import cc.fascinated.monitor.metrics.vm.series.VmGaugeSeries;
+import cc.fascinated.monitor.metrics.vm.series.impl.ServerStatusSeries;
 import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
 import cc.fascinated.monitor.model.dto.response.server.metrics.ServerMetricsResponse;
 import cc.fascinated.monitor.model.persistance.ServerRow;
@@ -23,6 +24,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ServerMetricService {
+    private static final String UPTIME_WINDOW = "30d";
+
     private final VictoriaMetricsQueryClient victoriaMetricsQueryClient;
 
     public ServerMetricService(VictoriaMetricsQueryClient victoriaMetricsQueryClient) {
@@ -45,6 +48,33 @@ public class ServerMetricService {
             }
             return VmMetricsAssembler.assemble(server.getId(), range, window, byGroup);
         }
+    }
+
+    public Map<Long, Double> fetchUptimePercent30d(List<Long> serverIds) {
+        if (serverIds.isEmpty()) {
+            return Map.of();
+        }
+        String ids = serverIds.stream().map(String::valueOf).collect(Collectors.joining("|"));
+        String promql = "avg_over_time(%s{server_id=~\"%s\"}[%s]) * 100".formatted(
+                ServerStatusSeries.UP.metricName(),
+                ids,
+                UPTIME_WINDOW
+        );
+        VmQueryResponse response = this.victoriaMetricsQueryClient.execute(
+                VictoriaMetricsQuery.builder().query(promql).build()
+        );
+        Map<Long, Double> result = new HashMap<>();
+        for (VmTimeSeries series : response.timeSeries()) {
+            String serverIdLabel = series.labels().get("server_id");
+            if (serverIdLabel == null || series.samples().isEmpty()) {
+                continue;
+            }
+            double value = series.samples().getLast().value();
+            if (Double.isFinite(value)) {
+                result.put(Long.parseLong(serverIdLabel), value);
+            }
+        }
+        return result;
     }
 
     public Map<Long, Double> fetchLatestMetric(VmGaugeSeries metric, List<Long> serverIds) {

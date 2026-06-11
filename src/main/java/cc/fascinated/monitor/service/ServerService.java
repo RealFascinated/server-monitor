@@ -28,6 +28,7 @@ import cc.fascinated.monitor.metrics.vm.series.impl.DiskSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.DockerSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.GpuSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.HostSeries;
+import cc.fascinated.monitor.metrics.vm.series.impl.ServerStatusSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.TemperatureSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.NetworkSeries;
 import cc.fascinated.monitor.metrics.vm.series.impl.ZfsArcSeries;
@@ -103,6 +104,7 @@ public class ServerService {
         int updated = this.serverRepository.markStaleServersOffline(cutoff);
         if (updated > 0) {
             log.info("Marked {} server(s) offline (no update since {})", updated, cutoff);
+            writeServerStatusOffline(staleServerIds);
             this.serverWebSocketService.notifyServersOffline(staleServerIds);
         }
     }
@@ -116,10 +118,12 @@ public class ServerService {
                 .filter(server -> server.getStatus() == ServerStatus.ONLINE)
                 .map(ServerRow::getId)
                 .toList();
+        List<Long> serverIds = servers.stream().map(ServerRow::getId).toList();
         LatestHostMetrics metrics = fetchLatestHostMetrics(onlineServerIds);
+        Map<Long, Double> uptimePercent30d = this.serverMetricService.fetchUptimePercent30d(serverIds);
         Map<Long, ServerRole> rolesByServerId = this.serverAccessService.findRolesByUserId(user.getId());
         return servers.stream()
-                .map(server -> toServerResponse(server, rolesByServerId.get(server.getId()), metrics))
+                .map(server -> toServerResponse(server, rolesByServerId.get(server.getId()), metrics, uptimePercent30d))
                 .toList();
     }
 
@@ -177,7 +181,7 @@ public class ServerService {
         server.setServerName(request.name());
         this.serverRepository.save(server);
         this.serverWebSocketService.notifyServerUpdated(serverId);
-        return ServerResponse.from(server, ServerRole.OWNER, null, null, null, null, null);
+        return ServerResponse.from(server, ServerRole.OWNER, null, null, null, null, null, null);
     }
 
     @Transactional
@@ -251,6 +255,7 @@ public class ServerService {
             Utils.forEach(metrics.zfsPoolMetrics(), pool -> ZfsPoolSeries.write(ctx, pool));
             Utils.forEach(metrics.dockerContainers(), container -> DockerSeries.write(ctx, container));
             Utils.forEach(metrics.tcpConnectionMetrics(), tcp -> TcpConnectionSeries.write(ctx, tcp));
+            ServerStatusSeries.writeOnline(ctx);
             this.victoriaMetricsWriteClient.flush(buffer.toString());
 
             this.serverRepository.save(server);
@@ -263,6 +268,15 @@ public class ServerService {
                 this.ingestDurationHistogramMetric.observeSeconds((System.nanoTime() - startedNanos) / 1_000_000_000.0);
             }
         }
+    }
+
+    private void writeServerStatusOffline(List<Long> serverIds) {
+        StringBuilder buffer = new StringBuilder();
+        long epochSeconds = Instant.now().getEpochSecond();
+        for (Long serverId : serverIds) {
+            ServerStatusSeries.writeOffline(new MetricWriteContext(buffer, serverId, epochSeconds));
+        }
+        this.victoriaMetricsWriteClient.flush(buffer.toString());
     }
 
     private static ServerInventoryRow getOrCreateInventory(ServerRow server) {
@@ -288,8 +302,18 @@ public class ServerService {
     private static final Map<String, String> ROOT_DISK_LABEL = Map.of("disk", ROOT_DISK_MOUNT);
 
     private ServerResponse toServerResponse(ServerRow server, ServerRole role, LatestHostMetrics metrics) {
+        return toServerResponse(server, role, metrics, Map.of());
+    }
+
+    private ServerResponse toServerResponse(
+            ServerRow server,
+            ServerRole role,
+            LatestHostMetrics metrics,
+            Map<Long, Double> uptimePercent30d
+    ) {
+        Double uptime = uptimePercent30d.get(server.getId());
         if (server.getStatus() != ServerStatus.ONLINE) {
-            return ServerResponse.from(server, role, null, null, null, null, null);
+            return ServerResponse.from(server, role, null, null, null, null, null, uptime);
         }
         long serverId = server.getId();
         return ServerResponse.from(
@@ -299,7 +323,8 @@ public class ServerService {
                 NumberUtils.toLong(metrics.memUsage().get(serverId)),
                 NumberUtils.toLong(metrics.memMax().get(serverId)),
                 NumberUtils.toLong(metrics.diskUsage().get(serverId)),
-                NumberUtils.toLong(metrics.diskMax().get(serverId))
+                NumberUtils.toLong(metrics.diskMax().get(serverId)),
+                uptime
         );
     }
 
