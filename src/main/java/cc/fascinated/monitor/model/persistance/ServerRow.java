@@ -49,5 +49,6 @@ public class ServerRow {
         this.serverName = serverName;
         this.ownerId = ownerId;
         this.createdAt = createdAt;
+        this.status = ServerStatus.PENDING;
     }
 }
