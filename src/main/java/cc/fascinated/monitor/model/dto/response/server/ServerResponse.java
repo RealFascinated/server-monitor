@@ -16,7 +16,8 @@ public record ServerResponse(
         Double cpuPercent,
         Long memUsage,
         Long memMax,
-        ServerRole role
+        ServerRole role,
+        ServerInventoryResponse inventory
 ) {
     public static ServerResponse from(
             ServerRow server,
@@ -35,7 +36,10 @@ public record ServerResponse(
                 cpuPercent,
                 memUsage,
                 memMax,
-                role
+                role,
+                server.getInventory() != null
+                        ? ServerInventoryResponse.from(server.getInventory())
+                        : null
         );
     }
 }
