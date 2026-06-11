@@ -36,6 +36,8 @@ import cc.fascinated.monitor.metrics.vm.series.impl.ZfsPoolSeries;
 import cc.fascinated.monitor.repository.ServerIngestTokenRepository;
 import cc.fascinated.monitor.repository.ServerRepository;
 import cc.fascinated.monitor.util.AuthUtils;
+import cc.fascinated.monitor.util.NumberUtils;
+import cc.fascinated.monitor.util.ServerUtils;
 import cc.fascinated.monitor.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -44,7 +46,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,20 +54,6 @@ import java.util.UUID;
 @Service
 @Slf4j
 public class ServerService {
-    private static final Comparator<String> SERVER_NAME_STRING_ORDER = (left, right) -> {
-        boolean leftStartsWithLetter = startsWithLetter(left);
-        boolean rightStartsWithLetter = startsWithLetter(right);
-        if (leftStartsWithLetter != rightStartsWithLetter) {
-            return leftStartsWithLetter ? 1 : -1;
-        }
-        return String.CASE_INSENSITIVE_ORDER.compare(left, right);
-    };
-
-    private static final Comparator<ServerRow> SERVER_NAME_ORDER = Comparator.comparing(
-            ServerRow::getServerName,
-            SERVER_NAME_STRING_ORDER
-    );
-
     private final ServerRepository serverRepository;
     private final ServerIngestTokenRepository serverIngestTokenRepository;
     private final TotalIngestsCounterMetric totalIngestsCounterMetric;
@@ -96,6 +83,16 @@ public class ServerService {
         this.serverProperties = serverProperties;
     }
 
+    @Scheduled(fixedDelayString = "#{@monitorMetricsProperties.refreshIntervalMs}")
+    @Transactional
+    public void markStaleServersOffline() {
+        Instant cutoff = Instant.now().minus(this.serverProperties.getOfflineThreshold());
+        int updated = this.serverRepository.markStaleServersOffline(cutoff);
+        if (updated > 0) {
+            log.info("Marked {} server(s) offline (no update since {})", updated, cutoff);
+        }
+    }
+
     public List<ServerResponse> listServers(UserRow user) {
         List<ServerRow> servers = listAccessibleServers(user);
         if (servers.isEmpty()) {
@@ -105,53 +102,18 @@ public class ServerService {
                 .filter(server -> server.getStatus() == ServerStatus.ONLINE)
                 .map(ServerRow::getId)
                 .toList();
-        final Map<Long, Double> cpuByServer;
-        final Map<Long, Double> memUsageByServer;
-        final Map<Long, Double> memMaxByServer;
-        if (onlineServerIds.isEmpty()) {
-            cpuByServer = Map.of();
-            memUsageByServer = Map.of();
-            memMaxByServer = Map.of();
-        } else {
-            cpuByServer = this.serverMetricService.fetchLatestMetric(HostSeries.CPU_USAGE, onlineServerIds);
-            memUsageByServer = this.serverMetricService.fetchLatestMetric(HostSeries.MEM_USAGE, onlineServerIds);
-            memMaxByServer = this.serverMetricService.fetchLatestMetric(HostSeries.MEM_TOTAL, onlineServerIds);
-        }
+        LatestHostMetrics metrics = fetchLatestHostMetrics(onlineServerIds);
         Map<Long, ServerRole> rolesByServerId = this.serverAccessService.findRolesByUserId(user.getId());
         return servers.stream()
-                .map(server -> {
-                    ServerRole role = rolesByServerId.get(server.getId());
-                    if (server.getStatus() != ServerStatus.ONLINE) {
-                        return ServerResponse.from(server, role, null, null, null);
-                    }
-                    return ServerResponse.from(
-                            server,
-                            role,
-                            cpuByServer.get(server.getId()),
-                            toLong(memUsageByServer.get(server.getId())),
-                            toLong(memMaxByServer.get(server.getId()))
-                    );
-                })
+                .map(server -> toServerResponse(server, rolesByServerId.get(server.getId()), metrics))
                 .toList();
     }
 
     public ServerResponse getServer(UserRow user, long serverId) {
         ServerRow server = getAccessibleServer(user, serverId);
         ServerRole role = this.serverAccessService.findRole(server.getId(), user.getId()).orElseThrow();
-        if (server.getStatus() != ServerStatus.ONLINE) {
-            return ServerResponse.from(server, role, null, null, null);
-        }
-        List<Long> serverIds = List.of(server.getId());
-        Map<Long, Double> cpuByServer = this.serverMetricService.fetchLatestMetric(HostSeries.CPU_USAGE, serverIds);
-        Map<Long, Double> memUsageByServer = this.serverMetricService.fetchLatestMetric(HostSeries.MEM_USAGE, serverIds);
-        Map<Long, Double> memMaxByServer = this.serverMetricService.fetchLatestMetric(HostSeries.MEM_TOTAL, serverIds);
-        return ServerResponse.from(
-                server,
-                role,
-                cpuByServer.get(server.getId()),
-                toLong(memUsageByServer.get(server.getId())),
-                toLong(memMaxByServer.get(server.getId()))
-        );
+        List<Long> serverIds = server.getStatus() == ServerStatus.ONLINE ? List.of(server.getId()) : List.of();
+        return toServerResponse(server, role, fetchLatestHostMetrics(serverIds));
     }
 
     @Transactional
@@ -281,16 +243,6 @@ public class ServerService {
         }
     }
 
-    @Scheduled(fixedDelayString = "#{@monitorMetricsProperties.refreshIntervalMs}")
-    @Transactional
-    public void markStaleServersOffline() {
-        Instant cutoff = Instant.now().minus(this.serverProperties.getOfflineThreshold());
-        int updated = this.serverRepository.markStaleServersOffline(cutoff);
-        if (updated > 0) {
-            log.info("Marked {} server(s) offline (no update since {})", updated, cutoff);
-        }
-    }
-
     private static ServerInventoryRow getOrCreateInventory(ServerRow server) {
         ServerInventoryRow inventory = server.getInventory();
         if (inventory == null) {
@@ -306,12 +258,33 @@ public class ServerService {
             return List.of();
         }
         List<ServerRow> servers = new ArrayList<>(this.serverRepository.findAllById(serverIds));
-        servers.sort(SERVER_NAME_ORDER);
+        servers.sort(ServerUtils.NAME_ORDER);
         return servers;
     }
 
-    private static boolean startsWithLetter(String name) {
-        return !name.isEmpty() && Character.isLetter(name.charAt(0));
+    private ServerResponse toServerResponse(ServerRow server, ServerRole role, LatestHostMetrics metrics) {
+        if (server.getStatus() != ServerStatus.ONLINE) {
+            return ServerResponse.from(server, role, null, null, null);
+        }
+        long serverId = server.getId();
+        return ServerResponse.from(
+                server,
+                role,
+                metrics.cpu().get(serverId),
+                NumberUtils.toLong(metrics.memUsage().get(serverId)),
+                NumberUtils.toLong(metrics.memMax().get(serverId))
+        );
+    }
+
+    private LatestHostMetrics fetchLatestHostMetrics(List<Long> serverIds) {
+        if (serverIds.isEmpty()) {
+            return LatestHostMetrics.empty();
+        }
+        return new LatestHostMetrics(
+                this.serverMetricService.fetchLatestMetric(HostSeries.CPU_USAGE, serverIds),
+                this.serverMetricService.fetchLatestMetric(HostSeries.MEM_USAGE, serverIds),
+                this.serverMetricService.fetchLatestMetric(HostSeries.MEM_TOTAL, serverIds)
+        );
     }
 
     private UUID issueIngestToken(long serverId) {
@@ -320,7 +293,9 @@ public class ServerService {
         return ingestToken;
     }
 
-    private static Long toLong(Double value) {
-        return value != null ? value.longValue() : null;
+    private record LatestHostMetrics(Map<Long, Double> cpu, Map<Long, Double> memUsage, Map<Long, Double> memMax) {
+        private static LatestHostMetrics empty() {
+            return new LatestHostMetrics(Map.of(), Map.of(), Map.of());
+        }
     }
 }
