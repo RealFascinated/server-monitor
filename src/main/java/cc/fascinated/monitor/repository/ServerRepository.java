@@ -7,8 +7,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
+import java.util.List;
 
 public interface ServerRepository extends JpaRepository<ServerRow, Long> {
+
+    @Query("""
+            SELECT s FROM ServerRow s
+            LEFT JOIN FETCH s.inventory
+            WHERE s.ownerId = :ownerId
+            ORDER BY s.createdAt DESC
+            """)
+    List<ServerRow> findByOwnerIdWithInventory(@Param("ownerId") long ownerId);
 
     @Modifying(clearAutomatically = true)
     @Query("""

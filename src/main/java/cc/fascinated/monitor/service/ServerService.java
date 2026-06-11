@@ -11,6 +11,7 @@ import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerDetails;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerMetrics;
 import cc.fascinated.monitor.model.dto.response.server.CreatedServerResponse;
 import cc.fascinated.monitor.model.dto.response.server.IngestTokenResponse;
+import cc.fascinated.monitor.model.dto.response.server.ServerResponse;
 import cc.fascinated.monitor.model.persistance.ServerInventoryRow;
 import cc.fascinated.monitor.model.persistance.ServerRow;
 import cc.fascinated.monitor.model.persistance.UserRow;
@@ -40,6 +41,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -67,6 +69,12 @@ public class ServerService {
         this.ingestAuthFailuresCounterMetric = ingestAuthFailuresCounterMetric;
         this.victoriaMetricsWriteClient = victoriaMetricsWriteClient;
         this.serverProperties = serverProperties;
+    }
+
+    public List<ServerResponse> listServers(UserRow user) {
+        return this.serverRepository.findByOwnerIdWithInventory(user.getId()).stream()
+                .map(ServerResponse::from)
+                .toList();
     }
 
     public CreatedServerResponse createServer(UserRow user, ServerCreateRequest createRequest) {
