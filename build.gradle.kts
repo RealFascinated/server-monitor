@@ -1,3 +1,6 @@
+import org.gradle.kotlin.dsl.developmentOnly
+import org.springframework.boot.gradle.tasks.run.BootRun
+
 plugins {
     java
     id("org.springframework.boot") version "4.0.6"
@@ -49,12 +52,20 @@ dependencies {
     implementation("io.prometheus:prometheus-metrics-exposition-formats:1.6.1")
     implementation("io.prometheus:prometheus-metrics-model:1.6.1")
 
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
+
     // Lombok
     compileOnly("org.projectlombok:lombok:1.18.46")
     annotationProcessor("org.projectlombok:lombok:1.18.46")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.named<BootRun>("bootRun") {
+    val workDir = layout.projectDirectory.dir("work")
+    workingDir = workDir.asFile
+    doFirst { workDir.asFile.mkdirs() }
 }
 
 tasks.withType<Test> {

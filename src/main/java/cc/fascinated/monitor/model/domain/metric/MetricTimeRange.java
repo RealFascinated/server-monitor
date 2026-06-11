@@ -11,6 +11,10 @@ import java.util.Arrays;
 @Getter
 @Accessors(fluent = true)
 public enum MetricTimeRange {
+    H1("1h", Duration.ofHours(1), Duration.ofSeconds(15)),
+    H3("3h", Duration.ofHours(3), Duration.ofSeconds(30)),
+    H6("6h", Duration.ofHours(6), Duration.ofMinutes(1)),
+    H12("12h", Duration.ofHours(12), Duration.ofMinutes(2)),
     H24("24h", Duration.ofHours(24), Duration.ofMinutes(5)),
     D3("3d", Duration.ofDays(3), Duration.ofMinutes(15)),
     D7("7d", Duration.ofDays(7), Duration.ofMinutes(30)),
