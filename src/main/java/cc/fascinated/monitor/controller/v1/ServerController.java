@@ -72,7 +72,7 @@ public class ServerController {
             @PathVariable long serverId,
             @Valid @RequestBody ServerMemberInviteRequest request
     ) {
-        return this.serverAccessService.inviteUser(user, this.serverService.getOwnedServer(user, serverId), request);
+        return this.serverAccessService.inviteUser(user, this.serverService.requireOwnedServer(user, serverId), request);
     }
 
     @DeleteMapping(value = "/{serverId}/members/{memberUserId}")
@@ -82,7 +82,7 @@ public class ServerController {
             @PathVariable long serverId,
             @PathVariable long memberUserId
     ) {
-        this.serverAccessService.removeMember(user, this.serverService.getOwnedServer(user, serverId), memberUserId);
+        this.serverAccessService.removeMember(user, this.serverService.requireOwnedServer(user, serverId), memberUserId);
     }
 
     @DeleteMapping(value = "/{serverId}/invites/{inviteId}")
@@ -92,7 +92,7 @@ public class ServerController {
             @PathVariable long serverId,
             @PathVariable long inviteId
     ) {
-        this.serverAccessService.revokeInvite(user, this.serverService.getOwnedServer(user, serverId), inviteId);
+        this.serverAccessService.revokeInvite(user, this.serverService.requireOwnedServer(user, serverId), inviteId);
     }
 
     @PostMapping(value = "/ingest")

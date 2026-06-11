@@ -1,6 +1,6 @@
 package cc.fascinated.monitor.model.persistance;
 
-import cc.fascinated.monitor.model.domain.server.ServerMemberRole;
+import cc.fascinated.monitor.model.domain.server.ServerRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -28,7 +28,7 @@ public class ServerInviteRow {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ServerMemberRole role;
+    private ServerRole role;
 
     @Column(name = "token_hash", nullable = false, unique = true)
     private String tokenHash;
@@ -43,7 +43,7 @@ public class ServerInviteRow {
     @Setter(AccessLevel.NONE)
     private Instant createdAt;
 
-    public ServerInviteRow(Long serverId, String email, ServerMemberRole role, String tokenHash,
+    public ServerInviteRow(Long serverId, String email, ServerRole role, String tokenHash,
                            Long invitedById, Instant expiresAt, Instant createdAt) {
         this.serverId = serverId;
         this.email = email;

@@ -3,8 +3,7 @@ package cc.fascinated.monitor.service;
 import cc.fascinated.monitor.exception.impl.ConflictException;
 import cc.fascinated.monitor.exception.impl.NotFoundException;
 import cc.fascinated.monitor.exception.impl.UnauthorizedException;
-import cc.fascinated.monitor.model.domain.server.ServerMemberRole;
-import cc.fascinated.monitor.model.domain.server.UserServerRole;
+import cc.fascinated.monitor.model.domain.server.ServerRole;
 import cc.fascinated.monitor.model.dto.request.server.ServerMemberInviteRequest;
 import cc.fascinated.monitor.model.dto.response.server.access.*;
 import cc.fascinated.monitor.model.persistance.ServerInviteRow;
@@ -26,6 +25,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -50,34 +50,60 @@ public class ServerAccessService {
         this.userRepository = userRepository;
     }
 
-    public boolean isMember(long serverId, long userId) {
-        return this.serverMemberRepository.existsByServerIdAndUserId(serverId, userId);
+    public Optional<ServerRole> findRole(long serverId, long userId) {
+        return this.serverMemberRepository.findByServerIdAndUserId(serverId, userId)
+                .map(ServerMemberRow::getRole);
     }
 
-    public List<Long> findMemberServerIds(long userId) {
-        return this.serverMemberRepository.findServerIdsByUserId(userId);
-    }
-
-    public Map<Long, UserServerRole> findMemberRolesByUserId(long userId) {
+    public Map<Long, ServerRole> findRolesByUserId(long userId) {
         return this.serverMemberRepository.findByUserId(userId).stream()
                 .collect(Collectors.toMap(
                         ServerMemberRow::getServerId,
-                        member -> UserServerRole.valueOf(member.getRole().name())
+                        ServerMemberRow::getRole
                 ));
     }
 
-    public ServerAccessListResponse listAccess(UserRow user, ServerRow server) {
-        UserRow ownerUser = this.userRepository.findById(server.getOwnerId())
-                .orElseThrow(() -> new NotFoundException("Server owner not found"));
+    public List<Long> findAccessibleServerIds(long userId) {
+        return this.serverMemberRepository.findServerIdsByUserId(userId);
+    }
 
-        List<ServerMemberRow> members = this.serverMemberRepository.findByServerId(server.getId());
+    public void requireAccessible(UserRow user, ServerRow server) {
+        if (findRole(server.getId(), user.getId()).isEmpty()) {
+            throw new UnauthorizedException("You do not have access to this server");
+        }
+    }
+
+    public void requireOwner(UserRow user, ServerRow server) {
+        if (findRole(server.getId(), user.getId()).orElse(null) != ServerRole.OWNER) {
+            throw new UnauthorizedException("You do not own this server");
+        }
+    }
+
+    public UserRow getOwnerUser(ServerRow server) {
+        ServerMemberRow ownerMember = this.serverMemberRepository.findByServerIdAndRole(server.getId(), ServerRole.OWNER)
+                .orElseThrow(() -> new NotFoundException("Server owner not found"));
+        return this.userRepository.findById(ownerMember.getUserId())
+                .orElseThrow(() -> new NotFoundException("Server owner not found"));
+    }
+
+    @Transactional
+    public void addOwner(long serverId, long userId, Instant joinedAt) {
+        this.serverMemberRepository.save(new ServerMemberRow(serverId, userId, ServerRole.OWNER, joinedAt));
+    }
+
+    public ServerAccessListResponse listAccess(UserRow user, ServerRow server) {
+        UserRow ownerUser = getOwnerUser(server);
+
+        List<ServerMemberRow> members = this.serverMemberRepository.findByServerId(server.getId()).stream()
+                .filter(member -> member.getRole() != ServerRole.OWNER)
+                .toList();
         Map<Long, UserRow> usersById = loadUsers(members.stream().map(ServerMemberRow::getUserId).toList());
 
         List<ServerMemberEntryResponse> memberResponses = members.stream()
                 .map(member -> ServerMemberEntryResponse.from(member, usersById.get(member.getUserId())))
                 .toList();
 
-        List<PendingInviteResponse> pendingInvites = server.getOwnerId().equals(user.getId())
+        List<PendingInviteResponse> pendingInvites = findRole(server.getId(), user.getId()).orElse(null) == ServerRole.OWNER
                 ? this.serverInviteRepository.findByServerId(server.getId()).stream()
                         .map(PendingInviteResponse::from)
                         .toList()
@@ -92,11 +118,10 @@ public class ServerAccessService {
 
     @Transactional
     public ServerInviteCreatedResponse inviteUser(UserRow owner, ServerRow server, ServerMemberInviteRequest request) {
-        requireServerOwner(owner, server);
+        requireOwner(owner, server);
 
         String email = UserUtils.normalizeEmail(request.email());
-        UserRow ownerUser = this.userRepository.findById(server.getOwnerId())
-                .orElseThrow(() -> new NotFoundException("Server owner not found"));
+        UserRow ownerUser = getOwnerUser(server);
 
         if (email.equalsIgnoreCase(ownerUser.getEmail())) {
             throw new ConflictException("The server owner already has access");
@@ -117,7 +142,7 @@ public class ServerAccessService {
         ServerInviteRow invite = this.serverInviteRepository.save(new ServerInviteRow(
                 server.getId(),
                 email,
-                ServerMemberRole.VIEWER,
+                ServerRole.VIEWER,
                 AuthUtils.hash(token),
                 owner.getId(),
                 now.plus(INVITE_DURATION_DAYS, ChronoUnit.DAYS),
@@ -129,9 +154,9 @@ public class ServerAccessService {
 
     @Transactional
     public void removeMember(UserRow owner, ServerRow server, long userId) {
-        requireServerOwner(owner, server);
+        requireOwner(owner, server);
 
-        if (server.getOwnerId().equals(userId)) {
+        if (findRole(server.getId(), userId).orElse(null) == ServerRole.OWNER) {
             throw new ConflictException("Cannot remove the server owner");
         }
 
@@ -144,7 +169,7 @@ public class ServerAccessService {
 
     @Transactional
     public void revokeInvite(UserRow owner, ServerRow server, long inviteId) {
-        requireServerOwner(owner, server);
+        requireOwner(owner, server);
 
         ServerInviteRow invite = this.serverInviteRepository.findById(inviteId)
                 .filter(row -> row.getServerId().equals(server.getId()))
@@ -204,12 +229,6 @@ public class ServerAccessService {
                 .orElseThrow(() -> new NotFoundException("Server \"%s\" not found".formatted(invite.getServerId())));
 
         return ServerMemberResponse.from(server, member);
-    }
-
-    private static void requireServerOwner(UserRow user, ServerRow server) {
-        if (!server.getOwnerId().equals(user.getId())) {
-            throw new UnauthorizedException("You do not own this server");
-        }
     }
 
     private String generateInviteToken() {

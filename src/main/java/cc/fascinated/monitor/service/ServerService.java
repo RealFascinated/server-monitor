@@ -4,8 +4,8 @@ import cc.fascinated.monitor.config.MonitorServerProperties;
 import cc.fascinated.monitor.exception.impl.InternalServerException;
 import cc.fascinated.monitor.exception.impl.NotFoundException;
 import cc.fascinated.monitor.exception.impl.UnauthorizedException;
+import cc.fascinated.monitor.model.domain.server.ServerRole;
 import cc.fascinated.monitor.model.domain.server.ServerStatus;
-import cc.fascinated.monitor.model.domain.server.UserServerRole;
 import cc.fascinated.monitor.model.dto.request.server.ServerCreateRequest;
 import cc.fascinated.monitor.model.dto.request.server.ServerRenameRequest;
 import cc.fascinated.monitor.model.dto.request.server.ingest.IngestServerMetrics;
@@ -45,11 +45,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -119,13 +117,10 @@ public class ServerService {
             memUsageByServer = this.serverMetricService.fetchLatestMetric(HostSeries.MEM_USAGE, onlineServerIds);
             memMaxByServer = this.serverMetricService.fetchLatestMetric(HostSeries.MEM_TOTAL, onlineServerIds);
         }
-        Map<Long, UserServerRole> memberRolesByServerId =
-                this.serverAccessService.findMemberRolesByUserId(user.getId());
+        Map<Long, ServerRole> rolesByServerId = this.serverAccessService.findRolesByUserId(user.getId());
         return servers.stream()
                 .map(server -> {
-                    UserServerRole role = server.getOwnerId().equals(user.getId())
-                            ? UserServerRole.OWNER
-                            : memberRolesByServerId.get(server.getId());
+                    ServerRole role = rolesByServerId.get(server.getId());
                     if (server.getStatus() != ServerStatus.ONLINE) {
                         return ServerResponse.from(server, role, null, null, null);
                     }
@@ -142,9 +137,7 @@ public class ServerService {
 
     public ServerResponse getServer(UserRow user, long serverId) {
         ServerRow server = getAccessibleServer(user, serverId);
-        UserServerRole role = server.getOwnerId().equals(user.getId())
-                ? UserServerRole.OWNER
-                : this.serverAccessService.findMemberRolesByUserId(user.getId()).get(server.getId());
+        ServerRole role = this.serverAccessService.findRole(server.getId(), user.getId()).orElseThrow();
         if (server.getStatus() != ServerStatus.ONLINE) {
             return ServerResponse.from(server, role, null, null, null);
         }
@@ -161,9 +154,12 @@ public class ServerService {
         );
     }
 
+    @Transactional
     public CreatedServerResponse createServer(UserRow user, ServerCreateRequest createRequest) {
         try {
-            ServerRow serverRow = this.serverRepository.save(new ServerRow(createRequest.name(), user.getId(), Instant.now()));
+            Instant now = Instant.now();
+            ServerRow serverRow = this.serverRepository.save(new ServerRow(createRequest.name(), now));
+            this.serverAccessService.addOwner(serverRow.getId(), user.getId(), now);
             UUID ingestToken = issueIngestToken(serverRow.getId());
 
             return new CreatedServerResponse(
@@ -185,34 +181,29 @@ public class ServerService {
         throw new NotFoundException("Server \"%s\" not found".formatted(id));
     }
 
-    public ServerRow getOwnedServer(UserRow user, long serverId) {
+    public ServerRow getAccessibleServer(UserRow user, long serverId) {
         ServerRow server = findServerRowById(serverId);
-        requireServerOwner(user, server);
+        this.serverAccessService.requireAccessible(user, server);
         return server;
     }
 
-    public ServerRow getAccessibleServer(UserRow user, long serverId) {
-        ServerRow server = findServerRowById(serverId);
-        if (server.getOwnerId().equals(user.getId())) {
-            return server;
-        }
-        if (this.serverAccessService.isMember(serverId, user.getId())) {
-            return server;
-        }
-        throw new UnauthorizedException("You do not have access to this server");
+    public ServerRow requireOwnedServer(UserRow user, long serverId) {
+        ServerRow server = getAccessibleServer(user, serverId);
+        this.serverAccessService.requireOwner(user, server);
+        return server;
     }
 
     @Transactional
     public ServerResponse renameServer(UserRow user, long serverId, ServerRenameRequest request) {
-        ServerRow server = getOwnedServer(user, serverId);
+        ServerRow server = requireOwnedServer(user, serverId);
         server.setServerName(request.name());
         this.serverRepository.save(server);
-        return ServerResponse.from(server, UserServerRole.OWNER, null, null, null);
+        return ServerResponse.from(server, ServerRole.OWNER, null, null, null);
     }
 
     @Transactional
     public void deleteServer(UserRow user, long serverId) {
-        requireServerOwner(user, findServerRowById(serverId));
+        requireOwnedServer(user, serverId);
         this.victoriaMetricsWriteClient.deleteSeriesForServer(serverId);
         this.serverRepository.deleteById(serverId);
         log.info("Deleted server {} and its VictoriaMetrics series", serverId);
@@ -220,7 +211,7 @@ public class ServerService {
 
     @Transactional
     public IngestTokenResponse rotateIngestToken(UserRow user, long serverId) {
-        requireServerOwner(user, findServerRowById(serverId));
+        requireOwnedServer(user, serverId);
         this.serverIngestTokenRepository.deleteByServerId(serverId);
         UUID ingestToken = issueIngestToken(serverId);
         log.info("Rotated ingest token for server {}", serverId);
@@ -310,36 +301,17 @@ public class ServerService {
     }
 
     private List<ServerRow> listAccessibleServers(UserRow user) {
-        List<ServerRow> owned = this.serverRepository.findByOwnerId(user.getId());
-        List<Long> memberServerIds = this.serverAccessService.findMemberServerIds(user.getId());
-        if (memberServerIds.isEmpty()) {
-            owned.sort(SERVER_NAME_ORDER);
-            return owned;
+        List<Long> serverIds = this.serverAccessService.findAccessibleServerIds(user.getId());
+        if (serverIds.isEmpty()) {
+            return List.of();
         }
-
-        Set<Long> ownedIds = new LinkedHashSet<>();
-        for (ServerRow server : owned) {
-            ownedIds.add(server.getId());
-        }
-
-        List<ServerRow> combined = new ArrayList<>(owned);
-        for (ServerRow server : this.serverRepository.findAllById(memberServerIds)) {
-            if (!ownedIds.contains(server.getId())) {
-                combined.add(server);
-            }
-        }
-        combined.sort(SERVER_NAME_ORDER);
-        return combined;
+        List<ServerRow> servers = new ArrayList<>(this.serverRepository.findAllById(serverIds));
+        servers.sort(SERVER_NAME_ORDER);
+        return servers;
     }
 
     private static boolean startsWithLetter(String name) {
         return !name.isEmpty() && Character.isLetter(name.charAt(0));
-    }
-
-    private static void requireServerOwner(UserRow user, ServerRow server) {
-        if (!server.getOwnerId().equals(user.getId())) {
-            throw new UnauthorizedException("You do not own this server");
-        }
     }
 
     private UUID issueIngestToken(long serverId) {

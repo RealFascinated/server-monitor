@@ -1,6 +1,6 @@
 package cc.fascinated.monitor.model.persistance;
 
-import cc.fascinated.monitor.model.domain.server.ServerMemberRole;
+import cc.fascinated.monitor.model.domain.server.ServerRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -26,13 +26,13 @@ public class ServerMemberRow {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ServerMemberRole role;
+    private ServerRole role;
 
     @Column(name = "created_at", nullable = false)
     @Setter(AccessLevel.NONE)
     private Instant createdAt;
 
-    public ServerMemberRow(Long serverId, Long userId, ServerMemberRole role, Instant createdAt) {
+    public ServerMemberRow(Long serverId, Long userId, ServerRole role, Instant createdAt) {
         this.serverId = serverId;
         this.userId = userId;
         this.role = role;

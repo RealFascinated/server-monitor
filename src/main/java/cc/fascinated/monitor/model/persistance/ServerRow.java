@@ -23,9 +23,6 @@ public class ServerRow {
     @Column(name = "server_name", nullable = false)
     private String serverName;
 
-    @Column(name = "owner_id", nullable = false)
-    private Long ownerId;
-
     @OneToOne(mappedBy = "server", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private ServerInventoryRow inventory;
 
@@ -45,9 +42,8 @@ public class ServerRow {
     @Setter(AccessLevel.NONE)
     private Instant createdAt;
 
-    public ServerRow(String serverName, Long ownerId, Instant createdAt) {
+    public ServerRow(String serverName, Instant createdAt) {
         this.serverName = serverName;
-        this.ownerId = ownerId;
         this.createdAt = createdAt;
         this.status = ServerStatus.PENDING;
     }

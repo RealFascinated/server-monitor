@@ -1,6 +1,6 @@
 package cc.fascinated.monitor.model.dto.response.server.access;
 
-import cc.fascinated.monitor.model.domain.server.ServerMemberRole;
+import cc.fascinated.monitor.model.domain.server.ServerRole;
 import cc.fascinated.monitor.model.persistance.ServerInviteRow;
 import cc.fascinated.monitor.model.persistance.ServerRow;
 
@@ -10,7 +10,7 @@ public record UserPendingInviteResponse(
         long inviteId,
         long serverId,
         String serverName,
-        ServerMemberRole role,
+        ServerRole role,
         Instant expiresAt,
         Instant createdAt
 ) {

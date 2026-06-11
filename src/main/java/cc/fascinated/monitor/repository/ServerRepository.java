@@ -7,11 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
-import java.util.List;
 
 public interface ServerRepository extends JpaRepository<ServerRow, Long> {
-
-    List<ServerRow> findByOwnerId(long ownerId);
 
     @Modifying(clearAutomatically = true)
     @Query("""
