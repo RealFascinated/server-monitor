@@ -31,6 +31,11 @@ public class ServerController {
         this.serverAccessService = serverAccessService;
     }
 
+    @GetMapping(value = "/{serverId}")
+    public ServerResponse getServer(@AuthenticatedUser UserRow user, @PathVariable long serverId) {
+        return this.serverService.getServer(user, serverId);
+    }
+
     @PostMapping(value = "/create")
     public CreatedServerResponse createServer(@AuthenticatedUser UserRow user, @RequestBody ServerCreateRequest createRequest) {
         return this.serverService.createServer(user, createRequest);

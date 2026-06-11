@@ -140,6 +140,27 @@ public class ServerService {
                 .toList();
     }
 
+    public ServerResponse getServer(UserRow user, long serverId) {
+        ServerRow server = getAccessibleServer(user, serverId);
+        UserServerRole role = server.getOwnerId().equals(user.getId())
+                ? UserServerRole.OWNER
+                : this.serverAccessService.findMemberRolesByUserId(user.getId()).get(server.getId());
+        if (server.getStatus() != ServerStatus.ONLINE) {
+            return ServerResponse.from(server, role, null, null, null);
+        }
+        List<Long> serverIds = List.of(server.getId());
+        Map<Long, Double> cpuByServer = this.serverMetricService.fetchLatestMetric(HostSeries.CPU_USAGE, serverIds);
+        Map<Long, Double> memUsageByServer = this.serverMetricService.fetchLatestMetric(HostSeries.MEM_USAGE, serverIds);
+        Map<Long, Double> memMaxByServer = this.serverMetricService.fetchLatestMetric(HostSeries.MEM_TOTAL, serverIds);
+        return ServerResponse.from(
+                server,
+                role,
+                cpuByServer.get(server.getId()),
+                toLong(memUsageByServer.get(server.getId())),
+                toLong(memMaxByServer.get(server.getId()))
+        );
+    }
+
     public CreatedServerResponse createServer(UserRow user, ServerCreateRequest createRequest) {
         try {
             ServerRow serverRow = this.serverRepository.save(new ServerRow(createRequest.name(), user.getId(), Instant.now()));
