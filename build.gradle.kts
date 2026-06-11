@@ -48,9 +48,9 @@ dependencies {
     implementation("com.maxmind.geoip2:geoip2:5.0.2")
 
     // Metrics
-    implementation("io.prometheus:prometheus-metrics-core:1.6.1")
-    implementation("io.prometheus:prometheus-metrics-exposition-formats:1.6.1")
-    implementation("io.prometheus:prometheus-metrics-model:1.6.1")
+    implementation("io.prometheus:prometheus-metrics-core:1.8.0")
+    implementation("io.prometheus:prometheus-metrics-exposition-formats:1.8.0")
+    implementation("io.prometheus:prometheus-metrics-model:1.8.0")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
