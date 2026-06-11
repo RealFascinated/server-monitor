@@ -8,7 +8,6 @@ import cc.fascinated.monitor.metrics.vm.query.VmQueryResponse;
 import cc.fascinated.monitor.metrics.vm.query.VmTimeSeries;
 import cc.fascinated.monitor.metrics.vm.series.VmGaugeSeries;
 import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
-import cc.fascinated.monitor.model.domain.server.ServerStatus;
 import cc.fascinated.monitor.model.dto.response.server.metrics.ServerMetricsResponse;
 import cc.fascinated.monitor.model.persistance.ServerRow;
 import org.springframework.stereotype.Service;
@@ -31,9 +30,6 @@ public class ServerMetricService {
     }
 
     public ServerMetricsResponse getServerMetrics(ServerRow server, MetricTimeRange range) {
-        if (server.getStatus() != ServerStatus.ONLINE) {
-            return ServerMetricsResponse.empty(server.getId(), range.param());
-        }
         MetricTimeRange.QueryWindow window = range.queryWindow();
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             Map<ServerMetricGroups, CompletableFuture<List<VmTimeSeries>>> tasks = new EnumMap<>(ServerMetricGroups.class);
