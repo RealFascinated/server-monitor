@@ -1,6 +1,7 @@
 package cc.fascinated.monitor.metrics.vm;
 
 import cc.fascinated.monitor.exception.impl.InternalServerException;
+import cc.fascinated.monitor.metrics.platform.collector.PlatformMetricsRecorder;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
@@ -15,9 +16,12 @@ import java.time.Duration;
 public class VictoriaMetricsWriteClient {
     private final VictoriaMetricsProperties properties;
     private final HttpClient httpClient;
+    private final PlatformMetricsRecorder platformMetricsRecorder;
 
-    public VictoriaMetricsWriteClient(VictoriaMetricsProperties properties) {
+    public VictoriaMetricsWriteClient(VictoriaMetricsProperties properties,
+                                      PlatformMetricsRecorder platformMetricsRecorder) {
         this.properties = properties;
+        this.platformMetricsRecorder = platformMetricsRecorder;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(5))
                 .build();
@@ -27,6 +31,17 @@ public class VictoriaMetricsWriteClient {
         if (body.isEmpty()) {
             return;
         }
+        long startedNanos = System.nanoTime();
+        boolean success = false;
+        try {
+            flushInternal(body);
+            success = true;
+        } finally {
+            this.platformMetricsRecorder.recordVmWrite((System.nanoTime() - startedNanos) / 1_000_000_000.0, success);
+        }
+    }
+
+    private void flushInternal(String body) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(this.properties.getImportUrl()))
                 .header("Content-Type", "text/plain")

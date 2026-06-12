@@ -64,6 +64,14 @@ public class ServerWebSocketService {
         }
     }
 
+    public int getConnectionCount() {
+        int count = 0;
+        for (Set<WebSocketSession> sessions : this.sessionsByUserId.values()) {
+            count += sessions.size();
+        }
+        return count;
+    }
+
     public void notifyIngest(long serverId) {
         runAsync(() -> {
             for (long userId : memberUserIds(serverId)) {

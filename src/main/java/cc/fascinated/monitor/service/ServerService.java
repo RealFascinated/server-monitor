@@ -18,23 +18,21 @@ import cc.fascinated.monitor.model.persistance.ServerInventoryRow;
 import cc.fascinated.monitor.model.persistance.ServerRow;
 import cc.fascinated.monitor.model.persistance.UserRow;
 import cc.fascinated.monitor.model.persistance.metric.IngestTokenRow;
-import cc.fascinated.monitor.metrics.counter.IngestAuthFailuresCounterMetric;
-import cc.fascinated.monitor.metrics.counter.TotalIngestsCounterMetric;
-import cc.fascinated.monitor.metrics.histogram.IngestDurationHistogramMetric;
+import cc.fascinated.monitor.metrics.platform.collector.PlatformMetricsRecorder;
 import cc.fascinated.monitor.metrics.vm.MetricWriteContext;
 import cc.fascinated.monitor.metrics.vm.VictoriaMetricsWriteClient;
-import cc.fascinated.monitor.metrics.vm.series.VmGaugeSeries;
-import cc.fascinated.monitor.metrics.vm.series.impl.CpuCoreSeries;
-import cc.fascinated.monitor.metrics.vm.series.impl.DiskSeries;
-import cc.fascinated.monitor.metrics.vm.series.impl.DockerSeries;
-import cc.fascinated.monitor.metrics.vm.series.impl.GpuSeries;
-import cc.fascinated.monitor.metrics.vm.series.impl.HostSeries;
-import cc.fascinated.monitor.metrics.vm.series.impl.ServerStatusSeries;
-import cc.fascinated.monitor.metrics.vm.series.impl.TemperatureSeries;
-import cc.fascinated.monitor.metrics.vm.series.impl.NetworkSeries;
-import cc.fascinated.monitor.metrics.vm.series.impl.ZfsArcSeries;
-import cc.fascinated.monitor.metrics.vm.series.impl.TcpConnectionSeries;
-import cc.fascinated.monitor.metrics.vm.series.impl.ZfsPoolSeries;
+import cc.fascinated.monitor.metrics.server.series.VmGaugeSeries;
+import cc.fascinated.monitor.metrics.server.series.CpuCoreSeries;
+import cc.fascinated.monitor.metrics.server.series.DiskSeries;
+import cc.fascinated.monitor.metrics.server.series.DockerSeries;
+import cc.fascinated.monitor.metrics.server.series.GpuSeries;
+import cc.fascinated.monitor.metrics.server.series.HostSeries;
+import cc.fascinated.monitor.metrics.server.series.ServerStatusSeries;
+import cc.fascinated.monitor.metrics.server.series.TemperatureSeries;
+import cc.fascinated.monitor.metrics.server.series.NetworkSeries;
+import cc.fascinated.monitor.metrics.server.series.ZfsArcSeries;
+import cc.fascinated.monitor.metrics.server.series.TcpConnectionSeries;
+import cc.fascinated.monitor.metrics.server.series.ZfsPoolSeries;
 import cc.fascinated.monitor.repository.ServerIngestTokenRepository;
 import cc.fascinated.monitor.repository.ServerMemberRepository;
 import cc.fascinated.monitor.repository.ServerRepository;
@@ -62,9 +60,7 @@ public class ServerService {
     private final ServerRepository serverRepository;
     private final ServerMemberRepository serverMemberRepository;
     private final ServerIngestTokenRepository serverIngestTokenRepository;
-    private final TotalIngestsCounterMetric totalIngestsCounterMetric;
-    private final IngestDurationHistogramMetric ingestDurationHistogramMetric;
-    private final IngestAuthFailuresCounterMetric ingestAuthFailuresCounterMetric;
+    private final PlatformMetricsRecorder platformMetricsRecorder;
     private final VictoriaMetricsWriteClient victoriaMetricsWriteClient;
     private final ServerMetricService serverMetricService;
     private final ServerAccessService serverAccessService;
@@ -74,9 +70,7 @@ public class ServerService {
 
     public ServerService(ServerRepository serverRepository, ServerMemberRepository serverMemberRepository,
                          ServerIngestTokenRepository serverIngestTokenRepository,
-                         TotalIngestsCounterMetric totalIngestsCounterMetric,
-                         IngestDurationHistogramMetric ingestDurationHistogramMetric,
-                         IngestAuthFailuresCounterMetric ingestAuthFailuresCounterMetric,
+                         PlatformMetricsRecorder platformMetricsRecorder,
                          VictoriaMetricsWriteClient victoriaMetricsWriteClient,
                          ServerMetricService serverMetricService,
                          ServerAccessService serverAccessService,
@@ -86,9 +80,7 @@ public class ServerService {
         this.serverRepository = serverRepository;
         this.serverMemberRepository = serverMemberRepository;
         this.serverIngestTokenRepository = serverIngestTokenRepository;
-        this.totalIngestsCounterMetric = totalIngestsCounterMetric;
-        this.ingestDurationHistogramMetric = ingestDurationHistogramMetric;
-        this.ingestAuthFailuresCounterMetric = ingestAuthFailuresCounterMetric;
+        this.platformMetricsRecorder = platformMetricsRecorder;
         this.victoriaMetricsWriteClient = victoriaMetricsWriteClient;
         this.serverMetricService = serverMetricService;
         this.serverAccessService = serverAccessService;
@@ -214,7 +206,7 @@ public class ServerService {
                     .orElseThrow(() -> new UnauthorizedException("Invalid ingest token"));
             return findServerRowById(tokenRow.getServerId());
         } catch (UnauthorizedException ex) {
-            this.ingestAuthFailuresCounterMetric.recordFailure();
+            this.platformMetricsRecorder.recordIngestAuthFailure();
             throw ex;
         }
     }
@@ -231,57 +223,50 @@ public class ServerService {
     }
 
     @Transactional
-    public void ingestMetrics(ServerRow server, IngestServerMetrics metrics) {
+    public void ingestMetrics(ServerRow server, IngestServerMetrics metrics, long payloadBytes) {
         long startedNanos = System.nanoTime();
-        boolean success = false;
-        try {
-            Instant now = Instant.now();
 
-            // todo: verify agent version
-            server.setAgentVersion(metrics.agentVersion());
+        Instant now = Instant.now();
 
-            ServerDetails serverDetails = metrics.serverDetails();
-            ServerInventoryRow inventory = getOrCreateInventory(server);
-            inventory.setIp(serverDetails.ip());
-            inventory.setCoreCount(serverDetails.coreCount());
-            inventory.setThreadCount(serverDetails.threadCount());
-            inventory.setOsName(serverDetails.osName());
-            inventory.setOsVersion(serverDetails.osVersion());
-            inventory.setCpuModel(serverDetails.cpuModel());
-            inventory.setSocketCount(serverDetails.socketCount());
-            server.setLastUptimeSeconds(serverDetails.uptimeSeconds());
-            server.setLastUpdated(now);
-            server.setLastHeartbeat(now);
-            server.setStatus(ServerStatus.ONLINE);
+        // todo: verify agent version
+        server.setAgentVersion(metrics.agentVersion());
 
-            StringBuilder buffer = new StringBuilder();
-            MetricWriteContext ctx = new MetricWriteContext(buffer, server.getId(), now.getEpochSecond());
-            ServerMetrics serverMetrics = metrics.serverMetrics();
-            HostSeries.write(ctx, serverMetrics, metrics.serverDetails());
-            Utils.forEach(serverMetrics.cpuCoreMetrics(), core -> CpuCoreSeries.write(ctx, core));
-            Utils.forEach(serverMetrics.temperatureMetrics(), reading -> TemperatureSeries.write(ctx, reading));
-            Utils.forEach(metrics.interfaceMetrics(), iface -> NetworkSeries.write(ctx, iface));
-            Utils.forEach(metrics.diskMetrics(), disk -> DiskSeries.write(ctx, disk));
-            Utils.forEach(metrics.gpuMetrics(), gpu -> GpuSeries.write(ctx, gpu));
-            if (metrics.zfsArcMetrics() != null) {
-                ZfsArcSeries.write(ctx, metrics.zfsArcMetrics());
-            }
-            Utils.forEach(metrics.zfsPoolMetrics(), pool -> ZfsPoolSeries.write(ctx, pool));
-            Utils.forEach(metrics.dockerContainers(), container -> DockerSeries.write(ctx, container));
-            Utils.forEach(metrics.tcpConnectionMetrics(), tcp -> TcpConnectionSeries.write(ctx, tcp));
-            ServerStatusSeries.writeOnline(ctx);
-            this.victoriaMetricsWriteClient.flush(buffer.toString());
+        ServerDetails serverDetails = metrics.serverDetails();
+        ServerInventoryRow inventory = getOrCreateInventory(server);
+        inventory.setIp(serverDetails.ip());
+        inventory.setCoreCount(serverDetails.coreCount());
+        inventory.setThreadCount(serverDetails.threadCount());
+        inventory.setOsName(serverDetails.osName());
+        inventory.setOsVersion(serverDetails.osVersion());
+        inventory.setCpuModel(serverDetails.cpuModel());
+        inventory.setSocketCount(serverDetails.socketCount());
+        server.setLastUptimeSeconds(serverDetails.uptimeSeconds());
+        server.setLastUpdated(now);
+        server.setLastHeartbeat(now);
+        server.setStatus(ServerStatus.ONLINE);
 
-            this.serverRepository.save(server);
-            this.serverWebSocketService.notifyIngest(server.getId());
-
-            this.totalIngestsCounterMetric.recordIngest();
-            success = true;
-        } finally {
-            if (success) {
-                this.ingestDurationHistogramMetric.observeSeconds((System.nanoTime() - startedNanos) / 1_000_000_000.0);
-            }
+        StringBuilder buffer = new StringBuilder();
+        MetricWriteContext ctx = new MetricWriteContext(buffer, server.getId(), now.getEpochSecond());
+        ServerMetrics serverMetrics = metrics.serverMetrics();
+        HostSeries.write(ctx, serverMetrics, metrics.serverDetails());
+        Utils.forEach(serverMetrics.cpuCoreMetrics(), core -> CpuCoreSeries.write(ctx, core));
+        Utils.forEach(serverMetrics.temperatureMetrics(), reading -> TemperatureSeries.write(ctx, reading));
+        Utils.forEach(metrics.interfaceMetrics(), iface -> NetworkSeries.write(ctx, iface));
+        Utils.forEach(metrics.diskMetrics(), disk -> DiskSeries.write(ctx, disk));
+        Utils.forEach(metrics.gpuMetrics(), gpu -> GpuSeries.write(ctx, gpu));
+        if (metrics.zfsArcMetrics() != null) {
+            ZfsArcSeries.write(ctx, metrics.zfsArcMetrics());
         }
+        Utils.forEach(metrics.zfsPoolMetrics(), pool -> ZfsPoolSeries.write(ctx, pool));
+        Utils.forEach(metrics.dockerContainers(), container -> DockerSeries.write(ctx, container));
+        Utils.forEach(metrics.tcpConnectionMetrics(), tcp -> TcpConnectionSeries.write(ctx, tcp));
+        ServerStatusSeries.writeOnline(ctx);
+        this.victoriaMetricsWriteClient.flush(buffer.toString());
+
+        this.serverRepository.save(server);
+        this.serverWebSocketService.notifyIngest(server.getId());
+
+        this.platformMetricsRecorder.recordIngest((System.nanoTime() - startedNanos) / 1_000_000_000.0, payloadBytes);
     }
 
     private void writeServerStatusOffline(List<Long> serverIds) {

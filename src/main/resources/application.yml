@@ -52,9 +52,8 @@ monitor:
     connectivity-probe-url: https://connectivitycheck.gstatic.com/generate_204
     connectivity-timeout: 5s
   metrics:
-    bearer-token: "" # empty = no auth on /metrics
+    enabled: true
     refresh-interval: 30s
-    reporting-threshold: 5m
 
 logging:
   pattern:

@@ -10,22 +10,10 @@ import java.time.Duration;
 @Setter
 @ConfigurationProperties(prefix = "monitor.metrics")
 public class MonitorMetricsProperties {
-    private String bearerToken = "";
+    private boolean enabled = true;
     private Duration refreshInterval = Duration.ofSeconds(30);
-    private Duration reportingThreshold = Duration.ofMinutes(5);
 
     public long getRefreshIntervalMs() {
         return this.refreshInterval.toMillis();
-    }
-
-    public String getReportingWindowLabel() {
-        long seconds = this.reportingThreshold.getSeconds();
-        if (seconds % 3600 == 0) {
-            return (seconds / 3600) + "h";
-        }
-        if (seconds % 60 == 0) {
-            return (seconds / 60) + "m";
-        }
-        return seconds + "s";
     }
 }

@@ -15,6 +15,7 @@ import cc.fascinated.monitor.service.ServerAccessService;
 import cc.fascinated.monitor.service.ServerService;
 import cc.fascinated.monitor.web.auth.AuthenticatedServer;
 import cc.fascinated.monitor.web.auth.AuthenticatedUser;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -101,7 +102,12 @@ public class ServerController {
     }
 
     @PostMapping(value = "/ingest")
-    public void ingestMetrics(@AuthenticatedServer ServerRow server, @RequestBody IngestServerMetrics metrics) {
-        this.serverService.ingestMetrics(server, metrics);
+    public void ingestMetrics(@AuthenticatedServer ServerRow server, @RequestBody IngestServerMetrics metrics,
+                              HttpServletRequest request) {
+        long payloadBytes = request.getContentLengthLong();
+        if (payloadBytes < 0) {
+            payloadBytes = 0;
+        }
+        this.serverService.ingestMetrics(server, metrics, payloadBytes);
     }
 }

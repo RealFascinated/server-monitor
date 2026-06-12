@@ -9,5 +9,7 @@ import java.util.Optional;
 public interface UserSessionRepository extends JpaRepository<UserSessionRow, Long> {
     Optional<UserSessionRow> findByTokenHashAndExpiresAtAfter(String tokenHash, Instant now);
 
+    long countByExpiresAtAfter(Instant now);
+
     void deleteByTokenHash(String tokenHash);
 }

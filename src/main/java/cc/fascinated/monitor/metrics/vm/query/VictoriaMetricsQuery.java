@@ -1,6 +1,6 @@
 package cc.fascinated.monitor.metrics.vm.query;
 
-import cc.fascinated.monitor.metrics.vm.series.VmGaugeSeries;
+import cc.fascinated.monitor.metrics.server.series.VmGaugeSeries;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 

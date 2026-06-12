@@ -1,12 +1,12 @@
 package cc.fascinated.monitor.metrics.vm;
 
-import cc.fascinated.monitor.metrics.vm.catalog.ComputedMetric;
-import cc.fascinated.monitor.metrics.vm.catalog.VmMetricCatalog;
+import cc.fascinated.monitor.metrics.server.catalog.ComputedMetric;
+import cc.fascinated.monitor.metrics.server.catalog.VmMetricCatalog;
 import cc.fascinated.monitor.metrics.vm.query.VictoriaMetricsQuery;
 import cc.fascinated.monitor.metrics.vm.query.VictoriaMetricsQueryClient;
 import cc.fascinated.monitor.metrics.vm.query.VmQueryResponse;
 import cc.fascinated.monitor.metrics.vm.query.VmTimeSeries;
-import cc.fascinated.monitor.metrics.vm.series.VmGaugeSeries;
+import cc.fascinated.monitor.metrics.server.series.VmGaugeSeries;
 import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
 import cc.fascinated.monitor.model.dto.response.server.metrics.ServerMetricsResponse;
 import org.springframework.stereotype.Component;

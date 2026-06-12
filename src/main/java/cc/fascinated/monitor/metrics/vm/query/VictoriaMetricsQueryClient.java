@@ -1,6 +1,7 @@
 package cc.fascinated.monitor.metrics.vm.query;
 
 import cc.fascinated.monitor.exception.impl.InternalServerException;
+import cc.fascinated.monitor.metrics.platform.collector.PlatformMetricsRecorder;
 import cc.fascinated.monitor.metrics.vm.VictoriaMetricsProperties;
 import cc.fascinated.monitor.util.Constants;
 import org.springframework.stereotype.Component;
@@ -18,15 +19,30 @@ public class VictoriaMetricsQueryClient {
 
     private final VictoriaMetricsProperties properties;
     private final HttpClient httpClient;
+    private final PlatformMetricsRecorder platformMetricsRecorder;
 
-    public VictoriaMetricsQueryClient(VictoriaMetricsProperties properties) {
+    public VictoriaMetricsQueryClient(VictoriaMetricsProperties properties,
+                                      PlatformMetricsRecorder platformMetricsRecorder) {
         this.properties = properties;
+        this.platformMetricsRecorder = platformMetricsRecorder;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(5))
                 .build();
     }
 
     public VmQueryResponse execute(VictoriaMetricsQuery query) {
+        long startedNanos = System.nanoTime();
+        boolean success = false;
+        try {
+            VmQueryResponse response = executeInternal(query);
+            success = true;
+            return response;
+        } finally {
+            this.platformMetricsRecorder.recordVmQuery((System.nanoTime() - startedNanos) / 1_000_000_000.0, success);
+        }
+    }
+
+    private VmQueryResponse executeInternal(VictoriaMetricsQuery query) {
         URI uri = query.isRange() ? buildRangeUri(query) : buildInstantUri(query);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)

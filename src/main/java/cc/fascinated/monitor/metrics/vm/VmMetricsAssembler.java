@@ -1,14 +1,14 @@
 package cc.fascinated.monitor.metrics.vm;
 
-import cc.fascinated.monitor.metrics.vm.catalog.ComputedMetric;
-import cc.fascinated.monitor.metrics.vm.catalog.MetricFamily;
-import cc.fascinated.monitor.metrics.vm.catalog.VmMetricCatalog;
+import cc.fascinated.monitor.metrics.server.catalog.ComputedMetric;
+import cc.fascinated.monitor.metrics.server.catalog.MetricFamily;
+import cc.fascinated.monitor.metrics.server.catalog.VmMetricCatalog;
+import cc.fascinated.monitor.metrics.vm.assembler.TimeSeriesAssembly;
 import cc.fascinated.monitor.metrics.vm.query.VmTimeSeries;
 import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
 import cc.fascinated.monitor.model.dto.response.server.metrics.LabeledSeries;
 import cc.fascinated.monitor.model.dto.response.server.metrics.ServerMetricsResponse;
 
-import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -50,8 +50,8 @@ public final class VmMetricsAssembler {
         Map<String, Object> sections = new LinkedHashMap<>();
         for (MetricSection section : MetricSection.values()) {
             Object data = section.scalar()
-                    ? pruneScalar(scalars.get(section))
-                    : pruneLabeled(labeled.get(section));
+                    ? TimeSeriesAssembly.pruneScalar(scalars.get(section))
+                    : TimeSeriesAssembly.pruneLabeled(labeled.get(section));
             if (data != null) {
                 sections.put(section.jsonKey(), data);
             }
@@ -84,71 +84,15 @@ public final class VmMetricsAssembler {
                 return;
             }
         }
-        String[] groupingLabels = family.groupingLabels();
-        String[] identityLabels = family.identityLabels();
         Map<String, LabeledSeries> entities = labeled.computeIfAbsent(family.section(), ignored -> new LinkedHashMap<>());
-        String key = identityKey(entry.labels(), groupingLabels);
-        LabeledSeries entity = entities.computeIfAbsent(key, ignored -> LabeledSeries.create(entry.labels(), identityLabels));
-        entity.refreshLabels(entry.labels(), identityLabels);
-        entity.putSeries(name, grid.align(entry));
-    }
-
-    private static String identityKey(Map<String, String> labels, String[] identityLabels) {
-        if (identityLabels.length == 0) {
-            return "";
-        }
-        StringBuilder builder = new StringBuilder();
-        for (String label : identityLabels) {
-            builder.append(label).append('=').append(labels.getOrDefault(label, "")).append('|');
-        }
-        return builder.toString();
-    }
-
-    private static Map<String, List<Double>> pruneScalar(Map<String, List<Double>> fields) {
-        if (fields == null || fields.isEmpty()) {
-            return null;
-        }
-        Map<String, List<Double>> pruned = new LinkedHashMap<>();
-        for (Map.Entry<String, List<Double>> entry : fields.entrySet()) {
-            if (hasData(entry.getValue())) {
-                pruned.put(entry.getKey(), entry.getValue());
-            }
-        }
-        return pruned.isEmpty() ? null : pruned;
-    }
-
-    private static List<LabeledSeries> pruneLabeled(Map<String, LabeledSeries> entities) {
-        if (entities == null || entities.isEmpty()) {
-            return null;
-        }
-        List<LabeledSeries> pruned = new ArrayList<>();
-        for (LabeledSeries entity : entities.values()) {
-            if (hasSeriesData(entity)) {
-                pruned.add(entity);
-            }
-        }
-        return pruned.isEmpty() ? null : pruned;
-    }
-
-    private static boolean hasData(List<Double> values) {
-        for (Double value : values) {
-            if (value != null) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean hasSeriesData(LabeledSeries item) {
-        for (Object value : item.fields().values()) {
-            if (value instanceof List<?> list) {
-                for (Object element : list) {
-                    if (element != null) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+        TimeSeriesAssembly.ingestLabeled(
+                grid,
+                entities,
+                entry,
+                name,
+                family.groupingLabels(),
+                family.identityLabels(),
+                true
+        );
     }
 }
