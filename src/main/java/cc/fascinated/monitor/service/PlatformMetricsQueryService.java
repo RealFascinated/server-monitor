@@ -46,9 +46,9 @@ public class PlatformMetricsQueryService {
         Map<String, Object> row = this.jdbcTemplate.queryForMap("""
                 SELECT
                     COUNT(*)::bigint AS total,
-                    COUNT(*) FILTER (WHERE last_updated > NOW() - (? || ' seconds')::interval)::bigint AS reporting,
-                    COUNT(*) FILTER (WHERE last_updated IS NOT NULL AND last_updated <= NOW() - (? || ' seconds')::interval)::bigint AS stale,
-                    COUNT(*) FILTER (WHERE last_updated IS NULL)::bigint AS never_reported
+                    COUNT(*) FILTER (WHERE last_heartbeat > NOW() - (? || ' seconds')::interval)::bigint AS reporting,
+                    COUNT(*) FILTER (WHERE last_heartbeat IS NOT NULL AND last_heartbeat <= NOW() - (? || ' seconds')::interval)::bigint AS stale,
+                    COUNT(*) FILTER (WHERE last_heartbeat IS NULL)::bigint AS never_reported
                 FROM servers
                 """, thresholdSeconds, thresholdSeconds);
         return new FleetCounts(

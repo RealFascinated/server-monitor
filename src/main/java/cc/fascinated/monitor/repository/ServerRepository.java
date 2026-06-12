@@ -14,8 +14,8 @@ public interface ServerRepository extends JpaRepository<ServerRow, Long> {
     @Query("""
             SELECT s.id FROM ServerRow s
             WHERE (s.status IS NULL OR s.status = cc.fascinated.monitor.model.domain.server.ServerStatus.ONLINE)
-            AND s.lastUpdated IS NOT NULL
-            AND s.lastUpdated <= :cutoff
+            AND s.lastHeartbeat IS NOT NULL
+            AND s.lastHeartbeat <= :cutoff
             """)
     List<Long> findStaleServerIds(@Param("cutoff") Instant cutoff);
 
@@ -24,8 +24,8 @@ public interface ServerRepository extends JpaRepository<ServerRow, Long> {
             UPDATE ServerRow s
             SET s.status = cc.fascinated.monitor.model.domain.server.ServerStatus.OFFLINE
             WHERE (s.status IS NULL OR s.status = cc.fascinated.monitor.model.domain.server.ServerStatus.ONLINE)
-            AND s.lastUpdated IS NOT NULL
-            AND s.lastUpdated <= :cutoff
+            AND s.lastHeartbeat IS NOT NULL
+            AND s.lastHeartbeat <= :cutoff
             """)
     int markStaleServersOffline(@Param("cutoff") Instant cutoff);
 }

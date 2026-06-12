@@ -213,6 +213,17 @@ public class ServerService {
     }
 
     @Transactional
+    public void recordHeartbeat(ServerRow server) {
+        Instant now = Instant.now();
+        server.setLastHeartbeat(now);
+        if (server.getStatus() != ServerStatus.ONLINE) {
+            server.setStatus(ServerStatus.ONLINE);
+        }
+        this.serverRepository.save(server);
+        this.serverWebSocketService.notifyServerUpdated(server.getId());
+    }
+
+    @Transactional
     public void ingestMetrics(ServerRow server, IngestServerMetrics metrics) {
         long startedNanos = System.nanoTime();
         boolean success = false;
@@ -233,6 +244,7 @@ public class ServerService {
             inventory.setSocketCount(serverDetails.socketCount());
             server.setLastUptimeSeconds(serverDetails.uptimeSeconds());
             server.setLastUpdated(now);
+            server.setLastHeartbeat(now);
             server.setStatus(ServerStatus.ONLINE);
 
             StringBuilder buffer = new StringBuilder();

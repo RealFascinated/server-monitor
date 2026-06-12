@@ -95,6 +95,11 @@ public class ServerController {
         this.serverAccessService.revokeInvite(user, this.serverService.requireOwnedServer(user, serverId), inviteId);
     }
 
+    @PostMapping(value = "/heartbeat")
+    public void heartbeat(@AuthenticatedServer ServerRow server) {
+        this.serverService.recordHeartbeat(server);
+    }
+
     @PostMapping(value = "/ingest")
     public void ingestMetrics(@AuthenticatedServer ServerRow server, @RequestBody IngestServerMetrics metrics) {
         this.serverService.ingestMetrics(server, metrics);

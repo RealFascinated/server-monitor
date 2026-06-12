@@ -32,6 +32,9 @@ public class ServerRow {
     @Column(name = "last_updated")
     private Instant lastUpdated;
 
+    @Column(name = "last_heartbeat")
+    private Instant lastHeartbeat;
+
     @Column(name = "last_uptime_seconds")
     private Long lastUptimeSeconds;
 
