@@ -11,4 +11,6 @@ import java.time.Duration;
 @ConfigurationProperties(prefix = "monitor.servers")
 public class MonitorServerProperties {
     private Duration offlineThreshold = Duration.ofMinutes(2);
+    private String connectivityProbeUrl = "https://connectivitycheck.gstatic.com/generate_204";
+    private Duration connectivityTimeout = Duration.ofSeconds(5);
 }

@@ -70,6 +70,7 @@ public class ServerService {
     private final ServerAccessService serverAccessService;
     private final MonitorServerProperties serverProperties;
     private final ServerWebSocketService serverWebSocketService;
+    private final InternetConnectivityService internetConnectivityService;
 
     public ServerService(ServerRepository serverRepository, ServerMemberRepository serverMemberRepository,
                          ServerIngestTokenRepository serverIngestTokenRepository,
@@ -80,7 +81,8 @@ public class ServerService {
                          ServerMetricService serverMetricService,
                          ServerAccessService serverAccessService,
                          MonitorServerProperties serverProperties,
-                         @Lazy ServerWebSocketService serverWebSocketService) {
+                         @Lazy ServerWebSocketService serverWebSocketService,
+                         InternetConnectivityService internetConnectivityService) {
         this.serverRepository = serverRepository;
         this.serverMemberRepository = serverMemberRepository;
         this.serverIngestTokenRepository = serverIngestTokenRepository;
@@ -92,11 +94,16 @@ public class ServerService {
         this.serverAccessService = serverAccessService;
         this.serverProperties = serverProperties;
         this.serverWebSocketService = serverWebSocketService;
+        this.internetConnectivityService = internetConnectivityService;
     }
 
     @Scheduled(fixedDelayString = "#{@monitorMetricsProperties.refreshIntervalMs}")
     @Transactional
     public void markStaleServersOffline() {
+        if (!this.internetConnectivityService.isAvailable()) {
+            log.info("Skipping stale-server offline check — internet connectivity probe failed");
+            return;
+        }
         Instant cutoff = Instant.now().minus(this.serverProperties.getOfflineThreshold());
         List<Long> staleServerIds = this.serverRepository.findStaleServerIds(cutoff);
         if (staleServerIds.isEmpty()) {
