@@ -45,7 +45,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp-urlconnection:5.3.2")
 
     // GeoIP - IP Lookups
-    implementation("com.maxmind.geoip2:geoip2:5.0.2")
+    implementation("com.maxmind.geoip2:geoip2:5.1.0")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
