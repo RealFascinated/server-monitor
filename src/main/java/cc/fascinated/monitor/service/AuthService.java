@@ -1,6 +1,7 @@
 package cc.fascinated.monitor.service;
 
 import cc.fascinated.monitor.exception.impl.ConflictException;
+import cc.fascinated.monitor.exception.impl.ForbiddenException;
 import cc.fascinated.monitor.exception.impl.UnauthorizedException;
 import cc.fascinated.monitor.model.domain.user.UserRole;
 import cc.fascinated.monitor.model.dto.request.auth.LoginRequest;
@@ -39,6 +40,10 @@ public class AuthService {
 
     @Transactional
     public AuthTokenResponse register(RegisterRequest request) {
+        if (!SettingsService.Settings.REGISTRATION_ENABLED.asBoolean() && this.userRepository.count() > 0) {
+            throw new ForbiddenException("Registration is disabled");
+        }
+
         String email = UserUtils.normalizeEmail(request.email());
         if (this.userRepository.existsByEmailIgnoreCase(email)) {
             throw new ConflictException("An account with this email already exists");
