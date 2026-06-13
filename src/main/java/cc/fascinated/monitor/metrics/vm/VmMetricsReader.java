@@ -8,7 +8,7 @@ import cc.fascinated.monitor.metrics.vm.query.VmQueryResponse;
 import cc.fascinated.monitor.metrics.vm.query.VmTimeSeries;
 import cc.fascinated.monitor.metrics.server.series.VmGaugeSeries;
 import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
-import cc.fascinated.monitor.model.dto.response.server.metrics.ServerMetricsResponse;
+import cc.fascinated.monitor.model.dto.response.metrics.ServerMetricsResponse;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;

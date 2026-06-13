@@ -1,4 +1,4 @@
-package cc.fascinated.monitor.model.dto.response.server.metrics;
+package cc.fascinated.monitor.model.dto.response.metrics;
 
 import cc.fascinated.monitor.metrics.vm.query.Promql;
 import com.fasterxml.jackson.annotation.JsonValue;

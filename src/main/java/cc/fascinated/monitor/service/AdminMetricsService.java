@@ -7,7 +7,7 @@ import cc.fascinated.monitor.metrics.vm.query.VictoriaMetricsQueryClient;
 import cc.fascinated.monitor.metrics.vm.query.VmQueryResponse;
 import cc.fascinated.monitor.metrics.vm.query.VmTimeSeries;
 import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
-import cc.fascinated.monitor.model.dto.response.admin.PlatformMetricsResponse;
+import cc.fascinated.monitor.model.dto.response.metrics.MetricsResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public class AdminMetricsService {
         this.victoriaMetricsQueryClient = victoriaMetricsQueryClient;
     }
 
-    public PlatformMetricsResponse getMetrics(MetricTimeRange range) {
+    public MetricsResponse getMetrics(MetricTimeRange range) {
         MetricTimeRange.QueryWindow window = range.queryWindow();
         Map<PlatformMetricFamily, List<VmTimeSeries>> seriesByFamily = new EnumMap<>(PlatformMetricFamily.class);
         for (PlatformMetricFamily family : PlatformMetricFamily.values()) {
@@ -38,7 +38,8 @@ public class AdminMetricsService {
         }
         Map<String, Object> sections = PlatformMetricsAssembler.assembleSections(range, window, seriesByFamily);
         List<Long> timestamps = sections.isEmpty() ? null : MetricTimeGrid.from(window).timestamps();
-        return new PlatformMetricsResponse(range.param(), timestamps, sections);
+        Long step = sections.isEmpty() ? null : range.step().getSeconds();
+        return new MetricsResponse(range.param(), step, timestamps, sections);
     }
 
     private List<VmTimeSeries> fetchRange(String promql, MetricTimeRange range, MetricTimeRange.QueryWindow window) {

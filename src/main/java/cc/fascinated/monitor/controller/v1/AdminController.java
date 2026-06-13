@@ -1,7 +1,7 @@
 package cc.fascinated.monitor.controller.v1;
 
 import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
-import cc.fascinated.monitor.model.dto.response.admin.PlatformMetricsResponse;
+import cc.fascinated.monitor.model.dto.response.metrics.MetricsResponse;
 import cc.fascinated.monitor.model.persistance.UserRow;
 import cc.fascinated.monitor.service.AdminMetricsService;
 import cc.fascinated.monitor.web.auth.AuthenticatedAdmin;
@@ -20,7 +20,7 @@ public class AdminController {
     }
 
     @GetMapping
-    public PlatformMetricsResponse getMetrics(
+    public MetricsResponse getMetrics(
             @AuthenticatedAdmin UserRow admin,
             @RequestParam(defaultValue = "1h") String range
     ) {

@@ -7,7 +7,7 @@ import cc.fascinated.monitor.metrics.vm.MetricTimeGrid;
 import cc.fascinated.monitor.metrics.vm.query.Promql;
 import cc.fascinated.monitor.metrics.vm.query.VmTimeSeries;
 import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
-import cc.fascinated.monitor.model.dto.response.server.metrics.LabeledSeries;
+import cc.fascinated.monitor.model.dto.response.metrics.LabeledSeries;
 import lombok.experimental.UtilityClass;
 
 import java.util.LinkedHashMap;

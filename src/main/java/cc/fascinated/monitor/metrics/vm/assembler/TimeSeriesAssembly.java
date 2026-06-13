@@ -2,7 +2,7 @@ package cc.fascinated.monitor.metrics.vm.assembler;
 
 import cc.fascinated.monitor.metrics.vm.MetricTimeGrid;
 import cc.fascinated.monitor.metrics.vm.query.VmTimeSeries;
-import cc.fascinated.monitor.model.dto.response.server.metrics.LabeledSeries;
+import cc.fascinated.monitor.model.dto.response.metrics.LabeledSeries;
 import lombok.experimental.UtilityClass;
 
 import java.util.ArrayList;

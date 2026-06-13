@@ -1,4 +1,4 @@
-package cc.fascinated.monitor.model.dto.response.server.metrics;
+package cc.fascinated.monitor.model.dto.response.metrics;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record ServerMetricsResponse(
-        long id,
+public record MetricsResponse(
         String range,
         Long step,
         List<Long> timestamps,
@@ -20,7 +19,7 @@ public record ServerMetricsResponse(
         return this.sectionData;
     }
 
-    public static ServerMetricsResponse empty(long id, String range) {
-        return new ServerMetricsResponse(id, range, null, null, Map.of());
+    public static MetricsResponse empty(String range) {
+        return new MetricsResponse(range, null, null, Map.of());
     }
 }

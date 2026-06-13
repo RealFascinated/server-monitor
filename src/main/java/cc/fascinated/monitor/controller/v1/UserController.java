@@ -5,7 +5,7 @@ import cc.fascinated.monitor.model.dto.request.server.ServerInviteAcceptRequest;
 import cc.fascinated.monitor.model.dto.response.server.ServerResponse;
 import cc.fascinated.monitor.model.dto.response.server.access.ServerMemberResponse;
 import cc.fascinated.monitor.model.dto.response.server.access.UserPendingInviteResponse;
-import cc.fascinated.monitor.model.dto.response.server.metrics.ServerMetricsResponse;
+import cc.fascinated.monitor.model.dto.response.metrics.ServerMetricsResponse;
 import cc.fascinated.monitor.model.persistance.UserRow;
 import cc.fascinated.monitor.service.ServerAccessService;
 import cc.fascinated.monitor.service.ServerMetricService;

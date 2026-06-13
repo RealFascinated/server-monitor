@@ -3,7 +3,7 @@ package cc.fascinated.monitor.service;
 import cc.fascinated.monitor.metrics.vm.VmMetricsReader;
 import cc.fascinated.monitor.metrics.server.series.VmGaugeSeries;
 import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
-import cc.fascinated.monitor.model.dto.response.server.metrics.ServerMetricsResponse;
+import cc.fascinated.monitor.model.dto.response.metrics.ServerMetricsResponse;
 import cc.fascinated.monitor.model.persistance.ServerRow;
 import org.springframework.stereotype.Service;
 

@@ -6,8 +6,9 @@ import cc.fascinated.monitor.metrics.server.catalog.VmMetricCatalog;
 import cc.fascinated.monitor.metrics.vm.assembler.TimeSeriesAssembly;
 import cc.fascinated.monitor.metrics.vm.query.VmTimeSeries;
 import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
-import cc.fascinated.monitor.model.dto.response.server.metrics.LabeledSeries;
-import cc.fascinated.monitor.model.dto.response.server.metrics.ServerMetricsResponse;
+import cc.fascinated.monitor.model.dto.response.metrics.LabeledSeries;
+import cc.fascinated.monitor.model.dto.response.metrics.MetricsResponse;
+import cc.fascinated.monitor.model.dto.response.metrics.ServerMetricsResponse;
 
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
@@ -59,7 +60,7 @@ public final class VmMetricsAssembler {
 
         List<Long> timestamps = sections.isEmpty() ? null : grid.timestamps();
         Long step = sections.isEmpty() ? null : range.step().getSeconds();
-        return new ServerMetricsResponse(id, range.param(), step, timestamps, Map.copyOf(sections));
+        return new ServerMetricsResponse(id, new MetricsResponse(range.param(), step, timestamps, Map.copyOf(sections)));
     }
 
     private static void ingestScalar(MetricTimeGrid grid, Map<MetricSection, Map<String, List<Double>>> scalars,
