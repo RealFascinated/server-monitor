@@ -23,8 +23,12 @@ public class ServerFolderRow {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    public ServerFolderRow(String name, long userId) {
+    @Column(nullable = false)
+    private int position;
+
+    public ServerFolderRow(String name, long userId, int position) {
         this.name = name;
         this.userId = userId;
+        this.position = position;
     }
 }

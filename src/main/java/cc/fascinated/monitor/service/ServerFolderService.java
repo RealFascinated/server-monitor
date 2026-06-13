@@ -1,7 +1,9 @@
 package cc.fascinated.monitor.service;
 
+import cc.fascinated.monitor.exception.impl.BadRequestException;
 import cc.fascinated.monitor.exception.impl.ConflictException;
 import cc.fascinated.monitor.exception.impl.NotFoundException;
+import cc.fascinated.monitor.model.dto.request.server.ReorderServerFoldersRequest;
 import cc.fascinated.monitor.model.dto.request.server.ServerRenameRequest;
 import cc.fascinated.monitor.model.dto.request.server.UpdateServerFolderRequest;
 import cc.fascinated.monitor.model.dto.response.server.ServerFolderResponse;
@@ -15,8 +17,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class ServerFolderService {
@@ -30,7 +35,7 @@ public class ServerFolderService {
     }
 
     public List<ServerFolderResponse> listFolders(UserRow user) {
-        return this.serverFolderRepository.findByUserIdOrderByNameAsc(user.getId()).stream()
+        return this.serverFolderRepository.findByUserIdOrderByPositionAsc(user.getId()).stream()
                 .map(ServerFolderResponse::from)
                 .toList();
     }
@@ -40,9 +45,31 @@ public class ServerFolderService {
         if (this.serverFolderRepository.findByUserIdAndNameIgnoreCase(user.getId(), request.name()).isPresent()) {
             throw new ConflictException("A folder named \"%s\" already exists".formatted(request.name()));
         }
+        int position = (int) this.serverFolderRepository.countByUserId(user.getId());
         return ServerFolderResponse.from(
-                this.serverFolderRepository.save(new ServerFolderRow(request.name(), user.getId()))
+                this.serverFolderRepository.save(new ServerFolderRow(request.name(), user.getId(), position))
         );
+    }
+
+    @Transactional
+    public List<ServerFolderResponse> reorderFolders(UserRow user, ReorderServerFoldersRequest request) {
+        List<ServerFolderRow> folders = this.serverFolderRepository.findByUserIdOrderByPositionAsc(user.getId());
+        if (request.folderIds().size() != folders.size()) {
+            throw new BadRequestException("Folder order must include every folder");
+        }
+
+        Map<Long, ServerFolderRow> foldersById = folders.stream()
+                .collect(Collectors.toMap(ServerFolderRow::getId, Function.identity()));
+        if (!foldersById.keySet().equals(new HashSet<>(request.folderIds()))) {
+            throw new BadRequestException("Folder order contains unknown folders");
+        }
+
+        for (int index = 0; index < request.folderIds().size(); index++) {
+            foldersById.get(request.folderIds().get(index)).setPosition(index);
+        }
+
+        this.serverFolderRepository.saveAll(folders);
+        return listFolders(user);
     }
 
     public Map<Long, String> findFolderNamesByServerIds(long userId, List<Long> serverIds) {
@@ -66,7 +93,12 @@ public class ServerFolderService {
 
         ServerFolderRow folder = this.serverFolderRepository
                 .findByUserIdAndNameIgnoreCase(user.getId(), folderName)
-                .orElseGet(() -> this.serverFolderRepository.save(new ServerFolderRow(folderName, user.getId())));
+                .orElseGet(() -> {
+                    int position = (int) this.serverFolderRepository.countByUserId(user.getId());
+                    return this.serverFolderRepository.save(
+                            new ServerFolderRow(folderName, user.getId(), position)
+                    );
+                });
 
         this.serverFolderAssignmentRepository.deleteByServerIdAndUserId(server.getId(), user.getId());
         this.serverFolderAssignmentRepository.save(new ServerFolderAssignmentRow(folder.getId(), server.getId()));

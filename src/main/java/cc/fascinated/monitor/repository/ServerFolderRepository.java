@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ServerFolderRepository extends JpaRepository<ServerFolderRow, Long> {
-    List<ServerFolderRow> findByUserIdOrderByNameAsc(long userId);
+    List<ServerFolderRow> findByUserIdOrderByPositionAsc(long userId);
+
+    long countByUserId(long userId);
 
     Optional<ServerFolderRow> findByIdAndUserId(long id, long userId);
 
