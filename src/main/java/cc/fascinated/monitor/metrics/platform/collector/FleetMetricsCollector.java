@@ -2,7 +2,6 @@ package cc.fascinated.monitor.metrics.platform.collector;
 
 import cc.fascinated.monitor.metrics.platform.catalog.PlatformMetricFamily;
 import cc.fascinated.monitor.metrics.vm.write.PrometheusWriteContext;
-import cc.fascinated.monitor.service.ServerWebSocketService;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -10,11 +9,9 @@ import java.util.Map;
 @Component
 public class FleetMetricsCollector {
     private final PlatformMetricsQueryService queries;
-    private final ServerWebSocketService serverWebSocketService;
 
-    public FleetMetricsCollector(PlatformMetricsQueryService queries, ServerWebSocketService serverWebSocketService) {
+    public FleetMetricsCollector(PlatformMetricsQueryService queries) {
         this.queries = queries;
-        this.serverWebSocketService = serverWebSocketService;
     }
 
     public void write(PrometheusWriteContext ctx) {
@@ -23,7 +20,6 @@ public class FleetMetricsCollector {
         ctx.gauge(PlatformMetricFamily.SERVERS_NEW_24H.metricName(), this.queries.countNewServers24h());
         ctx.gauge(PlatformMetricFamily.DATABASE_SIZE_BYTES.metricName(), this.queries.databaseSizeBytes());
         ctx.gauge(PlatformMetricFamily.ACTIVE_SESSIONS.metricName(), this.queries.countActiveSessions());
-        ctx.gauge(PlatformMetricFamily.WEBSOCKET_CONNECTIONS.metricName(), this.serverWebSocketService.getConnectionCount());
 
         PlatformMetricsQueryService.ServerStatusCounts statusCounts = this.queries.serverStatusCounts();
         ctx.gauge(PlatformMetricFamily.SERVERS_TOTAL.metricName(), statusCounts.total());

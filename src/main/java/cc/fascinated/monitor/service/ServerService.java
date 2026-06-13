@@ -36,15 +36,12 @@ import cc.fascinated.monitor.metrics.server.series.ZfsArcSeries;
 import cc.fascinated.monitor.metrics.server.series.TcpConnectionSeries;
 import cc.fascinated.monitor.metrics.server.series.ZfsPoolSeries;
 import cc.fascinated.monitor.repository.ServerIngestTokenRepository;
-import cc.fascinated.monitor.repository.ServerMemberRepository;
 import cc.fascinated.monitor.repository.ServerRepository;
-import cc.fascinated.monitor.model.persistance.ServerMemberRow;
 import cc.fascinated.monitor.util.AuthUtils;
 import cc.fascinated.monitor.util.NumberUtils;
 import cc.fascinated.monitor.util.ServerUtils;
 import cc.fascinated.monitor.util.Utils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,36 +57,31 @@ import java.util.UUID;
 @Slf4j
 public class ServerService {
     private final ServerRepository serverRepository;
-    private final ServerMemberRepository serverMemberRepository;
     private final ServerIngestTokenRepository serverIngestTokenRepository;
     private final PlatformMetricsRecorder platformMetricsRecorder;
     private final VictoriaMetricsWriteClient victoriaMetricsWriteClient;
     private final ServerMetricService serverMetricService;
     private final ServerAccessService serverAccessService;
     private final MonitorServerProperties serverProperties;
-    private final ServerWebSocketService serverWebSocketService;
     private final InternetConnectivityService internetConnectivityService;
     private final ServerFolderService serverFolderService;
 
-    public ServerService(ServerRepository serverRepository, ServerMemberRepository serverMemberRepository,
+    public ServerService(ServerRepository serverRepository,
                          ServerIngestTokenRepository serverIngestTokenRepository,
                          PlatformMetricsRecorder platformMetricsRecorder,
                          VictoriaMetricsWriteClient victoriaMetricsWriteClient,
                          ServerMetricService serverMetricService,
                          ServerAccessService serverAccessService,
                          MonitorServerProperties serverProperties,
-                         @Lazy ServerWebSocketService serverWebSocketService,
                          InternetConnectivityService internetConnectivityService,
                          ServerFolderService serverFolderService) {
         this.serverRepository = serverRepository;
-        this.serverMemberRepository = serverMemberRepository;
         this.serverIngestTokenRepository = serverIngestTokenRepository;
         this.platformMetricsRecorder = platformMetricsRecorder;
         this.victoriaMetricsWriteClient = victoriaMetricsWriteClient;
         this.serverMetricService = serverMetricService;
         this.serverAccessService = serverAccessService;
         this.serverProperties = serverProperties;
-        this.serverWebSocketService = serverWebSocketService;
         this.internetConnectivityService = internetConnectivityService;
         this.serverFolderService = serverFolderService;
     }
@@ -110,7 +102,6 @@ public class ServerService {
         if (updated > 0) {
             log.info("Marked {} server(s) offline (no update since {})", updated, cutoff);
             writeServerStatusOffline(staleServerIds);
-            this.serverWebSocketService.notifyServersOffline(staleServerIds);
         }
     }
 
@@ -152,13 +143,11 @@ public class ServerService {
             this.serverAccessService.addOwner(serverRow.getId(), user.getId(), now);
             UUID ingestToken = issueIngestToken(serverRow.getId());
 
-            CreatedServerResponse response = new CreatedServerResponse(
+            return new CreatedServerResponse(
                     serverRow.getServerName(),
                     serverRow.getId(),
                     ingestToken
             );
-            this.serverWebSocketService.notifyServerCreated(user, serverRow.getId());
-            return response;
         } catch (Exception ex) {
             log.error("Failed to create the server \"{}\"", createRequest.name(), ex);
             throw new InternalServerException("Failed to create the server \"%s\"".formatted(createRequest.name()));
@@ -190,17 +179,12 @@ public class ServerService {
         ServerRow server = requireOwnedServer(user, serverId);
         server.setServerName(request.name());
         this.serverRepository.save(server);
-        this.serverWebSocketService.notifyServerUpdated(serverId);
         return getServer(user, serverId);
     }
 
     @Transactional
     public void deleteServer(UserRow user, long serverId) {
         requireOwnedServer(user, serverId);
-        List<Long> memberUserIds = this.serverMemberRepository.findByServerId(serverId).stream()
-                .map(ServerMemberRow::getUserId)
-                .toList();
-        this.serverWebSocketService.notifyServerDeleted(serverId, memberUserIds);
         this.victoriaMetricsWriteClient.deleteSeriesForServer(serverId);
         this.serverRepository.deleteById(serverId);
         log.info("Deleted server {} and its VictoriaMetrics series", serverId);
@@ -235,7 +219,6 @@ public class ServerService {
             server.setStatus(ServerStatus.ONLINE);
         }
         this.serverRepository.save(server);
-        this.serverWebSocketService.notifyServerUpdated(server.getId());
     }
 
     @Transactional
@@ -280,7 +263,6 @@ public class ServerService {
         this.victoriaMetricsWriteClient.flush(buffer.toString());
 
         this.serverRepository.save(server);
-        this.serverWebSocketService.notifyIngest(server.getId());
 
         this.platformMetricsRecorder.recordIngest((System.nanoTime() - startedNanos) / 1_000_000_000.0, payloadBytes);
     }

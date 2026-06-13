@@ -15,7 +15,6 @@ public enum PlatformMetricFamily {
     USERS_NEW_24H("monitor_platform_users_new_24h", PlatformSection.OVERVIEW, false),
     DATABASE_SIZE_BYTES("monitor_platform_database_size_bytes", PlatformSection.OVERVIEW, false),
     ACTIVE_SESSIONS("monitor_platform_active_sessions", PlatformSection.OVERVIEW, false),
-    WEBSOCKET_CONNECTIONS("monitor_platform_websocket_connections", PlatformSection.OVERVIEW, false),
 
     SERVERS_TOTAL("monitor_platform_servers_total", PlatformSection.FLEET, false),
     SERVERS_ONLINE("monitor_platform_servers_online", PlatformSection.FLEET, false),
