@@ -78,8 +78,9 @@ public class PlatformMetricsQueryService {
         List<Map<String, Object>> rows = this.jdbcTemplate.queryForList("""
                 SELECT COALESCE(NULLIF(agent_version, ''), 'unknown') AS label, COUNT(*)::bigint AS cnt
                 FROM servers
+                WHERE status = ?
                 GROUP BY agent_version
-                """);
+                """, ServerStatus.ONLINE.ordinal());
         return toLabelMap(rows);
     }
 
