@@ -13,19 +13,20 @@ import cc.fascinated.monitor.repository.ServerMemberRepository;
 import cc.fascinated.monitor.repository.UserRepository;
 import cc.fascinated.monitor.websocket.WebSocketAuthHandshakeInterceptor;
 import cc.fascinated.monitor.websocket.impl.ServersWebSocket;
+import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 @Service
 @Slf4j
 public class ServerWebSocketService {
+
+    private static final long FLUSH_INTERVAL_MS = 1_500;
 
     private final ServersWebSocket serversWebSocket;
     private final ServerMemberRepository serverMemberRepository;
@@ -33,7 +34,11 @@ public class ServerWebSocketService {
     private final ServerAccessService serverAccessService;
     private final ServerService serverService;
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final Map<Long, Set<WebSocketSession>> sessionsByUserId = new ConcurrentHashMap<>();
+    private final Map<Long, Set<Long>> pendingServerUpdatesByUserId = new ConcurrentHashMap<>();
+    private final Map<Long, Set<Long>> pendingMetricsUpdatesByUserId = new ConcurrentHashMap<>();
+    private final Set<Long> scheduledFlushUserIds = ConcurrentHashMap.newKeySet();
 
     public ServerWebSocketService(
             @Lazy ServersWebSocket serversWebSocket,
@@ -49,6 +54,12 @@ public class ServerWebSocketService {
         this.serverService = serverService;
     }
 
+    @PreDestroy
+    public void shutdown() {
+        this.scheduler.shutdownNow();
+        this.executor.shutdownNow();
+    }
+
     public void registerSession(long userId, WebSocketSession session) {
         this.sessionsByUserId.computeIfAbsent(userId, ignored -> ConcurrentHashMap.newKeySet()).add(session);
     }
@@ -61,6 +72,9 @@ public class ServerWebSocketService {
         sessions.remove(session);
         if (sessions.isEmpty()) {
             this.sessionsByUserId.remove(userId);
+            this.pendingServerUpdatesByUserId.remove(userId);
+            this.pendingMetricsUpdatesByUserId.remove(userId);
+            this.scheduledFlushUserIds.remove(userId);
         }
     }
 
@@ -75,8 +89,8 @@ public class ServerWebSocketService {
     public void notifyIngest(long serverId) {
         runAsync(() -> {
             for (long userId : memberUserIds(serverId)) {
-                sendServerUpdate(userId, serverId);
-                sendToUser(userId, WebSocketCommand.SERVER_METRICS_UPDATE, new ServerIdData(serverId));
+                queueServerUpdate(userId, serverId);
+                queueMetricsUpdate(userId, serverId);
             }
         });
     }
@@ -88,7 +102,7 @@ public class ServerWebSocketService {
     public void notifyServerUpdated(long serverId) {
         runAsync(() -> {
             for (long userId : memberUserIds(serverId)) {
-                sendServerUpdate(userId, serverId);
+                queueServerUpdate(userId, serverId);
             }
         });
     }
@@ -115,7 +129,8 @@ public class ServerWebSocketService {
 
     public void notifyInviteAccepted(long serverId, long newMemberId, long inviteId) {
         runAsync(() -> {
-            sendServerUpdate(newMemberId, serverId);
+            queueServerUpdate(newMemberId, serverId);
+            flushImmediately(newMemberId);
             sendToUser(newMemberId, WebSocketCommand.INVITE_REVOKED, new InviteRevokedInviteeData(inviteId));
             sendMemberChangeToMembers(serverId);
         });
@@ -160,23 +175,85 @@ public class ServerWebSocketService {
         runAsync(() -> {
             for (long serverId : serverIds) {
                 for (long userId : memberUserIds(serverId)) {
-                    sendServerUpdate(userId, serverId);
+                    queueServerUpdate(userId, serverId);
                 }
             }
         });
     }
 
-    private void sendServerUpdate(long userId, long serverId) {
-        UserRow user = this.userRepository.findById(userId).orElse(null);
-        if (user == null) {
-            return;
+    private void queueServerUpdate(long userId, long serverId) {
+        this.pendingServerUpdatesByUserId
+                .computeIfAbsent(userId, ignored -> ConcurrentHashMap.newKeySet())
+                .add(serverId);
+        scheduleFlush(userId);
+    }
+
+    private void queueMetricsUpdate(long userId, long serverId) {
+        this.pendingMetricsUpdatesByUserId
+                .computeIfAbsent(userId, ignored -> ConcurrentHashMap.newKeySet())
+                .add(serverId);
+        scheduleFlush(userId);
+    }
+
+    private void scheduleFlush(long userId) {
+        if (this.scheduledFlushUserIds.add(userId)) {
+            this.scheduler.schedule(() -> flushUser(userId), FLUSH_INTERVAL_MS, TimeUnit.MILLISECONDS);
         }
-        try {
-            ServerResponse response = this.serverService.getServer(user, serverId);
-            sendToUser(userId, WebSocketCommand.SERVER_UPDATE, response);
-        } catch (RuntimeException ex) {
-            log.debug("Skipping SERVER_UPDATE for user {} server {}: {}", userId, serverId, ex.getMessage());
+    }
+
+    private void flushImmediately(long userId) {
+        this.scheduledFlushUserIds.remove(userId);
+        flushUser(userId);
+    }
+
+    private void flushUser(long userId) {
+        this.scheduledFlushUserIds.remove(userId);
+
+        Set<Long> serverIds = this.pendingServerUpdatesByUserId.remove(userId);
+        Set<Long> metricsServerIds = this.pendingMetricsUpdatesByUserId.remove(userId);
+
+        if (serverIds != null && !serverIds.isEmpty()) {
+            UserRow user = this.userRepository.findById(userId).orElse(null);
+            if (user != null) {
+                List<ServerResponse> servers = new ArrayList<>(serverIds.size());
+                for (long serverId : serverIds) {
+                    try {
+                        servers.add(this.serverService.getServer(user, serverId));
+                    } catch (RuntimeException ex) {
+                        log.debug(
+                                "Skipping SERVERS_UPDATE for user {} server {}: {}",
+                                userId,
+                                serverId,
+                                ex.getMessage()
+                        );
+                    }
+                }
+                if (!servers.isEmpty()) {
+                    sendToUser(userId, WebSocketCommand.SERVERS_UPDATE, new ServersUpdateData(servers));
+                }
+            }
         }
+
+        if (metricsServerIds != null && !metricsServerIds.isEmpty()) {
+            sendToUser(
+                    userId,
+                    WebSocketCommand.SERVER_METRICS_UPDATED,
+                    new ServerMetricsUpdatedData(new ArrayList<>(metricsServerIds))
+            );
+        }
+
+        if (hasPendingUpdates(userId)) {
+            scheduleFlush(userId);
+        }
+    }
+
+    private boolean hasPendingUpdates(long userId) {
+        Set<Long> pendingServers = this.pendingServerUpdatesByUserId.get(userId);
+        if (pendingServers != null && !pendingServers.isEmpty()) {
+            return true;
+        }
+        Set<Long> pendingMetrics = this.pendingMetricsUpdatesByUserId.get(userId);
+        return pendingMetrics != null && !pendingMetrics.isEmpty();
     }
 
     private void sendServerCreated(long userId, long serverId) {
