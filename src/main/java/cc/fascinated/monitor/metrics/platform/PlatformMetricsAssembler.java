@@ -39,7 +39,7 @@ public class PlatformMetricsAssembler {
             if (family.labeled()) {
                 ingestLabeled(grid, labeled, family, series);
             } else if (family.histogram()) {
-                ingestHistogram(grid, scalars, family, series);
+                ingestHistogramAverage(grid, scalars, family, series);
             } else {
                 ingestScalars(grid, scalars, family, series);
             }
@@ -67,19 +67,12 @@ public class PlatformMetricsAssembler {
         scalars.put(fieldName(family), grid.align(series.getFirst()));
     }
 
-    private static void ingestHistogram(MetricTimeGrid grid, Map<String, List<Double>> scalars,
-                                        PlatformMetricFamily family, List<VmTimeSeries> series) {
-        for (VmTimeSeries entry : series) {
-            String metricName = entry.labels().get("__name__");
-            if (metricName == null) {
-                continue;
-            }
-            if (metricName.endsWith("_count")) {
-                scalars.put(fieldName(family) + "Count", grid.align(entry));
-            } else if (metricName.endsWith("_sum")) {
-                scalars.put(fieldName(family) + "Sum", grid.align(entry));
-            }
+    private static void ingestHistogramAverage(MetricTimeGrid grid, Map<String, List<Double>> scalars,
+                                             PlatformMetricFamily family, List<VmTimeSeries> series) {
+        if (series.isEmpty()) {
+            return;
         }
+        scalars.put(fieldName(family), grid.align(series.getFirst()));
     }
 
     private static void ingestLabeled(MetricTimeGrid grid, Map<String, LabeledSeries> labeled,

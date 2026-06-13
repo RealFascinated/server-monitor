@@ -31,7 +31,7 @@ public class AdminMetricsService {
                 continue;
             }
             List<VmTimeSeries> combined = new ArrayList<>();
-            for (String promql : family.rangeQueries()) {
+            for (String promql : family.adminRangeQueries(range)) {
                 combined.addAll(fetchRange(promql, range, window));
             }
             seriesByFamily.put(family, combined);

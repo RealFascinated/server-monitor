@@ -1,5 +1,7 @@
 package cc.fascinated.monitor.metrics.platform.catalog;
 
+import cc.fascinated.monitor.metrics.vm.query.PromqlQueryBuilder;
+import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
@@ -73,6 +75,48 @@ public enum PlatformMetricFamily {
             return List.of(this.metricName);
         }
         return List.of(this.metricName + "_count", this.metricName + "_sum");
+    }
+
+    /**
+     * PromQL range queries for the admin dashboard. Counters return per-minute rates;
+     * histograms return interval averages via {@code rate(sum) / rate(count)}.
+     */
+    public List<String> adminRangeQueries(MetricTimeRange range) {
+        if (this.histogram && this.labeled) {
+            return List.of();
+        }
+        String rateWindow = rateWindowFor(range);
+        if (this.counter()) {
+            return List.of(
+                    PromqlQueryBuilder.metric(this.metricName).rate(rateWindow).multiply(60).build()
+            );
+        }
+        if (this.histogram) {
+            return List.of(histogramAverageRate(this.metricName, rateWindow));
+        }
+        return this.rangeQueries();
+    }
+
+    public boolean counter() {
+        return switch (this) {
+            case INGESTS_TOTAL, INGEST_AUTH_FAILURES_TOTAL,
+                 VM_QUERIES_TOTAL, VM_QUERY_ERRORS_TOTAL, VM_WRITES_TOTAL, VM_WRITE_ERRORS_TOTAL,
+                 HTTP_REQUESTS_TOTAL -> true;
+            default -> false;
+        };
+    }
+
+    private static String rateWindowFor(MetricTimeRange range) {
+        return switch (range) {
+            case H1, H3, H6 -> "2m";
+            default -> "5m";
+        };
+    }
+
+    private static String histogramAverageRate(String metricName, String rateWindow) {
+        String sumRate = PromqlQueryBuilder.metric(metricName + "_sum").rate(rateWindow).build();
+        String countRate = PromqlQueryBuilder.metric(metricName + "_count").rate(rateWindow).build();
+        return "(" + sumRate + ") / (" + countRate + ")";
     }
 
     public static List<PlatformMetricFamily> forSection(PlatformSection section) {

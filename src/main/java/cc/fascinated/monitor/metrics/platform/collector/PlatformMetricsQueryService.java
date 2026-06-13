@@ -57,13 +57,17 @@ public class PlatformMetricsQueryService {
         long offline = 0;
         long pending = 0;
         for (Map<String, Object> row : rows) {
-            String status = String.valueOf(row.get("status"));
+            Object statusValue = row.get("status");
+            if (!(statusValue instanceof Number statusNumber)) {
+                continue;
+            }
             long count = ((Number) row.get("cnt")).longValue();
-            if (ServerStatus.ONLINE.name().equals(status)) {
+            int ordinal = statusNumber.intValue();
+            if (ordinal == ServerStatus.ONLINE.ordinal()) {
                 online = count;
-            } else if (ServerStatus.OFFLINE.name().equals(status)) {
+            } else if (ordinal == ServerStatus.OFFLINE.ordinal()) {
                 offline = count;
-            } else if (ServerStatus.PENDING.name().equals(status)) {
+            } else if (ordinal == ServerStatus.PENDING.ordinal()) {
                 pending = count;
             }
         }
