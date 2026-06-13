@@ -9,8 +9,12 @@ import java.util.List;
 @Getter
 @Accessors(fluent = true)
 public enum PlatformMetricFamily {
-    USERS("monitor_platform_users", PlatformSection.FLEET, false),
-    USERS_NEW_24H("monitor_platform_users_new_24h", PlatformSection.FLEET, false),
+    USERS("monitor_platform_users", PlatformSection.OVERVIEW, false),
+    USERS_NEW_24H("monitor_platform_users_new_24h", PlatformSection.OVERVIEW, false),
+    DATABASE_SIZE_BYTES("monitor_platform_database_size_bytes", PlatformSection.OVERVIEW, false),
+    ACTIVE_SESSIONS("monitor_platform_active_sessions", PlatformSection.OVERVIEW, false),
+    WEBSOCKET_CONNECTIONS("monitor_platform_websocket_connections", PlatformSection.OVERVIEW, false),
+
     SERVERS_TOTAL("monitor_platform_servers_total", PlatformSection.FLEET, false),
     SERVERS_ONLINE("monitor_platform_servers_online", PlatformSection.FLEET, false),
     SERVERS_OFFLINE("monitor_platform_servers_offline", PlatformSection.FLEET, false),
@@ -18,9 +22,6 @@ public enum PlatformMetricFamily {
     SERVERS_NEW_24H("monitor_platform_servers_new_24h", PlatformSection.FLEET, false),
     SERVERS_BY_AGENT_VERSION("monitor_platform_servers_by_agent_version", PlatformSection.FLEET, true, "version"),
     SERVERS_BY_OS("monitor_platform_servers_by_os", PlatformSection.FLEET, true, "os"),
-    DATABASE_SIZE_BYTES("monitor_platform_database_size_bytes", PlatformSection.FLEET, false),
-    ACTIVE_SESSIONS("monitor_platform_active_sessions", PlatformSection.FLEET, false),
-    WEBSOCKET_CONNECTIONS("monitor_platform_websocket_connections", PlatformSection.FLEET, false),
 
     INGESTS_TOTAL("monitor_platform_ingests_total", PlatformSection.INGEST, false),
     INGEST_AUTH_FAILURES_TOTAL("monitor_platform_ingest_auth_failures_total", PlatformSection.INGEST, false),

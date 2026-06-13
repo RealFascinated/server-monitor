@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Accessors(fluent = true)
 public enum PlatformSection {
+    OVERVIEW("overview"),
     FLEET("fleet"),
     INGEST("ingest"),
     VM("vm"),
