@@ -21,6 +21,7 @@ public record ServerResponse(
         Long diskMax,
         Double uptimePercent30d,
         ServerRole role,
+        String folderName,
         ServerInventoryResponse inventory
 ) {
     public static ServerResponse from(
@@ -31,7 +32,8 @@ public record ServerResponse(
             Long memMax,
             Long diskUsage,
             Long diskMax,
-            Double uptimePercent30d
+            Double uptimePercent30d,
+            String folderName
     ) {
         return new ServerResponse(
                 server.getId(),
@@ -48,6 +50,7 @@ public record ServerResponse(
                 diskMax,
                 uptimePercent30d,
                 role,
+                folderName,
                 server.getInventory() != null
                         ? ServerInventoryResponse.from(server.getInventory())
                         : null

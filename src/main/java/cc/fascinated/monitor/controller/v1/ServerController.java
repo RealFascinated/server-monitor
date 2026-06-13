@@ -3,6 +3,7 @@ package cc.fascinated.monitor.controller.v1;
 import cc.fascinated.monitor.model.dto.request.server.ServerCreateRequest;
 import cc.fascinated.monitor.model.dto.request.server.ServerMemberInviteRequest;
 import cc.fascinated.monitor.model.dto.request.server.ServerRenameRequest;
+import cc.fascinated.monitor.model.dto.request.server.UpdateServerFolderRequest;
 import cc.fascinated.monitor.model.dto.response.server.ServerResponse;
 import cc.fascinated.monitor.model.dto.request.server.ingest.IngestServerMetrics;
 import cc.fascinated.monitor.model.dto.response.server.CreatedServerResponse;
@@ -49,6 +50,15 @@ public class ServerController {
             @Valid @RequestBody ServerRenameRequest request
     ) {
         return this.serverService.renameServer(user, serverId, request);
+    }
+
+    @PostMapping(value = "/{serverId}/folder")
+    public ServerResponse updateServerFolder(
+            @AuthenticatedUser UserRow user,
+            @PathVariable long serverId,
+            @Valid @RequestBody UpdateServerFolderRequest request
+    ) {
+        return this.serverService.updateServerFolder(user, serverId, request);
     }
 
     @DeleteMapping(value = "/{serverId}")

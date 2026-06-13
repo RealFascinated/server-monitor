@@ -8,6 +8,7 @@ import cc.fascinated.monitor.model.domain.server.ServerRole;
 import cc.fascinated.monitor.model.domain.server.ServerStatus;
 import cc.fascinated.monitor.model.dto.request.server.ServerCreateRequest;
 import cc.fascinated.monitor.model.dto.request.server.ServerRenameRequest;
+import cc.fascinated.monitor.model.dto.request.server.UpdateServerFolderRequest;
 import cc.fascinated.monitor.model.dto.request.server.ingest.IngestServerMetrics;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerDetails;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerMetrics;
@@ -67,6 +68,7 @@ public class ServerService {
     private final MonitorServerProperties serverProperties;
     private final ServerWebSocketService serverWebSocketService;
     private final InternetConnectivityService internetConnectivityService;
+    private final ServerFolderService serverFolderService;
 
     public ServerService(ServerRepository serverRepository, ServerMemberRepository serverMemberRepository,
                          ServerIngestTokenRepository serverIngestTokenRepository,
@@ -76,7 +78,8 @@ public class ServerService {
                          ServerAccessService serverAccessService,
                          MonitorServerProperties serverProperties,
                          @Lazy ServerWebSocketService serverWebSocketService,
-                         InternetConnectivityService internetConnectivityService) {
+                         InternetConnectivityService internetConnectivityService,
+                         ServerFolderService serverFolderService) {
         this.serverRepository = serverRepository;
         this.serverMemberRepository = serverMemberRepository;
         this.serverIngestTokenRepository = serverIngestTokenRepository;
@@ -87,6 +90,7 @@ public class ServerService {
         this.serverProperties = serverProperties;
         this.serverWebSocketService = serverWebSocketService;
         this.internetConnectivityService = internetConnectivityService;
+        this.serverFolderService = serverFolderService;
     }
 
     @Scheduled(fixedDelayString = "#{@monitorMetricsProperties.refreshIntervalMs}")
@@ -114,7 +118,7 @@ public class ServerService {
         if (servers.isEmpty()) {
             return List.of();
         }
-        ServerResponseContext context = fetchServerResponseContext(servers);
+        ServerResponseContext context = fetchServerResponseContext(servers, user.getId());
         Map<Long, ServerRole> rolesByServerId = this.serverAccessService.findRolesByUserId(user.getId());
         return servers.stream()
                 .map(server -> toServerResponse(server, rolesByServerId.get(server.getId()), context))
@@ -124,8 +128,15 @@ public class ServerService {
     public ServerResponse getServer(UserRow user, long serverId) {
         ServerRow server = getAccessibleServer(user, serverId);
         ServerRole role = this.serverAccessService.findRole(server.getId(), user.getId()).orElseThrow();
-        ServerResponseContext context = fetchServerResponseContext(List.of(server));
+        ServerResponseContext context = fetchServerResponseContext(List.of(server), user.getId());
         return toServerResponse(server, role, context);
+    }
+
+    @Transactional
+    public ServerResponse updateServerFolder(UserRow user, long serverId, UpdateServerFolderRequest request) {
+        ServerRow server = getAccessibleServer(user, serverId);
+        this.serverFolderService.updateServerFolder(user, server, request);
+        return getServer(user, serverId);
     }
 
     @Transactional
@@ -300,7 +311,7 @@ public class ServerService {
     private static final String ROOT_DISK_MOUNT = "/";
     private static final Map<String, String> ROOT_DISK_LABEL = Map.of("disk", ROOT_DISK_MOUNT);
 
-    private ServerResponseContext fetchServerResponseContext(List<ServerRow> servers) {
+    private ServerResponseContext fetchServerResponseContext(List<ServerRow> servers, long userId) {
         List<Long> serverIds = servers.stream().map(ServerRow::getId).toList();
         List<Long> onlineServerIds = servers.stream()
                 .filter(server -> server.getStatus() == ServerStatus.ONLINE)
@@ -308,14 +319,16 @@ public class ServerService {
                 .toList();
         return new ServerResponseContext(
                 fetchLatestHostMetrics(onlineServerIds),
-                this.serverMetricService.fetchUptimePercent30d(serverIds)
+                this.serverMetricService.fetchUptimePercent30d(serverIds),
+                this.serverFolderService.findFolderNamesByServerIds(userId, serverIds)
         );
     }
 
     private ServerResponse toServerResponse(ServerRow server, ServerRole role, ServerResponseContext context) {
         Double uptime = context.uptimePercent30d().get(server.getId());
+        String folderName = context.folderNamesByServerId().get(server.getId());
         if (server.getStatus() != ServerStatus.ONLINE) {
-            return ServerResponse.from(server, role, null, null, null, null, null, uptime);
+            return ServerResponse.from(server, role, null, null, null, null, null, uptime, folderName);
         }
         long serverId = server.getId();
         LatestHostMetrics metrics = context.hostMetrics();
@@ -327,7 +340,8 @@ public class ServerService {
                 NumberUtils.toLong(metrics.memMax().get(serverId)),
                 NumberUtils.toLong(metrics.diskUsage().get(serverId)),
                 NumberUtils.toLong(metrics.diskMax().get(serverId)),
-                uptime
+                uptime,
+                folderName
         );
     }
 
@@ -365,7 +379,11 @@ public class ServerService {
         return ingestToken;
     }
 
-    private record ServerResponseContext(LatestHostMetrics hostMetrics, Map<Long, Double> uptimePercent30d) {}
+    private record ServerResponseContext(
+            LatestHostMetrics hostMetrics,
+            Map<Long, Double> uptimePercent30d,
+            Map<Long, String> folderNamesByServerId
+    ) {}
 
     private record LatestHostMetrics(
             Map<Long, Double> cpu,
