@@ -24,6 +24,11 @@ public record ServerMetrics(
         Long runningProcesses,
         Long contextSwitchesPerSecond,
         Long interruptsPerSecond,
+        Long fdOpen,
+        Long fdMax,
+        Double fdUsagePercent,
+        Long oomKillsTotal,
+        Long oomKillsPerSecond,
         Double cpuPowerWatts,
         @Nullable List<CpuCoreMetric> cpuCoreMetrics,
         @Nullable List<TemperatureMetric> temperatureMetrics

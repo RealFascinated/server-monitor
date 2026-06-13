@@ -30,6 +30,11 @@ public enum HostSeries implements VmMetricFamily {
     RUNNING_PROCESSES("monitor_host_running_processes"),
     CTX_SWITCHES_PER_SECOND("monitor_host_ctx_switches_per_second"),
     INTERRUPTS_PER_SECOND("monitor_host_interrupts_per_second"),
+    FD_OPEN("monitor_host_fd_open"),
+    FD_MAX("monitor_host_fd_max"),
+    FD_USAGE_PCT("monitor_host_fd_usage_pct"),
+    OOM_KILLS_TOTAL("monitor_host_oom_kills_total"),
+    OOM_KILLS_PER_SECOND("monitor_host_oom_kills_per_second"),
     CPU_CLOCK_MHZ("monitor_host_cpu_clock_mhz"),
     CPU_POWER_WATTS("monitor_host_cpu_power_watts");
 
@@ -69,6 +74,11 @@ public enum HostSeries implements VmMetricFamily {
         RUNNING_PROCESSES.writeNullable(ctx, metrics.runningProcesses());
         CTX_SWITCHES_PER_SECOND.writeNullable(ctx, metrics.contextSwitchesPerSecond());
         INTERRUPTS_PER_SECOND.writeNullable(ctx, metrics.interruptsPerSecond());
+        FD_OPEN.writeNullable(ctx, metrics.fdOpen());
+        FD_MAX.writeNullable(ctx, metrics.fdMax());
+        FD_USAGE_PCT.writeNullable(ctx, metrics.fdUsagePercent());
+        OOM_KILLS_TOTAL.writeNullable(ctx, metrics.oomKillsTotal());
+        OOM_KILLS_PER_SECOND.writeNullable(ctx, metrics.oomKillsPerSecond());
         CPU_CLOCK_MHZ.writeNullable(ctx, details.cpuClockMhz());
         CPU_POWER_WATTS.writeNullable(ctx, metrics.cpuPowerWatts());
     }
