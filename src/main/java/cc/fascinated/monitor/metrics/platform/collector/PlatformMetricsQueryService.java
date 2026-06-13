@@ -89,8 +89,9 @@ public class PlatformMetricsQueryService {
                 SELECT COALESCE(NULLIF(si.os_name, ''), 'unknown') AS label, COUNT(*)::bigint AS cnt
                 FROM servers s
                 LEFT JOIN server_inventory si ON si.server_id = s.id
+                WHERE s.status = ?
                 GROUP BY si.os_name
-                """);
+                """, ServerStatus.ONLINE.ordinal());
         return toLabelMap(rows);
     }
 
