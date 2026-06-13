@@ -25,6 +25,14 @@ public class ServerFolderController {
         return this.serverFolderService.listFolders(user);
     }
 
+    @PostMapping
+    public ServerFolderResponse createFolder(
+            @AuthenticatedUser UserRow user,
+            @Valid @RequestBody ServerRenameRequest request
+    ) {
+        return this.serverFolderService.createFolder(user, request);
+    }
+
     @PostMapping(value = "/{folderId}/rename")
     public ServerFolderResponse renameFolder(
             @AuthenticatedUser UserRow user,

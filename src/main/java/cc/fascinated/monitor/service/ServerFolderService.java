@@ -35,6 +35,16 @@ public class ServerFolderService {
                 .toList();
     }
 
+    @Transactional
+    public ServerFolderResponse createFolder(UserRow user, ServerRenameRequest request) {
+        if (this.serverFolderRepository.findByUserIdAndNameIgnoreCase(user.getId(), request.name()).isPresent()) {
+            throw new ConflictException("A folder named \"%s\" already exists".formatted(request.name()));
+        }
+        return ServerFolderResponse.from(
+                this.serverFolderRepository.save(new ServerFolderRow(request.name(), user.getId()))
+        );
+    }
+
     public Map<Long, String> findFolderNamesByServerIds(long userId, List<Long> serverIds) {
         if (serverIds.isEmpty()) {
             return Map.of();
