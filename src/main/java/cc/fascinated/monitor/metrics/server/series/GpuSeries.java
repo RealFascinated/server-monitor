@@ -11,6 +11,8 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 public enum GpuSeries implements VmMetricFamily {
     USAGE_PERCENT("monitor_gpu_usage_percent"),
+    ENCODER_USAGE_PERCENT("monitor_gpu_encoder_usage_percent"),
+    DECODER_USAGE_PERCENT("monitor_gpu_decoder_usage_percent"),
     MEMORY_USED_BYTES("monitor_gpu_memory_used_bytes"),
     MEMORY_TOTAL_BYTES("monitor_gpu_memory_total_bytes"),
     TEMPERATURE_CELSIUS("monitor_gpu_temperature_celsius"),
@@ -38,6 +40,8 @@ public enum GpuSeries implements VmMetricFamily {
             labeled = labeled.withLabel("vendor", gpu.vendor());
         }
         USAGE_PERCENT.write(labeled, gpu.usagePercent());
+        ENCODER_USAGE_PERCENT.writeNullable(labeled, gpu.encoderUsagePercent());
+        DECODER_USAGE_PERCENT.writeNullable(labeled, gpu.decoderUsagePercent());
         MEMORY_USED_BYTES.writeNullable(labeled, gpu.memoryUsedBytes());
         MEMORY_TOTAL_BYTES.writeNullable(labeled, gpu.memoryTotalBytes());
         TEMPERATURE_CELSIUS.writeNullable(labeled, gpu.temperatureCelsius());

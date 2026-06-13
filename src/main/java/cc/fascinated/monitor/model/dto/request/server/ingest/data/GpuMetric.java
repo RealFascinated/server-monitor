@@ -12,6 +12,8 @@ public record GpuMetric(
         @Nullable String vendor,
         @NotNull(message = "GPU usage must not be null")
         Double usagePercent,
+        @Nullable Double encoderUsagePercent,
+        @Nullable Double decoderUsagePercent,
         @Nullable Long memoryUsedBytes,
         @Nullable Long memoryTotalBytes,
         @Nullable Double temperatureCelsius,
