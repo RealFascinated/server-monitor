@@ -4,7 +4,7 @@ import cc.fascinated.monitor.exception.impl.BadRequestException;
 import cc.fascinated.monitor.exception.impl.ConflictException;
 import cc.fascinated.monitor.exception.impl.NotFoundException;
 import cc.fascinated.monitor.model.dto.request.server.ReorderServerFoldersRequest;
-import cc.fascinated.monitor.model.dto.request.server.ServerRenameRequest;
+import cc.fascinated.monitor.model.dto.request.server.FolderNameRequest;
 import cc.fascinated.monitor.model.dto.request.server.UpdateServerFolderRequest;
 import cc.fascinated.monitor.model.dto.response.server.ServerFolderResponse;
 import cc.fascinated.monitor.model.persistance.ServerFolderAssignmentRow;
@@ -41,7 +41,7 @@ public class ServerFolderService {
     }
 
     @Transactional
-    public ServerFolderResponse createFolder(UserRow user, ServerRenameRequest request) {
+    public ServerFolderResponse createFolder(UserRow user, FolderNameRequest request) {
         if (this.serverFolderRepository.findByUserIdAndNameIgnoreCase(user.getId(), request.name()).isPresent()) {
             throw new ConflictException("A folder named \"%s\" already exists".formatted(request.name()));
         }
@@ -106,7 +106,7 @@ public class ServerFolderService {
     }
 
     @Transactional
-    public ServerFolderResponse renameFolder(UserRow user, long folderId, ServerRenameRequest request) {
+    public ServerFolderResponse renameFolder(UserRow user, long folderId, FolderNameRequest request) {
         ServerFolderRow folder = requireUserFolder(user, folderId);
         if (this.serverFolderRepository.findByUserIdAndNameIgnoreCaseExcludingId(
                 user.getId(), request.name(), folderId

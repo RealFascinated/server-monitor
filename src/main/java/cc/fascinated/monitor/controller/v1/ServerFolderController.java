@@ -1,7 +1,7 @@
 package cc.fascinated.monitor.controller.v1;
 
 import cc.fascinated.monitor.model.dto.request.server.ReorderServerFoldersRequest;
-import cc.fascinated.monitor.model.dto.request.server.ServerRenameRequest;
+import cc.fascinated.monitor.model.dto.request.server.FolderNameRequest;
 import cc.fascinated.monitor.model.dto.response.server.ServerFolderResponse;
 import cc.fascinated.monitor.model.persistance.UserRow;
 import cc.fascinated.monitor.service.ServerFolderService;
@@ -29,7 +29,7 @@ public class ServerFolderController {
     @PostMapping
     public ServerFolderResponse createFolder(
             @AuthenticatedUser UserRow user,
-            @Valid @RequestBody ServerRenameRequest request
+            @Valid @RequestBody FolderNameRequest request
     ) {
         return this.serverFolderService.createFolder(user, request);
     }
@@ -46,7 +46,7 @@ public class ServerFolderController {
     public ServerFolderResponse renameFolder(
             @AuthenticatedUser UserRow user,
             @PathVariable long folderId,
-            @Valid @RequestBody ServerRenameRequest request
+            @Valid @RequestBody FolderNameRequest request
     ) {
         return this.serverFolderService.renameFolder(user, folderId, request);
     }

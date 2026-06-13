@@ -5,6 +5,6 @@ import jakarta.validation.constraints.Size;
 
 public record ServerCreateRequest(
         @NotBlank(message = "Name must not be empty")
-        @Size(max = 20, message = "Name must be at most 20 characters")
+        @Size(max = 64, message = "Name must be at most 64 characters")
         String name
 ) {}
