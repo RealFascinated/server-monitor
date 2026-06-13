@@ -84,11 +84,11 @@ public class ServerFolderService {
     }
 
     @Transactional
-    public void updateServerFolder(UserRow user, ServerRow server, UpdateServerFolderRequest request) {
+    public String updateServerFolder(UserRow user, ServerRow server, UpdateServerFolderRequest request) {
         String folderName = request.folderName();
         if (folderName == null || folderName.isBlank()) {
             this.serverFolderAssignmentRepository.deleteByServerIdAndUserId(server.getId(), user.getId());
-            return;
+            return null;
         }
 
         ServerFolderRow folder = this.serverFolderRepository
@@ -102,6 +102,7 @@ public class ServerFolderService {
 
         this.serverFolderAssignmentRepository.deleteByServerIdAndUserId(server.getId(), user.getId());
         this.serverFolderAssignmentRepository.save(new ServerFolderAssignmentRow(folder.getId(), server.getId()));
+        return folder.getName();
     }
 
     @Transactional

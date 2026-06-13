@@ -4,6 +4,7 @@ import cc.fascinated.monitor.model.dto.request.server.ServerCreateRequest;
 import cc.fascinated.monitor.model.dto.request.server.ServerMemberInviteRequest;
 import cc.fascinated.monitor.model.dto.request.server.ServerRenameRequest;
 import cc.fascinated.monitor.model.dto.request.server.UpdateServerFolderRequest;
+import cc.fascinated.monitor.model.dto.response.server.ServerFolderAssignmentResponse;
 import cc.fascinated.monitor.model.dto.response.server.ServerResponse;
 import cc.fascinated.monitor.model.dto.request.server.ingest.IngestServerMetrics;
 import cc.fascinated.monitor.model.dto.response.server.CreatedServerResponse;
@@ -52,8 +53,8 @@ public class ServerController {
         return this.serverService.renameServer(user, serverId, request);
     }
 
-    @PostMapping(value = "/{serverId}/folder")
-    public ServerResponse updateServerFolder(
+    @PatchMapping(value = "/{serverId}/folder")
+    public ServerFolderAssignmentResponse updateServerFolder(
             @AuthenticatedUser UserRow user,
             @PathVariable long serverId,
             @Valid @RequestBody UpdateServerFolderRequest request

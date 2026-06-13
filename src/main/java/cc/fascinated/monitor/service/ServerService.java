@@ -14,6 +14,7 @@ import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerDetails;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerMetrics;
 import cc.fascinated.monitor.model.dto.response.server.CreatedServerResponse;
 import cc.fascinated.monitor.model.dto.response.server.IngestTokenResponse;
+import cc.fascinated.monitor.model.dto.response.server.ServerFolderAssignmentResponse;
 import cc.fascinated.monitor.model.dto.response.server.ServerResponse;
 import cc.fascinated.monitor.model.persistance.ServerInventoryRow;
 import cc.fascinated.monitor.model.persistance.ServerRow;
@@ -133,10 +134,14 @@ public class ServerService {
     }
 
     @Transactional
-    public ServerResponse updateServerFolder(UserRow user, long serverId, UpdateServerFolderRequest request) {
+    public ServerFolderAssignmentResponse updateServerFolder(
+            UserRow user,
+            long serverId,
+            UpdateServerFolderRequest request
+    ) {
         ServerRow server = getAccessibleServer(user, serverId);
-        this.serverFolderService.updateServerFolder(user, server, request);
-        return getServer(user, serverId);
+        String folderName = this.serverFolderService.updateServerFolder(user, server, request);
+        return new ServerFolderAssignmentResponse(serverId, folderName);
     }
 
     @Transactional
