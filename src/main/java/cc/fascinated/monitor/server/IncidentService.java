@@ -1,4 +1,4 @@
-package cc.fascinated.monitor.service;
+package cc.fascinated.monitor.server;
 
 import cc.fascinated.monitor.exception.impl.BadRequestException;
 import cc.fascinated.monitor.model.dto.response.server.IncidentResponse;

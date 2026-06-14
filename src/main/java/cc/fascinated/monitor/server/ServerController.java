@@ -1,22 +1,21 @@
-package cc.fascinated.monitor.controller.v1;
+package cc.fascinated.monitor.server;
 
 import cc.fascinated.monitor.model.dto.request.server.ServerCreateRequest;
 import cc.fascinated.monitor.model.dto.request.server.ServerMemberInviteRequest;
 import cc.fascinated.monitor.model.dto.request.server.ServerRenameRequest;
 import cc.fascinated.monitor.model.dto.request.server.UpdateServerFolderRequest;
-import cc.fascinated.monitor.model.dto.response.server.ServerFolderAssignmentResponse;
-import cc.fascinated.monitor.model.dto.response.server.ServerResponse;
-import cc.fascinated.monitor.model.dto.response.server.IncidentResponse;
-import cc.fascinated.monitor.model.dto.response.server.ServerStatusResponse;
-import cc.fascinated.monitor.util.Pagination;
 import cc.fascinated.monitor.model.dto.request.server.ingest.IngestServerMetrics;
 import cc.fascinated.monitor.model.dto.response.server.CreatedServerResponse;
+import cc.fascinated.monitor.model.dto.response.server.IncidentResponse;
 import cc.fascinated.monitor.model.dto.response.server.IngestTokenResponse;
+import cc.fascinated.monitor.model.dto.response.server.ServerFolderAssignmentResponse;
+import cc.fascinated.monitor.model.dto.response.server.ServerResponse;
+import cc.fascinated.monitor.model.dto.response.server.ServerStatusResponse;
 import cc.fascinated.monitor.model.dto.response.server.access.ServerAccessListResponse;
 import cc.fascinated.monitor.model.dto.response.server.access.ServerInviteCreatedResponse;
 import cc.fascinated.monitor.model.persistance.ServerRow;
 import cc.fascinated.monitor.model.persistance.UserRow;
-import cc.fascinated.monitor.service.ServerService;
+import cc.fascinated.monitor.util.Pagination;
 import cc.fascinated.monitor.web.auth.AuthenticatedServer;
 import cc.fascinated.monitor.web.auth.AuthenticatedUser;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,9 +28,11 @@ import org.springframework.web.bind.annotation.*;
 public class ServerController {
 
     private final ServerService serverService;
+    private final ServerIngestService serverIngestService;
 
-    public ServerController(ServerService serverService) {
+    public ServerController(ServerService serverService, ServerIngestService serverIngestService) {
         this.serverService = serverService;
+        this.serverIngestService = serverIngestService;
     }
 
     @GetMapping(value = "/{serverId}")
@@ -136,7 +137,7 @@ public class ServerController {
 
     @PostMapping(value = "/heartbeat")
     public void heartbeat(@AuthenticatedServer ServerRow server) {
-        this.serverService.recordHeartbeat(server);
+        this.serverIngestService.recordHeartbeat(server);
     }
 
     @PostMapping(value = "/ingest")
@@ -146,6 +147,6 @@ public class ServerController {
         if (payloadBytes < 0) {
             payloadBytes = 0;
         }
-        this.serverService.ingestMetrics(server, metrics, payloadBytes);
+        this.serverIngestService.ingestMetrics(server, metrics, payloadBytes);
     }
 }

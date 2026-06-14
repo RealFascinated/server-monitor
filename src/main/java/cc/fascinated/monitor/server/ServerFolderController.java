@@ -1,10 +1,9 @@
-package cc.fascinated.monitor.controller.v1;
+package cc.fascinated.monitor.server;
 
-import cc.fascinated.monitor.model.dto.request.server.ReorderServerFoldersRequest;
 import cc.fascinated.monitor.model.dto.request.server.FolderNameRequest;
+import cc.fascinated.monitor.model.dto.request.server.ReorderServerFoldersRequest;
 import cc.fascinated.monitor.model.dto.response.server.ServerFolderResponse;
 import cc.fascinated.monitor.model.persistance.UserRow;
-import cc.fascinated.monitor.service.ServerFolderService;
 import cc.fascinated.monitor.web.auth.AuthenticatedUser;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

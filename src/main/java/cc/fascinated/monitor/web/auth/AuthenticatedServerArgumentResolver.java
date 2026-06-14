@@ -1,7 +1,7 @@
 package cc.fascinated.monitor.web.auth;
 
 import cc.fascinated.monitor.model.persistance.ServerRow;
-import cc.fascinated.monitor.service.ServerService;
+import cc.fascinated.monitor.server.ServerIngestService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.NonNull;
 import org.springframework.core.MethodParameter;
@@ -13,10 +13,10 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
 public class AuthenticatedServerArgumentResolver implements HandlerMethodArgumentResolver {
-    private final ServerService serverService;
+    private final ServerIngestService serverIngestService;
 
-    public AuthenticatedServerArgumentResolver(ServerService serverService) {
-        this.serverService = serverService;
+    public AuthenticatedServerArgumentResolver(ServerIngestService serverIngestService) {
+        this.serverIngestService = serverIngestService;
     }
 
     @Override
@@ -29,6 +29,6 @@ public class AuthenticatedServerArgumentResolver implements HandlerMethodArgumen
                                   NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
         HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
         String authorization = request != null ? request.getHeader("Authorization") : null;
-        return this.serverService.authenticateIngestRequest(authorization);
+        return this.serverIngestService.authenticateIngestRequest(authorization);
     }
 }

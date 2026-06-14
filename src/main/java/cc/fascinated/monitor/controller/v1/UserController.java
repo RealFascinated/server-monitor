@@ -8,8 +8,8 @@ import cc.fascinated.monitor.model.dto.response.server.access.ServerMemberRespon
 import cc.fascinated.monitor.model.dto.response.server.access.UserPendingInviteResponse;
 import cc.fascinated.monitor.model.dto.response.metrics.ServerMetricsResponse;
 import cc.fascinated.monitor.model.persistance.UserRow;
-import cc.fascinated.monitor.service.ServerAccessService;
-import cc.fascinated.monitor.service.ServerService;
+import cc.fascinated.monitor.server.ServerService;
+import cc.fascinated.monitor.server.access.ServerAccessService;
 import cc.fascinated.monitor.web.auth.AuthenticatedUser;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;

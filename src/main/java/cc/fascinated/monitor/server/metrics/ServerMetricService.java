@@ -1,7 +1,7 @@
-package cc.fascinated.monitor.service;
+package cc.fascinated.monitor.server.metrics;
 
-import cc.fascinated.monitor.metrics.vm.VmMetricsReader;
 import cc.fascinated.monitor.metrics.server.series.VmGaugeSeries;
+import cc.fascinated.monitor.metrics.vm.VmMetricsReader;
 import cc.fascinated.monitor.model.domain.metric.MetricQueryWindow;
 import cc.fascinated.monitor.model.dto.response.metrics.ServerMetricsResponse;
 import cc.fascinated.monitor.model.persistance.ServerRow;

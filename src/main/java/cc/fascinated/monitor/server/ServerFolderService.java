@@ -1,10 +1,10 @@
-package cc.fascinated.monitor.service;
+package cc.fascinated.monitor.server;
 
 import cc.fascinated.monitor.exception.impl.BadRequestException;
 import cc.fascinated.monitor.exception.impl.ConflictException;
 import cc.fascinated.monitor.exception.impl.NotFoundException;
-import cc.fascinated.monitor.model.dto.request.server.ReorderServerFoldersRequest;
 import cc.fascinated.monitor.model.dto.request.server.FolderNameRequest;
+import cc.fascinated.monitor.model.dto.request.server.ReorderServerFoldersRequest;
 import cc.fascinated.monitor.model.dto.request.server.UpdateServerFolderRequest;
 import cc.fascinated.monitor.model.dto.response.server.ServerFolderResponse;
 import cc.fascinated.monitor.model.persistance.ServerFolderAssignmentRow;

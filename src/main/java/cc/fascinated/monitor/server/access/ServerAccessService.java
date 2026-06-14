@@ -1,4 +1,4 @@
-package cc.fascinated.monitor.service;
+package cc.fascinated.monitor.server.access;
 
 import cc.fascinated.monitor.exception.impl.ConflictException;
 import cc.fascinated.monitor.exception.impl.NotFoundException;
