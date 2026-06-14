@@ -41,7 +41,7 @@ dependencies {
     implementation("com.pngencoder:pngencoder:0.16.0")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.6.1")
     implementation("org.apache.httpcomponents.core5:httpcore5:5.4.2")
-    implementation("com.squareup.okhttp3:okhttp-urlconnection:5.3.2")
+    implementation("com.squareup.okhttp3:okhttp-urlconnection:5.4.0")
 
     // GeoIP - IP Lookups
     implementation("com.maxmind.geoip2:geoip2:5.0.2")
