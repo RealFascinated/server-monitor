@@ -12,12 +12,12 @@ import java.util.List;
 public interface ServerRepository extends JpaRepository<ServerRow, Long> {
 
     @Query("""
-            SELECT s.id FROM ServerRow s
+            SELECT s FROM ServerRow s
             WHERE (s.status IS NULL OR s.status = cc.fascinated.monitor.model.domain.server.ServerStatus.ONLINE)
             AND s.lastHeartbeat IS NOT NULL
             AND s.lastHeartbeat <= :cutoff
             """)
-    List<Long> findStaleServerIds(@Param("cutoff") Instant cutoff);
+    List<ServerRow> findStaleServers(@Param("cutoff") Instant cutoff);
 
     @Modifying(clearAutomatically = true)
     @Query("""

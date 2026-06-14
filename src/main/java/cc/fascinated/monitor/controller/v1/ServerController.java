@@ -6,7 +6,9 @@ import cc.fascinated.monitor.model.dto.request.server.ServerRenameRequest;
 import cc.fascinated.monitor.model.dto.request.server.UpdateServerFolderRequest;
 import cc.fascinated.monitor.model.dto.response.server.ServerFolderAssignmentResponse;
 import cc.fascinated.monitor.model.dto.response.server.ServerResponse;
+import cc.fascinated.monitor.model.dto.response.server.IncidentResponse;
 import cc.fascinated.monitor.model.dto.response.server.ServerStatusResponse;
+import cc.fascinated.monitor.util.Pagination;
 import cc.fascinated.monitor.model.dto.request.server.ingest.IngestServerMetrics;
 import cc.fascinated.monitor.model.dto.response.server.CreatedServerResponse;
 import cc.fascinated.monitor.model.dto.response.server.IngestTokenResponse;
@@ -43,6 +45,16 @@ public class ServerController {
             @PathVariable long serverId
     ) {
         return this.serverService.getServerStatus(user, serverId);
+    }
+
+    @GetMapping(value = "/{serverId}/incidents")
+    public Pagination.Page<IncidentResponse> listIncidents(
+            @AuthenticatedUser UserRow user,
+            @PathVariable long serverId,
+            @RequestParam int page,
+            @RequestParam int count
+    ) {
+        return this.serverService.listIncidents(user, serverId, page, count);
     }
 
     @PostMapping(value = "/create")

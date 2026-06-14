@@ -19,7 +19,9 @@ import cc.fascinated.monitor.model.dto.response.server.CreatedServerResponse;
 import cc.fascinated.monitor.model.dto.response.server.IngestTokenResponse;
 import cc.fascinated.monitor.model.dto.response.server.ServerFolderAssignmentResponse;
 import cc.fascinated.monitor.model.dto.response.server.ServerResponse;
+import cc.fascinated.monitor.model.dto.response.server.IncidentResponse;
 import cc.fascinated.monitor.model.dto.response.server.ServerStatusResponse;
+import cc.fascinated.monitor.util.Pagination;
 import cc.fascinated.monitor.model.dto.response.server.access.ServerAccessListResponse;
 import cc.fascinated.monitor.model.dto.response.server.access.ServerInviteCreatedResponse;
 import cc.fascinated.monitor.model.dto.response.metrics.ServerMetricsResponse;
@@ -72,6 +74,7 @@ public class ServerService {
     private final MonitorServerProperties serverProperties;
     private final InternetConnectivityService internetConnectivityService;
     private final ServerFolderService serverFolderService;
+    private final IncidentService incidentService;
 
     public ServerService(ServerRepository serverRepository,
                          ServerIngestTokenRepository serverIngestTokenRepository,
@@ -81,7 +84,8 @@ public class ServerService {
                          ServerAccessService serverAccessService,
                          MonitorServerProperties serverProperties,
                          InternetConnectivityService internetConnectivityService,
-                         ServerFolderService serverFolderService) {
+                         ServerFolderService serverFolderService,
+                         IncidentService incidentService) {
         this.serverRepository = serverRepository;
         this.serverIngestTokenRepository = serverIngestTokenRepository;
         this.platformMetricsRecorder = platformMetricsRecorder;
@@ -91,6 +95,7 @@ public class ServerService {
         this.serverProperties = serverProperties;
         this.internetConnectivityService = internetConnectivityService;
         this.serverFolderService = serverFolderService;
+        this.incidentService = incidentService;
     }
 
     @Scheduled(fixedDelayString = "#{@monitorMetricsProperties.refreshIntervalMs}")
@@ -101,14 +106,17 @@ public class ServerService {
             return;
         }
         Instant cutoff = Instant.now().minus(this.serverProperties.getOfflineThreshold());
-        List<Long> staleServerIds = this.serverRepository.findStaleServerIds(cutoff);
-        if (staleServerIds.isEmpty()) {
+        List<ServerRow> staleServers = this.serverRepository.findStaleServers(cutoff);
+        if (staleServers.isEmpty()) {
             return;
         }
         int updated = this.serverRepository.markStaleServersOffline(cutoff);
         if (updated > 0) {
             log.info("Marked {} server(s) offline (no update since {})", updated, cutoff);
-            writeServerStatusOffline(staleServerIds);
+            for (ServerRow server : staleServers) {
+                this.incidentService.openOutage(server.getId(), server.getLastHeartbeat());
+            }
+            writeServerStatusOffline(staleServers.stream().map(ServerRow::getId).toList());
         }
     }
 
@@ -134,6 +142,11 @@ public class ServerService {
     public ServerStatusResponse getServerStatus(UserRow user, long serverId) {
         ServerRow server = requireServer(user, serverId, ServerPermission.VIEW_SERVER);
         return ServerStatusResponse.from(server);
+    }
+
+    public Pagination.Page<IncidentResponse> listIncidents(UserRow user, long serverId, int page, int count) {
+        requireServer(user, serverId, ServerPermission.VIEW_SERVER);
+        return this.incidentService.listIncidents(serverId, page, count);
     }
 
     @Transactional
@@ -256,11 +269,15 @@ public class ServerService {
     @Transactional
     public void recordHeartbeat(ServerRow server) {
         Instant now = Instant.now();
+        ServerStatus previousStatus = server.getStatus();
         server.setLastHeartbeat(now);
         if (server.getStatus() != ServerStatus.ONLINE) {
             server.setStatus(ServerStatus.ONLINE);
         }
         this.serverRepository.save(server);
+        if (previousStatus == ServerStatus.OFFLINE) {
+            this.incidentService.resolveOpenOutage(server.getId(), now);
+        }
     }
 
     @Transactional
@@ -268,6 +285,7 @@ public class ServerService {
         long startedNanos = System.nanoTime();
 
         Instant now = Instant.now();
+        ServerStatus previousStatus = server.getStatus();
 
         // todo: verify agent version
         server.setAgentVersion(metrics.agentVersion());
@@ -305,6 +323,10 @@ public class ServerService {
         this.victoriaMetricsWriteClient.flush(buffer.toString());
 
         this.serverRepository.save(server);
+
+        if (previousStatus == ServerStatus.OFFLINE) {
+            this.incidentService.resolveOpenOutage(server.getId(), now);
+        }
 
         this.platformMetricsRecorder.recordIngest((System.nanoTime() - startedNanos) / 1_000_000_000.0, payloadBytes);
     }
