@@ -7,28 +7,24 @@ import cc.fascinated.monitor.model.persistance.UserRow;
 
 import java.time.Instant;
 
-public record UserPendingInviteResponse(
-        long inviteId,
-        long serverId,
+public record ServerInvitePreviewResponse(
         String serverName,
         ServerRole role,
+        String email,
         String invitedByEmail,
-        Instant expiresAt,
-        Instant createdAt
+        Instant expiresAt
 ) {
-    public static UserPendingInviteResponse from(
+    public static ServerInvitePreviewResponse from(
             ServerInviteRow invite,
             ServerRow server,
             UserRow invitedBy
     ) {
-        return new UserPendingInviteResponse(
-                invite.getId(),
-                server.getId(),
+        return new ServerInvitePreviewResponse(
                 server.getServerName(),
                 invite.getRole(),
+                invite.getEmail(),
                 invitedBy.getEmail(),
-                invite.getExpiresAt(),
-                invite.getCreatedAt()
+                invite.getExpiresAt()
         );
     }
 }

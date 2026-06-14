@@ -191,15 +191,37 @@ public class ServerAccessService {
                 invites.stream().map(ServerInviteRow::getServerId).toList()
         ).stream().collect(Collectors.toMap(ServerRow::getId, Function.identity()));
 
+        Map<Long, UserRow> invitersById = loadUsers(
+                invites.stream().map(ServerInviteRow::getInvitedById).toList()
+        );
+
         return invites.stream()
                 .map(invite -> {
                     ServerRow server = serversById.get(invite.getServerId());
                     if (server == null) {
                         throw new NotFoundException("Server \"%s\" not found".formatted(invite.getServerId()));
                     }
-                    return UserPendingInviteResponse.from(invite, server);
+                    UserRow invitedBy = invitersById.get(invite.getInvitedById());
+                    if (invitedBy == null) {
+                        throw new NotFoundException("Inviting user not found");
+                    }
+                    return UserPendingInviteResponse.from(invite, server, invitedBy);
                 })
                 .toList();
+    }
+
+    public ServerInvitePreviewResponse previewInvite(String token) {
+        ServerInviteRow invite = this.serverInviteRepository
+                .findByTokenHashAndExpiresAtAfter(AuthUtils.hash(token), Instant.now())
+                .orElseThrow(() -> new UnauthorizedException("Invalid or expired invite"));
+
+        ServerRow server = this.serverRepository.findById(invite.getServerId())
+                .orElseThrow(() -> new NotFoundException("Server \"%s\" not found".formatted(invite.getServerId())));
+
+        UserRow invitedBy = this.userRepository.findById(invite.getInvitedById())
+                .orElseThrow(() -> new NotFoundException("Inviting user not found"));
+
+        return ServerInvitePreviewResponse.from(invite, server, invitedBy);
     }
 
     @Transactional

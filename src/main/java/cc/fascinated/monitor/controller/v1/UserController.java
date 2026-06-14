@@ -3,6 +3,7 @@ package cc.fascinated.monitor.controller.v1;
 import cc.fascinated.monitor.model.domain.metric.MetricQueryWindow;
 import cc.fascinated.monitor.model.dto.request.server.ServerInviteAcceptRequest;
 import cc.fascinated.monitor.model.dto.response.server.ServerResponse;
+import cc.fascinated.monitor.model.dto.response.server.access.ServerInvitePreviewResponse;
 import cc.fascinated.monitor.model.dto.response.server.access.ServerMemberResponse;
 import cc.fascinated.monitor.model.dto.response.server.access.UserPendingInviteResponse;
 import cc.fascinated.monitor.model.dto.response.metrics.ServerMetricsResponse;
@@ -57,6 +58,14 @@ public class UserController {
     @GetMapping(value = "/invites")
     public List<UserPendingInviteResponse> listInvites(@AuthenticatedUser UserRow user) {
         return this.serverAccessService.listPendingInvites(user);
+    }
+
+    @GetMapping(value = "/invites/preview")
+    public ServerInvitePreviewResponse previewInvite(
+            @AuthenticatedUser UserRow user,
+            @RequestParam String token
+    ) {
+        return this.serverAccessService.previewInvite(token);
     }
 
     @PostMapping(value = "/invites/accept")
