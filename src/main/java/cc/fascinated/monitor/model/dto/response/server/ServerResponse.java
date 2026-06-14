@@ -21,6 +21,7 @@ public record ServerResponse(
         Long diskMax,
         Double uptimePercent30d,
         ServerRole role,
+        int permissions,
         String folderName,
         ServerInventoryResponse inventory
 ) {
@@ -50,6 +51,7 @@ public record ServerResponse(
                 diskMax,
                 uptimePercent30d,
                 role,
+                role.permissionMask(),
                 folderName,
                 server.getInventory() != null
                         ? ServerInventoryResponse.from(server.getInventory())

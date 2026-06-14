@@ -3,6 +3,7 @@ package cc.fascinated.monitor.service;
 import cc.fascinated.monitor.exception.impl.ConflictException;
 import cc.fascinated.monitor.exception.impl.NotFoundException;
 import cc.fascinated.monitor.exception.impl.UnauthorizedException;
+import cc.fascinated.monitor.model.domain.server.ServerPermission;
 import cc.fascinated.monitor.model.domain.server.ServerRole;
 import cc.fascinated.monitor.model.dto.request.server.ServerMemberInviteRequest;
 import cc.fascinated.monitor.model.dto.response.server.access.*;
@@ -67,16 +68,15 @@ public class ServerAccessService {
         return this.serverMemberRepository.findServerIdsByUserId(userId);
     }
 
-    public void requireAccessible(UserRow user, ServerRow server) {
-        if (findRole(server.getId(), user.getId()).isEmpty()) {
-            throw new UnauthorizedException("You do not have access to this server");
+    public void requirePermission(UserRow user, ServerRow server, ServerPermission permission) {
+        ServerRole role = findRole(server.getId(), user.getId()).orElse(null);
+        if (role == null || !role.has(permission)) {
+            throw new UnauthorizedException("You do not have permission to perform this action");
         }
     }
 
-    public void requireOwner(UserRow user, ServerRow server) {
-        if (findRole(server.getId(), user.getId()).orElse(null) != ServerRole.OWNER) {
-            throw new UnauthorizedException("You do not own this server");
-        }
+    public boolean hasPermission(long serverId, long userId, ServerPermission permission) {
+        return findRole(serverId, userId).map(role -> role.has(permission)).orElse(false);
     }
 
     public UserRow getOwnerUser(ServerRow server) {
@@ -92,6 +92,8 @@ public class ServerAccessService {
     }
 
     public ServerAccessListResponse listAccess(UserRow user, ServerRow server) {
+        requirePermission(user, server, ServerPermission.LIST_MEMBERS);
+
         UserRow ownerUser = getOwnerUser(server);
 
         List<ServerMemberRow> members = this.serverMemberRepository.findByServerId(server.getId()).stream()
@@ -103,7 +105,7 @@ public class ServerAccessService {
                 .map(member -> ServerMemberEntryResponse.from(member, usersById.get(member.getUserId())))
                 .toList();
 
-        List<PendingInviteResponse> pendingInvites = findRole(server.getId(), user.getId()).orElse(null) == ServerRole.OWNER
+        List<PendingInviteResponse> pendingInvites = hasPermission(server.getId(), user.getId(), ServerPermission.LIST_INVITES)
                 ? this.serverInviteRepository.findByServerId(server.getId()).stream()
                         .map(PendingInviteResponse::from)
                         .toList()
@@ -117,8 +119,8 @@ public class ServerAccessService {
     }
 
     @Transactional
-    public ServerInviteCreatedResponse inviteUser(UserRow owner, ServerRow server, ServerMemberInviteRequest request) {
-        requireOwner(owner, server);
+    public ServerInviteCreatedResponse inviteUser(UserRow user, ServerRow server, ServerMemberInviteRequest request) {
+        requirePermission(user, server, ServerPermission.INVITE_MEMBERS);
 
         String email = UserUtils.normalizeEmail(request.email());
         UserRow ownerUser = getOwnerUser(server);
@@ -127,8 +129,8 @@ public class ServerAccessService {
             throw new ConflictException("The server owner already has access");
         }
 
-        this.userRepository.findByEmailIgnoreCase(email).ifPresent(user -> {
-            if (this.serverMemberRepository.existsByServerIdAndUserId(server.getId(), user.getId())) {
+        this.userRepository.findByEmailIgnoreCase(email).ifPresent(existingUser -> {
+            if (this.serverMemberRepository.existsByServerIdAndUserId(server.getId(), existingUser.getId())) {
                 throw new ConflictException("This user already has access to the server");
             }
         });
@@ -144,7 +146,7 @@ public class ServerAccessService {
                 email,
                 ServerRole.VIEWER,
                 AuthUtils.hash(token),
-                owner.getId(),
+                user.getId(),
                 now.plus(INVITE_DURATION_DAYS, ChronoUnit.DAYS),
                 now
         ));
@@ -153,36 +155,29 @@ public class ServerAccessService {
     }
 
     @Transactional
-    public void removeMember(UserRow owner, ServerRow server, long userId) {
-        requireOwner(owner, server);
+    public void removeMember(UserRow user, ServerRow server, long memberUserId) {
+        requirePermission(user, server, ServerPermission.REMOVE_MEMBERS);
 
-        if (findRole(server.getId(), userId).orElse(null) == ServerRole.OWNER) {
+        if (findRole(server.getId(), memberUserId).orElse(null) == ServerRole.OWNER) {
             throw new ConflictException("Cannot remove the server owner");
         }
 
-        if (!this.serverMemberRepository.existsByServerIdAndUserId(server.getId(), userId)) {
+        if (!this.serverMemberRepository.existsByServerIdAndUserId(server.getId(), memberUserId)) {
             throw new NotFoundException("Member not found on this server");
         }
 
-        this.serverMemberRepository.deleteByServerIdAndUserId(server.getId(), userId);
+        this.serverMemberRepository.deleteByServerIdAndUserId(server.getId(), memberUserId);
     }
 
     @Transactional
     public void leaveServer(UserRow user, ServerRow server) {
-        ServerRole role = findRole(server.getId(), user.getId()).orElse(null);
-        if (role == null) {
-            throw new UnauthorizedException("You do not have access to this server");
-        }
-        if (role == ServerRole.OWNER) {
-            throw new ConflictException("Server owners cannot leave their own server");
-        }
-
+        requirePermission(user, server, ServerPermission.LEAVE_SERVER);
         this.serverMemberRepository.deleteByServerIdAndUserId(server.getId(), user.getId());
     }
 
     @Transactional
-    public void revokeInvite(UserRow owner, ServerRow server, long inviteId) {
-        requireOwner(owner, server);
+    public void revokeInvite(UserRow user, ServerRow server, long inviteId) {
+        requirePermission(user, server, ServerPermission.REVOKE_INVITES);
 
         ServerInviteRow invite = this.serverInviteRepository.findById(inviteId)
                 .filter(row -> row.getServerId().equals(server.getId()))

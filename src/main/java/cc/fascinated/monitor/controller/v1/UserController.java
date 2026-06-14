@@ -9,7 +9,6 @@ import cc.fascinated.monitor.model.dto.response.server.access.UserPendingInviteR
 import cc.fascinated.monitor.model.dto.response.metrics.ServerMetricsResponse;
 import cc.fascinated.monitor.model.persistance.UserRow;
 import cc.fascinated.monitor.service.ServerAccessService;
-import cc.fascinated.monitor.service.ServerMetricService;
 import cc.fascinated.monitor.service.ServerService;
 import cc.fascinated.monitor.web.auth.AuthenticatedUser;
 import jakarta.validation.Valid;
@@ -27,13 +26,10 @@ import java.util.List;
 @RequestMapping(value = "/v1/user")
 public class UserController {
     private final ServerService serverService;
-    private final ServerMetricService serverMetricService;
     private final ServerAccessService serverAccessService;
 
-    public UserController(ServerService serverService, ServerMetricService serverMetricService,
-                          ServerAccessService serverAccessService) {
+    public UserController(ServerService serverService, ServerAccessService serverAccessService) {
         this.serverService = serverService;
-        this.serverMetricService = serverMetricService;
         this.serverAccessService = serverAccessService;
     }
 
@@ -49,8 +45,9 @@ public class UserController {
             @RequestParam long from,
             @RequestParam long to
     ) {
-        return this.serverMetricService.getServerMetrics(
-                this.serverService.getAccessibleServer(user, serverId),
+        return this.serverService.getServerMetrics(
+                user,
+                serverId,
                 MetricQueryWindow.parse(from, to)
         );
     }

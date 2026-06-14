@@ -14,7 +14,6 @@ import cc.fascinated.monitor.model.dto.response.server.access.ServerAccessListRe
 import cc.fascinated.monitor.model.dto.response.server.access.ServerInviteCreatedResponse;
 import cc.fascinated.monitor.model.persistance.ServerRow;
 import cc.fascinated.monitor.model.persistance.UserRow;
-import cc.fascinated.monitor.service.ServerAccessService;
 import cc.fascinated.monitor.service.ServerService;
 import cc.fascinated.monitor.web.auth.AuthenticatedServer;
 import cc.fascinated.monitor.web.auth.AuthenticatedUser;
@@ -28,11 +27,9 @@ import org.springframework.web.bind.annotation.*;
 public class ServerController {
 
     private final ServerService serverService;
-    private final ServerAccessService serverAccessService;
 
-    public ServerController(ServerService serverService, ServerAccessService serverAccessService) {
+    public ServerController(ServerService serverService) {
         this.serverService = serverService;
-        this.serverAccessService = serverAccessService;
     }
 
     @GetMapping(value = "/{serverId}")
@@ -84,7 +81,7 @@ public class ServerController {
 
     @GetMapping(value = "/{serverId}/members")
     public ServerAccessListResponse listMembers(@AuthenticatedUser UserRow user, @PathVariable long serverId) {
-        return this.serverAccessService.listAccess(user, this.serverService.getAccessibleServer(user, serverId));
+        return this.serverService.listMembers(user, serverId);
     }
 
     @PostMapping(value = "/{serverId}/members/invite")
@@ -93,7 +90,7 @@ public class ServerController {
             @PathVariable long serverId,
             @Valid @RequestBody ServerMemberInviteRequest request
     ) {
-        return this.serverAccessService.inviteUser(user, this.serverService.requireOwnedServer(user, serverId), request);
+        return this.serverService.inviteMember(user, serverId, request);
     }
 
     @DeleteMapping(value = "/{serverId}/leave")
@@ -102,7 +99,7 @@ public class ServerController {
             @AuthenticatedUser UserRow user,
             @PathVariable long serverId
     ) {
-        this.serverAccessService.leaveServer(user, this.serverService.getAccessibleServer(user, serverId));
+        this.serverService.leaveServer(user, serverId);
     }
 
     @DeleteMapping(value = "/{serverId}/members/{memberUserId}")
@@ -112,7 +109,7 @@ public class ServerController {
             @PathVariable long serverId,
             @PathVariable long memberUserId
     ) {
-        this.serverAccessService.removeMember(user, this.serverService.requireOwnedServer(user, serverId), memberUserId);
+        this.serverService.removeMember(user, serverId, memberUserId);
     }
 
     @DeleteMapping(value = "/{serverId}/invites/{inviteId}")
@@ -122,7 +119,7 @@ public class ServerController {
             @PathVariable long serverId,
             @PathVariable long inviteId
     ) {
-        this.serverAccessService.revokeInvite(user, this.serverService.requireOwnedServer(user, serverId), inviteId);
+        this.serverService.revokeInvite(user, serverId, inviteId);
     }
 
     @PostMapping(value = "/heartbeat")

@@ -4,9 +4,12 @@ import cc.fascinated.monitor.config.MonitorServerProperties;
 import cc.fascinated.monitor.exception.impl.InternalServerException;
 import cc.fascinated.monitor.exception.impl.NotFoundException;
 import cc.fascinated.monitor.exception.impl.UnauthorizedException;
+import cc.fascinated.monitor.model.domain.metric.MetricQueryWindow;
+import cc.fascinated.monitor.model.domain.server.ServerPermission;
 import cc.fascinated.monitor.model.domain.server.ServerRole;
 import cc.fascinated.monitor.model.domain.server.ServerStatus;
 import cc.fascinated.monitor.model.dto.request.server.ServerCreateRequest;
+import cc.fascinated.monitor.model.dto.request.server.ServerMemberInviteRequest;
 import cc.fascinated.monitor.model.dto.request.server.ServerRenameRequest;
 import cc.fascinated.monitor.model.dto.request.server.UpdateServerFolderRequest;
 import cc.fascinated.monitor.model.dto.request.server.ingest.IngestServerMetrics;
@@ -17,6 +20,9 @@ import cc.fascinated.monitor.model.dto.response.server.IngestTokenResponse;
 import cc.fascinated.monitor.model.dto.response.server.ServerFolderAssignmentResponse;
 import cc.fascinated.monitor.model.dto.response.server.ServerResponse;
 import cc.fascinated.monitor.model.dto.response.server.ServerStatusResponse;
+import cc.fascinated.monitor.model.dto.response.server.access.ServerAccessListResponse;
+import cc.fascinated.monitor.model.dto.response.server.access.ServerInviteCreatedResponse;
+import cc.fascinated.monitor.model.dto.response.metrics.ServerMetricsResponse;
 import cc.fascinated.monitor.model.persistance.ServerInventoryRow;
 import cc.fascinated.monitor.model.persistance.ServerRow;
 import cc.fascinated.monitor.model.persistance.UserRow;
@@ -119,14 +125,14 @@ public class ServerService {
     }
 
     public ServerResponse getServer(UserRow user, long serverId) {
-        ServerRow server = getAccessibleServer(user, serverId);
+        ServerRow server = requireServer(user, serverId, ServerPermission.VIEW_SERVER);
         ServerRole role = this.serverAccessService.findRole(server.getId(), user.getId()).orElseThrow();
         ServerResponseContext context = fetchServerResponseContext(List.of(server), user.getId());
         return toServerResponse(server, role, context);
     }
 
     public ServerStatusResponse getServerStatus(UserRow user, long serverId) {
-        ServerRow server = getAccessibleServer(user, serverId);
+        ServerRow server = requireServer(user, serverId, ServerPermission.VIEW_SERVER);
         return ServerStatusResponse.from(server);
     }
 
@@ -136,9 +142,34 @@ public class ServerService {
             long serverId,
             UpdateServerFolderRequest request
     ) {
-        ServerRow server = getAccessibleServer(user, serverId);
+        ServerRow server = requireServer(user, serverId, ServerPermission.ASSIGN_FOLDER);
         String folderName = this.serverFolderService.updateServerFolder(user, server, request);
         return new ServerFolderAssignmentResponse(serverId, folderName);
+    }
+
+    public ServerMetricsResponse getServerMetrics(UserRow user, long serverId, MetricQueryWindow window) {
+        ServerRow server = requireServer(user, serverId, ServerPermission.VIEW_METRICS);
+        return this.serverMetricService.getServerMetrics(server, window);
+    }
+
+    public ServerAccessListResponse listMembers(UserRow user, long serverId) {
+        return this.serverAccessService.listAccess(user, findServerRowById(serverId));
+    }
+
+    public ServerInviteCreatedResponse inviteMember(UserRow user, long serverId, ServerMemberInviteRequest request) {
+        return this.serverAccessService.inviteUser(user, findServerRowById(serverId), request);
+    }
+
+    public void removeMember(UserRow user, long serverId, long memberUserId) {
+        this.serverAccessService.removeMember(user, findServerRowById(serverId), memberUserId);
+    }
+
+    public void leaveServer(UserRow user, long serverId) {
+        this.serverAccessService.leaveServer(user, findServerRowById(serverId));
+    }
+
+    public void revokeInvite(UserRow user, long serverId, long inviteId) {
+        this.serverAccessService.revokeInvite(user, findServerRowById(serverId), inviteId);
     }
 
     @Transactional
@@ -177,29 +208,25 @@ public class ServerService {
         throw new NotFoundException("Server \"%s\" not found".formatted(id));
     }
 
-    public ServerRow getAccessibleServer(UserRow user, long serverId) {
+    public ServerRow requireServer(UserRow user, long serverId, ServerPermission permission) {
         ServerRow server = findServerRowById(serverId);
-        this.serverAccessService.requireAccessible(user, server);
-        return server;
-    }
-
-    public ServerRow requireOwnedServer(UserRow user, long serverId) {
-        ServerRow server = getAccessibleServer(user, serverId);
-        this.serverAccessService.requireOwner(user, server);
+        this.serverAccessService.requirePermission(user, server, permission);
         return server;
     }
 
     @Transactional
     public ServerResponse renameServer(UserRow user, long serverId, ServerRenameRequest request) {
-        ServerRow server = requireOwnedServer(user, serverId);
+        ServerRow server = requireServer(user, serverId, ServerPermission.RENAME_SERVER);
         server.setServerName(request.name());
         this.serverRepository.save(server);
-        return getServer(user, serverId);
+        ServerRole role = this.serverAccessService.findRole(server.getId(), user.getId()).orElseThrow();
+        ServerResponseContext context = fetchServerResponseContext(List.of(server), user.getId());
+        return toServerResponse(server, role, context);
     }
 
     @Transactional
     public void deleteServer(UserRow user, long serverId) {
-        requireOwnedServer(user, serverId);
+        requireServer(user, serverId, ServerPermission.DELETE_SERVER);
         this.victoriaMetricsWriteClient.deleteSeriesForServer(serverId);
         this.serverRepository.deleteById(serverId);
         log.info("Deleted server {} and its VictoriaMetrics series", serverId);
@@ -207,7 +234,7 @@ public class ServerService {
 
     @Transactional
     public IngestTokenResponse rotateIngestToken(UserRow user, long serverId) {
-        requireOwnedServer(user, serverId);
+        requireServer(user, serverId, ServerPermission.ROTATE_INGEST_TOKEN);
         this.serverIngestTokenRepository.deleteByServerId(serverId);
         UUID ingestToken = issueIngestToken(serverId);
         log.info("Rotated ingest token for server {}", serverId);
