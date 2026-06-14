@@ -149,6 +149,15 @@ public class ServerService {
             this.serverAccessService.addOwner(serverRow.getId(), user.getId(), now);
             UUID ingestToken = issueIngestToken(serverRow.getId());
 
+            String folderName = createRequest.folderName();
+            if (folderName != null && !folderName.isBlank()) {
+                this.serverFolderService.updateServerFolder(
+                        user,
+                        serverRow,
+                        new UpdateServerFolderRequest(folderName.trim())
+                );
+            }
+
             return new CreatedServerResponse(
                     serverRow.getServerName(),
                     serverRow.getId(),
