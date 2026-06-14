@@ -66,4 +66,12 @@ public class UserController {
     ) {
         return this.serverAccessService.acceptInvite(user, request.token());
     }
+
+    @PostMapping(value = "/invites/{inviteId}/accept")
+    public ServerMemberResponse acceptInviteById(
+            @AuthenticatedUser UserRow user,
+            @PathVariable long inviteId
+    ) {
+        return this.serverAccessService.acceptInviteById(user, inviteId);
+    }
 }

@@ -32,6 +32,9 @@ public class PlatformMetricsAssembler {
 
     private static Object assembleSection(PlatformSection section, MetricTimeGrid grid,
                                           Map<PlatformMetricFamily, List<VmTimeSeries>> seriesByFamily) {
+        if (section == PlatformSection.FLEET) {
+            return assembleFleetSection(grid, seriesByFamily);
+        }
         Map<String, List<Double>> scalars = new LinkedHashMap<>();
         Map<String, LabeledSeries> labeled = new LinkedHashMap<>();
         for (PlatformMetricFamily family : PlatformMetricFamily.forSection(section)) {
@@ -57,6 +60,39 @@ public class PlatformMetricsAssembler {
             return scalars;
         }
         return null;
+    }
+
+    private static Object assembleFleetSection(MetricTimeGrid grid,
+                                               Map<PlatformMetricFamily, List<VmTimeSeries>> seriesByFamily) {
+        Map<String, List<Double>> scalars = new LinkedHashMap<>();
+        Map<String, LabeledSeries> byOs = new LinkedHashMap<>();
+        Map<String, LabeledSeries> byAgentVersion = new LinkedHashMap<>();
+
+        for (PlatformMetricFamily family : PlatformMetricFamily.forSection(PlatformSection.FLEET)) {
+            List<VmTimeSeries> series = seriesByFamily.getOrDefault(family, List.of());
+            if (family == PlatformMetricFamily.SERVERS_BY_OS) {
+                ingestLabeled(grid, byOs, family, series);
+            } else if (family == PlatformMetricFamily.SERVERS_BY_AGENT_VERSION) {
+                ingestLabeled(grid, byAgentVersion, family, series);
+            } else {
+                ingestScalars(grid, scalars, family, series);
+            }
+        }
+
+        Map<String, Object> fleet = new LinkedHashMap<>();
+        Map<String, List<Double>> prunedScalars = TimeSeriesAssembly.pruneScalar(scalars);
+        if (prunedScalars != null) {
+            fleet.putAll(prunedScalars);
+        }
+        List<LabeledSeries> byOsEntries = TimeSeriesAssembly.pruneLabeled(byOs);
+        if (byOsEntries != null) {
+            fleet.put("byOs", byOsEntries);
+        }
+        List<LabeledSeries> byAgentVersionEntries = TimeSeriesAssembly.pruneLabeled(byAgentVersion);
+        if (byAgentVersionEntries != null) {
+            fleet.put("byAgentVersion", byAgentVersionEntries);
+        }
+        return fleet.isEmpty() ? null : fleet;
     }
 
     private static void ingestScalars(MetricTimeGrid grid, Map<String, List<Double>> scalars,

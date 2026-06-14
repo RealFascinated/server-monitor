@@ -16,6 +16,7 @@ import cc.fascinated.monitor.model.dto.response.server.CreatedServerResponse;
 import cc.fascinated.monitor.model.dto.response.server.IngestTokenResponse;
 import cc.fascinated.monitor.model.dto.response.server.ServerFolderAssignmentResponse;
 import cc.fascinated.monitor.model.dto.response.server.ServerResponse;
+import cc.fascinated.monitor.model.dto.response.server.ServerStatusResponse;
 import cc.fascinated.monitor.model.persistance.ServerInventoryRow;
 import cc.fascinated.monitor.model.persistance.ServerRow;
 import cc.fascinated.monitor.model.persistance.UserRow;
@@ -122,6 +123,11 @@ public class ServerService {
         ServerRole role = this.serverAccessService.findRole(server.getId(), user.getId()).orElseThrow();
         ServerResponseContext context = fetchServerResponseContext(List.of(server), user.getId());
         return toServerResponse(server, role, context);
+    }
+
+    public ServerStatusResponse getServerStatus(UserRow user, long serverId) {
+        ServerRow server = getAccessibleServer(user, serverId);
+        return ServerStatusResponse.from(server);
     }
 
     @Transactional

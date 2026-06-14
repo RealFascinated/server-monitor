@@ -208,6 +208,22 @@ public class ServerAccessService {
                 .findByTokenHashAndExpiresAtAfter(AuthUtils.hash(token), Instant.now())
                 .orElseThrow(() -> new UnauthorizedException("Invalid or expired invite"));
 
+        return fulfillInvite(user, invite);
+    }
+
+    @Transactional
+    public ServerMemberResponse acceptInviteById(UserRow user, long inviteId) {
+        ServerInviteRow invite = this.serverInviteRepository.findById(inviteId)
+                .orElseThrow(() -> new NotFoundException("Invite not found"));
+
+        if (!invite.getExpiresAt().isAfter(Instant.now())) {
+            throw new UnauthorizedException("Invalid or expired invite");
+        }
+
+        return fulfillInvite(user, invite);
+    }
+
+    private ServerMemberResponse fulfillInvite(UserRow user, ServerInviteRow invite) {
         if (!invite.getEmail().equalsIgnoreCase(user.getEmail())) {
             throw new UnauthorizedException("This invite was sent to a different email");
         }
