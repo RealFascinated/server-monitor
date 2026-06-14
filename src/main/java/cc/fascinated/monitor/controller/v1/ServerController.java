@@ -96,6 +96,15 @@ public class ServerController {
         return this.serverAccessService.inviteUser(user, this.serverService.requireOwnedServer(user, serverId), request);
     }
 
+    @DeleteMapping(value = "/{serverId}/leave")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void leaveServer(
+            @AuthenticatedUser UserRow user,
+            @PathVariable long serverId
+    ) {
+        this.serverAccessService.leaveServer(user, this.serverService.getAccessibleServer(user, serverId));
+    }
+
     @DeleteMapping(value = "/{serverId}/members/{memberUserId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeMember(

@@ -168,6 +168,19 @@ public class ServerAccessService {
     }
 
     @Transactional
+    public void leaveServer(UserRow user, ServerRow server) {
+        ServerRole role = findRole(server.getId(), user.getId()).orElse(null);
+        if (role == null) {
+            throw new UnauthorizedException("You do not have access to this server");
+        }
+        if (role == ServerRole.OWNER) {
+            throw new ConflictException("Server owners cannot leave their own server");
+        }
+
+        this.serverMemberRepository.deleteByServerIdAndUserId(server.getId(), user.getId());
+    }
+
+    @Transactional
     public void revokeInvite(UserRow owner, ServerRow server, long inviteId) {
         requireOwner(owner, server);
 
