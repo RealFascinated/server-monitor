@@ -5,7 +5,7 @@ import cc.fascinated.monitor.metrics.server.catalog.MetricFamily;
 import cc.fascinated.monitor.metrics.server.catalog.VmMetricCatalog;
 import cc.fascinated.monitor.metrics.vm.assembler.TimeSeriesAssembly;
 import cc.fascinated.monitor.metrics.vm.query.VmTimeSeries;
-import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
+import cc.fascinated.monitor.model.domain.metric.MetricQueryWindow;
 import cc.fascinated.monitor.model.dto.response.metrics.LabeledSeries;
 import cc.fascinated.monitor.model.dto.response.metrics.MetricsResponse;
 import cc.fascinated.monitor.model.dto.response.metrics.ServerMetricsResponse;
@@ -18,7 +18,7 @@ import java.util.Map;
 public final class VmMetricsAssembler {
     private VmMetricsAssembler() {}
 
-    public static ServerMetricsResponse assemble(long id, MetricTimeRange range, MetricTimeRange.QueryWindow window,
+    public static ServerMetricsResponse assemble(long id, MetricQueryWindow window,
                                                  List<VmTimeSeries> gauges,
                                                  Map<ComputedMetric, List<VmTimeSeries>> computed) {
         MetricTimeGrid grid = MetricTimeGrid.from(window);
@@ -59,8 +59,9 @@ public final class VmMetricsAssembler {
         }
 
         List<Long> timestamps = sections.isEmpty() ? null : grid.timestamps();
-        Long step = sections.isEmpty() ? null : range.step().getSeconds();
-        return new ServerMetricsResponse(id, new MetricsResponse(range.param(), step, timestamps, Map.copyOf(sections)));
+        Long step = sections.isEmpty() ? null : window.stepSeconds();
+        return new ServerMetricsResponse(id, new MetricsResponse(
+                window.fromEpoch(), window.toEpoch(), step, timestamps, Map.copyOf(sections)));
     }
 
     private static void ingestScalar(MetricTimeGrid grid, Map<MetricSection, Map<String, List<Double>>> scalars,

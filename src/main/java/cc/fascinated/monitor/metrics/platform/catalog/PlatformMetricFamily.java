@@ -1,10 +1,10 @@
 package cc.fascinated.monitor.metrics.platform.catalog;
 
 import cc.fascinated.monitor.metrics.vm.query.PromqlQueryBuilder;
-import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -80,11 +80,11 @@ public enum PlatformMetricFamily {
      * PromQL range queries for the admin dashboard. Counters return per-minute rates;
      * histograms return interval averages via {@code rate(sum) / rate(count)}.
      */
-    public List<String> adminRangeQueries(MetricTimeRange range) {
+    public List<String> adminRangeQueries(Duration span) {
         if (this.histogram && this.labeled) {
             return List.of();
         }
-        String rateWindow = rateWindowFor(range);
+        String rateWindow = rateWindowFor(span);
         if (this.counter()) {
             return List.of(
                     PromqlQueryBuilder.metric(this.metricName).rate(rateWindow).multiply(60).build()
@@ -105,11 +105,8 @@ public enum PlatformMetricFamily {
         };
     }
 
-    private static String rateWindowFor(MetricTimeRange range) {
-        return switch (range) {
-            case H1, H3, H6 -> "2m";
-            default -> "5m";
-        };
+    private static String rateWindowFor(Duration span) {
+        return span.compareTo(Duration.ofHours(6)) <= 0 ? "2m" : "5m";
     }
 
     private static String histogramAverageRate(String metricName, String rateWindow) {

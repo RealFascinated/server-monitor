@@ -9,7 +9,8 @@ import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record MetricsResponse(
-        String range,
+        Long from,
+        Long to,
         Long step,
         List<Long> timestamps,
         @JsonIgnore Map<String, Object> sectionData
@@ -19,7 +20,7 @@ public record MetricsResponse(
         return this.sectionData;
     }
 
-    public static MetricsResponse empty(String range) {
-        return new MetricsResponse(range, null, null, Map.of());
+    public static MetricsResponse empty(long from, long to, long step) {
+        return new MetricsResponse(from, to, step, null, Map.of());
     }
 }

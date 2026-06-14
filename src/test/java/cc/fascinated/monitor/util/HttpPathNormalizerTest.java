@@ -8,6 +8,6 @@ class HttpPathNormalizerTest {
     @Test
     void normalize_replacesNumericSegments() {
         assertEquals("/v1/user/servers/{id}/metrics", HttpPathNormalizer.normalize("/v1/user/servers/42/metrics"));
-        assertEquals("/v1/user/servers/{id}/metrics", HttpPathNormalizer.normalize("/v1/user/servers/99/metrics?range=1h"));
+        assertEquals("/v1/user/servers/{id}/metrics", HttpPathNormalizer.normalize("/v1/user/servers/99/metrics?from=1748736000&to=1749340800"));
     }
 }

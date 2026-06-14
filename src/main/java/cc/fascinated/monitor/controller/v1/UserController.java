@@ -1,6 +1,6 @@
 package cc.fascinated.monitor.controller.v1;
 
-import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
+import cc.fascinated.monitor.model.domain.metric.MetricQueryWindow;
 import cc.fascinated.monitor.model.dto.request.server.ServerInviteAcceptRequest;
 import cc.fascinated.monitor.model.dto.response.server.ServerResponse;
 import cc.fascinated.monitor.model.dto.response.server.access.ServerMemberResponse;
@@ -45,11 +45,12 @@ public class UserController {
     public ServerMetricsResponse getServerMetrics(
             @AuthenticatedUser UserRow user,
             @PathVariable long serverId,
-            @RequestParam String range
+            @RequestParam long from,
+            @RequestParam long to
     ) {
         return this.serverMetricService.getServerMetrics(
                 this.serverService.getAccessibleServer(user, serverId),
-                MetricTimeRange.fromParam(range)
+                MetricQueryWindow.parse(from, to)
         );
     }
 

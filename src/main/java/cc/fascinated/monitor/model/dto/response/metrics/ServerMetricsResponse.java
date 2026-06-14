@@ -8,7 +8,7 @@ public record ServerMetricsResponse(
         long id,
         @JsonUnwrapped MetricsResponse metrics
 ) {
-    public static ServerMetricsResponse empty(long id, String range) {
-        return new ServerMetricsResponse(id, MetricsResponse.empty(range));
+    public static ServerMetricsResponse empty(long id, long from, long to, long step) {
+        return new ServerMetricsResponse(id, MetricsResponse.empty(from, to, step));
     }
 }

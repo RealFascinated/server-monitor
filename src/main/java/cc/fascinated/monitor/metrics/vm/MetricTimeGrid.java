@@ -2,7 +2,7 @@ package cc.fascinated.monitor.metrics.vm;
 
 import cc.fascinated.monitor.metrics.vm.query.VmSample;
 import cc.fascinated.monitor.metrics.vm.query.VmTimeSeries;
-import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
+import cc.fascinated.monitor.model.domain.metric.MetricQueryWindow;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
@@ -22,7 +22,7 @@ public final class MetricTimeGrid {
         this.gridStart = gridStart;
     }
 
-    public static MetricTimeGrid from(MetricTimeRange.QueryWindow window) {
+    public static MetricTimeGrid from(MetricQueryWindow window) {
         long step = window.stepSeconds();
         long start = window.from().getEpochSecond();
         long end = window.to().getEpochSecond();

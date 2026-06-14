@@ -6,7 +6,7 @@ import cc.fascinated.monitor.metrics.vm.assembler.TimeSeriesAssembly;
 import cc.fascinated.monitor.metrics.vm.MetricTimeGrid;
 import cc.fascinated.monitor.metrics.vm.query.Promql;
 import cc.fascinated.monitor.metrics.vm.query.VmTimeSeries;
-import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
+import cc.fascinated.monitor.model.domain.metric.MetricQueryWindow;
 import cc.fascinated.monitor.model.dto.response.metrics.LabeledSeries;
 import lombok.experimental.UtilityClass;
 
@@ -17,7 +17,7 @@ import java.util.Map;
 @UtilityClass
 public class PlatformMetricsAssembler {
 
-    public static Map<String, Object> assembleSections(MetricTimeRange range, MetricTimeRange.QueryWindow window,
+    public static Map<String, Object> assembleSections(MetricQueryWindow window,
                                                        Map<PlatformMetricFamily, List<VmTimeSeries>> seriesByFamily) {
         MetricTimeGrid grid = MetricTimeGrid.from(window);
         Map<String, Object> sections = new LinkedHashMap<>();

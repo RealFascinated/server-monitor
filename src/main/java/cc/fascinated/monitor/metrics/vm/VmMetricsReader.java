@@ -7,7 +7,7 @@ import cc.fascinated.monitor.metrics.vm.query.VictoriaMetricsQueryClient;
 import cc.fascinated.monitor.metrics.vm.query.VmQueryResponse;
 import cc.fascinated.monitor.metrics.vm.query.VmTimeSeries;
 import cc.fascinated.monitor.metrics.server.series.VmGaugeSeries;
-import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
+import cc.fascinated.monitor.model.domain.metric.MetricQueryWindow;
 import cc.fascinated.monitor.model.dto.response.metrics.ServerMetricsResponse;
 import org.springframework.stereotype.Component;
 
@@ -28,18 +28,17 @@ public class VmMetricsReader {
         this.victoriaMetricsQueryClient = victoriaMetricsQueryClient;
     }
 
-    public ServerMetricsResponse readDashboard(long serverId, MetricTimeRange range) {
-        MetricTimeRange.QueryWindow window = range.queryWindow();
+    public ServerMetricsResponse readDashboard(long serverId, MetricQueryWindow window) {
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             CompletableFuture<List<VmTimeSeries>> gauges = CompletableFuture.supplyAsync(
-                    () -> fetchRange(VmMetricCatalog.selectorForServer(serverId), range, window),
+                    () -> fetchRange(VmMetricCatalog.selectorForServer(serverId), window),
                     executor
             );
             Map<ComputedMetric, CompletableFuture<List<VmTimeSeries>>> computedTasks =
                     new EnumMap<>(ComputedMetric.class);
             for (ComputedMetric computed : ComputedMetric.values()) {
                 computedTasks.put(computed, CompletableFuture.supplyAsync(
-                        () -> fetchRange(computed.promql(serverId), range, window),
+                        () -> fetchRange(computed.promql(serverId), window),
                         executor
                 ));
             }
@@ -47,7 +46,7 @@ public class VmMetricsReader {
             for (ComputedMetric metric : ComputedMetric.values()) {
                 computed.put(metric, computedTasks.get(metric).join());
             }
-            return VmMetricsAssembler.assemble(serverId, range, window, gauges.join(), computed);
+            return VmMetricsAssembler.assemble(serverId, window, gauges.join(), computed);
         }
     }
 
@@ -111,8 +110,8 @@ public class VmMetricsReader {
         return result;
     }
 
-    private List<VmTimeSeries> fetchRange(String promql, MetricTimeRange range, MetricTimeRange.QueryWindow window) {
-        VmQueryResponse response = this.victoriaMetricsQueryClient.execute(range.toRangeQuery(promql, window));
+    private List<VmTimeSeries> fetchRange(String promql, MetricQueryWindow window) {
+        VmQueryResponse response = this.victoriaMetricsQueryClient.execute(window.toRangeQuery(promql));
         return response.timeSeries();
     }
 

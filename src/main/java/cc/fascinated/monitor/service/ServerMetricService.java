@@ -2,7 +2,7 @@ package cc.fascinated.monitor.service;
 
 import cc.fascinated.monitor.metrics.vm.VmMetricsReader;
 import cc.fascinated.monitor.metrics.server.series.VmGaugeSeries;
-import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
+import cc.fascinated.monitor.model.domain.metric.MetricQueryWindow;
 import cc.fascinated.monitor.model.dto.response.metrics.ServerMetricsResponse;
 import cc.fascinated.monitor.model.persistance.ServerRow;
 import org.springframework.stereotype.Service;
@@ -18,8 +18,8 @@ public class ServerMetricService {
         this.vmMetricsReader = vmMetricsReader;
     }
 
-    public ServerMetricsResponse getServerMetrics(ServerRow server, MetricTimeRange range) {
-        return this.vmMetricsReader.readDashboard(server.getId(), range);
+    public ServerMetricsResponse getServerMetrics(ServerRow server, MetricQueryWindow window) {
+        return this.vmMetricsReader.readDashboard(server.getId(), window);
     }
 
     public Map<Long, Double> fetchUptimePercent30d(List<Long> serverIds) {
