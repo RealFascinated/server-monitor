@@ -5,7 +5,6 @@ import cc.fascinated.monitor.model.domain.settings.SettingType;
 import cc.fascinated.monitor.model.dto.response.settings.SettingResponse;
 import cc.fascinated.monitor.model.persistance.SettingRow;
 import cc.fascinated.monitor.repository.SettingRepository;
-import cc.fascinated.monitor.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
@@ -24,12 +23,10 @@ public class SettingsService {
     public static SettingsService INSTANCE;
 
     private final SettingRepository settingRepository;
-    private final UserRepository userRepository;
 
-    public SettingsService(SettingRepository settingRepository, UserRepository userRepository) {
+    public SettingsService(SettingRepository settingRepository) {
         INSTANCE = this;
         this.settingRepository = settingRepository;
-        this.userRepository = userRepository;
     }
 
     public List<SettingResponse> getSettings() {
@@ -37,7 +34,7 @@ public class SettingsService {
     }
 
     public List<SettingResponse> getPublicSettings() {
-        return Settings.getPublicSettings().stream().map(this::toPublicResponse).toList();
+        return Settings.getPublicSettings().stream().map(this::toResponse).toList();
     }
 
     @Transactional
@@ -53,15 +50,6 @@ public class SettingsService {
         Object value = row.map(SettingRow::getValue).orElse(setting.getDefaultValue());
         Instant lastModified = row.map(SettingRow::getLastModified).orElse(null);
         return new SettingResponse(setting.getKey(), setting.getType(), value, lastModified);
-    }
-
-    private SettingResponse toPublicResponse(Settings setting) {
-        if (setting == Settings.REGISTRATION_ENABLED && !setting.asBoolean() && this.userRepository.count() == 0) {
-            SettingResponse response = toResponse(setting);
-            return new SettingResponse(response.key(), response.type(), true, response.lastModified());
-        }
-
-        return toResponse(setting);
     }
 
     @AllArgsConstructor
