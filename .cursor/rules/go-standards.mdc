@@ -1,0 +1,98 @@
+---
+description: Go coding standards for Monitor Agent
+globs: agent/**/*.go
+alwaysApply: false
+---
+
+# Code Style
+
+## Formatting and Imports
+
+- Run `gofmt` / standard Go formatting. Group imports: stdlib, third-party, `fascinated.cc/monitor/agent/...`.
+- Prefer explicit package names in import paths; no dot-imports.
+
+## File Layout
+
+Within a file, typical order:
+
+1. Package comment (if any)
+2. `//go:build` constraint line
+3. `package` declaration
+4. Imports
+5. Constants
+6. Package-level `var` (e.g. compiled regexes, shared clients)
+7. Types
+8. Exported functions/methods
+9. Unexported functions/methods
+
+## Platform Builds
+
+Use modern build constraints at the top of platform-specific files:
+
+```go
+//go:build linux
+
+package disk
+```
+
+- Linux-first implementations in `*_linux.go`; Windows in `*_windows.go`.
+- Provide stubs for other platforms (`*_unsupported.go`, `other.go`) so the module compiles everywhere Go supports, even though runtime only allows linux/windows.
+- Keep shared logic in neutral files; only split when behavior differs by OS.
+
+## Errors
+
+- Wrap errors with context: `fmt.Errorf("load config: %w", err)`.
+- Return errors from libraries; log at the call site with `slog` where appropriate.
+- Don't swallow errors silently unless the existing code already treats that case as optional (e.g. missing ZFS).
+
+## Logging
+
+Use `log/slog` only — no third-party loggers.
+
+```go
+slog.Info("agent started", "schedule", schedule)
+slog.Warn("reload config", "err", err)
+slog.Error("push failed", "err", err)
+```
+
+Structured key-value pairs; no printf-style logging in new code.
+
+## Types and JSON
+
+- Ingest payload types live in `internal/ingest` with `json` tags matching the API. Don't rename tags without coordinating API changes.
+- Use pointers for optional JSON objects (`*ingest.ZFSArcMetrics` with `omitempty`).
+- Prefer value types for small structs passed by copy; use slices/maps for collections built during collect.
+
+## Tests
+
+- Table-driven tests when multiple cases share setup.
+- Use `t.Fatalf` for hard failures; `t.Helper()` in small test helpers if needed.
+- Platform-specific tests carry the same `//go:build` tag as the code under test.
+- Run `go test ./...` before finishing non-trivial changes.
+
+## Concurrency
+
+- `Agent` uses `sync.RWMutex` for config and cron lifecycle — follow that pattern for shared mutable agent state.
+- Pass `context.Context` for shutdown/cancellation in long-running loops (`Run`, cron tied to ctx).
+- Don't spawn goroutines without a clear exit path tied to context or agent stop.
+
+## Performance
+
+Collection and push run on a hot cron path. Performance is not an afterthought.
+
+- Preallocate slices when length is known: `make([]T, 0, len(entries))`.
+- Prefer maps with `struct{}` values for set membership over repeated slice scans.
+- Reuse package-level `http.Client` for push (see `ingest.push.go`); don't create clients per request.
+- Avoid extra allocations in per-tick collectors; cache host details that don't change every tick (`host.PopulateDetails` at agent start).
+- Compute deltas with `internal/delta` instead of storing redundant counters.
+- If two approaches are otherwise equal, pick the faster one.
+
+## Dependencies
+
+- Prefer stdlib and existing deps (`gopsutil`, `yaml.v3`, `cron/v3`) over new libraries.
+- Linux-only features (ZFS, Docker socket, `/proc`) stay behind build tags and config flags (`EnableDocker`).
+
+## Config
+
+- New config keys: add to `fileConfig`, `Config`, `config-example.yml`, and document the `MONITOR_*` env var via `ConfigEnvVar`.
+- Env vars override YAML. Validate schedules with `cron.ParseStandard` (or existing helpers) before starting the agent.

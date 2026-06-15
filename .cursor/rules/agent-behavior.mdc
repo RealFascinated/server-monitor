@@ -1,5 +1,5 @@
 ---
-description: Agent behavior and workflow for Monitor API
+description: Agent behavior and workflow for Monitor monorepo
 alwaysApply: true
 ---
 
@@ -20,6 +20,12 @@ alwaysApply: true
 - No error handling for impossible scenarios.
 - If you write 200 lines and it could be 50, rewrite it.
 
+**No backward compatibility unless asked.**
+
+- Do not add migration paths, dual-format loaders, deprecated-key fallbacks, or legacy shims when changing configs, persisted data (localStorage, cookies), serialized fields, or API contracts — unless the user explicitly requests it.
+- Default to the new shape only. This project is early-stage; there is usually no production data to preserve.
+- If a change could break something already live, **ask the user** before adding compatibility or migrations.
+
 **Never commit automatically. Let the user commit their own changes.**
 
 After completing changes, suggest a short commit message the user can use — but don't run `git commit`. No conventional commit prefixes. Just the message itself.
@@ -32,6 +38,10 @@ After completing changes, suggest a short commit message the user can use — bu
 - Remove imports/variables/methods that *your* changes made unused — leave pre-existing dead code alone unless asked.
 
 ## Project Overview
+
+Monorepo: Spring Boot API (`src/`), TanStack Start frontend (`www/`), Go metrics agent (`agent/`).
+
+### API (Java)
 
 Spring Boot REST API (`cc.fascinated.monitor`) for server monitoring: user auth, server registration, and agent metrics ingestion into PostgreSQL.
 
@@ -49,3 +59,34 @@ Spring Boot REST API (`cc.fascinated.monitor`) for server monitoring: user auth,
 | Migrations | `src/main/resources/db/migration` | `V{n}__description.sql` |
 
 Auth uses Bearer tokens parsed via `AuthUtils`. User sessions and ingest tokens are stored as SHA-256 hashes — never persist raw tokens.
+
+### www (frontend)
+
+TanStack Start + React 19 + Tailwind v4 + shadcn/ui. Routes in `www/src/routes/`, UI in `www/src/components/`. See `project-conventions.mdc` for layout and integration details.
+
+### Agent (Go)
+
+Go metrics agent (`fascinated.cc/monitor/agent`) for Linux and Windows. Collects host metrics (CPU, memory, load, network, disk, optional ZFS and Docker) and pushes JSON to the Monitor API ingest endpoint on a cron schedule. Runtime uses three loops: fast sample tick, slow metrics refresh, and cron push against a stateful `collector.Sampler` backed by `internal/platform` backends.
+
+| Package | Role |
+|---------|------|
+| `cmd` | `main` — config load, signal handling, update subcommand |
+| `internal/agent` | Cron scheduling, sample/slow loops, push loop, config reload |
+| `internal/platform` | Platform backends (linux/windows tick and slow orchestration) |
+| `internal/collector` | Stateful `Sampler` (fast tick + slow refresh) → `ingest` types |
+| `internal/ingest` | Config (YAML + `MONITOR_*` env), HTTP push, ingest JSON structs |
+| `internal/cpu` | CPU usage, per-core, clock speed, iowait (PDH), package power |
+| `internal/memory` | Memory and swap (Linux `/proc` + cgroup) |
+| `internal/thermal` | Temperature sensors (sysfs, gopsutil, LHM fallback) |
+| `internal/disk`, `network`, `host`, `loadavg`, `counters` | Other metric sources |
+| `internal/linux`, `zfs`, `docker`, `winpdh`, `lhm` | Platform-specific collectors |
+| `internal/delta`, `iostats` | Rate/delta helpers |
+| `internal/update` | Self-update via GitHub releases |
+
+Supported OS: `linux`, `windows` only (`cmd/main.go` exits on other platforms). Platform code uses `//go:build` tags; unsupported platforms get stub files (`*_unsupported.go`, `other.go`).
+
+Config: `config.yml` (see `config-example.yml`) with `MONITOR_` + uppercase key env overrides. Ingest token is required — never log or persist it beyond in-memory config.
+
+JSON field names on `ingest` types must stay compatible with the Monitor API ingest contract (camelCase `json` tags).
+
+Releases are tagged `agent/vMAJOR.MINOR.PATCH`.

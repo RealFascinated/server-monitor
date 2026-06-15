@@ -1,6 +1,6 @@
 ---
 description: Java and SQL coding standards for Monitor API
-globs: "**/*.java,**/*.sql"
+globs: src/**/*.java,src/**/*.sql
 alwaysApply: false
 ---
 
