@@ -7,8 +7,8 @@ import cc.fascinated.monitor.model.dto.response.agent.AgentUpdateResponse;
 import cc.fascinated.monitor.service.agent.AgentReleaseSupport;
 import cc.fascinated.monitor.service.agent.AgentReleaseSupport.GitHubAsset;
 import cc.fascinated.monitor.service.agent.AgentReleaseSupport.GitHubRelease;
+import cc.fascinated.monitor.util.Constants;
 import cc.fascinated.monitor.util.Semver;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -30,13 +30,11 @@ public class AgentUpdateService {
 
     private final AgentUpdateProperties properties;
     private final HttpClient httpClient;
-    private final ObjectMapper objectMapper;
 
     private volatile CachedRelease cachedRelease;
 
-    public AgentUpdateService(AgentUpdateProperties properties, ObjectMapper objectMapper) {
+    public AgentUpdateService(AgentUpdateProperties properties) {
         this.properties = properties;
-        this.objectMapper = objectMapper;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(HTTP_TIMEOUT)
                 .build();
@@ -107,7 +105,7 @@ public class AgentUpdateService {
             if (response.statusCode() >= 400) {
                 throw new InternalServerException("Failed to fetch agent releases (" + response.statusCode() + ")");
             }
-            GitHubRelease[] releases = this.objectMapper.readValue(response.body(), GitHubRelease[].class);
+            GitHubRelease[] releases = Constants.OBJECT_MAPPER.readValue(response.body(), GitHubRelease[].class);
             return List.of(releases);
         } catch (InternalServerException ex) {
             throw ex;

@@ -40,6 +40,8 @@ out/
 work/
 work
 
+.env
+
 # agent
 agent/main
 agent/main.exe

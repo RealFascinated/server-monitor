@@ -1,0 +1,64 @@
+server:
+  address: 0.0.0.0
+  port: 80
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+    min-response-size: 1024
+
+spring:
+  threads:
+    virtual:
+      enabled: true
+  jackson:
+    default-property-inclusion: non_null
+    mapper:
+      sort-properties-alphabetically: false
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 200
+        order_inserts: true
+        order_updates: true
+  datasource:
+    url: jdbc:postgresql://postgres:5432/monitor
+    username: monitor
+    password: monitor
+    hikari:
+      maximum-pool-size: 200
+      minimum-idle: 10
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+monitor:
+  agent:
+    github-owner: RealFascinated
+    github-repo: Monitor-API
+    tag-prefix: agent/v
+    release-cache-ttl: 5m
+  victoriametrics:
+    import-url: http://victoriametrics:8428/api/v1/import/prometheus
+    delete-token: changeme
+  servers:
+    offline-threshold: 2m
+    connectivity-probe-url: https://connectivitycheck.gstatic.com/generate_204
+    connectivity-timeout: 5s
+  metrics:
+    enabled: true
+    refresh-interval: 30s
+
+logging:
+  pattern:
+    console: "%level %logger{36} - %msg%n"
+  level:
+    cc.fascinated.monitor: info
