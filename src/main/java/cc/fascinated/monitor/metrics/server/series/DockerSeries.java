@@ -7,6 +7,8 @@ import cc.fascinated.monitor.model.dto.request.server.ingest.data.DockerContaine
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
+
 @Getter
 @Accessors(fluent = true)
 public enum DockerSeries implements VmMetricFamily {
@@ -31,7 +33,8 @@ public enum DockerSeries implements VmMetricFamily {
 
     public static void write(MetricWriteContext ctx, DockerContainerMetric container) {
         MetricWriteContext labeled = ctx.withLabel("container", container.containerName());
-        CPU_USAGE.write(labeled, container.cpuUsage().doubleValue());
+        BigDecimal cpuUsage = container.cpuUsage();
+        CPU_USAGE.writeNullable(labeled, cpuUsage != null ? cpuUsage.doubleValue() : null);
         MEMORY_USAGE.writeNullable(labeled, container.memoryUsage());
     }
 }
