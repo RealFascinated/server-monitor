@@ -2,6 +2,8 @@
 
 Server monitoring: API, web dashboard, and host agent. Collect metrics from your machines and view them in one place.
 
+![Servers](https://cdn.fascinated.cc/rSmesawI.png)
+
 ## Install with Docker
 
 You need [Docker Engine](https://docs.docker.com/engine/install/) and the [Compose plugin](https://docs.docker.com/compose/install/linux/).
