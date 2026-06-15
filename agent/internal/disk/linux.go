@@ -137,11 +137,13 @@ func statfsUsage(path string) (used, total, inodeUsed, inodeTotal uint64, err er
 		return 0, 0, 0, 0, err
 	}
 
-	blockSize := uint64(stat.Bsize)
+	blockSize := uint64(stat.Frsize)
+	if blockSize == 0 {
+		blockSize = uint64(stat.Bsize)
+	}
 	total = uint64(stat.Blocks) * blockSize
-	avail := uint64(stat.Bavail) * blockSize
-	if total > avail {
-		used = total - avail
+	if stat.Blocks >= stat.Bfree {
+		used = (uint64(stat.Blocks) - uint64(stat.Bfree)) * blockSize
 	}
 
 	inodeTotal = stat.Files
