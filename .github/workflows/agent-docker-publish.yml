@@ -137,7 +137,7 @@ jobs:
           images: ${{ steps.build.outputs.image }}
 
       - name: Build and push (default)
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: agent
           file: agent/Dockerfile
@@ -149,7 +149,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Build and push (NVIDIA)
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: agent
           file: agent/Dockerfile.nvidia
