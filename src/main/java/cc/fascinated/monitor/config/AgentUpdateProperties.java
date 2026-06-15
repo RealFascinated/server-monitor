@@ -11,7 +11,7 @@ import java.time.Duration;
 @ConfigurationProperties(prefix = "monitor.agent")
 public class AgentUpdateProperties {
     private String githubOwner = "RealFascinated";
-    private String githubRepo = "Monitor-API";
+    private String githubRepo = "server-monitor";
     private String tagPrefix = "agent/v";
     private Duration releaseCacheTtl = Duration.ofMinutes(5);
 }

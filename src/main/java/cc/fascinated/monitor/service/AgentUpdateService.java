@@ -37,6 +37,7 @@ public class AgentUpdateService {
         this.properties = properties;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(HTTP_TIMEOUT)
+                .followRedirects(HttpClient.Redirect.NORMAL)
                 .build();
     }
 
