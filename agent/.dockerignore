@@ -1,0 +1,7 @@
+.git
+.github
+dist
+config.yml
+*.exe
+main
+main.exe

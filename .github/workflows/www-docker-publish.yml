@@ -1,0 +1,87 @@
+name: Publish WWW Docker image
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "www/**"
+      - ".github/workflows/www-docker-publish.yml"
+    tags:
+      - "www/v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_REPOSITORY: ghcr.io/realfascinated/monitor-www
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve build
+        id: build
+        shell: bash
+        run: |
+          set -euo pipefail
+          image="${{ env.IMAGE_REPOSITORY }}"
+          echo "image=$image" >> "$GITHUB_OUTPUT"
+
+          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            version="master-$(git rev-parse --short HEAD)"
+            {
+              echo "version=$version"
+              echo "tags<<EOF"
+              echo "${image}:master"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          tag="${GITHUB_REF#refs/tags/}"
+          if [[ ! "$tag" =~ ^www/v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Unexpected ref: ${GITHUB_REF}"
+            exit 1
+          fi
+          version="${tag#www/v}"
+          {
+            echo "version=$version"
+            echo "tags<<EOF"
+            echo "${image}:${version}"
+            echo "${image}:latest"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker metadata labels
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.build.outputs.image }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: www
+          file: www/Dockerfile
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.build.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

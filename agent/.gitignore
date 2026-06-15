@@ -1,0 +1,6 @@
+main
+main.exe
+config.yml
+*.exe
+internal/lhm/sensorhost/bin/
+internal/lhm/sensorhost/obj/

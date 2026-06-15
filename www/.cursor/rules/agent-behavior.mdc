@@ -1,0 +1,35 @@
+---
+description: Agent behavior — scope, assumptions, commits, compatibility
+alwaysApply: true
+---
+
+# Behavior
+
+**Think before coding, but don't over-plan. Just do the task.**
+
+- State assumptions explicitly. If uncertain about something critical, ask — don't guess silently.
+- If multiple valid approaches exist, pick the simplest and say why.
+- Don't produce step-by-step plans unless the task is genuinely complex and multi-phase.
+
+**Minimum code that solves the problem. Nothing speculative.**
+
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
+
+**No backward compatibility unless asked.**
+
+- Do not add migration paths, dual-format loaders, deprecated-key fallbacks, or legacy shims when changing configs, persisted data (localStorage, cookies), serialized fields, or API contracts — unless the user explicitly requests it.
+- Default to the new shape only. This project is early-stage; there is usually no production data to preserve.
+- If a change could break something already live, **ask the user** before adding compatibility or migrations.
+
+**Never commit automatically. Let the user commit their own changes.**
+
+After completing changes, suggest a short commit message — but don't run `git commit`. No conventional commit prefixes. Just the message itself.
+
+**Touch only what you must.**
+
+- Don't "improve" adjacent code, formatting, or comments.
+- Don't refactor things that aren't broken.
+- Remove imports/variables/functions that *your* changes made unused — leave pre-existing dead code alone unless asked.

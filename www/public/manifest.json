@@ -1,0 +1,19 @@
+{
+  "id": "/",
+  "name": "Server Monitor",
+  "short_name": "Monitor",
+  "description": "Monitor server health, CPU, memory, and metrics in real time.",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#6b16ed",
+  "background_color": "#f9fafb",
+  "categories": ["utilities", "productivity"]
+}

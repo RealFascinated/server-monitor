@@ -39,3 +39,24 @@ out/
 
 work/
 work
+
+# agent
+agent/main
+agent/main.exe
+agent/config.yml
+agent/*.exe
+agent/internal/lhm/sensorhost/bin/
+agent/internal/lhm/sensorhost/obj/
+
+# www
+www/node_modules/
+www/dist/
+www/dist-ssr/
+www/.env*
+www/.tanstack/
+www/.wrangler/
+www/.output/
+www/.vinxi/
+www/__unconfig*/
+www/todos.json
+www/*.tsbuildinfo

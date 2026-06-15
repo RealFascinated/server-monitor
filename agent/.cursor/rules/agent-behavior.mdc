@@ -1,0 +1,59 @@
+---
+description: Agent behavior and workflow for Monitor Agent
+alwaysApply: true
+---
+
+# Agent Guidelines
+
+## Behavior
+
+**Think before coding, but don't over-plan. Just do the task.**
+
+- State assumptions explicitly. If uncertain about something critical, ask — don't guess silently.
+- If multiple valid approaches exist, pick the simplest and say why.
+- Don't produce step-by-step plans or loop structures unless the task is genuinely complex and multi-phase.
+
+**Minimum code that solves the problem. Nothing speculative.**
+
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
+
+**Never commit automatically. Let the user commit their own changes.**
+
+After completing changes, suggest a short commit message the user can use — but don't run `git commit`. No conventional commit prefixes. Just the message itself.
+
+**Touch only what you must.**
+
+- Don't "improve" adjacent code, formatting, or comments.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- Remove imports/variables/functions that *your* changes made unused — leave pre-existing dead code alone unless asked.
+
+## Project Overview
+
+Go metrics agent (`fascinated.cc/monitor/agent`) for Linux and Windows. Collects host metrics (CPU, memory, load, network, disk, optional ZFS and Docker) and pushes JSON to the Monitor API ingest endpoint on a cron schedule. Runtime uses three loops: fast sample tick, slow metrics refresh, and cron push against a stateful `collector.Sampler` backed by `internal/platform` backends.
+
+| Package | Role |
+|---------|------|
+| `cmd` | `main` — config load, signal handling, update subcommand |
+| `internal/agent` | Cron scheduling, sample/slow loops, push loop, config reload |
+| `internal/platform` | Platform backends (linux/windows tick and slow orchestration) |
+| `internal/collector` | Stateful `Sampler` (fast tick + slow refresh) → `ingest` types |
+| `internal/ingest` | Config (YAML + `MONITOR_*` env), HTTP push, ingest JSON structs |
+| `internal/cpu` | CPU usage, per-core, clock speed, iowait (PDH), package power |
+| `internal/memory` | Memory and swap (Linux `/proc` + cgroup) |
+| `internal/thermal` | Temperature sensors (sysfs, gopsutil, LHM fallback) |
+| `internal/disk`, `network`, `host`, `loadavg`, `counters` | Other metric sources |
+| `internal/linux`, `zfs`, `docker`, `winpdh`, `lhm` | Platform-specific collectors |
+| `internal/delta`, `iostats` | Rate/delta helpers |
+| `internal/update` | Self-update via GitHub releases |
+
+Supported OS: `linux`, `windows` only (`cmd/main.go` exits on other platforms). Platform code uses `//go:build` tags; unsupported platforms get stub files (`*_unsupported.go`, `other.go`).
+
+Config: `config.yml` (see `config-example.yml`) with `MONITOR_` + uppercase key env overrides. Ingest token is required — never log or persist it beyond in-memory config.
+
+JSON field names on `ingest` types must stay compatible with the Monitor API ingest contract (camelCase `json` tags).
+
+Releases are tagged `agent/vMAJOR.MINOR.PATCH`.

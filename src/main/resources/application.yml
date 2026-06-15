@@ -44,6 +44,11 @@ spring:
     locations: classpath:db/migration
 
 monitor:
+  agent:
+    github-owner: RealFascinated
+    github-repo: Monitor-API
+    tag-prefix: agent/v
+    release-cache-ttl: 5m
   victoriametrics:
     import-url: http://localhost:8428/api/v1/import/prometheus
     delete-token: "set_me" # VictoriaMetrics -httpAuthKey for admin/tsdb/delete_series

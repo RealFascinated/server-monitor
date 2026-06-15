@@ -1,0 +1,34 @@
+# syntax=docker/dockerfile:1
+# NVIDIA variant: Ubuntu + CUDA base (glibc). Use with the NVIDIA Container Toolkit and
+# --gpus all so nvidia-smi and driver libraries are injected from the host.
+
+FROM golang:1.25-alpine AS build
+
+WORKDIR /src
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+ARG VERSION=dev
+RUN CGO_ENABLED=0 go build \
+    -ldflags "-s -w -X main.agentVersion=${VERSION}" \
+    -o /monitor-agent \
+    ./cmd/main.go
+
+FROM nvidia/cuda:12.6.0-base-ubuntu24.04
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    docker.io \
+    util-linux \
+    zfsutils-linux \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=build /monitor-agent /usr/local/bin/monitor-agent
+COPY config-example.yml /etc/monitor-agent/config-example.yml
+
+WORKDIR /etc/monitor-agent
+
+ENTRYPOINT ["/usr/local/bin/monitor-agent"]

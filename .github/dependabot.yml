@@ -6,6 +6,16 @@ updates:
     schedule:
       interval: weekly
 
+  - package-ecosystem: gomod
+    directory: /agent
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: bun
+    directory: /www
+    schedule:
+      interval: weekly
+
   - package-ecosystem: github-actions
     directory: /
     schedule:

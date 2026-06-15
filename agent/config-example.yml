@@ -1,0 +1,6 @@
+# Optional. All settings can be set with environment variables instead (see README).
+ingest_token: ""
+api_endpoint: "https://monitor.fascinated.cc/api/v1/servers/ingest"
+push_schedule: "*/5 * * * * *"
+enable_docker: true
+enable_gpu: true
