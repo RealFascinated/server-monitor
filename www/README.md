@@ -1,21 +1,20 @@
-# TanStack Start + shadcn/ui
+# Monitor Web
 
-This is a template for a new TanStack Start project with React, TypeScript, and shadcn/ui.
+Dashboard for Monitor. TanStack Start, React, TypeScript, shadcn/ui.
 
-## Adding components
+**Users:** install the full stack with [Docker](../README.md#install-with-docker).
 
-To add components to your app, run the following command:
+**Developers:**
 
 ```bash
-npx shadcn@latest add button
+bun install
+VITE_API_URL=http://localhost:8080 bun dev
 ```
 
-This will place the ui components in the `components` directory.
+Runs on port 3000. Point it at a running API (default `http://localhost:8080`).
 
-## Using components
-
-To use the components in your app, import them as follows:
-
-```tsx
-import { Button } from "@/components/ui/button"
+```bash
+docker build -t monitor-www .
 ```
+
+Image: `ghcr.io/realfascinated/monitor-www`
