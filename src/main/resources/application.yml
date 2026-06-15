@@ -46,7 +46,7 @@ spring:
 monitor:
   agent:
     github-owner: RealFascinated
-    github-repo: Monitor-API
+    github-repo: server-monitor
     tag-prefix: agent/v
     release-cache-ttl: 5m
   victoriametrics:
