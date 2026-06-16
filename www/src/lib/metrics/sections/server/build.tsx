@@ -7,14 +7,12 @@ import {
   Gauge,
   Gpu,
   HardDrive,
-  LayoutDashboard,
   MemoryStick,
   Network,
   Thermometer,
 } from "lucide-react"
 
 import type { ServerMetricsResponse } from "@/lib/api/user/metrics"
-import type { ServerResponse } from "@/lib/api/user/servers"
 import { createMetricsSectionBuilder } from "@/lib/metrics/sections/builder"
 import { addChartSection } from "@/lib/metrics/sections/chart-section"
 import { metricSectionId } from "@/lib/metrics/sections/id"
@@ -32,34 +30,15 @@ import {
   tcpCharts,
   zfsPoolCharts,
 } from "@/lib/metrics/sections/server/charts"
-import {
-  OverviewStats,
-  overviewHasData,
-} from "@/lib/metrics/sections/server/overview"
 import type { MetricsTimeGrid } from "@/lib/metrics/timestamps"
 import { formatMemoryBytes, formatNumber } from "@/lib/formatter"
 
-type BuildServerMetricSectionsOptions = {
-  includeOverview?: boolean
-}
-
 function buildServerMetricSections(
   metrics: ServerMetricsResponse,
-  timeGrid: MetricsTimeGrid,
-  server?: ServerResponse,
-  options: BuildServerMetricSectionsOptions = {}
+  timeGrid: MetricsTimeGrid
 ): MetricsSectionNode[] {
-  const { includeOverview = true } = options
   const host = metrics.host ?? {}
   const builder = createMetricsSectionBuilder()
-
-  if (includeOverview && overviewHasData(server)) {
-    builder.leaf({
-      title: "Overview",
-      icon: LayoutDashboard,
-      render: () => <OverviewStats serverId={metrics.id} />,
-    })
-  }
 
   addChartSection(builder, {
     title: "CPU",
@@ -233,4 +212,3 @@ function buildServerMetricSections(
 }
 
 export { buildServerMetricSections }
-export type { BuildServerMetricSectionsOptions }

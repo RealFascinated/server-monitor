@@ -9,7 +9,7 @@ import {
 } from "@/lib/formatter"
 import { percentLevelColorClass } from "@/lib/metrics/percent-level"
 
-function overviewHasData(
+function serverOverviewHasData(
   server: Pick<ServerResponse, "cpu" | "memory" | "disk"> | undefined
 ): boolean {
   return (
@@ -19,7 +19,7 @@ function overviewHasData(
   )
 }
 
-function OverviewStats({ serverId }: { serverId: number }) {
+function ServerOverviewStats({ serverId }: { serverId: number }) {
   const { data: server } = useUserServer(serverId)
   if (!server) {
     return null
@@ -89,4 +89,4 @@ function OverviewStats({ serverId }: { serverId: number }) {
   return <div className="metric-stat-grid">{stats}</div>
 }
 
-export { OverviewStats, overviewHasData }
+export { ServerOverviewStats, serverOverviewHasData }
