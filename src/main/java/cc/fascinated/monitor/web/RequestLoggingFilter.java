@@ -24,8 +24,16 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } finally {
-            long durationMs = (System.nanoTime() - startNanos) / 1_000_000;
-            log.info("{} {} {} {}ms", request.getMethod(), requestUri(request), response.getStatus(), durationMs);
+            int status = response.getStatus();
+            if (status >= 400) {
+                long durationMs = (System.nanoTime() - startNanos) / 1_000_000;
+                String line = "%s %s %d %dms".formatted(request.getMethod(), requestUri(request), status, durationMs);
+                if (status >= 500) {
+                    log.error(line);
+                } else {
+                    log.warn(line);
+                }
+            }
         }
     }
 
