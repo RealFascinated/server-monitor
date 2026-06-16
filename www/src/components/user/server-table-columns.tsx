@@ -20,11 +20,11 @@ import {
 } from "@/lib/formatter"
 import type { ServerResponse } from "@/lib/api/user/servers"
 import { hasPermission, ServerPermission } from "@/lib/api/user/permissions"
+import type { MetricTimeRange } from "@/lib/metrics/range"
 import {
   pendingOnlyTooltip,
   SERVER_TABLE_COLUMN_TOOLTIPS,
 } from "@/lib/tooltips/copy"
-import { defaultMetricRangeSearch } from "@/lib/metrics/default-range"
 import { cn } from "@/lib/utils"
 
 export type ServerTableRow = {
@@ -68,7 +68,8 @@ function renderUptime30d(server: ServerResponse): ReactNode {
 }
 
 export function getServerTableColumns(
-  showActionsColumn: boolean
+  showActionsColumn: boolean,
+  defaultRange: MetricTimeRange
 ): ColumnDef<ServerTableRow>[] {
   const baseColumns: ColumnDef<ServerTableRow>[] = [
     {
@@ -81,7 +82,7 @@ export function getServerTableColumns(
             <Link
               to="/servers/$serverId"
               params={{ serverId: String(server.serverId) }}
-              search={defaultMetricRangeSearch()}
+              search={{ range: defaultRange }}
               className="text-monitor hover:underline dark:text-warning"
             >
               {server.serverName}

@@ -14,6 +14,7 @@ import { AsyncContent } from "@/components/animated-content"
 import { Callout } from "@/components/callout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useMetricDefaultRange } from "@/hooks/use-metric-default-range"
 import {
   useServerFolderLayout,
   useServerIds,
@@ -31,6 +32,7 @@ import { toastMutationError } from "@/lib/toast"
 const EMPTY_FOLDERS: ServerFolderResponse[] = []
 
 function ServersTable() {
+  const { defaultRange } = useMetricDefaultRange()
   const [searchQuery, setSearchQuery] = useState("")
   const [draggingRowId, setDraggingRowId] = useState<string | null>(null)
   const [draggingFolderId, setDraggingFolderId] = useState<number | null>(null)
@@ -60,8 +62,8 @@ function ServersTable() {
   )
 
   const columns = useMemo(
-    () => getServerTableColumns(showActionsColumn),
-    [showActionsColumn]
+    () => getServerTableColumns(showActionsColumn, defaultRange),
+    [showActionsColumn, defaultRange]
   )
 
   const filteredUngroupedIds = useMemo(

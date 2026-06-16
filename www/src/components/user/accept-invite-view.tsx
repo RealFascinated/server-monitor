@@ -5,13 +5,15 @@ import { AsyncContent } from "@/components/animated-content"
 import { Callout } from "@/components/callout"
 import { Spinner } from "@/components/spinner"
 import { Button } from "@/components/ui/button"
+import { useMetricDefaultRange } from "@/hooks/use-metric-default-range"
 import { acceptServerInvite } from "@/lib/api/user/invites"
-import { serverInvitePreviewQueryOptions } from "@/lib/api/user/invites.queries"
-import { userInvitesQueryKey } from "@/lib/api/user/invites.queries"
+import {
+  serverInvitePreviewQueryOptions,
+  userInvitesQueryKey,
+} from "@/lib/api/user/invites.queries"
 import { userServersQueryKey } from "@/lib/api/user/servers.queries"
 import { useAuth } from "@/lib/auth"
 import { formatDate } from "@/lib/formatter"
-import { defaultMetricRangeSearch } from "@/lib/metrics/default-range"
 import { toastMutationError } from "@/lib/toast"
 import { SERVER_ROLE_TOOLTIPS } from "@/lib/tooltips/copy"
 
@@ -27,6 +29,7 @@ function AcceptInviteView({ token }: AcceptInviteViewProps) {
   const navigate = useNavigate()
   const { user } = useAuth()
   const queryClient = useQueryClient()
+  const { defaultRange } = useMetricDefaultRange()
 
   const {
     data: preview,
@@ -44,7 +47,7 @@ function AcceptInviteView({ token }: AcceptInviteViewProps) {
       await navigate({
         to: "/servers/$serverId",
         params: { serverId: String(member.serverId) },
-        search: defaultMetricRangeSearch(),
+        search: { range: defaultRange },
       })
     },
     onError: (mutationError) => {

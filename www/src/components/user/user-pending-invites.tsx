@@ -13,10 +13,10 @@ import { SimpleTooltip, TableHeaderTooltip } from "@/components/simple-tooltip"
 import { Spinner } from "@/components/spinner"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/data-table"
+import { useMetricDefaultRange } from "@/hooks/use-metric-default-range"
 import { useUserInvites } from "@/hooks/use-user-invites"
 import { acceptServerInviteById } from "@/lib/api/user/invites"
 import type { UserPendingInvite } from "@/lib/api/user/invites"
-import { defaultMetricRangeSearch } from "@/lib/metrics/default-range"
 import { userInvitesQueryKey } from "@/lib/api/user/invites.queries"
 import { userServersQueryKey } from "@/lib/api/user/servers.queries"
 import { formatDate, formatDateWithRelative } from "@/lib/formatter"
@@ -39,6 +39,7 @@ function AcceptInviteButton({
 }) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { defaultRange } = useMetricDefaultRange()
 
   const mutation = useMutation({
     mutationFn: () => acceptServerInviteById(inviteId),
@@ -50,7 +51,7 @@ function AcceptInviteButton({
       await navigate({
         to: "/servers/$serverId",
         params: { serverId: String(member.serverId) },
-        search: defaultMetricRangeSearch(),
+        search: { range: defaultRange },
       })
     },
     onError: (mutationError) => {

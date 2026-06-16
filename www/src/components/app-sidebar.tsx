@@ -25,6 +25,7 @@ import { ThemeSwitcher } from "@/components/theme-switcher"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { filterServerIdsBySearch } from "@/components/user/server-table-columns"
+import { useMetricDefaultRange } from "@/hooks/use-metric-default-range"
 import { useSidebarColumnVisibility } from "@/hooks/use-sidebar-column-visibility"
 import { useSidebarDetailedMode } from "@/hooks/use-sidebar-detailed-mode"
 import {
@@ -42,10 +43,7 @@ import {
 import type { ServerFolderResponse } from "@/lib/api/user/folders"
 import type { ServerResponse, ServerStatus } from "@/lib/api/user/servers"
 import type { User } from "@/lib/auth/types"
-import {
-  defaultMetricRangeSearch,
-  getStoredDefaultMetricRange,
-} from "@/lib/metrics/default-range"
+import type { MetricTimeRange } from "@/lib/metrics/range"
 import { SERVER_STATUS_TOOLTIPS } from "@/lib/tooltips/copy"
 import { cn } from "@/lib/utils"
 
@@ -141,7 +139,7 @@ function SidebarAdminLink({
   compact: boolean
   onNavigate?: () => void
   to: "/admin/metrics" | "/admin/settings"
-  search?: ReturnType<typeof defaultMetricRangeSearch>
+  search?: { range: MetricTimeRange }
   icon: typeof Gauge
   label: string
 }) {
@@ -176,6 +174,8 @@ function SidebarAdminSection({
   compact: boolean
   onNavigate?: () => void
 }) {
+  const { defaultRange } = useMetricDefaultRange()
+
   return (
     <div className="flex shrink-0 flex-col">
       {!compact ? (
@@ -197,7 +197,7 @@ function SidebarAdminSection({
         compact={compact}
         onNavigate={onNavigate}
         to="/admin/metrics"
-        search={defaultMetricRangeSearch()}
+        search={{ range: defaultRange }}
         icon={Gauge}
         label="Metrics"
       />
@@ -223,6 +223,7 @@ const SidebarServerItem = memo(
     nested?: boolean
   }) {
     const { visibility } = useSidebarColumnVisibility()
+    const { defaultRange } = useMetricDefaultRange()
     const queryClient = useQueryClient()
 
     const prefetchServer = useCallback(() => {
@@ -230,10 +231,10 @@ const SidebarServerItem = memo(
       void queryClient.prefetchQuery(
         userServerMetricsQueryOptions(server.serverId, {
           kind: "preset",
-          range: getStoredDefaultMetricRange(),
+          range: defaultRange,
         })
       )
-    }, [queryClient, server.serverId])
+    }, [queryClient, server.serverId, defaultRange])
 
   const serverTooltip = `${server.serverName} — ${SERVER_STATUS_TOOLTIPS[server.status]}`
 
@@ -241,7 +242,7 @@ const SidebarServerItem = memo(
     <Link
       to="/servers/$serverId"
       params={{ serverId: String(server.serverId) }}
-      search={defaultMetricRangeSearch()}
+      search={{ range: defaultRange }}
       onClick={onNavigate}
       onMouseEnter={prefetchServer}
       onFocus={prefetchServer}

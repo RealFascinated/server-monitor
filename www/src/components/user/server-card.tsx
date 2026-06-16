@@ -9,13 +9,13 @@ import {
 import { ServerStatusDot } from "@/components/server/server-status-badge"
 import { UsageBar } from "@/components/server/usage-bar"
 import { SimpleTooltip } from "@/components/simple-tooltip"
+import { useMetricDefaultRange } from "@/hooks/use-metric-default-range"
 import type { ServerResponse } from "@/lib/api/user/servers"
 import {
   formatUptime,
   formatUptimeDetailed,
   memoryUsagePercent,
 } from "@/lib/formatter"
-import { defaultMetricRangeSearch } from "@/lib/metrics/default-range"
 import { SERVER_DRAG_MIME } from "@/lib/servers/drag"
 import { pendingOnlyTooltip } from "@/lib/tooltips/copy"
 import { cn } from "@/lib/utils"
@@ -56,6 +56,7 @@ const ServerCard = memo(
     onDragStart,
     onDragEnd,
   }: ServerCardProps) {
+    const { defaultRange } = useMetricDefaultRange()
     const memPercent = memoryUsagePercent(
       server.memory?.usage ?? null,
       server.memory?.max ?? null
@@ -95,7 +96,7 @@ const ServerCard = memo(
         <Link
           to="/servers/$serverId"
           params={{ serverId: String(server.serverId) }}
-          search={defaultMetricRangeSearch()}
+          search={{ range: defaultRange }}
           className={cn(
             "flex min-w-0 flex-1 items-center gap-3 rounded-sm border border-neutral-200 bg-card px-3 py-2.5 transition-colors hover:bg-neutral-50 active:bg-neutral-100 dark:border-monitor-gray-300 dark:hover:bg-monitor-gray-200 dark:active:bg-monitor-gray-100"
           )}

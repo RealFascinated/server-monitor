@@ -1,10 +1,11 @@
 import type { BreadcrumbItem } from "@/components/breadcrumb"
 import type { ServerResponse } from "@/lib/api/user/servers"
-import { defaultMetricRangeSearch } from "@/lib/metrics/default-range"
+import type { MetricTimeRange } from "@/lib/metrics/range"
 
 function serverBreadcrumbItems(
   server: ServerResponse | undefined,
   serverId: number,
+  defaultRange: MetricTimeRange,
   tail?: BreadcrumbItem
 ): BreadcrumbItem[] {
   const serverLabel = server?.serverName ?? `Server ${serverId}`
@@ -20,7 +21,7 @@ function serverBreadcrumbItems(
         label: serverLabel,
         to: "/servers/$serverId",
         params: { serverId: String(serverId) },
-        search: defaultMetricRangeSearch(),
+        search: { range: defaultRange },
       },
       tail
     )

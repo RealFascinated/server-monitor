@@ -2,8 +2,8 @@ import { z } from "zod"
 
 import type { MetricTimeRange } from "@/lib/metrics/range"
 import { METRIC_RANGES } from "@/lib/metrics/range"
-import { getStoredDefaultMetricRange } from "@/lib/metrics/default-range"
 import type { MetricTimeWindow } from "@/lib/metrics/time-window"
+import { Preferences } from "@/lib/preferences"
 
 export function metricRangeSearchSchema(overrideDefault?: MetricTimeRange) {
   return z
@@ -19,7 +19,8 @@ export function metricRangeSearchSchema(overrideDefault?: MetricTimeRange) {
         return { kind: "custom", from, to }
       }
 
-      const defaultRange = overrideDefault ?? getStoredDefaultMetricRange()
+      const defaultRange =
+        overrideDefault ?? Preferences.METRIC_DEFAULT_RANGE.defaultValue
       return { kind: "preset", range: range ?? defaultRange }
     })
 }
