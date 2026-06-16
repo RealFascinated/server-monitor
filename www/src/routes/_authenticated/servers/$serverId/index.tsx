@@ -52,12 +52,13 @@ function ServerMetricsPage() {
 
   const { data: server } = useUserServer(numericServerId)
 
-  const metricsForServer =
-    metrics?.id === numericServerId ? metrics : undefined
+  const metricsForServer = metrics?.id === numericServerId ? metrics : undefined
   const deferredMetrics = useDeferredValue(metricsForServer)
-  const metricsReady =
+  const readyMetrics =
     deferredServerId === numericServerId &&
     deferredMetrics?.id === numericServerId
+      ? deferredMetrics
+      : undefined
 
   const errorMessage =
     error instanceof ApiClientError
@@ -78,12 +79,9 @@ function ServerMetricsPage() {
     [navigate, numericServerId]
   )
 
-  const dataWindow = deferredMetrics
-    ? { from: deferredMetrics.from, to: deferredMetrics.to }
-    : null
   const showLoading =
     (isPending && !metricsForServer && !errorMessage) ||
-    (metricsForServer != null && !metricsReady)
+    (metricsForServer != null && !readyMetrics)
 
   useEffect(() => {
     window.scrollTo({ top: 0 })
@@ -110,7 +108,10 @@ function ServerMetricsPage() {
         ) : null}
 
         {server?.status === "PENDING" &&
-        hasPermission(server.permissions, ServerPermission.ROTATE_INGEST_TOKEN) ? (
+        hasPermission(
+          server.permissions,
+          ServerPermission.ROTATE_INGEST_TOKEN
+        ) ? (
           <Callout type="info" title="Waiting for the agent">
             <div className="flex flex-col gap-3">
               <p>
@@ -133,15 +134,13 @@ function ServerMetricsPage() {
           </Callout>
         ) : null}
 
-        {showLoading ? (
-          <LoadingState message="Loading metrics…" />
-        ) : null}
+        {showLoading ? <LoadingState message="Loading metrics…" /> : null}
 
-        {metricsReady && deferredMetrics && dataWindow && !errorMessage ? (
+        {readyMetrics && !errorMessage ? (
           <ServerMetricsView
-            metrics={deferredMetrics}
+            metrics={readyMetrics}
             timeWindow={timeWindow}
-            dataWindow={dataWindow}
+            dataWindow={{ from: readyMetrics.from, to: readyMetrics.to }}
             onZoomToRange={handleZoomToRange}
             zoomDisabled={isFetching}
           />

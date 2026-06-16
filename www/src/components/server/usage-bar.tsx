@@ -4,7 +4,10 @@ import { SimpleTooltip } from "@/components/simple-tooltip"
 import type { ServerStatus } from "@/lib/api/user/servers"
 import { formatPercent } from "@/lib/formatter"
 import type { PercentLevel } from "@/lib/metrics/percent-level"
-import { getPercentLevel, percentLevelColorClass } from "@/lib/metrics/percent-level"
+import {
+  getPercentLevel,
+  percentLevelColorClass,
+} from "@/lib/metrics/percent-level"
 import { PENDING_NO_METRIC_DATA } from "@/lib/tooltips/copy"
 import { cn } from "@/lib/utils"
 
@@ -34,7 +37,9 @@ function UsageBar({
 
   const bar = (
     <div className="flex min-w-0 items-center gap-2">
-      <span className="w-8 shrink-0 text-xs text-muted-foreground">{label}</span>
+      <span className="w-8 shrink-0 text-xs text-muted-foreground">
+        {label}
+      </span>
       <div className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-neutral-200 dark:bg-monitor-gray-300">
         <div
           className={cn("h-full rounded-full", barFillClasses[level])}

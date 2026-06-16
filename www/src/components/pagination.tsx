@@ -9,10 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import type { Page } from "@/lib/api/pagination"
-import {
-  getVisiblePageNumbers,
-  pageItemRange,
-} from "@/lib/api/pagination"
+import { getVisiblePageNumbers, pageItemRange } from "@/lib/api/pagination"
 import { formatCount } from "@/lib/formatter"
 import { PAGE_SIZE_OPTIONS } from "@/lib/schemas/pagination"
 import { cn } from "@/lib/utils"

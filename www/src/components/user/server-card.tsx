@@ -49,7 +49,7 @@ function ServerCardUptime({ server }: { server: ServerResponse }) {
 }
 
 const ServerCard = memo(
-  function ServerCard({
+  function ({
     server,
     isDragging = false,
     editMode = false,
@@ -68,10 +68,7 @@ const ServerCard = memo(
 
     return (
       <div
-        className={cn(
-          "flex items-stretch gap-1",
-          isDragging && "opacity-40"
-        )}
+        className={cn("flex items-stretch gap-1", isDragging && "opacity-40")}
       >
         {editMode ? (
           <button
@@ -116,11 +113,7 @@ const ServerCard = memo(
                 status={server.status}
                 tooltip={cpuTooltip}
               />
-              <UsageBar
-                label="RAM"
-                value={memPercent}
-                status={server.status}
-              />
+              <UsageBar label="RAM" value={memPercent} status={server.status} />
             </div>
           </div>
           <ChevronRight

@@ -8,8 +8,8 @@ import {
   History,
   RefreshCw,
   Timer,
-  type LucideIcon,
 } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -37,8 +37,8 @@ import {
   getMetricRangeOption,
   METRIC_RANGE_GROUPS,
   METRIC_RANGE_OPTIONS,
-  type MetricTimeRange,
 } from "@/lib/metrics/range"
+import type { MetricTimeRange } from "@/lib/metrics/range"
 import {
   datetimeLocalToEpoch,
   defaultCustomMetricTimeWindow,
@@ -48,7 +48,11 @@ import {
 import type { MetricTimeWindow } from "@/lib/metrics/time-window"
 import { cn } from "@/lib/utils"
 
-const MOBILE_QUICK_RANGES = ["1h", "24h", "7d"] as const satisfies readonly MetricTimeRange[]
+const MOBILE_QUICK_RANGES = [
+  "1h",
+  "24h",
+  "7d",
+] as const satisfies readonly MetricTimeRange[]
 
 const MOBILE_QUICK_RANGE_ICONS: Record<
   (typeof MOBILE_QUICK_RANGES)[number],
@@ -327,10 +331,7 @@ function MetricRangeSelector({
 
   return (
     <div
-      className={cn(
-        "flex min-w-0 flex-1 items-center gap-0.5",
-        className
-      )}
+      className={cn("flex min-w-0 flex-1 items-center gap-0.5", className)}
       role="group"
       aria-label="Time range"
     >
@@ -366,9 +367,9 @@ function MetricRangeSelector({
             aria-label={`Time range: ${activeLabel.label}`}
             className={cn(
               toolbarLabeledButtonClassName,
-              "min-w-0 max-w-56 shrink cursor-pointer",
+              "max-w-56 min-w-0 shrink cursor-pointer",
               isQuickRangeActive
-                ? "text-muted-foreground hover:bg-white/70 hover:text-foreground dark:hover:bg-monitor-gray-300/60 dark:hover:text-white sm:bg-white sm:text-monitor sm:shadow-sm dark:sm:bg-monitor-gray-300 dark:sm:text-warning"
+                ? "text-muted-foreground hover:bg-white/70 hover:text-foreground sm:bg-white sm:text-monitor sm:shadow-sm dark:hover:bg-monitor-gray-300/60 dark:hover:text-white dark:sm:bg-monitor-gray-300 dark:sm:text-warning"
                 : "bg-white text-monitor shadow-sm hover:bg-white/90 dark:bg-monitor-gray-300 dark:text-warning dark:hover:bg-monitor-gray-300/90"
             )}
           >

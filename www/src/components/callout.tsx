@@ -67,11 +67,7 @@ function Callout({
 }: CalloutProps) {
   return (
     <div
-      className={cn(
-        calloutVariants({ type }),
-        "motion-callout",
-        className
-      )}
+      className={cn(calloutVariants({ type }), "motion-callout", className)}
       {...props}
     >
       <p className={titleVariants({ type })}>{title}</p>

@@ -30,10 +30,7 @@ import { userServerFoldersQueryOptions } from "@/lib/api/user/folders.queries"
 import { createServer } from "@/lib/api/user/servers"
 import type { CreatedServerResponse } from "@/lib/api/user/servers"
 import { userServersQueryKey } from "@/lib/api/user/servers.queries"
-import {
-  MAX_FOLDER_NAME_LENGTH,
-  validateFolderName,
-} from "@/lib/folder-name"
+import { MAX_FOLDER_NAME_LENGTH, validateFolderName } from "@/lib/folder-name"
 import { invalidateServerFoldersIfNeeded } from "@/lib/servers/folder-queries"
 import { MAX_SERVER_NAME_LENGTH, validateServerName } from "@/lib/server-name"
 import { toastMutationError } from "@/lib/toast"

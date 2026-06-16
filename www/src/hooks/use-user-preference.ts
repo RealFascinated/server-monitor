@@ -4,7 +4,9 @@ import type { UserPreferenceResponse } from "@/lib/api/user/preferences"
 import { updateUserPreference } from "@/lib/api/user/preferences"
 import { userPreferencesQueryOptions } from "@/lib/api/user/preferences.queries"
 
-export function useUserPreference<T extends boolean | string | number>(definition: {
+export function useUserPreference<
+  T extends boolean | string | number,
+>(definition: {
   key: string
   defaultValue: T
 }): { value: T; setValue: (value: T) => void } {
@@ -12,7 +14,8 @@ export function useUserPreference<T extends boolean | string | number>(definitio
   const { data: preferences } = useQuery(userPreferencesQueryOptions())
 
   const stored = preferences?.find((p) => p.key === definition.key)
-  const value = stored !== undefined ? (stored.value as T) : definition.defaultValue
+  const value =
+    stored !== undefined ? (stored.value as T) : definition.defaultValue
 
   const { mutate } = useMutation({
     mutationFn: (next: T) => updateUserPreference(definition.key, next),

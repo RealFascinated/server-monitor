@@ -44,7 +44,7 @@ function ServerStatusBadge({ status }: { status: ServerStatus }) {
         {status === "ONLINE" ? (
           <span
             aria-hidden
-            className="size-1.5 shrink-0 rounded-full bg-current status-pulse-dot"
+            className="status-pulse-dot size-1.5 shrink-0 rounded-full bg-current"
           />
         ) : null}
         {status}

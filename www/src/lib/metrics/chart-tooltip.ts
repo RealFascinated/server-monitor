@@ -340,9 +340,9 @@ export function createCursorTooltipHandler({
       const totalFormatted = formatValue(stackTotal, -1)
       rows.push(
         `<div class="mt-1 flex items-center justify-between border-t border-neutral-200 pt-1 dark:border-monitor-gray-300">` +
-        `<span class="text-neutral-500 dark:text-neutral-400">Total</span>` +
-        `<span class="font-medium tabular-nums">${totalFormatted}</span>` +
-        `</div>`
+          `<span class="text-neutral-500 dark:text-neutral-400">Total</span>` +
+          `<span class="font-medium tabular-nums">${totalFormatted}</span>` +
+          `</div>`
       )
     } else if (usedTotalFooter) {
       rows.push(

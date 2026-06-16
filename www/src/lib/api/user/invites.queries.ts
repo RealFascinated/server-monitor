@@ -1,6 +1,9 @@
 import { queryOptions } from "@tanstack/react-query"
 
-import { getServerInvitePreview, getUserPendingInvites } from "@/lib/api/user/invites"
+import {
+  getServerInvitePreview,
+  getUserPendingInvites,
+} from "@/lib/api/user/invites"
 
 export const userInvitesQueryKey = ["user", "invites"] as const
 

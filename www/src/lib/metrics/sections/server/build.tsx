@@ -37,10 +37,7 @@ import {
   overviewHasData,
 } from "@/lib/metrics/sections/server/overview"
 import type { MetricsTimeGrid } from "@/lib/metrics/timestamps"
-import {
-  formatMemoryBytes,
-  formatNumber,
-} from "@/lib/formatter"
+import { formatMemoryBytes, formatNumber } from "@/lib/formatter"
 
 type BuildServerMetricSectionsOptions = {
   includeOverview?: boolean

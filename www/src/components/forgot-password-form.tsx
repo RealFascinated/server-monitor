@@ -42,8 +42,8 @@ function ForgotPasswordForm() {
   if (sent) {
     return (
       <Callout type="success" title="Check your email">
-        If an account exists for that address, we sent a password reset link. The
-        link expires in one hour.
+        If an account exists for that address, we sent a password reset link.
+        The link expires in one hour.
       </Callout>
     )
   }

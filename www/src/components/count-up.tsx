@@ -44,7 +44,7 @@ function runCountUp(
   return () => cancelAnimationFrame(frame)
 }
 
-const CountUp = memo(function CountUp({
+const CountUp = memo(function ({
   value,
   format = String,
   duration = ENTRANCE_DURATION_MS,

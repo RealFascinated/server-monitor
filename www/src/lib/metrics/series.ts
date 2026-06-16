@@ -1,8 +1,6 @@
 import type { MetricValues } from "@/lib/api/user/metrics"
-import {
-  alignValuesToTimestamps,
-  type MetricsTimeGrid,
-} from "@/lib/metrics/timestamps"
+import { alignValuesToTimestamps } from "@/lib/metrics/timestamps"
+import type { MetricsTimeGrid } from "@/lib/metrics/timestamps"
 import type uPlot from "uplot"
 
 export type ChartSeries = {

@@ -28,14 +28,18 @@ function AgentVersionLabel({
   layout = "table",
 }: AgentVersionLabelProps) {
   const { data: latest } = useQuery(latestAgentVersionQueryOptions())
-  const updateAvailable =
+  const availableUpdateVersion =
     version != null &&
     latest != null &&
     isVersionOlderThan(version, latest.version)
+      ? latest.version
+      : null
 
   if (!version) {
     return layout === "settings" ? (
-      <span className="text-xs text-neutral-500">No agent version reported</span>
+      <span className="text-xs text-neutral-500">
+        No agent version reported
+      </span>
     ) : (
       <span>—</span>
     )
@@ -51,15 +55,13 @@ function AgentVersionLabel({
 
   return (
     <span className="inline-flex flex-wrap items-center gap-1.5">
-      {layout === "settings" ? (
-        <>
-          Agent {versionNode}
-        </>
-      ) : (
-        versionNode
-      )}
-      {updateAvailable && latest ? (
-        <SimpleTooltip content={<AgentUpdateTooltip latestVersion={latest.version} />}>
+      {layout === "settings" ? <>Agent {versionNode}</> : versionNode}
+      {availableUpdateVersion ? (
+        <SimpleTooltip
+          content={
+            <AgentUpdateTooltip latestVersion={availableUpdateVersion} />
+          }
+        >
           <span
             className={cn(
               "inline-flex cursor-help items-center rounded-sm bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",

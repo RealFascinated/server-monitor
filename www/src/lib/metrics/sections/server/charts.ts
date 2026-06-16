@@ -13,7 +13,10 @@ import {
   TEMPERATURE_THRESHOLDS,
 } from "@/lib/metrics/chart-thresholds"
 import type { ChartThreshold } from "@/lib/metrics/chart-thresholds"
-import type { MetricChartConfig, TooltipSortEntry } from "@/lib/metrics/chart-config"
+import type {
+  MetricChartConfig,
+  TooltipSortEntry,
+} from "@/lib/metrics/chart-config"
 import { chartSeries } from "@/lib/metrics/series"
 import {
   formatCelsius,
@@ -435,11 +438,7 @@ function hostSystemCharts(
         chartSeries("Usage", host.fdUsagePct),
       ],
       valueFormatter: formatCount,
-      seriesFormatters: [
-        formatCount,
-        formatCount,
-        formatPercentValue,
-      ],
+      seriesFormatters: [formatCount, formatCount, formatPercentValue],
     },
   ]
 }

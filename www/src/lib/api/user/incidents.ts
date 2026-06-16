@@ -1,5 +1,6 @@
 import { apiFetch, ApiClientError } from "@/lib/auth/api"
-import { emptyPage, type Page } from "@/lib/api/pagination"
+import { emptyPage } from "@/lib/api/pagination"
+import type { Page } from "@/lib/api/pagination"
 
 export type IncidentResponse = {
   id: number
@@ -30,11 +31,7 @@ export function getServerIncidents(
   return apiFetch<Page<IncidentResponse>>(
     `/v1/servers/${serverId}/incidents?page=${page}&count=${count}`
   ).catch((error) => {
-    if (
-      page === 1 &&
-      error instanceof ApiClientError &&
-      error.status === 400
-    ) {
+    if (page === 1 && error instanceof ApiClientError && error.status === 400) {
       return emptyPage<IncidentResponse>(count)
     }
 

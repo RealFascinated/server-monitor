@@ -8,237 +8,237 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as RegisterRouteImport } from './routes/register'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
-import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
-import { Route as AuthenticatedInvitesRouteRouteImport } from './routes/_authenticated/invites/route'
-import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
-import { Route as AuthenticatedInvitesIndexRouteImport } from './routes/_authenticated/invites/index'
-import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
-import { Route as AuthenticatedInvitesAcceptRouteImport } from './routes/_authenticated/invites/accept'
-import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
-import { Route as AuthenticatedAdminMetricsRouteImport } from './routes/_authenticated/admin/metrics'
-import { Route as AuthenticatedServersServerIdRouteRouteImport } from './routes/_authenticated/servers/$serverId/route'
-import { Route as AuthenticatedServersServerIdIndexRouteImport } from './routes/_authenticated/servers/$serverId/index'
-import { Route as AuthenticatedServersServerIdSettingsRouteImport } from './routes/_authenticated/servers/$serverId/settings'
-import { Route as AuthenticatedServersServerIdIncidentsRouteImport } from './routes/_authenticated/servers/$serverId/incidents'
+import { Route as rootRouteImport } from "./routes/__root"
+import { Route as ResetPasswordRouteImport } from "./routes/reset-password"
+import { Route as RegisterRouteImport } from "./routes/register"
+import { Route as LoginRouteImport } from "./routes/login"
+import { Route as ForgotPasswordRouteImport } from "./routes/forgot-password"
+import { Route as AuthenticatedRouteImport } from "./routes/_authenticated"
+import { Route as AuthenticatedIndexRouteImport } from "./routes/_authenticated/index"
+import { Route as AuthenticatedSettingsRouteImport } from "./routes/_authenticated/settings"
+import { Route as AuthenticatedInvitesRouteRouteImport } from "./routes/_authenticated/invites/route"
+import { Route as AuthenticatedAdminRouteRouteImport } from "./routes/_authenticated/admin/route"
+import { Route as AuthenticatedInvitesIndexRouteImport } from "./routes/_authenticated/invites/index"
+import { Route as AuthenticatedAdminIndexRouteImport } from "./routes/_authenticated/admin/index"
+import { Route as AuthenticatedInvitesAcceptRouteImport } from "./routes/_authenticated/invites/accept"
+import { Route as AuthenticatedAdminSettingsRouteImport } from "./routes/_authenticated/admin/settings"
+import { Route as AuthenticatedAdminMetricsRouteImport } from "./routes/_authenticated/admin/metrics"
+import { Route as AuthenticatedServersServerIdRouteRouteImport } from "./routes/_authenticated/servers/$serverId/route"
+import { Route as AuthenticatedServersServerIdIndexRouteImport } from "./routes/_authenticated/servers/$serverId/index"
+import { Route as AuthenticatedServersServerIdSettingsRouteImport } from "./routes/_authenticated/servers/$serverId/settings"
+import { Route as AuthenticatedServersServerIdIncidentsRouteImport } from "./routes/_authenticated/servers/$serverId/incidents"
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
+  id: "/reset-password",
+  path: "/reset-password",
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegisterRoute = RegisterRouteImport.update({
-  id: '/register',
-  path: '/register',
+  id: "/register",
+  path: "/register",
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+  id: "/login",
+  path: "/login",
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
-  id: '/forgot-password',
-  path: '/forgot-password',
+  id: "/forgot-password",
+  path: "/forgot-password",
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
+  id: "/_authenticated",
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
+  id: "/settings",
+  path: "/settings",
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedInvitesRouteRoute =
   AuthenticatedInvitesRouteRouteImport.update({
-    id: '/invites',
-    path: '/invites',
+    id: "/invites",
+    path: "/invites",
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+  id: "/admin",
+  path: "/admin",
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedInvitesIndexRoute =
   AuthenticatedInvitesIndexRouteImport.update({
-    id: '/',
-    path: '/',
+    id: "/",
+    path: "/",
     getParentRoute: () => AuthenticatedInvitesRouteRoute,
   } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
 const AuthenticatedInvitesAcceptRoute =
   AuthenticatedInvitesAcceptRouteImport.update({
-    id: '/accept',
-    path: '/accept',
+    id: "/accept",
+    path: "/accept",
     getParentRoute: () => AuthenticatedInvitesRouteRoute,
   } as any)
 const AuthenticatedAdminSettingsRoute =
   AuthenticatedAdminSettingsRouteImport.update({
-    id: '/settings',
-    path: '/settings',
+    id: "/settings",
+    path: "/settings",
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminMetricsRoute =
   AuthenticatedAdminMetricsRouteImport.update({
-    id: '/metrics',
-    path: '/metrics',
+    id: "/metrics",
+    path: "/metrics",
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedServersServerIdRouteRoute =
   AuthenticatedServersServerIdRouteRouteImport.update({
-    id: '/servers/$serverId',
-    path: '/servers/$serverId',
+    id: "/servers/$serverId",
+    path: "/servers/$serverId",
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedServersServerIdIndexRoute =
   AuthenticatedServersServerIdIndexRouteImport.update({
-    id: '/',
-    path: '/',
+    id: "/",
+    path: "/",
     getParentRoute: () => AuthenticatedServersServerIdRouteRoute,
   } as any)
 const AuthenticatedServersServerIdSettingsRoute =
   AuthenticatedServersServerIdSettingsRouteImport.update({
-    id: '/settings',
-    path: '/settings',
+    id: "/settings",
+    path: "/settings",
     getParentRoute: () => AuthenticatedServersServerIdRouteRoute,
   } as any)
 const AuthenticatedServersServerIdIncidentsRoute =
   AuthenticatedServersServerIdIncidentsRouteImport.update({
-    id: '/incidents',
-    path: '/incidents',
+    id: "/incidents",
+    path: "/incidents",
     getParentRoute: () => AuthenticatedServersServerIdRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthenticatedIndexRoute
-  '/forgot-password': typeof ForgotPasswordRoute
-  '/login': typeof LoginRoute
-  '/register': typeof RegisterRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
-  '/invites': typeof AuthenticatedInvitesRouteRouteWithChildren
-  '/settings': typeof AuthenticatedSettingsRoute
-  '/servers/$serverId': typeof AuthenticatedServersServerIdRouteRouteWithChildren
-  '/admin/metrics': typeof AuthenticatedAdminMetricsRoute
-  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
-  '/invites/accept': typeof AuthenticatedInvitesAcceptRoute
-  '/admin/': typeof AuthenticatedAdminIndexRoute
-  '/invites/': typeof AuthenticatedInvitesIndexRoute
-  '/servers/$serverId/incidents': typeof AuthenticatedServersServerIdIncidentsRoute
-  '/servers/$serverId/settings': typeof AuthenticatedServersServerIdSettingsRoute
-  '/servers/$serverId/': typeof AuthenticatedServersServerIdIndexRoute
+  "/": typeof AuthenticatedIndexRoute
+  "/forgot-password": typeof ForgotPasswordRoute
+  "/login": typeof LoginRoute
+  "/register": typeof RegisterRoute
+  "/reset-password": typeof ResetPasswordRoute
+  "/admin": typeof AuthenticatedAdminRouteRouteWithChildren
+  "/invites": typeof AuthenticatedInvitesRouteRouteWithChildren
+  "/settings": typeof AuthenticatedSettingsRoute
+  "/servers/$serverId": typeof AuthenticatedServersServerIdRouteRouteWithChildren
+  "/admin/metrics": typeof AuthenticatedAdminMetricsRoute
+  "/admin/settings": typeof AuthenticatedAdminSettingsRoute
+  "/invites/accept": typeof AuthenticatedInvitesAcceptRoute
+  "/admin/": typeof AuthenticatedAdminIndexRoute
+  "/invites/": typeof AuthenticatedInvitesIndexRoute
+  "/servers/$serverId/incidents": typeof AuthenticatedServersServerIdIncidentsRoute
+  "/servers/$serverId/settings": typeof AuthenticatedServersServerIdSettingsRoute
+  "/servers/$serverId/": typeof AuthenticatedServersServerIdIndexRoute
 }
 export interface FileRoutesByTo {
-  '/forgot-password': typeof ForgotPasswordRoute
-  '/login': typeof LoginRoute
-  '/register': typeof RegisterRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/settings': typeof AuthenticatedSettingsRoute
-  '/': typeof AuthenticatedIndexRoute
-  '/admin/metrics': typeof AuthenticatedAdminMetricsRoute
-  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
-  '/invites/accept': typeof AuthenticatedInvitesAcceptRoute
-  '/admin': typeof AuthenticatedAdminIndexRoute
-  '/invites': typeof AuthenticatedInvitesIndexRoute
-  '/servers/$serverId/incidents': typeof AuthenticatedServersServerIdIncidentsRoute
-  '/servers/$serverId/settings': typeof AuthenticatedServersServerIdSettingsRoute
-  '/servers/$serverId': typeof AuthenticatedServersServerIdIndexRoute
+  "/forgot-password": typeof ForgotPasswordRoute
+  "/login": typeof LoginRoute
+  "/register": typeof RegisterRoute
+  "/reset-password": typeof ResetPasswordRoute
+  "/settings": typeof AuthenticatedSettingsRoute
+  "/": typeof AuthenticatedIndexRoute
+  "/admin/metrics": typeof AuthenticatedAdminMetricsRoute
+  "/admin/settings": typeof AuthenticatedAdminSettingsRoute
+  "/invites/accept": typeof AuthenticatedInvitesAcceptRoute
+  "/admin": typeof AuthenticatedAdminIndexRoute
+  "/invites": typeof AuthenticatedInvitesIndexRoute
+  "/servers/$serverId/incidents": typeof AuthenticatedServersServerIdIncidentsRoute
+  "/servers/$serverId/settings": typeof AuthenticatedServersServerIdSettingsRoute
+  "/servers/$serverId": typeof AuthenticatedServersServerIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/forgot-password': typeof ForgotPasswordRoute
-  '/login': typeof LoginRoute
-  '/register': typeof RegisterRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
-  '/_authenticated/invites': typeof AuthenticatedInvitesRouteRouteWithChildren
-  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
-  '/_authenticated/': typeof AuthenticatedIndexRoute
-  '/_authenticated/servers/$serverId': typeof AuthenticatedServersServerIdRouteRouteWithChildren
-  '/_authenticated/admin/metrics': typeof AuthenticatedAdminMetricsRoute
-  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
-  '/_authenticated/invites/accept': typeof AuthenticatedInvitesAcceptRoute
-  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
-  '/_authenticated/invites/': typeof AuthenticatedInvitesIndexRoute
-  '/_authenticated/servers/$serverId/incidents': typeof AuthenticatedServersServerIdIncidentsRoute
-  '/_authenticated/servers/$serverId/settings': typeof AuthenticatedServersServerIdSettingsRoute
-  '/_authenticated/servers/$serverId/': typeof AuthenticatedServersServerIdIndexRoute
+  "/_authenticated": typeof AuthenticatedRouteWithChildren
+  "/forgot-password": typeof ForgotPasswordRoute
+  "/login": typeof LoginRoute
+  "/register": typeof RegisterRoute
+  "/reset-password": typeof ResetPasswordRoute
+  "/_authenticated/admin": typeof AuthenticatedAdminRouteRouteWithChildren
+  "/_authenticated/invites": typeof AuthenticatedInvitesRouteRouteWithChildren
+  "/_authenticated/settings": typeof AuthenticatedSettingsRoute
+  "/_authenticated/": typeof AuthenticatedIndexRoute
+  "/_authenticated/servers/$serverId": typeof AuthenticatedServersServerIdRouteRouteWithChildren
+  "/_authenticated/admin/metrics": typeof AuthenticatedAdminMetricsRoute
+  "/_authenticated/admin/settings": typeof AuthenticatedAdminSettingsRoute
+  "/_authenticated/invites/accept": typeof AuthenticatedInvitesAcceptRoute
+  "/_authenticated/admin/": typeof AuthenticatedAdminIndexRoute
+  "/_authenticated/invites/": typeof AuthenticatedInvitesIndexRoute
+  "/_authenticated/servers/$serverId/incidents": typeof AuthenticatedServersServerIdIncidentsRoute
+  "/_authenticated/servers/$serverId/settings": typeof AuthenticatedServersServerIdSettingsRoute
+  "/_authenticated/servers/$serverId/": typeof AuthenticatedServersServerIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/forgot-password'
-    | '/login'
-    | '/register'
-    | '/reset-password'
-    | '/admin'
-    | '/invites'
-    | '/settings'
-    | '/servers/$serverId'
-    | '/admin/metrics'
-    | '/admin/settings'
-    | '/invites/accept'
-    | '/admin/'
-    | '/invites/'
-    | '/servers/$serverId/incidents'
-    | '/servers/$serverId/settings'
-    | '/servers/$serverId/'
+    | "/"
+    | "/forgot-password"
+    | "/login"
+    | "/register"
+    | "/reset-password"
+    | "/admin"
+    | "/invites"
+    | "/settings"
+    | "/servers/$serverId"
+    | "/admin/metrics"
+    | "/admin/settings"
+    | "/invites/accept"
+    | "/admin/"
+    | "/invites/"
+    | "/servers/$serverId/incidents"
+    | "/servers/$serverId/settings"
+    | "/servers/$serverId/"
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/forgot-password'
-    | '/login'
-    | '/register'
-    | '/reset-password'
-    | '/settings'
-    | '/'
-    | '/admin/metrics'
-    | '/admin/settings'
-    | '/invites/accept'
-    | '/admin'
-    | '/invites'
-    | '/servers/$serverId/incidents'
-    | '/servers/$serverId/settings'
-    | '/servers/$serverId'
+    | "/forgot-password"
+    | "/login"
+    | "/register"
+    | "/reset-password"
+    | "/settings"
+    | "/"
+    | "/admin/metrics"
+    | "/admin/settings"
+    | "/invites/accept"
+    | "/admin"
+    | "/invites"
+    | "/servers/$serverId/incidents"
+    | "/servers/$serverId/settings"
+    | "/servers/$serverId"
   id:
-    | '__root__'
-    | '/_authenticated'
-    | '/forgot-password'
-    | '/login'
-    | '/register'
-    | '/reset-password'
-    | '/_authenticated/admin'
-    | '/_authenticated/invites'
-    | '/_authenticated/settings'
-    | '/_authenticated/'
-    | '/_authenticated/servers/$serverId'
-    | '/_authenticated/admin/metrics'
-    | '/_authenticated/admin/settings'
-    | '/_authenticated/invites/accept'
-    | '/_authenticated/admin/'
-    | '/_authenticated/invites/'
-    | '/_authenticated/servers/$serverId/incidents'
-    | '/_authenticated/servers/$serverId/settings'
-    | '/_authenticated/servers/$serverId/'
+    | "__root__"
+    | "/_authenticated"
+    | "/forgot-password"
+    | "/login"
+    | "/register"
+    | "/reset-password"
+    | "/_authenticated/admin"
+    | "/_authenticated/invites"
+    | "/_authenticated/settings"
+    | "/_authenticated/"
+    | "/_authenticated/servers/$serverId"
+    | "/_authenticated/admin/metrics"
+    | "/_authenticated/admin/settings"
+    | "/_authenticated/invites/accept"
+    | "/_authenticated/admin/"
+    | "/_authenticated/invites/"
+    | "/_authenticated/servers/$serverId/incidents"
+    | "/_authenticated/servers/$serverId/settings"
+    | "/_authenticated/servers/$serverId/"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -249,131 +249,131 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
+    "/reset-password": {
+      id: "/reset-password"
+      path: "/reset-password"
+      fullPath: "/reset-password"
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/register': {
-      id: '/register'
-      path: '/register'
-      fullPath: '/register'
+    "/register": {
+      id: "/register"
+      path: "/register"
+      fullPath: "/register"
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
+    "/login": {
+      id: "/login"
+      path: "/login"
+      fullPath: "/login"
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/forgot-password': {
-      id: '/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
+    "/forgot-password": {
+      id: "/forgot-password"
+      path: "/forgot-password"
+      fullPath: "/forgot-password"
       preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
+    "/_authenticated": {
+      id: "/_authenticated"
+      path: ""
+      fullPath: "/"
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/': {
-      id: '/_authenticated/'
-      path: '/'
-      fullPath: '/'
+    "/_authenticated/": {
+      id: "/_authenticated/"
+      path: "/"
+      fullPath: "/"
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/settings': {
-      id: '/_authenticated/settings'
-      path: '/settings'
-      fullPath: '/settings'
+    "/_authenticated/settings": {
+      id: "/_authenticated/settings"
+      path: "/settings"
+      fullPath: "/settings"
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/invites': {
-      id: '/_authenticated/invites'
-      path: '/invites'
-      fullPath: '/invites'
+    "/_authenticated/invites": {
+      id: "/_authenticated/invites"
+      path: "/invites"
+      fullPath: "/invites"
       preLoaderRoute: typeof AuthenticatedInvitesRouteRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
+    "/_authenticated/admin": {
+      id: "/_authenticated/admin"
+      path: "/admin"
+      fullPath: "/admin"
       preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/invites/': {
-      id: '/_authenticated/invites/'
-      path: '/'
-      fullPath: '/invites/'
+    "/_authenticated/invites/": {
+      id: "/_authenticated/invites/"
+      path: "/"
+      fullPath: "/invites/"
       preLoaderRoute: typeof AuthenticatedInvitesIndexRouteImport
       parentRoute: typeof AuthenticatedInvitesRouteRoute
     }
-    '/_authenticated/admin/': {
-      id: '/_authenticated/admin/'
-      path: '/'
-      fullPath: '/admin/'
+    "/_authenticated/admin/": {
+      id: "/_authenticated/admin/"
+      path: "/"
+      fullPath: "/admin/"
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
-    '/_authenticated/invites/accept': {
-      id: '/_authenticated/invites/accept'
-      path: '/accept'
-      fullPath: '/invites/accept'
+    "/_authenticated/invites/accept": {
+      id: "/_authenticated/invites/accept"
+      path: "/accept"
+      fullPath: "/invites/accept"
       preLoaderRoute: typeof AuthenticatedInvitesAcceptRouteImport
       parentRoute: typeof AuthenticatedInvitesRouteRoute
     }
-    '/_authenticated/admin/settings': {
-      id: '/_authenticated/admin/settings'
-      path: '/settings'
-      fullPath: '/admin/settings'
+    "/_authenticated/admin/settings": {
+      id: "/_authenticated/admin/settings"
+      path: "/settings"
+      fullPath: "/admin/settings"
       preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
-    '/_authenticated/admin/metrics': {
-      id: '/_authenticated/admin/metrics'
-      path: '/metrics'
-      fullPath: '/admin/metrics'
+    "/_authenticated/admin/metrics": {
+      id: "/_authenticated/admin/metrics"
+      path: "/metrics"
+      fullPath: "/admin/metrics"
       preLoaderRoute: typeof AuthenticatedAdminMetricsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
-    '/_authenticated/servers/$serverId': {
-      id: '/_authenticated/servers/$serverId'
-      path: '/servers/$serverId'
-      fullPath: '/servers/$serverId'
+    "/_authenticated/servers/$serverId": {
+      id: "/_authenticated/servers/$serverId"
+      path: "/servers/$serverId"
+      fullPath: "/servers/$serverId"
       preLoaderRoute: typeof AuthenticatedServersServerIdRouteRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/servers/$serverId/': {
-      id: '/_authenticated/servers/$serverId/'
-      path: '/'
-      fullPath: '/servers/$serverId/'
+    "/_authenticated/servers/$serverId/": {
+      id: "/_authenticated/servers/$serverId/"
+      path: "/"
+      fullPath: "/servers/$serverId/"
       preLoaderRoute: typeof AuthenticatedServersServerIdIndexRouteImport
       parentRoute: typeof AuthenticatedServersServerIdRouteRoute
     }
-    '/_authenticated/servers/$serverId/settings': {
-      id: '/_authenticated/servers/$serverId/settings'
-      path: '/settings'
-      fullPath: '/servers/$serverId/settings'
+    "/_authenticated/servers/$serverId/settings": {
+      id: "/_authenticated/servers/$serverId/settings"
+      path: "/settings"
+      fullPath: "/servers/$serverId/settings"
       preLoaderRoute: typeof AuthenticatedServersServerIdSettingsRouteImport
       parentRoute: typeof AuthenticatedServersServerIdRouteRoute
     }
-    '/_authenticated/servers/$serverId/incidents': {
-      id: '/_authenticated/servers/$serverId/incidents'
-      path: '/incidents'
-      fullPath: '/servers/$serverId/incidents'
+    "/_authenticated/servers/$serverId/incidents": {
+      id: "/_authenticated/servers/$serverId/incidents"
+      path: "/incidents"
+      fullPath: "/servers/$serverId/incidents"
       preLoaderRoute: typeof AuthenticatedServersServerIdIncidentsRouteImport
       parentRoute: typeof AuthenticatedServersServerIdRouteRoute
     }
@@ -395,7 +395,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
 
 const AuthenticatedAdminRouteRouteWithChildren =
   AuthenticatedAdminRouteRoute._addFileChildren(
-    AuthenticatedAdminRouteRouteChildren,
+    AuthenticatedAdminRouteRouteChildren
   )
 
 interface AuthenticatedInvitesRouteRouteChildren {
@@ -411,7 +411,7 @@ const AuthenticatedInvitesRouteRouteChildren: AuthenticatedInvitesRouteRouteChil
 
 const AuthenticatedInvitesRouteRouteWithChildren =
   AuthenticatedInvitesRouteRoute._addFileChildren(
-    AuthenticatedInvitesRouteRouteChildren,
+    AuthenticatedInvitesRouteRouteChildren
   )
 
 interface AuthenticatedServersServerIdRouteRouteChildren {
@@ -432,7 +432,7 @@ const AuthenticatedServersServerIdRouteRouteChildren: AuthenticatedServersServer
 
 const AuthenticatedServersServerIdRouteRouteWithChildren =
   AuthenticatedServersServerIdRouteRoute._addFileChildren(
-    AuthenticatedServersServerIdRouteRouteChildren,
+    AuthenticatedServersServerIdRouteRouteChildren
   )
 
 interface AuthenticatedRouteChildren {
@@ -453,7 +453,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren,
+  AuthenticatedRouteChildren
 )
 
 const rootRouteChildren: RootRouteChildren = {
@@ -467,9 +467,9 @@ export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
+import type { getRouter } from "./router.tsx"
+import type { createStart } from "@tanstack/react-start"
+declare module "@tanstack/react-start" {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>

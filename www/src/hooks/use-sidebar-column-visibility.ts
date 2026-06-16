@@ -22,8 +22,12 @@ export function useSidebarColumnVisibility() {
   const setColumnVisible = useCallback(
     (column: SidebarColumnId, visible: boolean) => {
       switch (column) {
-        case "cpu": setCpu(visible); break
-        case "ram": setRam(visible); break
+        case "cpu":
+          setCpu(visible)
+          break
+        case "ram":
+          setRam(visible)
+          break
       }
     },
     [setCpu, setRam]

@@ -41,7 +41,8 @@ export async function resolveUserServer(
     return cached
   }
 
-  const servers = queryClient.getQueryData<ServerResponse[]>(userServersQueryKey)
+  const servers =
+    queryClient.getQueryData<ServerResponse[]>(userServersQueryKey)
   const fromList = servers?.find((server) => server.serverId === serverId)
   if (fromList) {
     queryClient.setQueryData(userServerQueryKey(serverId), fromList)
@@ -62,7 +63,8 @@ export function resolveUserServerFromCache(
     return cached
   }
 
-  const servers = queryClient.getQueryData<ServerResponse[]>(userServersQueryKey)
+  const servers =
+    queryClient.getQueryData<ServerResponse[]>(userServersQueryKey)
   const fromList = servers?.find((server) => server.serverId === serverId)
   if (fromList) {
     queryClient.setQueryData(userServerQueryKey(serverId), fromList)

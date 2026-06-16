@@ -125,10 +125,7 @@ function DataTable<TData>({
                         SERVER_DRAG_MIME,
                         String(serverId)
                       )
-                      event.dataTransfer.setData(
-                        "text/plain",
-                        String(serverId)
-                      )
+                      event.dataTransfer.setData("text/plain", String(serverId))
                       rowDrag.onDragStart(row.id)
                     }}
                     onDragEnd={rowDrag.onDragEnd}

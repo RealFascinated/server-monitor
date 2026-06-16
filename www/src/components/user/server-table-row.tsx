@@ -26,7 +26,7 @@ function ServerTableRowCells({ row }: { row: Row<ServerTableRow> }) {
 }
 
 const ServerTableDataRow = memo(
-  function ServerTableDataRow({
+  function ({
     row,
     rowDrag,
   }: {

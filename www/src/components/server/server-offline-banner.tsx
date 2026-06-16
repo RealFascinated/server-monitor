@@ -50,9 +50,7 @@ function ServerOfflineBanner({ serverId, status }: ServerOfflineBannerProps) {
     ? formatDurationSeconds(
         Math.max(
           0,
-          Math.floor(
-            (now - new Date(outageStartedAt).getTime()) / 1000
-          )
+          Math.floor((now - new Date(outageStartedAt).getTime()) / 1000)
         )
       )
     : null

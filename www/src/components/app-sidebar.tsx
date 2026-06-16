@@ -76,7 +76,6 @@ const statusDotStyles: Record<ServerStatus, string> = {
   PENDING: "bg-amber-500",
 }
 
-
 function SidebarNavLink({
   compact,
   onNavigate,
@@ -112,7 +111,9 @@ function SidebarNavLink({
     >
       <span className="relative shrink-0">
         <Icon className="size-4" />
-        {compact ? <CountBadge count={badgeCount} variant="accent" compact /> : null}
+        {compact ? (
+          <CountBadge count={badgeCount} variant="accent" compact />
+        ) : null}
       </span>
       {!compact ? <span className="truncate">{label}</span> : null}
       {!compact ? (
@@ -209,7 +210,7 @@ const UNGROUPED_SIDEBAR_KEY = "Ungrouped"
 const EMPTY_FOLDERS: ServerFolderResponse[] = []
 
 const SidebarServerItem = memo(
-  function SidebarServerItem({
+  function ({
     server,
     compact,
     detailed,
@@ -236,80 +237,80 @@ const SidebarServerItem = memo(
       )
     }, [queryClient, server.serverId, defaultRange])
 
-  const serverTooltip = `${server.serverName} — ${SERVER_STATUS_TOOLTIPS[server.status]}`
+    const serverTooltip = `${server.serverName} — ${SERVER_STATUS_TOOLTIPS[server.status]}`
 
-  const link = (
-    <Link
-      to="/servers/$serverId"
-      params={{ serverId: String(server.serverId) }}
-      search={{ range: defaultRange }}
-      onClick={onNavigate}
-      onMouseEnter={prefetchServer}
-      onFocus={prefetchServer}
-      className={cn(
-        "flex w-full shrink-0 rounded-sm text-sm font-medium text-muted-foreground transition-colors hover:bg-muted",
-        "[&.active]:bg-neutral-200 [&.active]:text-black dark:[&.active]:bg-monitor-gray-200 dark:[&.active]:text-warning",
-        nested && !compact && "pl-4",
-        compact
-          ? "min-h-7 cursor-pointer items-center justify-center gap-3 px-0 py-1"
-          : detailed
-            ? "items-center gap-2 px-2 py-1"
-            : "min-h-7 items-center gap-3 px-2 py-1"
-      )}
-    >
-      <span className="relative shrink-0">
-        <Server className="size-4" />
-        <span
-          className={cn(
-            "absolute -right-0.5 -bottom-0.5 size-1.5 rounded-full ring-2 ring-white dark:ring-base",
-            statusDotStyles[server.status]
-          )}
-        />
-      </span>
-      {!compact ? (
-        <span
-          className={cn(
-            "flex min-w-0 flex-1 flex-col",
-            detailed ? "gap-0 leading-tight" : "gap-0.5"
-          )}
-        >
-          <span className="truncate leading-tight">{server.serverName}</span>
-          {detailed && (visibility.cpu || visibility.ram) ? (
-            <span className="truncate text-[11px] leading-tight text-neutral-400">
-              {visibility.cpu ? (
-                <>
-                  CPU{" "}
-                  <CpuPercent
-                    cpu={server.cpu}
-                    status={server.status}
-                    className="font-medium"
-                  />
-                </>
-              ) : null}
-              {visibility.cpu && visibility.ram ? " · " : null}
-              {visibility.ram ? (
-                <>
-                  RAM{" "}
-                  <MemoryPercent
-                    usage={server.memory?.usage ?? null}
-                    max={server.memory?.max ?? null}
-                    status={server.status}
-                    className="font-medium"
-                  />
-                </>
-              ) : null}
-            </span>
-          ) : null}
+    const link = (
+      <Link
+        to="/servers/$serverId"
+        params={{ serverId: String(server.serverId) }}
+        search={{ range: defaultRange }}
+        onClick={onNavigate}
+        onMouseEnter={prefetchServer}
+        onFocus={prefetchServer}
+        className={cn(
+          "flex w-full shrink-0 rounded-sm text-sm font-medium text-muted-foreground transition-colors hover:bg-muted",
+          "[&.active]:bg-neutral-200 [&.active]:text-black dark:[&.active]:bg-monitor-gray-200 dark:[&.active]:text-warning",
+          nested && !compact && "pl-4",
+          compact
+            ? "min-h-7 cursor-pointer items-center justify-center gap-3 px-0 py-1"
+            : detailed
+              ? "items-center gap-2 px-2 py-1"
+              : "min-h-7 items-center gap-3 px-2 py-1"
+        )}
+      >
+        <span className="relative shrink-0">
+          <Server className="size-4" />
+          <span
+            className={cn(
+              "absolute -right-0.5 -bottom-0.5 size-1.5 rounded-full ring-2 ring-white dark:ring-base",
+              statusDotStyles[server.status]
+            )}
+          />
         </span>
-      ) : null}
-    </Link>
-  )
+        {!compact ? (
+          <span
+            className={cn(
+              "flex min-w-0 flex-1 flex-col",
+              detailed ? "gap-0 leading-tight" : "gap-0.5"
+            )}
+          >
+            <span className="truncate leading-tight">{server.serverName}</span>
+            {detailed && (visibility.cpu || visibility.ram) ? (
+              <span className="truncate text-[11px] leading-tight text-neutral-400">
+                {visibility.cpu ? (
+                  <>
+                    CPU{" "}
+                    <CpuPercent
+                      cpu={server.cpu}
+                      status={server.status}
+                      className="font-medium"
+                    />
+                  </>
+                ) : null}
+                {visibility.cpu && visibility.ram ? " · " : null}
+                {visibility.ram ? (
+                  <>
+                    RAM{" "}
+                    <MemoryPercent
+                      usage={server.memory?.usage ?? null}
+                      max={server.memory?.max ?? null}
+                      status={server.status}
+                      className="font-medium"
+                    />
+                  </>
+                ) : null}
+              </span>
+            ) : null}
+          </span>
+        ) : null}
+      </Link>
+    )
 
-  if (compact) {
-    return <SimpleTooltip content={serverTooltip}>{link}</SimpleTooltip>
-  }
+    if (compact) {
+      return <SimpleTooltip content={serverTooltip}>{link}</SimpleTooltip>
+    }
 
-  return link
+    return link
   },
   (prev, next) =>
     prev.server === next.server &&
@@ -318,7 +319,7 @@ const SidebarServerItem = memo(
     prev.nested === next.nested
 )
 
-const SidebarFolderGroup = memo(function SidebarFolderGroup({
+const SidebarFolderGroup = memo(function ({
   folderName,
   serverIds,
   getServer,

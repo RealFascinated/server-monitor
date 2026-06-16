@@ -5,5 +5,7 @@ export type AgentLatestVersionResponse = {
 }
 
 export function getLatestAgentVersion(): Promise<AgentLatestVersionResponse> {
-  return apiFetch<AgentLatestVersionResponse>("/v1/agent/latest", { auth: false })
+  return apiFetch<AgentLatestVersionResponse>("/v1/agent/latest", {
+    auth: false,
+  })
 }

@@ -59,9 +59,9 @@ export function getVisiblePageNumbers(
   const result: (number | "ellipsis")[] = []
 
   for (let index = 0; index < sorted.length; index++) {
-    const page = sorted[index]!
+    const page = sorted[index]
 
-    if (index > 0 && page - sorted[index - 1]! > 1) {
+    if (index > 0 && page - sorted[index - 1] > 1) {
       result.push("ellipsis")
     }
 

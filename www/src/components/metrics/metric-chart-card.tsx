@@ -245,7 +245,7 @@ function MetricChartCard({
       <Dialog open={fullscreenOpen} onOpenChange={setFullscreenOpen}>
         <DialogContent
           showCloseButton
-          className="flex h-[min(90vh,calc(100vh-2rem))] w-[min(96vw,calc(100vw-2rem))] max-w-none animate-none! flex-col gap-0 overflow-hidden p-0 data-closed:animate-none! data-open:animate-none! sm:max-w-none"
+          className="flex h-[min(90vh,calc(100vh-2rem))] w-[min(96vw,calc(100vw-2rem))] max-w-none animate-none! flex-col gap-0 overflow-hidden p-0 sm:max-w-none data-open:animate-none! data-closed:animate-none!"
         >
           <DialogHeader className="shrink-0 gap-2 border-b border-border bg-neutral-100/90 px-4 py-3 dark:border-monitor-gray-300 dark:bg-monitor-gray-200/60">
             <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 pr-8">

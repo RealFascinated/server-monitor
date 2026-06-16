@@ -278,9 +278,7 @@ function ServersTable() {
 
       <AsyncContent loading={isLoading} loadingMessage="Loading servers…">
         <div className="flex flex-col gap-6">
-          {servers.length > 0 ? (
-            <FleetSummaryCards servers={servers} />
-          ) : null}
+          {servers.length > 0 ? <FleetSummaryCards servers={servers} /> : null}
 
           {editMode && (canOrganize || canReorderFolders) ? (
             <p className="text-xs text-neutral-500">

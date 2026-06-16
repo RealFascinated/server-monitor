@@ -61,8 +61,11 @@ function AcceptInviteView({ token }: AcceptInviteViewProps) {
     },
   })
 
-  const previewError =
-    error instanceof Error ? error.message : error ? "Could not load invite" : null
+  const previewError = error
+    ? error instanceof Error
+      ? error.message
+      : "Could not load invite"
+    : null
   const emailMismatch =
     preview && user
       ? preview.email.toLowerCase() !== user.email.toLowerCase()
@@ -87,7 +90,9 @@ function AcceptInviteView({ token }: AcceptInviteViewProps) {
               <div className="flex flex-col gap-2 text-center">
                 <h1>Join {preview.serverName}</h1>
                 <p className="text-sm text-muted-foreground">
-                  <span className="text-foreground">{preview.invitedByEmail}</span>{" "}
+                  <span className="text-foreground">
+                    {preview.invitedByEmail}
+                  </span>{" "}
                   invited you to join as a{" "}
                   <span title={SERVER_ROLE_TOOLTIPS[preview.role]}>
                     {formatRole(preview.role)}
@@ -95,14 +100,15 @@ function AcceptInviteView({ token }: AcceptInviteViewProps) {
                   .
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Sent to {preview.email}. Expires {formatDate(preview.expiresAt)}.
+                  Sent to {preview.email}. Expires{" "}
+                  {formatDate(preview.expiresAt)}.
                 </p>
               </div>
 
               {emailMismatch ? (
                 <Callout type="warning" title="Wrong account">
-                  This invite was sent to {preview.email}, but you are signed in as{" "}
-                  {user?.email}. Sign in with the invited account to accept.
+                  This invite was sent to {preview.email}, but you are signed in
+                  as {user?.email}. Sign in with the invited account to accept.
                 </Callout>
               ) : null}
 

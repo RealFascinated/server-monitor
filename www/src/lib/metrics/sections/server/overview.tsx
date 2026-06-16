@@ -10,9 +10,7 @@ import {
 import { percentLevelColorClass } from "@/lib/metrics/percent-level"
 
 function overviewHasData(
-  server:
-    | Pick<ServerResponse, "cpu" | "memory" | "disk">
-    | undefined
+  server: Pick<ServerResponse, "cpu" | "memory" | "disk"> | undefined
 ): boolean {
   return (
     server?.cpu?.percent != null ||

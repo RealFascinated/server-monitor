@@ -1,9 +1,6 @@
 import { keepPreviousData, queryOptions } from "@tanstack/react-query"
 
-import {
-  getIncidentStatus,
-  getServerIncidents,
-} from "@/lib/api/user/incidents"
+import { getIncidentStatus, getServerIncidents } from "@/lib/api/user/incidents"
 import { userServerQueryKey } from "@/lib/api/user/servers.queries"
 import type { PageSearchParams } from "@/lib/schemas/pagination"
 
@@ -43,10 +40,9 @@ export function serverOpenIncidentQueryOptions(serverId: number) {
     queryKey: serverOpenIncidentQueryKey(serverId),
     queryFn: async () => {
       const page = await getServerIncidents(serverId, 1, 1)
-      const incident = page.items[0]
-      return incident && getIncidentStatus(incident) === "ongoing"
-        ? incident
-        : null
+      return (
+        page.items.find((item) => getIncidentStatus(item) === "ongoing") ?? null
+      )
     },
     refetchInterval: OPEN_INCIDENT_POLL_MS,
   })

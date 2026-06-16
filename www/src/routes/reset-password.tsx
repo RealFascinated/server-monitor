@@ -35,7 +35,9 @@ function ResetPasswordPage() {
       <Card className="motion-auth-card w-full max-w-md">
         <CardHeader>
           <CardTitle>Reset password</CardTitle>
-          <CardDescription>Choose a new password for your account.</CardDescription>
+          <CardDescription>
+            Choose a new password for your account.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {token ? (
@@ -48,7 +50,9 @@ function ResetPasswordPage() {
           )}
           <AuthPageFooter>
             Need a new link?{" "}
-            <AuthPageLink to="/forgot-password">Request reset link</AuthPageLink>
+            <AuthPageLink to="/forgot-password">
+              Request reset link
+            </AuthPageLink>
           </AuthPageFooter>
         </CardContent>
       </Card>
