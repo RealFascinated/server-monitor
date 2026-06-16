@@ -30,6 +30,27 @@ export function userServerQueryOptions(serverId: number) {
   })
 }
 
+export async function resolveUserServer(
+  queryClient: QueryClient,
+  serverId: number
+): Promise<ServerResponse> {
+  const cached = queryClient.getQueryData<ServerResponse>(
+    userServerQueryKey(serverId)
+  )
+  if (cached) {
+    return cached
+  }
+
+  const servers = queryClient.getQueryData<ServerResponse[]>(userServersQueryKey)
+  const fromList = servers?.find((server) => server.serverId === serverId)
+  if (fromList) {
+    queryClient.setQueryData(userServerQueryKey(serverId), fromList)
+    return fromList
+  }
+
+  return queryClient.ensureQueryData(userServerQueryOptions(serverId))
+}
+
 export function resolveUserServerFromCache(
   queryClient: QueryClient,
   serverId: number
