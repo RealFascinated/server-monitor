@@ -6,7 +6,6 @@ import { MetricRangeSelector } from "@/components/server/metric-range-selector"
 import type { MetricRefreshInterval } from "@/lib/metrics/refresh-interval"
 import { metricTimeWindowToSearch } from "@/lib/metrics/time-window"
 import type { MetricTimeWindow } from "@/lib/metrics/time-window"
-import { cn } from "@/lib/utils"
 
 type AdminMetricsHeaderProps = {
   timeWindow: MetricTimeWindow
@@ -81,29 +80,28 @@ function AdminMetricsHeader({
   }
 
   return (
-    <PageHeader
-      breadcrumb={[
-        { label: "Servers", to: "/" },
-        { label: "Admin Metrics", current: true },
-      ]}
-      icon={Gauge}
-      title="Admin Metrics"
-      description="Platform-wide metrics for fleet health, ingest, JVM, VictoriaMetrics, and HTTP traffic."
-      actions={
-        <div className="hidden shrink-0 lg:block">
-          <AdminMetricsToolbar {...toolbarProps} />
-        </div>
-      }
-      footer={
-        <div
-          className={cn(
-            "sticky top-14 z-30 -mx-0 mt-2.5 w-full self-start bg-background/95 py-1.5 backdrop-blur-sm lg:hidden"
-          )}
-        >
-          <AdminMetricsToolbar {...toolbarProps} />
-        </div>
-      }
-    />
+    <>
+      <PageHeader
+        sticky
+        className="mb-2.5 lg:mb-6"
+        breadcrumb={[
+          { label: "Servers", to: "/" },
+          { label: "Admin Metrics", current: true },
+        ]}
+        icon={Gauge}
+        title="Admin Metrics"
+        description="Platform-wide metrics for fleet health, ingest, JVM, VictoriaMetrics, and HTTP traffic."
+        actions={
+          <div className="hidden shrink-0 lg:block">
+            <AdminMetricsToolbar {...toolbarProps} />
+          </div>
+        }
+      />
+
+      <div className="sticky top-14 z-30 mb-6 w-full bg-background/95 py-1.5 backdrop-blur-sm lg:hidden">
+        <AdminMetricsToolbar {...toolbarProps} />
+      </div>
+    </>
   )
 }
 

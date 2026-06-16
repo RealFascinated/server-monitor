@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import { useLayoutEffect, useRef, type ReactNode } from "react"
 import type { LucideIcon } from "lucide-react"
 
 import { Breadcrumb } from "@/components/breadcrumb"
@@ -30,8 +30,44 @@ function PageHeader({
   sticky = false,
   className,
 }: PageHeaderProps) {
+  const headerRef = useRef<HTMLDivElement>(null)
+
+  useLayoutEffect(() => {
+    if (!sticky) return
+
+    const el = headerRef.current
+    if (!el) return
+
+    const section = el.closest("section")
+    if (!section) return
+
+    const media = window.matchMedia("(min-width: 1024px)")
+
+    function syncOffset() {
+      if (media.matches) {
+        section.style.setProperty(
+          "--metrics-header-offset",
+          `${el.getBoundingClientRect().height}px`
+        )
+      } else {
+        section.style.removeProperty("--metrics-header-offset")
+      }
+    }
+
+    syncOffset()
+    const observer = new ResizeObserver(syncOffset)
+    observer.observe(el)
+    media.addEventListener("change", syncOffset)
+    return () => {
+      observer.disconnect()
+      media.removeEventListener("change", syncOffset)
+      section.style.removeProperty("--metrics-header-offset")
+    }
+  }, [sticky])
+
   return (
     <div
+      ref={headerRef}
       className={cn(
         "mb-6 flex flex-col gap-2.5 border-b border-sidebar-border py-3",
         sticky && "z-30 bg-background/95 backdrop-blur-sm lg:sticky lg:top-0",

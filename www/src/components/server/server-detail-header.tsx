@@ -14,6 +14,8 @@ type ServerDetailHeaderProps = {
   breadcrumbTail?: BreadcrumbItem
   actions?: ReactNode
   footer?: ReactNode
+  sticky?: boolean
+  className?: string
 }
 
 function ServerDetailHeader({
@@ -22,11 +24,15 @@ function ServerDetailHeader({
   breadcrumbTail,
   actions,
   footer,
+  sticky = false,
+  className,
 }: ServerDetailHeaderProps) {
   const { defaultRange } = useMetricDefaultRange()
 
   return (
     <PageHeader
+      sticky={sticky}
+      className={className}
       breadcrumb={serverBreadcrumbItems(
         server,
         serverId,

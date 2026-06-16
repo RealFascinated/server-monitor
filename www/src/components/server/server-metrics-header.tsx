@@ -129,58 +129,61 @@ function ServerMetricsHeader({
   }
 
   return (
-    <ServerDetailHeader
-      server={server}
-      serverId={serverId}
-      actions={
-        <>
-          <div className="hidden shrink-0 lg:block">
-            <ServerMetricsToolbar {...toolbarProps} />
-          </div>
+    <>
+      <ServerDetailHeader
+        server={server}
+        serverId={serverId}
+        sticky
+        className="mb-2.5 lg:mb-6"
+        actions={
+          <>
+            <div className="hidden shrink-0 lg:block">
+              <ServerMetricsToolbar {...toolbarProps} />
+            </div>
 
-          <div className="flex shrink-0 items-center gap-1 lg:hidden">
-            <SimpleTooltip content="Incident history">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 shrink-0 rounded-sm border border-neutral-200 bg-neutral-100/80 px-2.5 text-xs hover:bg-white/70 dark:border-monitor-gray-300 dark:bg-monitor-gray-200/60 dark:hover:bg-monitor-gray-300/60"
-                asChild
-              >
-                <Link
-                  to="/servers/$serverId/incidents"
-                  params={{ serverId: String(serverId) }}
+            <div className="flex shrink-0 items-center gap-1 lg:hidden">
+              <SimpleTooltip content="Incident history">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 shrink-0 rounded-sm border border-neutral-200 bg-neutral-100/80 px-2.5 text-xs hover:bg-white/70 dark:border-monitor-gray-300 dark:bg-monitor-gray-200/60 dark:hover:bg-monitor-gray-300/60"
+                  asChild
                 >
-                  <History className="size-3.5" />
-                  <span className="hidden sm:inline">Incidents</span>
-                </Link>
-              </Button>
-            </SimpleTooltip>
+                  <Link
+                    to="/servers/$serverId/incidents"
+                    params={{ serverId: String(serverId) }}
+                  >
+                    <History className="size-3.5" />
+                    <span className="hidden sm:inline">Incidents</span>
+                  </Link>
+                </Button>
+              </SimpleTooltip>
 
-            <SimpleTooltip content="Server settings">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 shrink-0 rounded-sm border border-neutral-200 bg-neutral-100/80 px-2.5 text-xs hover:bg-white/70 dark:border-monitor-gray-300 dark:bg-monitor-gray-200/60 dark:hover:bg-monitor-gray-300/60"
-                asChild
-              >
-                <Link
-                  to="/servers/$serverId/settings"
-                  params={{ serverId: String(serverId) }}
+              <SimpleTooltip content="Server settings">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 shrink-0 rounded-sm border border-neutral-200 bg-neutral-100/80 px-2.5 text-xs hover:bg-white/70 dark:border-monitor-gray-300 dark:bg-monitor-gray-200/60 dark:hover:bg-monitor-gray-300/60"
+                  asChild
                 >
-                  <Settings className="size-3.5" />
-                  <span className="hidden sm:inline">Settings</span>
-                </Link>
-              </Button>
-            </SimpleTooltip>
-          </div>
-        </>
-      }
-      footer={
-        <div className="sticky top-14 z-30 mt-2.5 w-full self-start bg-background/95 py-1.5 backdrop-blur-sm lg:hidden">
-          <ServerMetricsToolbar {...toolbarProps} showSettings={false} />
-        </div>
-      }
-    />
+                  <Link
+                    to="/servers/$serverId/settings"
+                    params={{ serverId: String(serverId) }}
+                  >
+                    <Settings className="size-3.5" />
+                    <span className="hidden sm:inline">Settings</span>
+                  </Link>
+                </Button>
+              </SimpleTooltip>
+            </div>
+          </>
+        }
+      />
+
+      <div className="sticky top-14 z-30 mb-6 w-full bg-background/95 py-1.5 backdrop-blur-sm lg:hidden">
+        <ServerMetricsToolbar {...toolbarProps} showSettings={false} />
+      </div>
+    </>
   )
 }
 
