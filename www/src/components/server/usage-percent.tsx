@@ -1,7 +1,11 @@
-import type { ReactElement } from "react"
+import type { ReactElement, ReactNode } from "react"
 
+import {
+  CpuBreakdownTooltip,
+  hasCpuBreakdown,
+} from "@/components/server/cpu-breakdown-tooltip"
 import { SimpleTooltip } from "@/components/simple-tooltip"
-import type { ServerStatus } from "@/lib/api/user/servers"
+import type { ServerCpuSnapshot, ServerStatus } from "@/lib/api/user/servers"
 import {
   formatMemoryBytes,
   formatPercent,
@@ -24,7 +28,7 @@ function ColoredPercent({
   )
 }
 
-function withMetricTooltip(content: string | null, node: ReactElement) {
+function withMetricTooltip(content: ReactNode, node: ReactElement) {
   if (!content) {
     return node
   }
@@ -37,10 +41,14 @@ function withMetricTooltip(content: string | null, node: ReactElement) {
 }
 
 function getCpuTooltip(
-  value: number | null,
+  cpu: ServerCpuSnapshot | null,
   status?: ServerStatus
-): string | null {
-  if (value != null || status !== "PENDING") {
+): ReactNode {
+  if (cpu && hasCpuBreakdown(cpu)) {
+    return <CpuBreakdownTooltip cpu={cpu} />
+  }
+
+  if (cpu?.percent != null || status !== "PENDING") {
     return null
   }
 
@@ -64,17 +72,17 @@ function getUsageTooltip(
 }
 
 function CpuPercent({
-  value,
+  cpu,
   status,
   className,
 }: {
-  value: number | null
+  cpu: ServerCpuSnapshot | null
   status?: ServerStatus
   className?: string
 }) {
   return withMetricTooltip(
-    getCpuTooltip(value, status),
-    <ColoredPercent value={value} className={className} />
+    getCpuTooltip(cpu, status),
+    <ColoredPercent value={cpu?.percent ?? null} className={className} />
   )
 }
 

@@ -1,11 +1,10 @@
+import type { ReactNode } from "react"
+
 import { SimpleTooltip } from "@/components/simple-tooltip"
 import type { ServerStatus } from "@/lib/api/user/servers"
 import { formatPercent } from "@/lib/formatter"
-import {
-  getPercentLevel,
-  percentLevelColorClass,
-  type PercentLevel,
-} from "@/lib/metrics/percent-level"
+import type { PercentLevel } from "@/lib/metrics/percent-level"
+import { getPercentLevel, percentLevelColorClass } from "@/lib/metrics/percent-level"
 import { PENDING_NO_METRIC_DATA } from "@/lib/tooltips/copy"
 import { cn } from "@/lib/utils"
 
@@ -25,7 +24,7 @@ function UsageBar({
   label: string
   value: number | null
   status?: ServerStatus
-  tooltip?: string | null
+  tooltip?: ReactNode
 }) {
   const level = value == null ? "unknown" : getPercentLevel(value)
   const width = value == null ? 0 : Math.min(100, Math.max(0, value))

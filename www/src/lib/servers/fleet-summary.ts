@@ -20,11 +20,17 @@ export function serverNeedsAttention(server: ServerResponse): boolean {
     return false
   }
 
-  const memPercent = memoryUsagePercent(server.memUsage, server.memMax)
-  const diskPercent = memoryUsagePercent(server.diskUsage, server.diskMax)
+  const memPercent = memoryUsagePercent(
+    server.memory?.usage ?? null,
+    server.memory?.max ?? null
+  )
+  const diskPercent = memoryUsagePercent(
+    server.disk?.usage ?? null,
+    server.disk?.max ?? null
+  )
 
   return (
-    isHighUsage(server.cpuPercent) ||
+    isHighUsage(server.cpu?.percent ?? null) ||
     isHighUsage(memPercent) ||
     isHighUsage(diskPercent)
   )
@@ -55,12 +61,15 @@ export function computeFleetSummary(servers: ServerResponse[]): FleetSummary {
     switch (server.status) {
       case "ONLINE":
         online++
-        if (server.cpuPercent != null) {
-          cpuSum += server.cpuPercent
+        if (server.cpu?.percent != null) {
+          cpuSum += server.cpu.percent
           cpuCount++
         }
         {
-          const memPercent = memoryUsagePercent(server.memUsage, server.memMax)
+          const memPercent = memoryUsagePercent(
+            server.memory?.usage ?? null,
+            server.memory?.max ?? null
+          )
           if (memPercent != null) {
             memSum += memPercent
             memCount++

@@ -279,7 +279,7 @@ const SidebarServerItem = memo(
                 <>
                   CPU{" "}
                   <CpuPercent
-                    value={server.cpuPercent}
+                    cpu={server.cpu}
                     status={server.status}
                     className="font-medium"
                   />
@@ -290,8 +290,8 @@ const SidebarServerItem = memo(
                 <>
                   RAM{" "}
                   <MemoryPercent
-                    usage={server.memUsage}
-                    max={server.memMax}
+                    usage={server.memory?.usage ?? null}
+                    max={server.memory?.max ?? null}
                     status={server.status}
                     className="font-medium"
                   />

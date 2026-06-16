@@ -127,7 +127,7 @@ export function getServerTableColumns(
     },
     {
       id: "cpu",
-      accessorFn: (row) => row.server.cpuPercent ?? null,
+      accessorFn: (row) => row.server.cpu?.percent ?? null,
       header: () => (
         <TableHeaderTooltip
           label="CPU"
@@ -136,15 +136,15 @@ export function getServerTableColumns(
       ),
       meta: {
         renderServer: (server) => (
-          <CpuPercent value={server.cpuPercent} status={server.status} />
+          <CpuPercent cpu={server.cpu} status={server.status} />
         ),
       },
     },
     {
       id: "memory",
       accessorFn: (row) => {
-        const { memUsage, memMax } = row.server
-        return memUsage != null && memMax ? memUsage / memMax : null
+        const { usage, max } = row.server.memory ?? {}
+        return usage != null && max ? usage / max : null
       },
       header: () => (
         <TableHeaderTooltip
@@ -155,8 +155,8 @@ export function getServerTableColumns(
       meta: {
         renderServer: (server) => (
           <MemoryPercent
-            usage={server.memUsage}
-            max={server.memMax}
+            usage={server.memory?.usage ?? null}
+            max={server.memory?.max ?? null}
             status={server.status}
           />
         ),
@@ -165,8 +165,8 @@ export function getServerTableColumns(
     {
       id: "disk",
       accessorFn: (row) => {
-        const { diskUsage, diskMax } = row.server
-        return diskUsage != null && diskMax ? diskUsage / diskMax : null
+        const { usage, max } = row.server.disk ?? {}
+        return usage != null && max ? usage / max : null
       },
       header: () => (
         <TableHeaderTooltip
@@ -177,8 +177,8 @@ export function getServerTableColumns(
       meta: {
         renderServer: (server) => (
           <DiskPercent
-            usage={server.diskUsage}
-            max={server.diskMax}
+            usage={server.disk?.usage ?? null}
+            max={server.disk?.max ?? null}
             status={server.status}
           />
         ),

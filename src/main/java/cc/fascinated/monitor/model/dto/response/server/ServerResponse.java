@@ -3,6 +3,7 @@ package cc.fascinated.monitor.model.dto.response.server;
 import cc.fascinated.monitor.model.domain.server.ServerStatus;
 import cc.fascinated.monitor.model.domain.server.ServerRole;
 import cc.fascinated.monitor.model.persistance.ServerRow;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 
@@ -14,25 +15,21 @@ public record ServerResponse(
         String agentVersion,
         Instant createdAt,
         Instant lastHeartbeat,
-        Double cpuPercent,
-        Long memUsage,
-        Long memMax,
-        Long diskUsage,
-        Long diskMax,
         Double uptimePercent30d,
         ServerRole role,
         int permissions,
         String folderName,
-        ServerInventoryResponse inventory
+        ServerInventoryResponse inventory,
+        @Nullable ServerCpuSnapshot cpu,
+        @Nullable ServerMemorySnapshot memory,
+        @Nullable ServerDiskSnapshot disk
 ) {
     public static ServerResponse from(
             ServerRow server,
             ServerRole role,
-            Double cpuPercent,
-            Long memUsage,
-            Long memMax,
-            Long diskUsage,
-            Long diskMax,
+            @Nullable ServerCpuSnapshot cpu,
+            @Nullable ServerMemorySnapshot memory,
+            @Nullable ServerDiskSnapshot disk,
             Double uptimePercent30d,
             String folderName
     ) {
@@ -44,18 +41,16 @@ public record ServerResponse(
                 server.getAgentVersion(),
                 server.getCreatedAt(),
                 server.getLastHeartbeat(),
-                cpuPercent,
-                memUsage,
-                memMax,
-                diskUsage,
-                diskMax,
                 uptimePercent30d,
                 role,
                 role.permissionMask(),
                 folderName,
                 server.getInventory() != null
                         ? ServerInventoryResponse.from(server.getInventory())
-                        : null
+                        : null,
+                cpu,
+                memory,
+                disk
         );
     }
 }

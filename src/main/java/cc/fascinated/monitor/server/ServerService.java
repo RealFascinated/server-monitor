@@ -19,7 +19,10 @@ import cc.fascinated.monitor.model.dto.response.metrics.ServerMetricsResponse;
 import cc.fascinated.monitor.model.dto.response.server.CreatedServerResponse;
 import cc.fascinated.monitor.model.dto.response.server.IncidentResponse;
 import cc.fascinated.monitor.model.dto.response.server.IngestTokenResponse;
+import cc.fascinated.monitor.model.dto.response.server.ServerCpuSnapshot;
+import cc.fascinated.monitor.model.dto.response.server.ServerDiskSnapshot;
 import cc.fascinated.monitor.model.dto.response.server.ServerFolderAssignmentResponse;
+import cc.fascinated.monitor.model.dto.response.server.ServerMemorySnapshot;
 import cc.fascinated.monitor.model.dto.response.server.ServerResponse;
 import cc.fascinated.monitor.model.dto.response.server.ServerStatusResponse;
 import cc.fascinated.monitor.model.dto.response.server.access.ServerAccessListResponse;
@@ -262,18 +265,28 @@ public class ServerService {
         Double uptime = context.uptimePercent30d().get(server.getId());
         String folderName = context.folderNamesByServerId().get(server.getId());
         if (server.getStatus() != ServerStatus.ONLINE) {
-            return ServerResponse.from(server, role, null, null, null, null, null, uptime, folderName);
+            return ServerResponse.from(server, role, null, null, null, uptime, folderName);
         }
         long serverId = server.getId();
         LatestHostMetrics metrics = context.hostMetrics();
         return ServerResponse.from(
                 server,
                 role,
-                metrics.cpu().get(serverId),
-                NumberUtils.toLong(metrics.memUsage().get(serverId)),
-                NumberUtils.toLong(metrics.memMax().get(serverId)),
-                NumberUtils.toLong(metrics.diskUsage().get(serverId)),
-                NumberUtils.toLong(metrics.diskMax().get(serverId)),
+                new ServerCpuSnapshot(
+                        metrics.cpuUsage().get(serverId),
+                        metrics.cpuUser().get(serverId),
+                        metrics.cpuSystem().get(serverId),
+                        metrics.cpuIowait().get(serverId),
+                        metrics.cpuSteal().get(serverId)
+                ),
+                new ServerMemorySnapshot(
+                        NumberUtils.toLong(metrics.memUsage().get(serverId)),
+                        NumberUtils.toLong(metrics.memMax().get(serverId))
+                ),
+                new ServerDiskSnapshot(
+                        NumberUtils.toLong(metrics.diskUsage().get(serverId)),
+                        NumberUtils.toLong(metrics.diskMax().get(serverId))
+                ),
                 uptime,
                 folderName
         );
@@ -287,6 +300,10 @@ public class ServerService {
                 this.serverMetricService.fetchLatestMetrics(
                         List.of(
                                 HostSeries.CPU_USAGE,
+                                HostSeries.CPU_USER_PCT,
+                                HostSeries.CPU_SYSTEM_PCT,
+                                HostSeries.CPU_IOWAIT_PCT,
+                                HostSeries.CPU_STEAL_PCT,
                                 HostSeries.MEM_USAGE,
                                 HostSeries.MEM_TOTAL,
                                 DiskSeries.USED_BYTES,
@@ -300,6 +317,10 @@ public class ServerService {
                 );
         return new LatestHostMetrics(
                 latest.getOrDefault(HostSeries.CPU_USAGE, Map.of()),
+                latest.getOrDefault(HostSeries.CPU_USER_PCT, Map.of()),
+                latest.getOrDefault(HostSeries.CPU_SYSTEM_PCT, Map.of()),
+                latest.getOrDefault(HostSeries.CPU_IOWAIT_PCT, Map.of()),
+                latest.getOrDefault(HostSeries.CPU_STEAL_PCT, Map.of()),
                 latest.getOrDefault(HostSeries.MEM_USAGE, Map.of()),
                 latest.getOrDefault(HostSeries.MEM_TOTAL, Map.of()),
                 latest.getOrDefault(DiskSeries.USED_BYTES, Map.of()),
@@ -314,14 +335,28 @@ public class ServerService {
     ) {}
 
     private record LatestHostMetrics(
-            Map<Long, Double> cpu,
+            Map<Long, Double> cpuUsage,
+            Map<Long, Double> cpuUser,
+            Map<Long, Double> cpuSystem,
+            Map<Long, Double> cpuIowait,
+            Map<Long, Double> cpuSteal,
             Map<Long, Double> memUsage,
             Map<Long, Double> memMax,
             Map<Long, Double> diskUsage,
             Map<Long, Double> diskMax
     ) {
         private static LatestHostMetrics empty() {
-            return new LatestHostMetrics(Map.of(), Map.of(), Map.of(), Map.of(), Map.of());
+            return new LatestHostMetrics(
+                    Map.of(),
+                    Map.of(),
+                    Map.of(),
+                    Map.of(),
+                    Map.of(),
+                    Map.of(),
+                    Map.of(),
+                    Map.of(),
+                    Map.of()
+            );
         }
     }
 }

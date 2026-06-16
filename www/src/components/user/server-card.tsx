@@ -2,6 +2,10 @@ import { Link } from "@tanstack/react-router"
 import { ChevronRight, GripVertical } from "lucide-react"
 import { memo } from "react"
 
+import {
+  CpuBreakdownTooltip,
+  hasCpuBreakdown,
+} from "@/components/server/cpu-breakdown-tooltip"
 import { ServerStatusDot } from "@/components/server/server-status-badge"
 import { UsageBar } from "@/components/server/usage-bar"
 import { SimpleTooltip } from "@/components/simple-tooltip"
@@ -52,7 +56,14 @@ const ServerCard = memo(
     onDragStart,
     onDragEnd,
   }: ServerCardProps) {
-    const memPercent = memoryUsagePercent(server.memUsage, server.memMax)
+    const memPercent = memoryUsagePercent(
+      server.memory?.usage ?? null,
+      server.memory?.max ?? null
+    )
+    const cpuTooltip =
+      server.cpu && hasCpuBreakdown(server.cpu) ? (
+        <CpuBreakdownTooltip cpu={server.cpu} />
+      ) : null
 
     return (
       <div
@@ -100,8 +111,9 @@ const ServerCard = memo(
             <div className="flex flex-col gap-1.5">
               <UsageBar
                 label="CPU"
-                value={server.cpuPercent}
+                value={server.cpu?.percent ?? null}
                 status={server.status}
+                tooltip={cpuTooltip}
               />
               <UsageBar
                 label="RAM"

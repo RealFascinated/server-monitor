@@ -11,13 +11,13 @@ import { percentLevelColorClass } from "@/lib/metrics/percent-level"
 
 function overviewHasData(
   server:
-    | Pick<ServerResponse, "cpuPercent" | "memUsage" | "diskUsage">
+    | Pick<ServerResponse, "cpu" | "memory" | "disk">
     | undefined
 ): boolean {
   return (
-    server?.cpuPercent != null ||
-    server?.memUsage != null ||
-    server?.diskUsage != null
+    server?.cpu?.percent != null ||
+    server?.memory?.usage != null ||
+    server?.disk?.usage != null
   )
 }
 
@@ -27,15 +27,15 @@ function OverviewStats({ serverId }: { serverId: number }) {
     return null
   }
 
-  const cpuUsage = server.cpuPercent ?? null
+  const cpuUsage = server.cpu?.percent ?? null
   const cpuModel = server.inventory?.cpuModel ?? null
   const cpuInventoryTooltip = formatCpuInventoryTooltip(server.inventory)
-  const memUsage = server.memUsage ?? null
-  const memTotal = server.memMax ?? null
+  const memUsage = server.memory?.usage ?? null
+  const memTotal = server.memory?.max ?? null
   const memPercent = memoryUsagePercent(memUsage, memTotal)
 
-  const diskUsage = server.diskUsage ?? null
-  const diskTotal = server.diskMax ?? null
+  const diskUsage = server.disk?.usage ?? null
+  const diskTotal = server.disk?.max ?? null
   const diskPercent = memoryUsagePercent(diskUsage, diskTotal)
 
   const stats = [

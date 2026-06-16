@@ -15,6 +15,24 @@ export type ServerInventory = {
   kernelVersion: string | null
 }
 
+export type ServerCpuSnapshot = {
+  percent: number | null
+  user: number | null
+  system: number | null
+  iowait: number | null
+  steal: number | null
+}
+
+export type ServerMemorySnapshot = {
+  usage: number | null
+  max: number | null
+}
+
+export type ServerDiskSnapshot = {
+  usage: number | null
+  max: number | null
+}
+
 export type ServerResponse = {
   serverId: number
   serverName: string
@@ -23,15 +41,13 @@ export type ServerResponse = {
   uptimePercent30d: number | null
   agentVersion: string | null
   createdAt: string
-  cpuPercent: number | null
-  memUsage: number | null
-  memMax: number | null
-  diskUsage: number | null
-  diskMax: number | null
   role: ServerRole
   permissions: number
   folderName: string | null
   inventory: ServerInventory | null
+  cpu: ServerCpuSnapshot | null
+  memory: ServerMemorySnapshot | null
+  disk: ServerDiskSnapshot | null
 }
 
 export type ServerCreateRequest = {
