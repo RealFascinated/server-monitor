@@ -41,6 +41,13 @@ public class AgentUpdateService {
                 .build();
     }
 
+    public String getLatestVersion() {
+        CachedRelease latest = this.fetchLatestRelease();
+        return Semver.parse(
+                AgentReleaseSupport.stripTagPrefix(latest.release().tagName(), this.properties.getTagPrefix())
+        ).toString();
+    }
+
     public Optional<AgentUpdateResponse> checkUpdate(String version) {
         Semver.Version current = Semver.parse(version);
         CachedRelease latest = this.fetchLatestRelease();

@@ -3,6 +3,7 @@ import { AlertTriangle, Terminal } from "lucide-react"
 import { useState } from "react"
 
 import { AgentInstallPanel } from "@/components/server/agent-install-panel"
+import { AgentVersionLabel } from "@/components/server/agent-version-label"
 import { ServerStatusBadge } from "@/components/server/server-status-badge"
 import { SimpleTooltip } from "@/components/simple-tooltip"
 import { Spinner } from "@/components/spinner"
@@ -53,16 +54,7 @@ function ServerIngestTokenSection({
         <ServerStatusBadge status={status} />
         <SimpleTooltip content={SERVER_TABLE_COLUMN_TOOLTIPS.agent}>
           <span className="cursor-help text-xs text-neutral-500">
-            {agentVersion ? (
-              <>
-                Agent{" "}
-                <span className="font-medium text-foreground">
-                  {agentVersion}
-                </span>
-              </>
-            ) : (
-              "No agent version reported"
-            )}
+            <AgentVersionLabel version={agentVersion} layout="settings" />
           </span>
         </SimpleTooltip>
       </div>

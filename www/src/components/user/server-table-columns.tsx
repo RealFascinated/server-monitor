@@ -4,6 +4,7 @@ import type { ReactNode } from "react"
 
 import { DeleteServerButton } from "@/components/user/delete-server-button"
 import { RenameServerDialog } from "@/components/user/rename-server-dialog"
+import { AgentVersionLabel } from "@/components/server/agent-version-label"
 import {
   CpuPercent,
   DiskPercent,
@@ -195,7 +196,9 @@ export function getServerTableColumns(
         />
       ),
       meta: {
-        renderServer: (server) => server.agentVersion ?? "—",
+        renderServer: (server) => (
+          <AgentVersionLabel version={server.agentVersion} />
+        ),
       },
     },
     {

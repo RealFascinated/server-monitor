@@ -1,5 +1,6 @@
 package cc.fascinated.monitor.controller.v1;
 
+import cc.fascinated.monitor.model.dto.response.agent.AgentLatestVersionResponse;
 import cc.fascinated.monitor.model.dto.response.agent.AgentUpdateResponse;
 import cc.fascinated.monitor.service.AgentUpdateService;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,11 @@ public class AgentController {
 
     public AgentController(AgentUpdateService agentUpdateService) {
         this.agentUpdateService = agentUpdateService;
+    }
+
+    @GetMapping(value = "/latest")
+    public AgentLatestVersionResponse getLatestVersion() {
+        return new AgentLatestVersionResponse(this.agentUpdateService.getLatestVersion());
     }
 
     @GetMapping(value = "/update")
