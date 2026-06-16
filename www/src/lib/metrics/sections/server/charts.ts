@@ -10,7 +10,7 @@ import {
   TEMPERATURE_THRESHOLDS,
 } from "@/lib/metrics/chart-thresholds"
 import type { ChartThreshold } from "@/lib/metrics/chart-thresholds"
-import type { MetricChartConfig } from "@/lib/metrics/chart-config"
+import type { MetricChartConfig, TooltipSortEntry } from "@/lib/metrics/chart-config"
 import { chartSeries } from "@/lib/metrics/series"
 import {
   formatCelsius,
@@ -39,6 +39,18 @@ function loadAverageThresholds(
     { value: coreCount, level: "warning" },
     { value: coreCount * 2, level: "critical" },
   ]
+}
+
+function cpuCoreIndex(label: string): number {
+  const match = /\d+$/.exec(label)
+  return match ? Number(match[0]) : 0
+}
+
+function compareCpuCoreLabels(
+  a: TooltipSortEntry,
+  b: TooltipSortEntry
+): number {
+  return cpuCoreIndex(a.label) - cpuCoreIndex(b.label)
 }
 
 function diskCharts(disk: DiskMetrics): MetricChartConfig[] {
@@ -324,6 +336,8 @@ function hostCpuCharts(
       yRange: PERCENT_Y_RANGE,
       thresholds: PERCENT_THRESHOLDS,
       showCurrentValues: false,
+      tooltipColumnSize: 16,
+      tooltipSort: compareCpuCoreLabels,
     },
     {
       title: "CPU clock",

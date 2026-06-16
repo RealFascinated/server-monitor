@@ -25,6 +25,7 @@ import {
 } from "@/lib/metrics/chart-sync"
 import { enqueueChartDestroy } from "@/lib/metrics/chart-hydration-queue"
 import type { ChartYRange } from "@/lib/metrics/uplot-theme"
+import type { TooltipSortEntry } from "@/lib/metrics/chart-config"
 import { useTheme } from "@/lib/theme"
 
 export type MetricChartMode = "line" | "stack"
@@ -40,6 +41,8 @@ type MetricChartProps = {
   yRange?: ChartYRange
   thresholds?: ChartThreshold[]
   mode?: MetricChartMode
+  tooltipColumnSize?: number
+  tooltipSort?: (a: TooltipSortEntry, b: TooltipSortEntry) => number
 }
 
 function MetricChart({
@@ -53,6 +56,8 @@ function MetricChart({
   yRange,
   thresholds,
   mode = "line",
+  tooltipColumnSize,
+  tooltipSort,
 }: MetricChartProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const chartRef = useRef<uPlot | null>(null)
@@ -149,6 +154,8 @@ function MetricChart({
             formatValue: formatSeriesValue,
             theme: resolvedTheme,
             stacked,
+            tooltipColumnSize,
+            tooltipSort,
           }),
         ],
         ...(syncKey ? { setScale: [createChartZoomSyncHook(syncKey)] } : {}),
@@ -218,6 +225,8 @@ function MetricChart({
     prepared.bands,
     thresholds,
     syncKey,
+    tooltipColumnSize,
+    tooltipSort,
   ])
 
   useLayoutEffect(() => {

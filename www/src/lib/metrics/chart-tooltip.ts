@@ -2,11 +2,13 @@ import type uPlot from "uplot"
 
 import { formatPercentValue, formatTooltipTimestamp } from "@/lib/formatter"
 import type { ResolvedTheme } from "@/lib/theme/context"
+import type { TooltipSortEntry } from "@/lib/metrics/chart-config"
 
 const TOOLTIP_PADDING = 8
 const TOOLTIP_OFFSET_X = 20
 const VIEWPORT_PADDING = 8
 const TOOLTIP_MAX_WIDTH = 320
+const TOOLTIP_COLUMN_WIDTH = 132
 const MOBILE_BREAKPOINT = 768
 const HIDDEN_CURSOR_POS = -10
 
@@ -156,6 +158,90 @@ function getUsedTotalFooter(
   return `${formatValue(used.value, usedIndex)} of ${formatValue(total.value, totalIndex)} (${formatPercentValue(percent)})`
 }
 
+type TooltipEntry = {
+  value: number
+  label: string
+  color: string
+  seriesIndex: number
+}
+
+function renderTooltipRow(
+  entry: TooltipEntry,
+  formatValue: (value: number, seriesIndex: number) => string
+): string {
+  const formatted = formatValue(entry.value, entry.seriesIndex)
+
+  return (
+    `<div class="flex items-center gap-2 py-0.5">` +
+    `<span class="size-2 shrink-0 rounded-full" style="background:${entry.color}"></span>` +
+    `<span class="truncate text-neutral-500 dark:text-neutral-400">${entry.label}</span>` +
+    `<span class="ml-auto pl-3 font-medium whitespace-nowrap tabular-nums">${formatted}</span>` +
+    `</div>`
+  )
+}
+
+function chunkEntries(
+  entries: TooltipEntry[],
+  columnSize: number
+): TooltipEntry[][] {
+  const columns: TooltipEntry[][] = []
+  for (let index = 0; index < entries.length; index += columnSize) {
+    columns.push(entries.slice(index, index + columnSize))
+  }
+  return columns
+}
+
+function renderTooltipBody(
+  entries: TooltipEntry[],
+  formatValue: (value: number, seriesIndex: number) => string,
+  tooltipColumnSize?: number,
+  tooltipSort?: (a: TooltipSortEntry, b: TooltipSortEntry) => number,
+  seriesCount = entries.length
+): string {
+  const useColumns =
+    tooltipColumnSize != null && seriesCount > tooltipColumnSize
+
+  const ordered = tooltipSort
+    ? [...entries].sort(tooltipSort)
+    : [...entries].sort((a, b) => Math.abs(b.value) - Math.abs(a.value))
+
+  if (!useColumns) {
+    return ordered.map((entry) => renderTooltipRow(entry, formatValue)).join("")
+  }
+
+  const columns = chunkEntries(ordered, tooltipColumnSize)
+
+  return (
+    `<div class="flex items-start gap-4">` +
+    columns
+      .map(
+        (column) =>
+          `<div class="min-w-0 shrink-0" style="width:${TOOLTIP_COLUMN_WIDTH}px">` +
+          column.map((entry) => renderTooltipRow(entry, formatValue)).join("") +
+          `</div>`
+      )
+      .join("") +
+    `</div>`
+  )
+}
+
+function getTooltipMaxWidth(
+  viewport: ReturnType<typeof getViewportBounds>,
+  tooltipColumnSize?: number,
+  entryCount = 0
+): number {
+  if (tooltipColumnSize == null || entryCount <= tooltipColumnSize) {
+    return viewport.maxWidth
+  }
+
+  const columnCount = Math.ceil(entryCount / tooltipColumnSize)
+  const desiredWidth =
+    columnCount * TOOLTIP_COLUMN_WIDTH + Math.max(0, columnCount - 1) * 16 + 20
+  const availableWidth = viewport.width - VIEWPORT_PADDING * 2
+
+  return Math.min(availableWidth, desiredWidth)
+}
+
 type CreateCursorTooltipHandlerParams = {
   tooltip: HTMLDivElement
   labels: string[]
@@ -164,6 +250,8 @@ type CreateCursorTooltipHandlerParams = {
   formatValue: (value: number, seriesIndex: number) => string
   theme: ResolvedTheme
   stacked?: boolean
+  tooltipColumnSize?: number
+  tooltipSort?: (a: TooltipSortEntry, b: TooltipSortEntry) => number
 }
 
 export function createCursorTooltipHandler({
@@ -174,14 +262,21 @@ export function createCursorTooltipHandler({
   formatValue,
   theme,
   stacked = false,
+  tooltipColumnSize,
+  tooltipSort,
 }: CreateCursorTooltipHandlerParams) {
   const isDark = theme === "dark"
+  const useColumnLayout =
+    tooltipColumnSize != null && labels.length > tooltipColumnSize
   tooltip.className = [
-    "pointer-events-none fixed z-50 max-w-xs rounded-sm border px-2.5 py-2 text-xs shadow-md",
+    "pointer-events-none fixed z-50 rounded-sm border px-2.5 py-2 text-xs shadow-md",
+    useColumnLayout ? "" : "max-w-xs",
     isDark
       ? "border-monitor-gray-300 bg-monitor-gray-100 text-white"
       : "border-neutral-200 bg-white text-black",
-  ].join(" ")
+  ]
+    .filter(Boolean)
+    .join(" ")
 
   return (u: uPlot) => {
     const { idx, left } = u.cursor
@@ -199,12 +294,7 @@ export function createCursorTooltipHandler({
         ? timestamps[timestamps.length - 1] - timestamps[0]
         : 0
 
-    const entries: {
-      value: number
-      label: string
-      color: string
-      seriesIndex: number
-    }[] = []
+    const entries: TooltipEntry[] = []
     for (let seriesIndex = 0; seriesIndex < labels.length; seriesIndex++) {
       const value = (data[seriesIndex + 1] as (number | null)[])[idx]
       if (value == null) {
@@ -219,32 +309,23 @@ export function createCursorTooltipHandler({
       })
     }
 
-    entries.sort((a, b) => Math.abs(b.value) - Math.abs(a.value))
+    if (entries.length === 0) {
+      tooltip.style.display = "none"
+      return
+    }
 
     const stackTotal = stacked
       ? entries.reduce((sum, entry) => sum + Math.abs(entry.value), 0)
       : 0
 
-    const rows = entries.map((entry) => {
-      const formatted = formatValue(entry.value, entry.seriesIndex)
-      const share =
-        stacked && stackTotal > 0
-          ? ` <span class="text-neutral-400 dark:text-neutral-500">(${formatPercentValue((Math.abs(entry.value) / stackTotal) * 100, 0)})</span>`
-          : ""
-
-      return (
-        `<div class="flex items-center gap-2 py-0.5">` +
-        `<span class="size-2 shrink-0 rounded-full" style="background:${entry.color}"></span>` +
-        `<span class="truncate text-neutral-500 dark:text-neutral-400">${entry.label}</span>` +
-        `<span class="ml-auto pl-3 font-medium whitespace-nowrap tabular-nums">${formatted}${share}</span>` +
-        `</div>`
-      )
-    })
-
-    if (rows.length === 0) {
-      tooltip.style.display = "none"
-      return
-    }
+    const body = renderTooltipBody(
+      entries,
+      formatValue,
+      tooltipColumnSize,
+      tooltipSort,
+      labels.length
+    )
+    const rows = [body]
 
     const seriesIndexByLabel = new Map(
       labels.map((label, index) => [label, index])
@@ -284,7 +365,7 @@ export function createCursorTooltipHandler({
     tooltip.style.display = "block"
     tooltip.style.transform = "none"
     tooltip.style.maxHeight = ""
-    tooltip.style.maxWidth = `${viewport.maxWidth}px`
+    tooltip.style.maxWidth = `${getTooltipMaxWidth(viewport, tooltipColumnSize, labels.length)}px`
 
     tooltip.style.left = "0"
     tooltip.style.top = "0"

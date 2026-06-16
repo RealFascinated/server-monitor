@@ -26,6 +26,7 @@ import type { MetricsTimeGrid } from "@/lib/metrics/timestamps"
 import type { MetricChartMode } from "@/components/metrics/metric-chart"
 import type { ChartThreshold } from "@/lib/metrics/chart-thresholds"
 import type { ChartYRange } from "@/lib/metrics/uplot-theme"
+import type { TooltipSortEntry } from "@/lib/metrics/chart-config"
 import { cn } from "@/lib/utils"
 import { useTheme } from "@/lib/theme"
 
@@ -41,6 +42,8 @@ type MetricChartCardProps = {
   thresholds?: ChartThreshold[]
   showCurrentValues?: boolean
   mode?: MetricChartMode
+  tooltipColumnSize?: number
+  tooltipSort?: (a: TooltipSortEntry, b: TooltipSortEntry) => number
 }
 
 const FULLSCREEN_CHART_MIN_HEIGHT = 480
@@ -54,6 +57,8 @@ type MetricChartPanelProps = {
   yRange?: ChartYRange
   thresholds?: ChartThreshold[]
   mode?: MetricChartMode
+  tooltipColumnSize?: number
+  tooltipSort?: (a: TooltipSortEntry, b: TooltipSortEntry) => number
   className?: string
 }
 
@@ -66,6 +71,8 @@ function MetricChartPanel({
   yRange,
   thresholds,
   mode,
+  tooltipColumnSize,
+  tooltipSort,
   className,
 }: MetricChartPanelProps) {
   return (
@@ -86,6 +93,8 @@ function MetricChartPanel({
           yRange={yRange}
           thresholds={thresholds}
           mode={mode}
+          tooltipColumnSize={tooltipColumnSize}
+          tooltipSort={tooltipSort}
         />
       ) : null}
     </div>
@@ -104,6 +113,8 @@ function MetricChartCard({
   thresholds,
   showCurrentValues,
   mode,
+  tooltipColumnSize,
+  tooltipSort,
 }: MetricChartCardProps) {
   const chartHeight = height ?? 260
   const [fullscreenOpen, setFullscreenOpen] = useState(false)
@@ -226,6 +237,8 @@ function MetricChartCard({
           yRange={yRange}
           thresholds={thresholds}
           mode={mode}
+          tooltipColumnSize={tooltipColumnSize}
+          tooltipSort={tooltipSort}
         />
       </CardContent>
 
@@ -262,6 +275,8 @@ function MetricChartCard({
               yRange={yRange}
               thresholds={thresholds}
               mode={mode}
+              tooltipColumnSize={tooltipColumnSize}
+              tooltipSort={tooltipSort}
             />
           </div>
         </DialogContent>

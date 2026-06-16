@@ -31,6 +31,8 @@ function MetricChartGrid({ timeGrid, charts }: MetricChartGridProps) {
             thresholds={chart.thresholds}
             showCurrentValues={chart.showCurrentValues}
             mode={chart.mode}
+            tooltipColumnSize={chart.tooltipColumnSize}
+            tooltipSort={chart.tooltipSort}
           />
         ))}
       </div>

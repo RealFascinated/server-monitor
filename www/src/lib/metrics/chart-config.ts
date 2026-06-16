@@ -4,6 +4,12 @@ import { hasSeriesData } from "@/lib/metrics/series"
 import type { ChartYRange } from "@/lib/metrics/uplot-theme"
 import type { MetricChartMode } from "@/components/metrics/metric-chart"
 
+type TooltipSortEntry = {
+  value: number
+  label: string
+  seriesIndex: number
+}
+
 type MetricChartConfig = {
   title: string
   description?: string
@@ -14,11 +20,13 @@ type MetricChartConfig = {
   thresholds?: ChartThreshold[]
   showCurrentValues?: boolean
   mode?: MetricChartMode
+  tooltipColumnSize?: number
+  tooltipSort?: (a: TooltipSortEntry, b: TooltipSortEntry) => number
 }
 
 function chartsHaveData(charts: MetricChartConfig[]): boolean {
   return charts.some((chart) => hasSeriesData(chart.series))
 }
 
-export type { MetricChartConfig }
+export type { MetricChartConfig, TooltipSortEntry }
 export { chartsHaveData }
