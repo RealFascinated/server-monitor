@@ -7,7 +7,8 @@ export type MetricsDataWindow = {
   to: number
 }
 
-const MIN_ZOOM_SPAN_SECONDS = 60
+// Must match API MetricStepPolicy.minSpan() (5 minutes).
+const MIN_ZOOM_SPAN_SECONDS = 5 * 60
 const ZOOM_IN_THRESHOLD = 0.95
 
 export function shouldNavigateChartZoom(
