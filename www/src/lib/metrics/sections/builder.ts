@@ -3,6 +3,7 @@ import type { ReactNode } from "react"
 
 import { metricSectionId } from "@/lib/metrics/sections/id"
 import type {
+  MetricsSectionGroup,
   MetricsSectionLeaf,
   MetricsSectionNode,
 } from "@/lib/metrics/sections/types"
@@ -39,6 +40,25 @@ function createLeaf(input: LeafInput): MetricsSectionLeaf {
   }
 }
 
+function orderSectionNodes(nodes: MetricsSectionNode[]): MetricsSectionNode[] {
+  const leaves: MetricsSectionLeaf[] = []
+  const groups: MetricsSectionGroup[] = []
+
+  for (const node of nodes) {
+    if (node.kind === "leaf") {
+      leaves.push(node)
+      continue
+    }
+
+    groups.push({
+      ...node,
+      children: orderSectionNodes(node.children),
+    })
+  }
+
+  return [...leaves, ...groups]
+}
+
 class MetricsSectionGroupBuilder {
   private nodes: MetricsSectionNode[] = []
 
@@ -69,7 +89,7 @@ class MetricsSectionGroupBuilder {
   }
 
   build(): MetricsSectionNode[] {
-    return this.nodes
+    return orderSectionNodes(this.nodes)
   }
 }
 
@@ -103,7 +123,7 @@ class MetricsSectionBuilder {
   }
 
   build(): MetricsSectionNode[] {
-    return this.nodes
+    return orderSectionNodes(this.nodes)
   }
 }
 

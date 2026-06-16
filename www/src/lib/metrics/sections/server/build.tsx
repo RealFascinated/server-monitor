@@ -4,18 +4,17 @@ import {
   Cpu,
   Database,
   Disc,
+  Gauge,
   Gpu,
   HardDrive,
   LayoutDashboard,
   MemoryStick,
   Network,
   Thermometer,
-  Cog,
 } from "lucide-react"
 
 import type { ServerMetricsResponse } from "@/lib/api/user/metrics"
 import type { ServerResponse } from "@/lib/api/user/servers"
-import { TEMPERATURE_THRESHOLDS } from "@/lib/metrics/chart-thresholds"
 import { createMetricsSectionBuilder } from "@/lib/metrics/sections/builder"
 import { addChartSection } from "@/lib/metrics/sections/chart-section"
 import { metricSectionId } from "@/lib/metrics/sections/id"
@@ -26,9 +25,11 @@ import {
   diskCharts,
   gpuCharts,
   hostCpuCharts,
+  hostHardwareCharts,
   hostMemoryCharts,
-  hostProcessCharts,
+  hostSystemCharts,
   networkCharts,
+  tcpCharts,
   zfsPoolCharts,
 } from "@/lib/metrics/sections/server/charts"
 import {
@@ -37,8 +38,6 @@ import {
 } from "@/lib/metrics/sections/server/overview"
 import type { MetricsTimeGrid } from "@/lib/metrics/timestamps"
 import {
-  formatCelsius,
-  formatCount,
   formatMemoryBytes,
   formatNumber,
 } from "@/lib/formatter"
@@ -80,9 +79,16 @@ function buildServerMetricSections(
   })
 
   addChartSection(builder, {
-    title: "Processes",
-    icon: Cog,
-    charts: hostProcessCharts(host),
+    title: "System",
+    icon: Gauge,
+    charts: hostSystemCharts(host),
+    timeGrid,
+  })
+
+  addChartSection(builder, {
+    title: "Hardware",
+    icon: Thermometer,
+    charts: hostHardwareCharts(host, metrics.temperatures),
     timeGrid,
   })
 
@@ -113,38 +119,30 @@ function buildServerMetricSections(
   builder.group(
     { id: "networks", title: "Network", icon: Network },
     (group) => {
-      for (const network of metrics.networks ?? []) {
-        addChartSection(group, {
-          id: metricSectionId(`network-${network.interface}`),
-          title: `Network ${network.interface}`,
-          navLabel: network.interface,
-          icon: Network,
-          charts: networkCharts(network),
-          timeGrid,
-        })
-      }
+      group.group(
+        { id: "network-interfaces", title: "Interfaces", icon: Network },
+        (interfaces) => {
+          for (const network of metrics.networks ?? []) {
+            addChartSection(interfaces, {
+              id: metricSectionId(`network-${network.interface}`),
+              title: `Network ${network.interface}`,
+              navLabel: network.interface,
+              icon: Network,
+              charts: networkCharts(network),
+              timeGrid,
+            })
+          }
+        }
+      )
+
+      addChartSection(group, {
+        title: "TCP",
+        icon: Cable,
+        charts: tcpCharts(metrics.tcpConnections),
+        timeGrid,
+      })
     }
   )
-
-  if ((metrics.tcpConnections ?? []).length > 0) {
-    addChartSection(builder, {
-      title: "TCP",
-      icon: Cable,
-      charts: [
-        {
-          title: "Connections by state",
-          description:
-            "TCP connections grouped by state (for example ESTABLISHED, TIME_WAIT).",
-          series: (metrics.tcpConnections ?? []).map((tcp) =>
-            chartSeries(tcp.state, tcp.connections)
-          ),
-          valueFormatter: formatCount,
-          showCurrentValues: false,
-        },
-      ],
-      timeGrid,
-    })
-  }
 
   builder.group({ id: "gpus", title: "GPU", icon: Gpu }, (group) => {
     for (const gpu of metrics.gpus ?? []) {
@@ -166,26 +164,6 @@ function buildServerMetricSections(
     charts: containerCharts(metrics.containers),
     timeGrid,
   })
-
-  if ((metrics.temperatures ?? []).length > 0) {
-    addChartSection(builder, {
-      title: "Temperature",
-      icon: Thermometer,
-      charts: [
-        {
-          title: "Sensors",
-          description: "Hardware temperature readings from system sensors.",
-          series: (metrics.temperatures ?? []).map((sensor) =>
-            chartSeries(sensor.sensor, sensor.temperatureCelsius)
-          ),
-          valueFormatter: formatCelsius,
-          thresholds: TEMPERATURE_THRESHOLDS,
-          showCurrentValues: false,
-        },
-      ],
-      timeGrid,
-    })
-  }
 
   builder.group(
     { id: "zfs", title: "ZFS", icon: Disc, showChildCount: false },

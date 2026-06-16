@@ -3,6 +3,8 @@ import type {
   GpuMetrics,
   NetworkMetrics,
   ServerMetricsResponse,
+  TemperatureMetrics,
+  TcpConnectionMetrics,
   ZfsPoolMetrics,
 } from "@/lib/api/user/metrics"
 import {
@@ -359,8 +361,8 @@ function hostMemoryCharts(
 ): MetricChartConfig[] {
   return [
     {
-      title: "Memory bytes",
-      description: "Used, available, and total physical memory.",
+      title: "Physical memory",
+      description: "Used, available, and total RAM.",
       series: [
         chartSeries("Used", host.memUsage),
         chartSeries("Available", host.memAvailable),
@@ -369,7 +371,7 @@ function hostMemoryCharts(
       valueFormatter: formatMemoryBytes,
     },
     {
-      title: "Memory cache",
+      title: "Buffers & cache",
       description: "Kernel buffers and page cache.",
       series: [
         chartSeries("Buffers", host.memBuffers),
@@ -386,10 +388,21 @@ function hostMemoryCharts(
       ],
       valueFormatter: formatMemoryBytes,
     },
+    {
+      title: "OOM kills",
+      description:
+        "Out-of-memory killer events. Total is cumulative; rate is kills per second.",
+      series: [
+        chartSeries("Total", host.oomKillsTotal),
+        chartSeries("Kills/s", host.oomKillsPerSecond),
+      ],
+      valueFormatter: formatCount,
+      seriesFormatters: [formatCount, (value) => `${formatCount(value)}/s`],
+    },
   ]
 }
 
-function hostProcessCharts(
+function hostSystemCharts(
   host: NonNullable<ServerMetricsResponse["host"]>
 ): MetricChartConfig[] {
   return [
@@ -403,7 +416,7 @@ function hostProcessCharts(
       valueFormatter: formatCount,
     },
     {
-      title: "Kernel activity",
+      title: "Scheduling",
       description: "Context switches and hardware interrupts per second.",
       series: [
         chartSeries("Context switches/s", host.ctxSwitchesPerSecond),
@@ -414,39 +427,61 @@ function hostProcessCharts(
     {
       title: "File descriptors",
       description:
-        "System-wide open file descriptors vs the kernel limit. High usage can block new connections and file opens.",
+        "Open file descriptors vs the kernel limit. High usage can block new connections and file opens.",
       series: [
         chartSeries("Open", host.fdOpen),
         chartSeries("Max", host.fdMax),
+        chartSeries("Usage", host.fdUsagePct),
       ],
       valueFormatter: formatCount,
-    },
-    {
-      title: "FD usage",
-      description: "Open file descriptors as a percentage of the system limit.",
-      series: [chartSeries("Usage", host.fdUsagePct)],
-      valueFormatter: formatPercentValue,
-      yRange: PERCENT_Y_RANGE,
-      thresholds: PERCENT_THRESHOLDS,
-    },
-    {
-      title: "OOM kills",
-      description:
-        "Out-of-memory killer events. Total is cumulative; rate is kills per second.",
-      series: [
-        chartSeries("Total", host.oomKillsTotal),
-        chartSeries("Kills/s", host.oomKillsPerSecond),
+      seriesFormatters: [
+        formatCount,
+        formatCount,
+        formatPercentValue,
       ],
-      valueFormatter: formatCount,
-      seriesFormatters: [formatCount, (value) => `${formatCount(value)}/s`],
+    },
+  ]
+}
+
+function hostHardwareCharts(
+  host: NonNullable<ServerMetricsResponse["host"]>,
+  temperatures: TemperatureMetrics[] | null | undefined
+): MetricChartConfig[] {
+  return [
+    {
+      title: "Temperature",
+      description: "Hardware temperature readings from system sensors.",
+      series: (temperatures ?? []).map((sensor) =>
+        chartSeries(sensor.sensor, sensor.temperatureCelsius)
+      ),
+      valueFormatter: formatCelsius,
+      thresholds: TEMPERATURE_THRESHOLDS,
+      showCurrentValues: false,
     },
     {
       title: "Battery",
-      description: "Laptop battery charge level.",
+      description: "Battery charge level on laptops and portable devices.",
       series: [chartSeries("Charge", host.batteryPct)],
       valueFormatter: formatPercentValue,
       yRange: PERCENT_Y_RANGE,
       thresholds: PERCENT_THRESHOLDS,
+    },
+  ]
+}
+
+function tcpCharts(
+  tcpConnections: TcpConnectionMetrics[] | null | undefined
+): MetricChartConfig[] {
+  return [
+    {
+      title: "Connections by state",
+      description:
+        "TCP connections grouped by state (for example ESTABLISHED, TIME_WAIT).",
+      series: (tcpConnections ?? []).map((tcp) =>
+        chartSeries(tcp.state, tcp.connections)
+      ),
+      valueFormatter: formatCount,
+      showCurrentValues: false,
     },
   ]
 }
@@ -457,8 +492,10 @@ export {
   diskCharts,
   gpuCharts,
   hostCpuCharts,
+  hostHardwareCharts,
   hostMemoryCharts,
-  hostProcessCharts,
+  hostSystemCharts,
   networkCharts,
+  tcpCharts,
   zfsPoolCharts,
 }
