@@ -7,11 +7,12 @@ import { cn } from "@/lib/utils"
 function adminOverviewHasData(metrics: AdminMetricsResponse): boolean {
   const overview = metrics.overview ?? {}
   const fleet = metrics.fleet ?? {}
+  const vm = metrics.vm ?? {}
 
   return (
     hasValues(overview.users) ||
-    hasValues(overview.activeSessions) ||
     hasValues(overview.databaseSizeBytes) ||
+    hasValues(vm.vmStorageSizeBytes) ||
     hasValues(fleet.serversOnline)
   )
 }
@@ -19,11 +20,12 @@ function adminOverviewHasData(metrics: AdminMetricsResponse): boolean {
 function AdminOverviewStats({ metrics }: { metrics: AdminMetricsResponse }) {
   const overview = metrics.overview ?? {}
   const fleet = metrics.fleet ?? {}
+  const vm = metrics.vm ?? {}
 
   const users = getLatestValue(overview.users)
   const usersNew24h = getLatestValue(overview.usersNew24h)
-  const activeSessions = getLatestValue(overview.activeSessions)
   const databaseSizeBytes = getLatestValue(overview.databaseSizeBytes)
+  const vmStorageSizeBytes = getLatestValue(vm.vmStorageSizeBytes)
   const serversOnline = getLatestValue(fleet.serversOnline)
   const serversOffline = getLatestValue(fleet.serversOffline)
   const serversPending = getLatestValue(fleet.serversPending)
@@ -50,15 +52,6 @@ function AdminOverviewStats({ metrics }: { metrics: AdminMetricsResponse }) {
         detail={usersNewDetail}
       />
     ) : null,
-    activeSessions != null ? (
-      <MetricStatCard
-        key="sessions"
-        title="Active sessions"
-        value={activeSessions}
-        formatValue={(value) => formatCount(Math.round(value))}
-        detail="Signed-in sessions that have not expired"
-      />
-    ) : null,
     serversOnline != null ? (
       <MetricStatCard
         key="servers"
@@ -82,6 +75,15 @@ function AdminOverviewStats({ metrics }: { metrics: AdminMetricsResponse }) {
         value={databaseSizeBytes}
         formatValue={formatMemoryBytes}
         detail="Total storage used by Monitor"
+      />
+    ) : null,
+    vmStorageSizeBytes != null ? (
+      <MetricStatCard
+        key="vm-storage"
+        title="VictoriaMetrics size"
+        value={vmStorageSizeBytes}
+        formatValue={formatMemoryBytes}
+        detail="Total time-series data stored on disk"
       />
     ) : null,
   ].filter(Boolean)
