@@ -1,7 +1,6 @@
 import type { MetricRefreshInterval } from "@/lib/metrics/refresh-interval"
 import type { MetricTimeRange } from "@/lib/metrics/range"
 import { DEFAULT_METRIC_TIME_RANGE } from "@/lib/metrics/range"
-import type { ThemePreference } from "@/lib/theme/context"
 
 type PreferenceDefinition<T extends boolean | string | number> = {
   key: string
@@ -9,11 +8,6 @@ type PreferenceDefinition<T extends boolean | string | number> = {
 }
 
 export const Preferences = {
-  THEME: {
-    key: "theme",
-    defaultValue: "system" as ThemePreference,
-  } satisfies PreferenceDefinition<ThemePreference>,
-
   METRIC_DEFAULT_RANGE: {
     key: "metric_default_range",
     defaultValue: DEFAULT_METRIC_TIME_RANGE,

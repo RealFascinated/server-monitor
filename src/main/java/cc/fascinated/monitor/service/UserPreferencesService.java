@@ -4,7 +4,6 @@ import cc.fascinated.monitor.exception.impl.NotFoundException;
 import cc.fascinated.monitor.model.domain.metric.MetricRefreshInterval;
 import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
 import cc.fascinated.monitor.model.domain.settings.SettingType;
-import cc.fascinated.monitor.model.domain.user.ThemePreference;
 import cc.fascinated.monitor.model.dto.response.user.UserPreferenceResponse;
 import cc.fascinated.monitor.model.persistance.UserPreferenceRow;
 import cc.fascinated.monitor.repository.UserPreferenceRepository;
@@ -54,7 +53,6 @@ public class UserPreferencesService {
     @AllArgsConstructor
     @Getter
     public enum Preferences {
-        THEME("theme", SettingType.ENUM.from(ThemePreference.class), "system"),
         METRIC_DEFAULT_RANGE("metric_default_range", SettingType.ENUM.from(MetricTimeRange.class), "7d"),
         METRIC_REFRESH_INTERVAL("metric_refresh_interval", SettingType.ENUM.from(MetricRefreshInterval.class), "10s"),
         SIDEBAR_DETAILED_MODE("sidebar_detailed_mode", SettingType.BOOLEAN, false),
