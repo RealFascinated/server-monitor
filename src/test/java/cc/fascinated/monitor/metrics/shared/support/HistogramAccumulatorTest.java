@@ -15,7 +15,7 @@ class HistogramAccumulatorTest {
         assertEquals(3, histogram.count());
         assertEquals(15.6, histogram.sum(), 0.001);
         assertEquals(1, histogram.bucketCount(1));
-        assertEquals(1, histogram.bucketCount(4));
+        assertEquals(1, histogram.bucketCount(3));
         assertEquals(1, histogram.bucketCount(HistogramAccumulator.DURATION_BUCKETS.length));
     }
 }

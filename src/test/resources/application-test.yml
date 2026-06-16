@@ -1,0 +1,12 @@
+spring:
+  task:
+    scheduling:
+      enabled: false
+
+monitor:
+  metrics:
+    enabled: false
+  mail:
+    enabled: false
+  victoriametrics:
+    delete-token: test
