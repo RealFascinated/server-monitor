@@ -207,6 +207,13 @@ function vmCharts(vm: VmMetrics): MetricChartConfig[] {
       yRange: { autoMin: true },
     },
     {
+      title: "Datapoint count",
+      description: "Total samples stored in VictoriaMetrics.",
+      series: [chartSeries("Datapoints", vm.vmDatapointCount)],
+      valueFormatter: formatCount,
+      yRange: { autoMin: true },
+    },
+    {
       title: "Queries and writes per minute",
       description: "VictoriaMetrics query and write operations per minute.",
       series: [

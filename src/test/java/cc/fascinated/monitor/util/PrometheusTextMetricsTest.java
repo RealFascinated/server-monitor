@@ -31,4 +31,17 @@ class PrometheusTextMetricsTest {
     void returnsEmptyWhenMetricMissing() {
         assertTrue(PrometheusTextMetrics.sumGaugeValues("vm_up 1\n", "vm_data_size_bytes").isEmpty());
     }
+
+    @Test
+    void sumsGaugeValuesExcludingLabelPrefix() {
+        String body = """
+                vm_rows{type="storage/inmemory"} 100
+                vm_rows{type="storage/small"} 200
+                vm_rows{type="storage/big"} 300
+                vm_rows{type="indexdb/inmemory"} 400
+                vm_rows{type="indexdb/file"} 999
+                """;
+
+        assertEquals(600L, PrometheusTextMetrics.sumGaugeValuesExcludingLabelPrefix(body, "vm_rows", "type", "indexdb").orElseThrow());
+    }
 }

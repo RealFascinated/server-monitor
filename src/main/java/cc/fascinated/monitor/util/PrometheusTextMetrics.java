@@ -9,6 +9,16 @@ import java.util.OptionalLong;
 public class PrometheusTextMetrics {
 
     public static OptionalLong sumGaugeValues(String body, String metricName) {
+        return sumGaugeValues(body, metricName, null, null, false);
+    }
+
+    public static OptionalLong sumGaugeValuesExcludingLabelPrefix(String body, String metricName,
+                                                                  String labelName, String excludedLabelValuePrefix) {
+        return sumGaugeValues(body, metricName, labelName, excludedLabelValuePrefix, true);
+    }
+
+    private static OptionalLong sumGaugeValues(String body, String metricName, String labelName,
+                                               String labelValuePrefix, boolean excludeLabelPrefix) {
         double sum = 0;
         boolean found = false;
         for (int index = 0; index < body.length(); ) {
@@ -22,6 +32,12 @@ public class PrometheusTextMetrics {
             if (line.isEmpty() || line.charAt(0) == '#') {
                 continue;
             }
+            if (labelName != null) {
+                String labelValue = labelValue(line, labelName);
+                if (labelValue != null && labelValue.startsWith(labelValuePrefix) == excludeLabelPrefix) {
+                    continue;
+                }
+            }
             OptionalDouble value = gaugeValue(line, metricName);
             if (value.isPresent()) {
                 sum += value.getAsDouble();
@@ -32,6 +48,31 @@ public class PrometheusTextMetrics {
             return OptionalLong.empty();
         }
         return OptionalLong.of((long) sum);
+    }
+
+    private static String labelValue(String line, String labelName) {
+        int braceStart = line.indexOf('{');
+        if (braceStart < 0) {
+            return null;
+        }
+        int braceEnd = line.indexOf('}', braceStart);
+        if (braceEnd < 0) {
+            return null;
+        }
+        String labels = line.substring(braceStart + 1, braceEnd);
+        for (String part : labels.split(",")) {
+            String trimmed = part.trim();
+            int equals = trimmed.indexOf('=');
+            if (equals < 0 || !trimmed.substring(0, equals).trim().equals(labelName)) {
+                continue;
+            }
+            String value = trimmed.substring(equals + 1).trim();
+            if (value.length() >= 2 && value.charAt(0) == '"' && value.charAt(value.length() - 1) == '"') {
+                return value.substring(1, value.length() - 1);
+            }
+            return value;
+        }
+        return null;
     }
 
     private static OptionalDouble gaugeValue(String line, String metricName) {

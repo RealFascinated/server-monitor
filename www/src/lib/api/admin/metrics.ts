@@ -60,6 +60,7 @@ export type JvmMetrics = {
 }
 
 export type VmMetrics = {
+  vmDatapointCount?: MetricValues
   vmStorageSizeBytes?: MetricValues
   vmQueriesTotal?: MetricValues
   vmQueryDurationSeconds?: MetricValues

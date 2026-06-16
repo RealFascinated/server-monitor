@@ -12,6 +12,7 @@ function adminOverviewHasData(metrics: AdminMetricsResponse): boolean {
   return (
     hasValues(overview.users) ||
     hasValues(overview.databaseSizeBytes) ||
+    hasValues(vm.vmDatapointCount) ||
     hasValues(vm.vmStorageSizeBytes) ||
     hasValues(fleet.serversOnline)
   )
@@ -25,6 +26,7 @@ function AdminOverviewStats({ metrics }: { metrics: AdminMetricsResponse }) {
   const users = getLatestValue(overview.users)
   const usersNew24h = getLatestValue(overview.usersNew24h)
   const databaseSizeBytes = getLatestValue(overview.databaseSizeBytes)
+  const vmDatapointCount = getLatestValue(vm.vmDatapointCount)
   const vmStorageSizeBytes = getLatestValue(vm.vmStorageSizeBytes)
   const serversOnline = getLatestValue(fleet.serversOnline)
   const serversOffline = getLatestValue(fleet.serversOffline)
@@ -83,7 +85,20 @@ function AdminOverviewStats({ metrics }: { metrics: AdminMetricsResponse }) {
         title="VictoriaMetrics size"
         value={vmStorageSizeBytes}
         formatValue={formatMemoryBytes}
-        detail="Total time-series data stored on disk"
+        detail={
+          vmDatapointCount == null
+            ? "Total time-series data stored on disk"
+            : `${formatCount(Math.round(vmDatapointCount))} datapoints stored`
+        }
+      />
+    ) : null,
+    vmDatapointCount != null && vmStorageSizeBytes == null ? (
+      <MetricStatCard
+        key="vm-datapoints"
+        title="VictoriaMetrics datapoints"
+        value={vmDatapointCount}
+        formatValue={(value) => formatCount(Math.round(value))}
+        detail="Total samples stored in VictoriaMetrics"
       />
     ) : null,
   ].filter(Boolean)

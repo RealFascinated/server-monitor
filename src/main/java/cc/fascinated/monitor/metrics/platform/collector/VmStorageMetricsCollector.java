@@ -14,8 +14,12 @@ public class VmStorageMetricsCollector {
     }
 
     public void write(PrometheusWriteContext ctx) {
-        this.victoriaMetricsSelfMetricsClient.storageSizeBytes().ifPresent(size ->
+        VictoriaMetricsSelfMetricsClient.SelfMetrics metrics = this.victoriaMetricsSelfMetricsClient.read();
+        metrics.storageSizeBytes().ifPresent(size ->
                 ctx.gauge(PlatformMetricFamily.VM_STORAGE_SIZE_BYTES.metricName(), size)
+        );
+        metrics.datapointCount().ifPresent(count ->
+                ctx.gauge(PlatformMetricFamily.VM_DATAPOINT_COUNT.metricName(), count)
         );
     }
 }
