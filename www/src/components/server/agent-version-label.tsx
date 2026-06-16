@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
+import { ArrowUpCircle } from "lucide-react"
 
 import { SimpleTooltip } from "@/components/simple-tooltip"
 import { latestAgentVersionQueryOptions } from "@/lib/api/agent.queries"
@@ -54,7 +55,12 @@ function AgentVersionLabel({
   )
 
   return (
-    <span className="inline-flex flex-wrap items-center gap-1.5">
+    <span
+      className={cn(
+        "inline-flex items-center",
+        layout === "table" ? "gap-1" : "flex-wrap gap-1.5"
+      )}
+    >
       {layout === "settings" ? <>Agent {versionNode}</> : versionNode}
       {availableUpdateVersion ? (
         <SimpleTooltip
@@ -62,14 +68,22 @@ function AgentVersionLabel({
             <AgentUpdateTooltip latestVersion={availableUpdateVersion} />
           }
         >
-          <span
-            className={cn(
-              "inline-flex cursor-help items-center rounded-sm bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
-              layout === "settings" && "text-xs"
-            )}
-          >
-            {layout === "table" ? "Update" : "Update available"}
-          </span>
+          {layout === "table" ? (
+            <span
+              aria-label={`Agent update available (${availableUpdateVersion})`}
+              className="inline-flex cursor-help items-center text-amber-600 dark:text-amber-400"
+            >
+              <ArrowUpCircle className="size-3.5 shrink-0" aria-hidden />
+            </span>
+          ) : (
+            <span
+              className={cn(
+                "inline-flex cursor-help items-center rounded-sm bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-300"
+              )}
+            >
+              Update available
+            </span>
+          )}
         </SimpleTooltip>
       ) : null}
     </span>
