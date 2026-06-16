@@ -11,6 +11,8 @@ public record ServerDetails(
         String osName,
         @NotBlank(message = "OS version must not be empty")
         String osVersion,
+        @NotBlank(message = "Kernel version must not be empty")
+        String kernelVersion,
         Long uptimeSeconds,
         @NotBlank(message = "CPU model must not be empty")
         String cpuModel,

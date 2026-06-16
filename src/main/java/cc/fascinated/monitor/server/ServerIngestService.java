@@ -100,6 +100,7 @@ public class ServerIngestService {
         inventory.setThreadCount(serverDetails.threadCount());
         inventory.setOsName(serverDetails.osName());
         inventory.setOsVersion(serverDetails.osVersion());
+        inventory.setKernelVersion(serverDetails.kernelVersion());
         inventory.setCpuModel(serverDetails.cpuModel());
         inventory.setSocketCount(serverDetails.socketCount());
         server.setLastUptimeSeconds(serverDetails.uptimeSeconds());

@@ -39,6 +39,10 @@ func populatePlatformDetails(details ingest.ServerDetails) ingest.ServerDetails 
 		}
 	}
 
+	if data, err := os.ReadFile("/proc/sys/kernel/osrelease"); err == nil {
+		details.KernelVersion = strings.TrimSpace(string(data))
+	}
+
 	lscpu := getLscpuValues()
 	details.CPUModel = linuxCPUModel(lscpu)
 	details.SocketCount = linuxSocketCount(lscpu)

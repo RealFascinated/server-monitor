@@ -9,7 +9,8 @@ public record ServerInventoryResponse(
         String cpuModel,
         Integer socketCount,
         String osName,
-        String osVersion
+        String osVersion,
+        String kernelVersion
 ) {
     public static ServerInventoryResponse from(ServerInventoryRow inventory) {
         return new ServerInventoryResponse(
@@ -19,7 +20,8 @@ public record ServerInventoryResponse(
                 inventory.getCpuModel(),
                 inventory.getSocketCount(),
                 inventory.getOsName(),
-                inventory.getOsVersion()
+                inventory.getOsVersion(),
+                inventory.getKernelVersion()
         );
     }
 }

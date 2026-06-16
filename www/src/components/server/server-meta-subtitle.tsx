@@ -70,6 +70,12 @@ function buildMetaItems(server: ServerResponse): MetaItem[] {
     label: "Operating system",
   })
 
+  pushMetaItem(items, inventory?.kernelVersion, {
+    key: "kernel",
+    icon: Cpu,
+    label: "Kernel version",
+  })
+
   return items
 }
 

@@ -41,6 +41,9 @@ public class ServerInventoryRow {
     @Column(name = "os_version")
     private String osVersion;
 
+    @Column(name = "kernel_version")
+    private String kernelVersion;
+
     public ServerInventoryRow(ServerRow server) {
         this.server = server;
     }

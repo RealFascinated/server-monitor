@@ -36,6 +36,7 @@ type ServerDetails struct {
 	ThreadCount   int     `json:"threadCount"`
 	OsName        string  `json:"osName"`
 	OsVersion     string  `json:"osVersion"`
+	KernelVersion string  `json:"kernelVersion"`
 	UptimeSeconds int     `json:"uptimeSeconds"`
 	CPUModel      string  `json:"cpuModel"`
 	SocketCount   int     `json:"socketCount"`

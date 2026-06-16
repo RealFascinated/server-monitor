@@ -12,6 +12,7 @@ export type ServerInventory = {
   socketCount: number | null
   osName: string | null
   osVersion: string | null
+  kernelVersion: string | null
 }
 
 export type ServerResponse = {

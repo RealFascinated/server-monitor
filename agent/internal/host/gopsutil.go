@@ -15,6 +15,10 @@ func populatePlatformDetails(details ingest.ServerDetails) ingest.ServerDetails 
 	details.OsName = normalizeOSName(platform)
 	details.OsVersion = version
 
+	if info, err := host.Info(); err == nil {
+		details.KernelVersion = info.KernelVersion
+	}
+
 	info, err := cpu.Info()
 	if err == nil && len(info) > 0 {
 		details.CPUModel = info[0].ModelName
