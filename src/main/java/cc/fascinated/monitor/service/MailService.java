@@ -8,6 +8,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 @Slf4j
 @Service
 public class MailService {
@@ -27,7 +30,8 @@ public class MailService {
     }
 
     public void sendPasswordResetEmail(String to, String token) {
-        String resetUrl = buildPasswordResetUrl(token);
+        String baseUrl = this.monitorProperties.getWebsiteUrl().replaceAll("/+$", "");
+        String resetUrl = baseUrl + "/reset-password?token=" + token;
 
         if (!this.mailProperties.isEnabled() || this.mailSender == null) {
             log.info("Password reset link for {}: {}", to, resetUrl);
@@ -49,8 +53,36 @@ public class MailService {
         this.mailSender.send(message);
     }
 
-    private String buildPasswordResetUrl(String token) {
+    public void sendServerInviteEmail(
+            String to,
+            String token,
+            String serverName,
+            String invitedByEmail
+    ) {
         String baseUrl = this.monitorProperties.getWebsiteUrl().replaceAll("/+$", "");
-        return baseUrl + "/reset-password?token=" + token;
+        String inviteUrl = baseUrl
+                + "/invites/accept?token="
+                + URLEncoder.encode(token, StandardCharsets.UTF_8)
+                + "&email="
+                + URLEncoder.encode(to, StandardCharsets.UTF_8);
+
+        if (!this.mailProperties.isEnabled() || this.mailSender == null) {
+            log.info("Server invite link for {}: {}", to, inviteUrl);
+            return;
+        }
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(this.mailProperties.getFrom());
+        message.setTo(to);
+        message.setSubject("You've been invited to %s on Monitor".formatted(serverName));
+        message.setText("""
+                %s invited you to join the server "%s" on Monitor.
+
+                Accept the invite using this link (valid for 7 days):
+                %s
+
+                You'll receive viewer access once you accept.
+                """.formatted(invitedByEmail, serverName, inviteUrl));
+        this.mailSender.send(message);
     }
 }

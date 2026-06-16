@@ -15,6 +15,7 @@ import cc.fascinated.monitor.repository.ServerInviteRepository;
 import cc.fascinated.monitor.repository.ServerMemberRepository;
 import cc.fascinated.monitor.repository.ServerRepository;
 import cc.fascinated.monitor.repository.UserRepository;
+import cc.fascinated.monitor.service.MailService;
 import cc.fascinated.monitor.util.AuthUtils;
 import cc.fascinated.monitor.util.UserUtils;
 import org.springframework.stereotype.Service;
@@ -39,16 +40,19 @@ public class ServerAccessService {
     private final ServerInviteRepository serverInviteRepository;
     private final ServerRepository serverRepository;
     private final UserRepository userRepository;
+    private final MailService mailService;
     private final SecureRandom secureRandom = new SecureRandom();
 
     public ServerAccessService(ServerMemberRepository serverMemberRepository,
                                ServerInviteRepository serverInviteRepository,
                                ServerRepository serverRepository,
-                               UserRepository userRepository) {
+                               UserRepository userRepository,
+                               MailService mailService) {
         this.serverMemberRepository = serverMemberRepository;
         this.serverInviteRepository = serverInviteRepository;
         this.serverRepository = serverRepository;
         this.userRepository = userRepository;
+        this.mailService = mailService;
     }
 
     public Optional<ServerRole> findRole(long serverId, long userId) {
@@ -150,6 +154,13 @@ public class ServerAccessService {
                 now.plus(INVITE_DURATION_DAYS, ChronoUnit.DAYS),
                 now
         ));
+
+        this.mailService.sendServerInviteEmail(
+                email,
+                token,
+                server.getServerName(),
+                user.getEmail()
+        );
 
         return ServerInviteCreatedResponse.from(invite, token);
     }

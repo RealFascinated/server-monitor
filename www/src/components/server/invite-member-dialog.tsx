@@ -138,8 +138,8 @@ function InviteMemberDialog({ serverId }: InviteMemberDialogProps) {
             <DialogHeader>
               <DialogTitle>Invite created</DialogTitle>
               <DialogDescription>
-                Share this link with {createdInvite.email}. They will receive
-                viewer access once they accept.
+                We emailed an invite to {createdInvite.email}. You can also copy
+                the link below to share it directly.
               </DialogDescription>
             </DialogHeader>
 
