@@ -8,6 +8,7 @@ import type {
   ZfsPoolMetrics,
 } from "@/lib/api/user/metrics"
 import {
+  BATTERY_THRESHOLDS,
   PERCENT_THRESHOLDS,
   TEMPERATURE_THRESHOLDS,
 } from "@/lib/metrics/chart-thresholds"
@@ -464,7 +465,7 @@ function hostHardwareCharts(
       series: [chartSeries("Charge", host.batteryPct)],
       valueFormatter: formatPercentValue,
       yRange: PERCENT_Y_RANGE,
-      thresholds: PERCENT_THRESHOLDS,
+      thresholds: BATTERY_THRESHOLDS,
     },
   ]
 }

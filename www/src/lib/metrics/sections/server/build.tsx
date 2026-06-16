@@ -125,7 +125,7 @@ function buildServerMetricSections(
           for (const network of metrics.networks ?? []) {
             addChartSection(interfaces, {
               id: metricSectionId(`network-${network.interface}`),
-              title: `Network ${network.interface}`,
+              title: `Interface ${network.interface}`,
               navLabel: network.interface,
               icon: Network,
               charts: networkCharts(network),

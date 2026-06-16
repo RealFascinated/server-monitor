@@ -27,6 +27,11 @@ export const PERCENT_THRESHOLDS: ChartThreshold[] = [
   { value: 95, level: "critical" },
 ]
 
+export const BATTERY_THRESHOLDS: ChartThreshold[] = [
+  { value: 20, level: "warning" },
+  { value: 5, level: "critical" },
+]
+
 export const TEMPERATURE_THRESHOLDS: ChartThreshold[] = [
   { value: 70, level: "warning" },
   { value: 85, level: "critical" },
