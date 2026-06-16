@@ -82,6 +82,7 @@ type ServerMetrics struct {
 	FdOpen                   int64   `json:"fdOpen"`
 	FdMax                    int64   `json:"fdMax,omitempty"`
 	FdUsagePercent           float64 `json:"fdUsagePercent,omitempty"`
+	BatteryPercent           *float64 `json:"batteryPercent,omitempty"`
 	OomKillsTotal            int64   `json:"oomKillsTotal"`
 	OomKillsPerSecond        int64   `json:"oomKillsPerSecond"`
 	CPUCoreMetrics           []CPUCoreMetric      `json:"cpuCoreMetrics,omitempty"`

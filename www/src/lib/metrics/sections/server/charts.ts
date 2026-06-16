@@ -440,6 +440,14 @@ function hostProcessCharts(
       valueFormatter: formatCount,
       seriesFormatters: [formatCount, (value) => `${formatCount(value)}/s`],
     },
+    {
+      title: "Battery",
+      description: "Laptop battery charge level.",
+      series: [chartSeries("Charge", host.batteryPct)],
+      valueFormatter: formatPercentValue,
+      yRange: PERCENT_Y_RANGE,
+      thresholds: PERCENT_THRESHOLDS,
+    },
   ]
 }
 

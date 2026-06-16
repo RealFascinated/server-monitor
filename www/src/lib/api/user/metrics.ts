@@ -34,6 +34,7 @@ export type HostMetrics = {
   oomKillsPerSecond?: MetricValues
   cpuClockMhz?: MetricValues
   cpuPowerWatts?: MetricValues
+  batteryPct?: MetricValues
 }
 
 export type CpuCoreMetrics = {

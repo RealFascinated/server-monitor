@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"fascinated.cc/monitor/agent/internal/battery"
 	"fascinated.cc/monitor/agent/internal/connections"
 	"fascinated.cc/monitor/agent/internal/cpu"
 	"fascinated.cc/monitor/agent/internal/disk"
@@ -163,6 +164,7 @@ func (b *linuxBackend) Tick(ready bool) (TickUpdate, error) {
 	metrics.RunningProcesses = avg.RunningProcesses
 
 	memory.ApplyTo(&metrics, memory.Read())
+	battery.ApplyTo(&metrics, battery.Read())
 	fd.ApplyTo(&metrics, fd.Read())
 	oomAfter, hasOom := oom.Read()
 	if hasOom {

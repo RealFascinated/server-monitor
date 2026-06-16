@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"fascinated.cc/monitor/agent/internal/counters"
+	"fascinated.cc/monitor/agent/internal/battery"
 	cpupkg "fascinated.cc/monitor/agent/internal/cpu"
 	"fascinated.cc/monitor/agent/internal/disk"
 	"fascinated.cc/monitor/agent/internal/docker"
@@ -134,6 +135,7 @@ func (b *windowsBackend) Tick(ready bool) (TickUpdate, error) {
 	})
 	profilePhase("tick_cpu", cpuStart)
 	memory.ApplyTo(&metrics, memory.Read())
+	battery.ApplyTo(&metrics, battery.Read())
 
 	avg := loadavg.Read()
 	metrics.Load1 = avg.Load1

@@ -36,7 +36,8 @@ public enum HostSeries implements VmMetricFamily {
     OOM_KILLS_TOTAL("monitor_host_oom_kills_total"),
     OOM_KILLS_PER_SECOND("monitor_host_oom_kills_per_second"),
     CPU_CLOCK_MHZ("monitor_host_cpu_clock_mhz"),
-    CPU_POWER_WATTS("monitor_host_cpu_power_watts");
+    CPU_POWER_WATTS("monitor_host_cpu_power_watts"),
+    BATTERY_PCT("monitor_host_battery_pct");
 
     private final String metricName;
 
@@ -81,5 +82,6 @@ public enum HostSeries implements VmMetricFamily {
         OOM_KILLS_PER_SECOND.writeNullable(ctx, metrics.oomKillsPerSecond());
         CPU_CLOCK_MHZ.writeNullable(ctx, details.cpuClockMhz());
         CPU_POWER_WATTS.writeNullable(ctx, metrics.cpuPowerWatts());
+        BATTERY_PCT.writeNullable(ctx, metrics.batteryPercent());
     }
 }

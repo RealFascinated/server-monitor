@@ -27,6 +27,7 @@ public record ServerMetrics(
         Long fdOpen,
         Long fdMax,
         Double fdUsagePercent,
+        Double batteryPercent,
         Long oomKillsTotal,
         Long oomKillsPerSecond,
         Double cpuPowerWatts,
