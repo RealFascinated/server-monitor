@@ -95,15 +95,17 @@ function diskCharts(disk: DiskMetrics): MetricChartConfig[] {
       valueFormatter: formatRate,
     },
     {
-      title: "I/O",
-      description:
-        "Disk utilization percentage and average I/O wait time in milliseconds.",
-      series: [
-        chartSeries("Usage", disk.ioUsagePct),
-        chartSeries("Wait", disk.ioWaitMs),
-      ],
-      valueFormatter: formatNumber,
-      seriesFormatters: [formatPercentValue, formatMilliseconds],
+      title: "I/O usage",
+      description: "Disk utilization as a percentage of capacity.",
+      series: [chartSeries("Usage", disk.ioUsagePct)],
+      valueFormatter: formatPercentValue,
+      yRange: PERCENT_Y_RANGE,
+    },
+    {
+      title: "I/O wait",
+      description: "Average I/O wait time in milliseconds.",
+      series: [chartSeries("Wait", disk.ioWaitMs)],
+      valueFormatter: formatMilliseconds,
     },
     {
       title: "Inodes",
