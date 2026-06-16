@@ -3,12 +3,24 @@ import { useQuery } from "@tanstack/react-query"
 import { SimpleTooltip } from "@/components/simple-tooltip"
 import { latestAgentVersionQueryOptions } from "@/lib/api/agent.queries"
 import { isVersionOlderThan } from "@/lib/agent/semver"
-import { agentUpdateAvailableTooltip } from "@/lib/tooltips/copy"
 import { cn } from "@/lib/utils"
 
 type AgentVersionLabelProps = {
   version: string | null
   layout?: "table" | "settings"
+}
+
+function AgentUpdateTooltip({ latestVersion }: { latestVersion: string }) {
+  return (
+    <span>
+      Version <span className="font-medium">{latestVersion}</span> is available.
+      Run{" "}
+      <code className="rounded-sm bg-neutral-300/70 px-1 py-0.5 font-mono font-medium text-foreground dark:bg-monitor-gray-500/70">
+        monitor-agent update
+      </code>{" "}
+      on the host to upgrade.
+    </span>
+  )
 }
 
 function AgentVersionLabel({
@@ -47,7 +59,7 @@ function AgentVersionLabel({
         versionNode
       )}
       {updateAvailable && latest ? (
-        <SimpleTooltip content={agentUpdateAvailableTooltip(latest.version)}>
+        <SimpleTooltip content={<AgentUpdateTooltip latestVersion={latest.version} />}>
           <span
             className={cn(
               "inline-flex cursor-help items-center rounded-sm bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",

@@ -29,10 +29,6 @@ export const SERVER_TABLE_COLUMN_TOOLTIPS = {
   created: "When this server was registered in Monitor.",
 } as const
 
-export function agentUpdateAvailableTooltip(latestVersion: string): string {
-  return `Version ${latestVersion} is available. Run monitor-agent update on the host to upgrade.`
-}
-
 export const USER_ROLE_TOOLTIPS: Record<UserRole, string> = {
   ADMIN: "Can manage all servers and users across the account.",
   USER: "Can access servers shared with this account.",
