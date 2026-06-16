@@ -153,8 +153,15 @@ public class ServerIngestService {
 
     @Transactional
     public UUID rotateIngestToken(long serverId) {
-        this.serverIngestTokenRepository.deleteByServerId(serverId);
-        UUID ingestToken = issueIngestToken(serverId);
+        UUID ingestToken = UUID.randomUUID();
+        String tokenHash = AuthUtils.hash(ingestToken.toString());
+        IngestTokenRow row = this.serverIngestTokenRepository.findByServerId(serverId)
+                .map(existing -> {
+                    existing.setTokenHash(tokenHash);
+                    return existing;
+                })
+                .orElseGet(() -> new IngestTokenRow(tokenHash, serverId));
+        this.serverIngestTokenRepository.save(row);
         log.info("Rotated ingest token for server {}", serverId);
         return ingestToken;
     }
