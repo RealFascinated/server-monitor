@@ -2,8 +2,10 @@ package cc.fascinated.monitor.service;
 
 import cc.fascinated.monitor.config.MonitorMailProperties;
 import cc.fascinated.monitor.config.MonitorProperties;
+import cc.fascinated.monitor.exception.impl.InternalServerException;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -50,7 +52,7 @@ public class MailService {
 
                 If you did not request this, you can ignore this email.
                 """.formatted(resetUrl));
-        this.mailSender.send(message);
+        this.send(message);
     }
 
     public void sendServerInviteEmail(
@@ -83,6 +85,15 @@ public class MailService {
 
                 You'll receive viewer access once you accept.
                 """.formatted(invitedByEmail, serverName, inviteUrl));
-        this.mailSender.send(message);
+        this.send(message);
+    }
+
+    private void send(SimpleMailMessage message) {
+        try {
+            this.mailSender.send(message);
+        } catch (MailException ex) {
+            log.error("Failed to send email to {}", message.getTo(), ex);
+            throw new InternalServerException("Failed to send email");
+        }
     }
 }
