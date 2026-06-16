@@ -1,39 +1,20 @@
-import { useCallback, useState } from "react"
+import { useCallback } from "react"
 
-import {
-  useLocalStorageSync,
-  writeLocalStorage,
-} from "@/lib/local-storage-sync"
-
-const SIDEBAR_DETAILED_MODE_STORAGE_KEY = "sidebar-detailed-mode"
-
-function readDetailedMode(): boolean {
-  return localStorage.getItem(SIDEBAR_DETAILED_MODE_STORAGE_KEY) === "true"
-}
+import { useUserPreference } from "@/hooks/use-user-preference"
+import { Preferences } from "@/lib/preferences"
 
 export function useSidebarDetailedMode() {
-  const [detailed, setDetailed] = useState(readDetailedMode)
-
-  useLocalStorageSync(SIDEBAR_DETAILED_MODE_STORAGE_KEY, () => {
-    setDetailed(readDetailedMode())
-  })
-
-  const setDetailedPersisted = useCallback((value: boolean) => {
-    setDetailed(value)
-    writeLocalStorage(SIDEBAR_DETAILED_MODE_STORAGE_KEY, String(value))
-  }, [])
+  const { value: detailed, setValue } = useUserPreference(
+    Preferences.SIDEBAR_DETAILED_MODE
+  )
 
   const toggleDetailed = useCallback(() => {
-    setDetailed((current) => {
-      const next = !current
-      writeLocalStorage(SIDEBAR_DETAILED_MODE_STORAGE_KEY, String(next))
-      return next
-    })
-  }, [])
+    setValue(!detailed)
+  }, [detailed, setValue])
 
   return {
     detailed,
-    setDetailed: setDetailedPersisted,
+    setDetailed: setValue,
     toggleDetailed,
   } as const
 }

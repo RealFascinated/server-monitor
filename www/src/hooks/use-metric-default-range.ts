@@ -1,32 +1,26 @@
-import { useCallback, useState } from "react"
+import { useEffect } from "react"
 
-import {
-  useLocalStorageSync,
-  writeLocalStorage,
-} from "@/lib/local-storage-sync"
-import {
-  DEFAULT_METRIC_TIME_RANGE,
-  getStoredDefaultMetricRange,
-  METRIC_DEFAULT_RANGE_STORAGE_KEY,
-} from "@/lib/metrics/default-range"
+import { useUserPreference } from "@/hooks/use-user-preference"
+import { METRIC_DEFAULT_RANGE_STORAGE_KEY } from "@/lib/metrics/default-range"
+import { parseMetricRange } from "@/lib/metrics/range"
 import type { MetricTimeRange } from "@/lib/metrics/range"
+import { Preferences } from "@/lib/preferences"
 
 export function useMetricDefaultRange() {
-  const [defaultRange, setDefaultRangeState] = useState<MetricTimeRange>(() =>
-    getStoredDefaultMetricRange()
+  const { value: raw, setValue: setRaw } = useUserPreference(
+    Preferences.METRIC_DEFAULT_RANGE
   )
+  const defaultRange = parseMetricRange(raw)
 
-  useLocalStorageSync(METRIC_DEFAULT_RANGE_STORAGE_KEY, () => {
-    setDefaultRangeState(getStoredDefaultMetricRange())
-  })
-
-  const setDefaultRange = useCallback((value: MetricTimeRange) => {
-    setDefaultRangeState(value)
-    writeLocalStorage(METRIC_DEFAULT_RANGE_STORAGE_KEY, value)
-  }, [])
+  useEffect(() => {
+    localStorage.setItem(METRIC_DEFAULT_RANGE_STORAGE_KEY, defaultRange)
+  }, [defaultRange])
 
   return {
     defaultRange,
-    setDefaultRange,
+    setDefaultRange: (value: MetricTimeRange) => {
+      localStorage.setItem(METRIC_DEFAULT_RANGE_STORAGE_KEY, value)
+      setRaw(value)
+    },
   } as const
 }
