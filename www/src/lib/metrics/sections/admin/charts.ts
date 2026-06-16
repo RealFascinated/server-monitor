@@ -204,6 +204,7 @@ function vmCharts(vm: VmMetrics): MetricChartConfig[] {
       description: "Total VictoriaMetrics time-series data stored on disk.",
       series: [chartSeries("Size", vm.vmStorageSizeBytes)],
       valueFormatter: formatMemoryBytes,
+      yRange: { autoMin: true },
     },
     {
       title: "Queries and writes per minute",

@@ -36,6 +36,7 @@ function measureAxisWidth(values: string[] | null): number {
 export type ChartYRange = {
   min?: number
   max?: number
+  autoMin?: boolean
 }
 
 function buildYScale(yRange?: ChartYRange, bidirectional = false): uPlot.Scale {
@@ -50,19 +51,38 @@ function buildYScale(yRange?: ChartYRange, bidirectional = false): uPlot.Scale {
     }
   }
 
-  const yMin = yRange?.min ?? 0
+  const autoMin = yRange?.autoMin ?? false
+  const yMin = yRange?.min ?? (autoMin ? undefined : 0)
 
   if (yRange?.max != null) {
+    if (yMin != null) {
+      return {
+        auto: false,
+        range: [yMin, yRange.max],
+      }
+    }
+
     return {
-      auto: false,
-      range: [yMin, yRange.max],
+      range: (_self, dataMin, dataMax) => {
+        const [min] = uPlot.rangeNum(dataMin, dataMax, 0.1, true)
+        return [min ?? dataMin, yRange.max!]
+      },
+    }
+  }
+
+  if (autoMin) {
+    return {
+      range: (_self, dataMin, dataMax) => {
+        const [min, max] = uPlot.rangeNum(dataMin, dataMax, 0.1, true)
+        return [min ?? dataMin, max ?? dataMax]
+      },
     }
   }
 
   return {
     range: (_self, dataMin, dataMax) => {
       const [min, max] = uPlot.rangeNum(dataMin, dataMax, 0.1, true)
-      return [Math.min(yMin, min ?? yMin), Math.max(yMin, max ?? yMin + 1)]
+      return [Math.min(yMin!, min ?? yMin!), Math.max(yMin!, max ?? yMin! + 1)]
     },
   }
 }
