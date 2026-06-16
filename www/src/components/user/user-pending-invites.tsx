@@ -17,6 +17,7 @@ import { useMetricDefaultRange } from "@/hooks/use-metric-default-range"
 import { useUserInvites } from "@/hooks/use-user-invites"
 import { acceptServerInviteById } from "@/lib/api/user/invites"
 import type { UserPendingInvite } from "@/lib/api/user/invites"
+import { getApiErrorMessage, getApiErrorTitle } from "@/lib/api/error-message"
 import { userInvitesQueryKey } from "@/lib/api/user/invites.queries"
 import { userServersQueryKey } from "@/lib/api/user/servers.queries"
 import { formatDate, formatDateWithRelative } from "@/lib/formatter"
@@ -89,7 +90,7 @@ const columns: ColumnDef<UserPendingInvite>[] = [
   {
     accessorKey: "invitedByEmail",
     header: "Invited by",
-    meta: { className: "text-neutral-500" },
+    meta: { className: "text-muted-foreground" },
     cell: ({ row }) => row.original.invitedByEmail,
   },
   {
@@ -111,7 +112,7 @@ const columns: ColumnDef<UserPendingInvite>[] = [
         tooltip="When the invite was sent to your account."
       />
     ),
-    meta: { className: "text-neutral-500" },
+    meta: { className: "text-muted-foreground" },
     cell: ({ row }) => (
       <SimpleTooltip content={formatDateWithRelative(row.original.createdAt)}>
         <span className="cursor-help">
@@ -128,7 +129,7 @@ const columns: ColumnDef<UserPendingInvite>[] = [
         tooltip="Accept the invite before this time."
       />
     ),
-    meta: { className: "text-neutral-500" },
+    meta: { className: "text-muted-foreground" },
     cell: ({ row }) => (
       <SimpleTooltip
         content={`${INVITE_EXPIRY_TOOLTIP} ${formatDateWithRelative(row.original.expiresAt)}`}
@@ -167,12 +168,17 @@ function UserPendingInvites() {
     onSortingChange: setSorting,
   })
 
-  const errorMessage = error instanceof Error ? error.message : null
+  const errorMessage = error
+    ? getApiErrorMessage(error, "Failed to load invites")
+    : null
+  const errorTitle = error
+    ? getApiErrorTitle(error, "Could not load invites")
+    : null
 
   return (
     <div className="flex flex-col gap-3">
       {errorMessage ? (
-        <Callout type="danger" title="Could not load invites">
+        <Callout type="danger" title={errorTitle ?? "Could not load invites"}>
           {errorMessage}
         </Callout>
       ) : null}
@@ -184,7 +190,7 @@ function UserPendingInvites() {
           className="flex flex-col gap-3"
         >
           {invites.length === 0 ? (
-            <p className="text-neutral-500">No pending invites.</p>
+            <p className="text-muted-foreground">No pending invites.</p>
           ) : null}
 
           {invites.length > 0 ? <DataTable table={table} /> : null}

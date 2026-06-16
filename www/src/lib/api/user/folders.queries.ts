@@ -2,9 +2,11 @@ import { queryOptions } from "@tanstack/react-query"
 
 import { getUserServerFolders } from "./folders"
 
+export const userServerFoldersQueryKey = ["user", "server-folders"] as const
+
 export function userServerFoldersQueryOptions() {
   return queryOptions({
-    queryKey: ["user", "server-folders"],
+    queryKey: userServerFoldersQueryKey,
     queryFn: getUserServerFolders,
   })
 }

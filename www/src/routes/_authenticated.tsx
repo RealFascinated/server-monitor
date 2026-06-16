@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-router"
 import { Menu } from "lucide-react"
 import { useQueryClient } from "@tanstack/react-query"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import type { CSSProperties } from "react"
 
 import { AppSidebar } from "@/components/app-sidebar"
@@ -20,6 +20,7 @@ import { userInvitesQueryOptions } from "@/lib/api/user/invites.queries"
 import { userPreferencesQueryOptions } from "@/lib/api/user/preferences.queries"
 import { userServersQueryOptions } from "@/lib/api/user/servers.queries"
 import { logout, useAuth } from "@/lib/auth"
+import { APP_NAME } from "@/lib/page-title"
 import { cn } from "@/lib/utils"
 
 export const Route = createFileRoute("/_authenticated")({
@@ -44,6 +45,10 @@ function AuthenticatedLayout() {
     toggleCollapsed: toggleSidebarCollapsed,
     startResize: startSidebarResize,
   } = useSidebarWidth()
+
+  const closeMobileSidebar = useCallback(() => {
+    setMobileSidebarOpen(false)
+  }, [])
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -77,7 +82,11 @@ function AuthenticatedLayout() {
   }, [mobileSidebarOpen])
 
   if (isLoading || !user) {
-    return <LoadingState message="Checking session…" centered />
+    return (
+      <main className="flex min-h-svh items-center justify-center bg-background p-4">
+        <LoadingState message="Checking session…" />
+      </main>
+    )
   }
 
   async function handleLogout() {
@@ -103,7 +112,7 @@ function AuthenticatedLayout() {
         mobileOpen={mobileSidebarOpen}
         onToggleCollapsed={toggleSidebarCollapsed}
         onResizeStart={startSidebarResize}
-        onMobileClose={() => setMobileSidebarOpen(false)}
+        onMobileClose={closeMobileSidebar}
         isLoggingOut={isLoggingOut}
         onLogout={handleLogout}
       />
@@ -128,7 +137,7 @@ function AuthenticatedLayout() {
           </Button>
           <Link to="/" aria-label="Servers" className="flex items-center gap-3">
             <MonitorLogo />
-            <p className="text-lg font-bold dark:text-white">Monitor</p>
+            <p className="text-base font-bold text-foreground">{APP_NAME}</p>
           </Link>
         </header>
 

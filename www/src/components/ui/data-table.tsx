@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { SERVER_DRAG_MIME } from "@/lib/servers/drag"
+import { beginServerDrag } from "@/lib/servers/drag"
 import { cn } from "@/lib/utils"
 
 type RowDragConfig<TData> = {
@@ -79,8 +79,8 @@ function DataTable<TData>({
                     <button
                       type="button"
                       className={cn(
-                        "-mx-1 flex items-center gap-1.5 px-1 hover:text-neutral-900 dark:hover:text-white",
-                        sortDirection && "text-neutral-900 dark:text-white"
+                        "-mx-1 flex items-center gap-1.5 px-1 hover:text-foreground",
+                        sortDirection && "text-foreground"
                       )}
                       onClick={header.column.getToggleSortingHandler()}
                     >
@@ -117,15 +117,9 @@ function DataTable<TData>({
                     type="button"
                     draggable
                     aria-label={`Move ${rowDrag.getServerLabel(row)}`}
-                    className="flex cursor-grab items-center text-neutral-400 hover:text-neutral-600 active:cursor-grabbing dark:hover:text-neutral-300"
+                    className="flex cursor-grab items-center text-muted-foreground hover:text-muted-foreground active:cursor-grabbing dark:hover:text-foreground"
                     onDragStart={(event) => {
-                      const serverId = rowDrag.getServerId(row)
-                      event.dataTransfer.effectAllowed = "move"
-                      event.dataTransfer.setData(
-                        SERVER_DRAG_MIME,
-                        String(serverId)
-                      )
-                      event.dataTransfer.setData("text/plain", String(serverId))
+                      beginServerDrag(event, rowDrag.getServerId(row))
                       rowDrag.onDragStart(row.id)
                     }}
                     onDragEnd={rowDrag.onDragEnd}

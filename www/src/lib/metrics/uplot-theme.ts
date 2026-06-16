@@ -1,4 +1,5 @@
 import { formatChartAxisTicks } from "@/lib/formatter"
+import { readCssVar } from "@/lib/css-vars"
 import { getChartColor, getChartColors } from "@/lib/metrics/chart-colors"
 import type { ResolvedTheme } from "@/lib/theme/context"
 import uPlot from "uplot"
@@ -130,8 +131,11 @@ export function buildUPlotOptions({
 }: BuildUPlotOptionsParams): uPlot.Options {
   const colors = getChartColors(theme)
   const isDark = theme === "dark"
-  const gridColor = isDark ? "#282828" : "#e5e5e5"
-  const axisColor = isDark ? "#737373" : "#a3a3a3"
+  const gridColor = readCssVar("--border", isDark ? "#242424" : "#e5e5e5")
+  const axisColor = readCssVar(
+    "--muted-foreground",
+    isDark ? "#a3a3a3" : "#737373"
+  )
   const formatAxisValue = (value: number) => {
     const display = bidirectional ? Math.abs(value) : value
     return valueFormatter ? valueFormatter(display) : String(display)

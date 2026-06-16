@@ -2,24 +2,24 @@ import { useState } from "react"
 import { useMutation } from "@tanstack/react-query"
 
 import { Callout } from "@/components/callout"
-import { Spinner } from "@/components/spinner"
-import { Button } from "@/components/ui/button"
+import { AuthFormField, AuthFormShell } from "@/components/auth-form-shell"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useAuthForm } from "@/hooks/use-auth-form"
 import { forgotPassword } from "@/lib/api/auth/password"
 import { validateEmail } from "@/lib/auth/validation"
 import { toastMutationError } from "@/lib/toast"
 
 function ForgotPasswordForm() {
   const [email, setEmail] = useState("")
-  const [fieldErrors, setFieldErrors] = useState<{ email?: string }>({})
   const [sent, setSent] = useState(false)
+  const { fieldErrors, setFieldErrors, clearFieldErrors } =
+    useAuthForm<"email">()
 
   const mutation = useMutation({
     mutationFn: forgotPassword,
     onSuccess: () => {
       setSent(true)
-      setFieldErrors({})
+      clearFieldErrors()
     },
     onError: (error) => {
       toastMutationError("Could not send reset email", error, "Request failed")
@@ -28,7 +28,7 @@ function ForgotPasswordForm() {
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setFieldErrors({})
+    clearFieldErrors()
 
     const emailError = validateEmail(email)
     if (emailError) {
@@ -49,9 +49,12 @@ function ForgotPasswordForm() {
   }
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="email">Email</Label>
+    <AuthFormShell
+      onSubmit={handleSubmit}
+      isPending={mutation.isPending}
+      submitLabel="Send reset link"
+    >
+      <AuthFormField id="email" label="Email" error={fieldErrors.email}>
         <Input
           id="email"
           type="email"
@@ -62,16 +65,8 @@ function ForgotPasswordForm() {
           disabled={mutation.isPending}
           required
         />
-        {fieldErrors.email ? (
-          <p className="text-xs font-bold text-error">{fieldErrors.email}</p>
-        ) : null}
-      </div>
-
-      <Button type="submit" variant="highlighted" disabled={mutation.isPending}>
-        {mutation.isPending ? <Spinner /> : null}
-        Send reset link
-      </Button>
-    </form>
+      </AuthFormField>
+    </AuthFormShell>
   )
 }
 

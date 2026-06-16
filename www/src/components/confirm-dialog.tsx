@@ -85,13 +85,13 @@ function ConfirmDialog({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       {dialogTrigger}
-      <DialogContent className="rounded-sm border border-neutral-200 sm:max-w-lg dark:border-monitor-gray-300">
+      <DialogContent className="rounded-sm border border-border sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
-        <DialogFooter className="border-t border-neutral-200 pt-3 dark:border-monitor-gray-200">
+        <DialogFooter>
           <Button
             type="button"
             variant="default"

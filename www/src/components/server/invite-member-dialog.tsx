@@ -132,7 +132,7 @@ function InviteMemberDialog({ serverId }: InviteMemberDialogProps) {
           Invite member
         </Button>
       </DialogTrigger>
-      <DialogContent className="rounded-sm border border-neutral-200 sm:max-w-lg dark:border-monitor-gray-300">
+      <DialogContent className="rounded-sm border border-border sm:max-w-lg">
         {createdInvite && inviteUrl ? (
           <>
             <DialogHeader>
@@ -165,7 +165,7 @@ function InviteMemberDialog({ serverId }: InviteMemberDialogProps) {
               </div>
             </div>
 
-            <DialogFooter className="border-t border-neutral-200 pt-3 dark:border-monitor-gray-200">
+            <DialogFooter>
               <Button
                 type="button"
                 variant="highlighted"
@@ -203,7 +203,7 @@ function InviteMemberDialog({ serverId }: InviteMemberDialogProps) {
               ) : null}
             </div>
 
-            <DialogFooter className="border-t border-neutral-200 pt-3 dark:border-monitor-gray-200">
+            <DialogFooter>
               <Button
                 type="button"
                 variant="default"

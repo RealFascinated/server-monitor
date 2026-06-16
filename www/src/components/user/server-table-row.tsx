@@ -4,7 +4,7 @@ import { GripVertical } from "lucide-react"
 
 import { TableCell, TableRow } from "@/components/ui/table"
 import type { ServerTableRow } from "@/components/user/server-table-columns"
-import { SERVER_DRAG_MIME } from "@/lib/servers/drag"
+import { beginServerDrag } from "@/lib/servers/drag"
 import { cn } from "@/lib/utils"
 
 type ServerRowDragConfig = {
@@ -43,12 +43,9 @@ const ServerTableDataRow = memo(
               type="button"
               draggable
               aria-label={`Move ${rowDrag.getServerLabel(row)}`}
-              className="flex cursor-grab items-center text-neutral-400 hover:text-neutral-600 active:cursor-grabbing dark:hover:text-neutral-300"
+              className="flex cursor-grab items-center text-muted-foreground hover:text-muted-foreground active:cursor-grabbing dark:hover:text-foreground"
               onDragStart={(event) => {
-                const serverId = rowDrag.getServerId(row)
-                event.dataTransfer.effectAllowed = "move"
-                event.dataTransfer.setData(SERVER_DRAG_MIME, String(serverId))
-                event.dataTransfer.setData("text/plain", String(serverId))
+                beginServerDrag(event, rowDrag.getServerId(row))
                 rowDrag.onDragStart(row.id)
               }}
               onDragEnd={rowDrag.onDragEnd}

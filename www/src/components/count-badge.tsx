@@ -31,7 +31,7 @@ function CountBadge({
           ? "absolute -top-1 -right-1.5 h-4 min-w-4 px-0.5 text-[9px]"
           : "h-5 min-w-5 px-1 text-[10px]",
         variant === "accent"
-          ? "bg-monitor font-semibold text-white dark:bg-warning dark:text-black"
+          ? "bg-monitor font-semibold text-white dark:bg-warning dark:text-foreground"
           : "bg-muted font-medium text-muted-foreground",
         className
       )}

@@ -33,7 +33,7 @@ export type ServerTableRow = {
   server: ServerResponse
 }
 
-const unknownStatClassName = "text-neutral-500"
+const unknownStatClassName = "text-muted-foreground"
 
 function renderUptime(server: ServerResponse): ReactNode {
   const formatted = formatUptime(server.uptimeSeconds)
@@ -211,7 +211,7 @@ export function getServerTableColumns(
         />
       ),
       meta: {
-        className: "text-neutral-500",
+        className: "text-muted-foreground",
         renderServer: (server) => (
           <SimpleTooltip content={formatDateWithRelative(server.createdAt)}>
             <span className="cursor-help">{formatDate(server.createdAt)}</span>

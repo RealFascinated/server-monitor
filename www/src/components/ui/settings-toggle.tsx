@@ -25,12 +25,12 @@ function SettingsToggle({
         "relative h-5 w-9 shrink-0 rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-monitor focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:focus-visible:ring-warning dark:focus-visible:ring-offset-base",
         checked
           ? "bg-monitor dark:bg-warning"
-          : "bg-neutral-200 dark:bg-monitor-gray-300"
+          : "bg-muted"
       )}
     >
       <span
         className={cn(
-          "absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform",
+          "absolute top-0.5 left-0.5 size-4 rounded-full bg-card shadow-sm transition-transform",
           checked && "translate-x-4"
         )}
       />

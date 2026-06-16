@@ -1,17 +1,16 @@
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 
-import { AnimatedContent } from "@/components/animated-content"
+import { AsyncContent } from "@/components/animated-content"
 import { Callout } from "@/components/callout"
-import { LoadingState } from "@/components/loading-state"
 import { ServerIncidentsHeader } from "@/components/server/server-incidents-header"
 import { ServerIncidentsView } from "@/components/server/server-incidents-view"
 import { useUserServer } from "@/hooks/use-user-server"
 import { serverIncidentsQueryOptions } from "@/lib/api/user/incidents.queries"
+import { getApiErrorMessage, getApiErrorTitle } from "@/lib/api/error-message"
 import { loadCachedQuery } from "@/lib/api/query-loader"
 import { hasPermission, ServerPermission } from "@/lib/api/user/permissions"
 import type { ServerResponse } from "@/lib/api/user/servers"
-import { ApiClientError } from "@/lib/auth/api"
 import { authenticatedPageSectionClassName } from "@/lib/layout"
 import { serverPageTitle } from "@/lib/page-title"
 import { pageSearchSchema } from "@/lib/schemas/pagination"
@@ -63,12 +62,12 @@ function ServerIncidentsPage() {
     enabled: canViewIncidents,
   })
 
-  const errorMessage =
-    error instanceof ApiClientError
-      ? error.message
-      : error
-        ? "Failed to load incidents"
-        : null
+  const errorMessage = error
+    ? getApiErrorMessage(error, "Failed to load incidents")
+    : null
+  const errorTitle = error
+    ? getApiErrorTitle(error, "Could not load incidents")
+    : null
 
   function handlePageChange(page: number) {
     navigate({
@@ -100,25 +99,24 @@ function ServerIncidentsPage() {
         ) : null}
 
         {errorMessage ? (
-          <Callout type="danger" title="Could not load incidents">
+          <Callout type="danger" title={errorTitle ?? "Could not load incidents"}>
             {errorMessage}
           </Callout>
         ) : null}
 
-        {canViewIncidents && isPending && !errorMessage ? (
-          <LoadingState message="Loading incidents…" />
-        ) : null}
-
-        {canViewIncidents && incidentsPage && !errorMessage ? (
-          <AnimatedContent>
+        <AsyncContent
+          loading={canViewIncidents && isPending && !errorMessage}
+          loadingMessage="Loading incidents…"
+        >
+          {canViewIncidents && incidentsPage && !errorMessage ? (
             <ServerIncidentsView
               page={incidentsPage}
               pagination={pagination}
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
             />
-          </AnimatedContent>
-        ) : null}
+          ) : null}
+        </AsyncContent>
       </div>
     </section>
   )

@@ -174,7 +174,7 @@ function renderTooltipRow(
   return (
     `<div class="flex items-center gap-2 py-0.5">` +
     `<span class="size-2 shrink-0 rounded-full" style="background:${entry.color}"></span>` +
-    `<span class="truncate text-neutral-500 dark:text-neutral-400">${entry.label}</span>` +
+    `<span class="truncate text-muted-foreground dark:text-muted-foreground">${entry.label}</span>` +
     `<span class="ml-auto pl-3 font-medium whitespace-nowrap tabular-nums">${formatted}</span>` +
     `</div>`
   )
@@ -272,8 +272,8 @@ export function createCursorTooltipHandler({
     "pointer-events-none fixed z-50 rounded-sm border px-2.5 py-2 text-xs shadow-md",
     useColumnLayout ? "" : "max-w-xs",
     isDark
-      ? "border-monitor-gray-300 bg-monitor-gray-100 text-white"
-      : "border-neutral-200 bg-white text-black",
+      ? "border-border bg-popover text-popover-foreground"
+      : "border-border bg-card text-foreground",
   ]
     .filter(Boolean)
     .join(" ")
@@ -339,14 +339,14 @@ export function createCursorTooltipHandler({
     if (stacked && entries.length > 1 && stackTotal > 0) {
       const totalFormatted = formatValue(stackTotal, -1)
       rows.push(
-        `<div class="mt-1 flex items-center justify-between border-t border-neutral-200 pt-1 dark:border-monitor-gray-300">` +
-          `<span class="text-neutral-500 dark:text-neutral-400">Total</span>` +
+        `<div class="mt-1 flex items-center justify-between border-t border-border pt-1">` +
+          `<span class="text-muted-foreground dark:text-muted-foreground">Total</span>` +
           `<span class="font-medium tabular-nums">${totalFormatted}</span>` +
           `</div>`
       )
     } else if (usedTotalFooter) {
       rows.push(
-        `<div class="mt-1 border-t border-neutral-200 pt-1 text-neutral-500 dark:border-monitor-gray-300 dark:text-neutral-400">${usedTotalFooter}</div>`
+        `<div class="mt-1 border-t border-border pt-1 text-muted-foreground dark:text-muted-foreground">${usedTotalFooter}</div>`
       )
     }
 
@@ -393,8 +393,8 @@ export function createChartTooltipElement(
   tooltip.className = [
     "pointer-events-none fixed z-50 max-w-xs rounded-sm border px-2.5 py-2 text-xs shadow-md",
     isDark
-      ? "border-monitor-gray-300 bg-monitor-gray-100 text-white"
-      : "border-neutral-200 bg-white text-black",
+      ? "border-border bg-popover text-popover-foreground"
+      : "border-border bg-card text-foreground",
   ].join(" ")
   tooltip.style.display = "none"
   document.body.appendChild(tooltip)

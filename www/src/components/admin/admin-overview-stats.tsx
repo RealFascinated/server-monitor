@@ -2,7 +2,7 @@ import { MetricStatCard } from "@/components/metrics/metric-stat-card"
 import type { AdminMetricsResponse } from "@/lib/api/admin/metrics"
 import { formatCompactCount, formatCount, formatMemoryBytes } from "@/lib/formatter"
 import { getLatestValue, hasValues } from "@/lib/metrics/series"
-import { cn } from "@/lib/utils"
+import { fleetOnlineStatusColorClass } from "@/lib/metrics/percent-level"
 
 function adminOverviewHasData(metrics: AdminMetricsResponse): boolean {
   const overview = metrics.overview ?? {}
@@ -61,12 +61,9 @@ function AdminOverviewStats({ metrics }: { metrics: AdminMetricsResponse }) {
         value={serversOnline}
         formatValue={(value) => `${formatCount(Math.round(value))} online`}
         detail={fleetDetail}
-        valueClassName={cn(
-          serversOnline > 0 && (serversOffline ?? 0) === 0
-            ? "text-[#2E9470] dark:text-green-400"
-            : serversOnline === 0
-              ? "text-[#C44E4E] dark:text-error"
-              : undefined
+        valueClassName={fleetOnlineStatusColorClass(
+          serversOnline,
+          serversOffline ?? 0
         )}
       />
     ) : null,

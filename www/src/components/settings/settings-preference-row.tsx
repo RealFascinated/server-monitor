@@ -15,7 +15,7 @@ function SettingsPreferenceRow({
     <div className="flex max-w-xl items-start justify-between gap-8">
       <div className="flex flex-col gap-1.5">
         <p className="text-sm font-medium">{label}</p>
-        <p className="text-xs font-bold text-neutral-500">{description}</p>
+        <p className="text-xs font-bold text-muted-foreground">{description}</p>
       </div>
 
       <div className="shrink-0 pt-0.5">{control}</div>

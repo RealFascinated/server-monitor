@@ -75,7 +75,7 @@ function ServerAgentSetupDialog({
           Install agent
         </Button>
       </DialogTrigger>
-      <DialogContent className="rounded-sm border border-neutral-200 sm:max-w-2xl dark:border-monitor-gray-300">
+      <DialogContent className="rounded-sm border border-border sm:max-w-2xl">
         {ingestToken ? (
           <>
             <DialogHeader>
@@ -93,7 +93,7 @@ function ServerAgentSetupDialog({
 
             <AgentInstallPanel ingestToken={ingestToken} />
 
-            <DialogFooter className="border-t border-neutral-200 pt-3 dark:border-monitor-gray-200">
+            <DialogFooter>
               <Button
                 type="button"
                 variant="highlighted"
@@ -119,7 +119,7 @@ function ServerAgentSetupDialog({
               replace a lost token.
             </Callout>
 
-            <DialogFooter className="border-t border-neutral-200 pt-3 dark:border-monitor-gray-200">
+            <DialogFooter>
               <Button
                 type="button"
                 variant="default"

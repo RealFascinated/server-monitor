@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { reorderServerFolders } from "@/lib/api/user/folders"
 import type { ServerFolderResponse } from "@/lib/api/user/folders"
+import { userServerFoldersQueryKey } from "@/lib/api/user/folders.queries"
 
 export function useReorderServerFolders() {
   const queryClient = useQueryClient()
@@ -9,12 +10,11 @@ export function useReorderServerFolders() {
   return useMutation({
     mutationFn: reorderServerFolders,
     onMutate: ({ folderIds }) => {
-      void queryClient.cancelQueries({ queryKey: ["user", "server-folders"] })
+      void queryClient.cancelQueries({ queryKey: userServerFoldersQueryKey })
 
-      const previous = queryClient.getQueryData<ServerFolderResponse[]>([
-        "user",
-        "server-folders",
-      ])
+      const previous = queryClient.getQueryData<ServerFolderResponse[]>(
+        userServerFoldersQueryKey
+      )
 
       if (previous) {
         const foldersById = new Map(
@@ -26,7 +26,7 @@ export function useReorderServerFolders() {
         })
 
         if (optimistic.length === folderIds.length) {
-          queryClient.setQueryData(["user", "server-folders"], optimistic)
+          queryClient.setQueryData(userServerFoldersQueryKey, optimistic)
         }
       }
 
@@ -34,11 +34,11 @@ export function useReorderServerFolders() {
     },
     onError: (_error, _variables, context) => {
       if (context?.previous) {
-        queryClient.setQueryData(["user", "server-folders"], context.previous)
+        queryClient.setQueryData(userServerFoldersQueryKey, context.previous)
       }
     },
     onSuccess: (folders) => {
-      queryClient.setQueryData(["user", "server-folders"], folders)
+      queryClient.setQueryData(userServerFoldersQueryKey, folders)
     },
   })
 }

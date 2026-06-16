@@ -40,7 +40,7 @@ function CpuBreakdownTooltip({ cpu }: { cpu: ServerCpuSnapshot }) {
             className="size-2 shrink-0 rounded-full"
             style={{ background: entry.color }}
           />
-          <span className="truncate text-neutral-500 dark:text-neutral-400">
+          <span className="truncate text-muted-foreground dark:text-muted-foreground">
             {entry.label}
           </span>
           <span className="ml-auto pl-3 font-medium whitespace-nowrap tabular-nums">
@@ -49,8 +49,8 @@ function CpuBreakdownTooltip({ cpu }: { cpu: ServerCpuSnapshot }) {
         </div>
       ))}
       {cpu.percent != null && entries.length > 1 ? (
-        <div className="mt-1 flex items-center justify-between border-t border-neutral-200 pt-1 dark:border-monitor-gray-300">
-          <span className="text-neutral-500 dark:text-neutral-400">Total</span>
+        <div className="mt-1 flex items-center justify-between border-t border-border pt-1">
+          <span className="text-muted-foreground dark:text-muted-foreground">Total</span>
           <span className="font-medium tabular-nums">
             {formatPercentValue(cpu.percent)}
           </span>

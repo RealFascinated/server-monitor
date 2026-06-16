@@ -52,7 +52,7 @@ function ProfileField({
       <p className="text-sm font-medium">{label}</p>
       {children}
       {hint ? (
-        <p className="text-xs font-bold text-neutral-500">{hint}</p>
+        <p className="text-xs font-bold text-muted-foreground">{hint}</p>
       ) : null}
     </div>
   )

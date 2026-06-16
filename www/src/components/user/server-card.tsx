@@ -10,13 +10,13 @@ import { ServerStatusDot } from "@/components/server/server-status-badge"
 import { UsageBar } from "@/components/server/usage-bar"
 import { SimpleTooltip } from "@/components/simple-tooltip"
 import { useMetricDefaultRange } from "@/hooks/use-metric-default-range"
+import { useServerDrag } from "@/hooks/use-server-drag"
 import type { ServerResponse } from "@/lib/api/user/servers"
 import {
   formatUptime,
   formatUptimeDetailed,
   memoryUsagePercent,
 } from "@/lib/formatter"
-import { SERVER_DRAG_MIME } from "@/lib/servers/drag"
 import { pendingOnlyTooltip } from "@/lib/tooltips/copy"
 import { cn } from "@/lib/utils"
 
@@ -34,7 +34,7 @@ function ServerCardUptime({ server }: { server: ServerResponse }) {
   const tooltip = detailed ?? pendingOnlyTooltip(server.status)
   const className = cn(
     "shrink-0 text-xs text-muted-foreground tabular-nums",
-    server.uptimeSeconds == null && "text-neutral-500"
+    server.uptimeSeconds == null && "text-muted-foreground"
   )
 
   if (!tooltip) {
@@ -57,6 +57,8 @@ const ServerCard = memo(
     onDragEnd,
   }: ServerCardProps) {
     const { defaultRange } = useMetricDefaultRange()
+    const { onDragStart: handleDragStart, onDragEnd: handleDragEnd } =
+      useServerDrag(server.serverId, { onDragStart, onDragEnd })
     const memPercent = memoryUsagePercent(
       server.memory?.usage ?? null,
       server.memory?.max ?? null
@@ -75,17 +77,9 @@ const ServerCard = memo(
             type="button"
             draggable
             aria-label={`Move ${server.serverName}`}
-            className="flex shrink-0 cursor-grab items-center self-center px-1 text-neutral-400 hover:text-neutral-600 active:cursor-grabbing dark:hover:text-neutral-300"
-            onDragStart={(event) => {
-              event.dataTransfer.effectAllowed = "move"
-              event.dataTransfer.setData(
-                SERVER_DRAG_MIME,
-                String(server.serverId)
-              )
-              event.dataTransfer.setData("text/plain", String(server.serverId))
-              onDragStart?.()
-            }}
-            onDragEnd={onDragEnd}
+            className="flex shrink-0 cursor-grab items-center self-center px-1 text-muted-foreground hover:text-muted-foreground active:cursor-grabbing dark:hover:text-foreground"
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
           >
             <GripVertical className="size-4" aria-hidden />
           </button>
@@ -95,7 +89,7 @@ const ServerCard = memo(
           params={{ serverId: String(server.serverId) }}
           search={{ range: defaultRange }}
           className={cn(
-            "flex min-w-0 flex-1 items-center gap-3 rounded-sm border border-neutral-200 bg-card px-3 py-2.5 transition-colors hover:bg-neutral-50 active:bg-neutral-100 dark:border-monitor-gray-300 dark:hover:bg-monitor-gray-200 dark:active:bg-monitor-gray-100"
+            "flex min-w-0 flex-1 items-center gap-3 rounded-sm border border-border bg-card px-3 py-2.5 transition-colors hover:bg-card-hover active:bg-muted"
           )}
         >
           <div className="flex min-w-0 flex-1 flex-col gap-2">
@@ -117,7 +111,7 @@ const ServerCard = memo(
             </div>
           </div>
           <ChevronRight
-            className="size-4 shrink-0 text-neutral-400"
+            className="size-4 shrink-0 text-muted-foreground"
             aria-hidden
           />
         </Link>

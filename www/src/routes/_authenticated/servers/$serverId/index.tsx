@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useCallback, useDeferredValue, useEffect } from "react"
 
-import { LoadingState } from "@/components/loading-state"
+import { AsyncContent } from "@/components/animated-content"
 import { Callout } from "@/components/callout"
 import { ServerAgentSetupDialog } from "@/components/server/server-agent-setup-dialog"
 import { ServerMetricsHeader } from "@/components/server/server-metrics-header"
@@ -11,8 +11,8 @@ import { ServerOfflineBanner } from "@/components/server/server-offline-banner"
 import { useUserServer } from "@/hooks/use-user-server"
 import { useMetricRefreshInterval } from "@/hooks/use-metric-refresh-interval"
 import { userServerMetricsQueryOptions } from "@/lib/api/user/metrics.queries"
+import { getApiErrorMessage, getApiErrorTitle } from "@/lib/api/error-message"
 import { loadCachedQuery } from "@/lib/api/query-loader"
-import { ApiClientError } from "@/lib/auth/api"
 import { hasPermission, ServerPermission } from "@/lib/api/user/permissions"
 import { authenticatedPageSectionClassName } from "@/lib/layout"
 import { metricRangeSearchSchema } from "@/lib/schemas/range"
@@ -60,12 +60,12 @@ function ServerMetricsPage() {
       ? deferredMetrics
       : undefined
 
-  const errorMessage =
-    error instanceof ApiClientError
-      ? error.message
-      : error
-        ? "Failed to load server metrics"
-        : null
+  const errorMessage = error
+    ? getApiErrorMessage(error, "Failed to load server metrics")
+    : null
+  const errorTitle = error
+    ? getApiErrorTitle(error, "Could not load metrics")
+    : null
 
   const handleZoomToRange = useCallback(
     (from: number, to: number) => {
@@ -129,22 +129,25 @@ function ServerMetricsPage() {
         ) : null}
 
         {errorMessage ? (
-          <Callout type="danger" title="Could not load metrics">
+          <Callout type="danger" title={errorTitle ?? "Could not load metrics"}>
             {errorMessage}
           </Callout>
         ) : null}
 
-        {showLoading ? <LoadingState message="Loading metrics…" /> : null}
-
-        {readyMetrics && !errorMessage ? (
-          <ServerMetricsView
-            metrics={readyMetrics}
-            timeWindow={timeWindow}
-            dataWindow={{ from: readyMetrics.from, to: readyMetrics.to }}
-            onZoomToRange={handleZoomToRange}
-            zoomDisabled={isFetching}
-          />
-        ) : null}
+        <AsyncContent
+          loading={showLoading && !errorMessage}
+          loadingMessage="Loading metrics…"
+        >
+          {readyMetrics && !errorMessage ? (
+            <ServerMetricsView
+              metrics={readyMetrics}
+              timeWindow={timeWindow}
+              dataWindow={{ from: readyMetrics.from, to: readyMetrics.to }}
+              onZoomToRange={handleZoomToRange}
+              zoomDisabled={isFetching}
+            />
+          ) : null}
+        </AsyncContent>
       </div>
     </section>
   )

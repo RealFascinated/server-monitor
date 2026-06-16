@@ -1,6 +1,7 @@
 import { env } from "@/env/client"
 import type { ApiError } from "@/lib/auth/types"
 import { clearToken, getToken } from "@/lib/auth/token"
+import { createNetworkError, NetworkError } from "@/lib/network"
 
 export class ApiClientError extends Error {
   readonly status: number
@@ -36,10 +37,19 @@ export async function apiFetch<T>(
     }
   }
 
-  const response = await fetch(`${env.VITE_API_URL}${path}`, {
-    ...init,
-    headers,
-  })
+  if (typeof navigator !== "undefined" && !navigator.onLine) {
+    throw new NetworkError("offline")
+  }
+
+  let response: Response
+  try {
+    response = await fetch(`${env.VITE_API_URL}${path}`, {
+      ...init,
+      headers,
+    })
+  } catch {
+    throw createNetworkError()
+  }
 
   if (!response.ok) {
     let message = response.statusText

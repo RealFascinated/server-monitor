@@ -1,12 +1,12 @@
 import { useState } from "react"
 import { Link, useNavigate } from "@tanstack/react-router"
 
-import { Callout } from "@/components/callout"
-import { Spinner } from "@/components/spinner"
-import { Button } from "@/components/ui/button"
+import { AuthFormField, AuthFormShell } from "@/components/auth-form-shell"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useAuthForm } from "@/hooks/use-auth-form"
 import { login, register, useAuth, validateCredentials } from "@/lib/auth"
+import { isNetworkError } from "@/lib/network"
 
 type AuthFormProps = {
   mode: "login" | "register"
@@ -17,17 +17,21 @@ function AuthForm({ mode }: AuthFormProps) {
   const { setUser } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [fieldErrors, setFieldErrors] = useState<{
-    email?: string
-    password?: string
-  }>({})
-  const [apiError, setApiError] = useState<string | null>(null)
-  const [isPending, setIsPending] = useState(false)
+  const [apiErrorTitle, setApiErrorTitle] = useState<string | undefined>()
+  const {
+    fieldErrors,
+    setFieldErrors,
+    apiError,
+    setApiError,
+    isPending,
+    setIsPending,
+    clearErrors,
+  } = useAuthForm<"email" | "password">()
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setApiError(null)
-    setFieldErrors({})
+    clearErrors()
+    setApiErrorTitle(undefined)
 
     try {
       const credentials = validateCredentials(
@@ -55,6 +59,9 @@ function AuthForm({ mode }: AuthFormProps) {
         } else if (error.message.includes("Password")) {
           setFieldErrors({ password: error.message })
         } else {
+          if (isNetworkError(error)) {
+            setApiErrorTitle(error.title)
+          }
           setApiError(error.message)
         }
       }
@@ -64,18 +71,17 @@ function AuthForm({ mode }: AuthFormProps) {
   }
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-      {apiError ? (
-        <Callout
-          type="danger"
-          title={mode === "login" ? "Sign in failed" : "Registration failed"}
-        >
-          {apiError}
-        </Callout>
-      ) : null}
-
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="email">Email</Label>
+    <AuthFormShell
+      onSubmit={handleSubmit}
+      isPending={isPending}
+      submitLabel={mode === "login" ? "Sign in" : "Create account"}
+      apiError={apiError}
+      apiErrorTitle={
+        apiErrorTitle ??
+        (mode === "login" ? "Sign in failed" : "Registration failed")
+      }
+    >
+      <AuthFormField id="email" label="Email" error={fieldErrors.email}>
         <Input
           id="email"
           type="email"
@@ -86,23 +92,25 @@ function AuthForm({ mode }: AuthFormProps) {
           disabled={isPending}
           required
         />
-        {fieldErrors.email ? (
-          <p className="text-xs font-bold text-error">{fieldErrors.email}</p>
-        ) : null}
-      </div>
+      </AuthFormField>
 
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between gap-3">
-          <Label htmlFor="password">Password</Label>
-          {mode === "login" ? (
-            <Link
-              to="/forgot-password"
-              className="text-xs font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-            >
-              Forgot password?
-            </Link>
-          ) : null}
-        </div>
+      <AuthFormField
+        id="password"
+        label={
+          <div className="flex items-center justify-between gap-3">
+            <Label htmlFor="password">Password</Label>
+            {mode === "login" ? (
+              <Link
+                to="/forgot-password"
+                className="text-xs font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              >
+                Forgot password?
+              </Link>
+            ) : null}
+          </div>
+        }
+        error={fieldErrors.password}
+      >
         <Input
           id="password"
           type="password"
@@ -113,16 +121,8 @@ function AuthForm({ mode }: AuthFormProps) {
           disabled={isPending}
           required
         />
-        {fieldErrors.password ? (
-          <p className="text-xs font-bold text-error">{fieldErrors.password}</p>
-        ) : null}
-      </div>
-
-      <Button type="submit" variant="highlighted" disabled={isPending}>
-        {isPending ? <Spinner /> : null}
-        {mode === "login" ? "Sign in" : "Create account"}
-      </Button>
-    </form>
+      </AuthFormField>
+    </AuthFormShell>
   )
 }
 

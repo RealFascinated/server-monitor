@@ -49,11 +49,11 @@ function ServerIngestTokenSection({
   }
 
   return (
-    <div className="overflow-hidden rounded-sm border border-neutral-200 dark:border-monitor-gray-300">
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-neutral-200 bg-neutral-50/80 px-4 py-2.5 dark:border-monitor-gray-300 dark:bg-monitor-gray-100/40">
+    <div className="overflow-hidden rounded-sm border border-border">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-border bg-muted/80 px-4 py-2.5">
         <ServerStatusBadge status={status} />
         <SimpleTooltip content={SERVER_TABLE_COLUMN_TOOLTIPS.agent}>
-          <span className="cursor-help text-xs text-neutral-500">
+          <span className="cursor-help text-xs text-muted-foreground">
             <AgentVersionLabel version={agentVersion} layout="settings" />
           </span>
         </SimpleTooltip>
@@ -67,7 +67,7 @@ function ServerIngestTokenSection({
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex min-w-0 flex-col gap-1">
                 <p className="text-sm font-medium">Ingest token</p>
-                <p className="text-xs font-bold text-neutral-500">
+                <p className="text-xs font-bold text-muted-foreground">
                   Authenticates the Monitor Agent on this host. Rotate when
                   setting up a new installation or replacing a lost token.
                 </p>

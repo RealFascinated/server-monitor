@@ -11,12 +11,13 @@ import { memo, useMemo, useState } from "react"
 import { CreateServerDialog } from "@/components/user/create-server-dialog"
 import { CountBadge } from "@/components/count-badge"
 import { DeleteFolderButton } from "@/components/user/delete-folder-button"
-import { RenameFolderDialog } from "@/components/user/rename-folder-dialog"
+import { RenameFolderDialog } from "@/components/user/folder-name-dialog"
 import type { ServerTableRow } from "@/components/user/server-table-columns"
+import type { ServerResponse } from "@/lib/api/user/servers"
 import { ServerCard } from "@/components/user/server-card"
 import { ServerTableDataRow } from "@/components/user/server-table-row"
 import { DataTable } from "@/components/ui/data-table"
-import { FOLDER_DRAG_MIME, readDraggedServerId } from "@/lib/servers/drag"
+import { beginFolderDrag, readDraggedServerId } from "@/lib/servers/drag"
 import { cn } from "@/lib/utils"
 
 type ServersFolderTableProps = {
@@ -38,7 +39,7 @@ type ServersFolderTableProps = {
   onDropTargetChange: (dropTargetKey: string | null) => void
   onMoveServer: (serverId: number, folderName: string | null) => void
   onReorderFolder: (draggedFolderId: number, targetFolderId: number) => void
-  getServer: (serverId: number) => ServerTableRow["server"]
+  serversMap: Record<number, ServerResponse>
 }
 
 function ServersFolderTableInner({
@@ -60,7 +61,7 @@ function ServersFolderTableInner({
   onDropTargetChange,
   onMoveServer,
   onReorderFolder,
-  getServer,
+  serversMap,
 }: ServersFolderTableProps) {
   const isFolderDropTarget =
     editMode &&
@@ -78,9 +79,9 @@ function ServersFolderTableInner({
     () =>
       serverIds.map((serverId) => ({
         serverId,
-        server: getServer(serverId),
+        server: serversMap[serverId],
       })),
-    [serverIds, getServer]
+    [serverIds, serversMap]
   )
 
   const table = useReactTable({
@@ -203,10 +204,9 @@ function ServersFolderTableInner({
             type="button"
             draggable
             aria-label={`Reorder folder ${title}`}
-            className="flex shrink-0 cursor-grab items-center text-neutral-400 hover:text-neutral-600 active:cursor-grabbing dark:hover:text-neutral-300"
+            className="flex shrink-0 cursor-grab items-center text-muted-foreground hover:text-muted-foreground active:cursor-grabbing dark:hover:text-foreground"
             onDragStart={(event) => {
-              event.dataTransfer.effectAllowed = "move"
-              event.dataTransfer.setData(FOLDER_DRAG_MIME, String(folderId))
+              beginFolderDrag(event, folderId)
               onFolderDragStart(folderId)
             }}
             onDragEnd={onFolderDragEnd}
@@ -215,7 +215,7 @@ function ServersFolderTableInner({
           </button>
         ) : null}
         <div className="flex min-w-0 flex-1 items-center gap-1">
-          <h3 className="min-w-0 truncate text-sm font-bold dark:text-white">
+          <h3 className="min-w-0 truncate text-sm font-bold text-foreground">
             {title}
           </h3>
           {!editMode && folderName != null ? (
@@ -225,7 +225,7 @@ function ServersFolderTableInner({
                 <button
                   type="button"
                   aria-label={`Create server in ${title}`}
-                  className="flex size-5 shrink-0 items-center justify-center rounded-sm text-neutral-400 transition-colors hover:bg-muted hover:text-foreground"
+                  className="flex size-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 >
                   <Plus className="size-3" />
                 </button>
@@ -258,7 +258,7 @@ function ServersFolderTableInner({
             {serverIds.map((serverId) => (
               <ServerCard
                 key={serverId}
-                server={getServer(serverId)}
+                server={serversMap[serverId]}
                 editMode={editMode}
                 isDragging={draggingServerId === serverId}
                 onDragStart={() => onServerDragStart(String(serverId))}
@@ -279,7 +279,7 @@ function ServersFolderTableInner({
       ) : (
         <p
           className={cn(
-            "rounded-sm border border-dashed border-neutral-200 px-3 py-6 text-center text-sm text-neutral-500 dark:border-monitor-gray-300",
+            "rounded-sm border border-dashed border-border px-3 py-6 text-center text-sm text-muted-foreground",
             isDropTarget && "border-monitor dark:border-warning"
           )}
           {...(editMode

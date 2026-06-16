@@ -4,12 +4,12 @@ import { useCallback } from "react"
 
 import { AdminMetricsHeader } from "@/components/admin/admin-metrics-header"
 import { AdminMetricsView } from "@/components/admin/admin-metrics-view"
-import { AnimatedContent } from "@/components/animated-content"
+import { AsyncContent } from "@/components/animated-content"
 import { Callout } from "@/components/callout"
-import { LoadingState } from "@/components/loading-state"
 import { adminMetricsQueryOptions } from "@/lib/api/admin/metrics.queries"
+import { getApiErrorMessage, getApiErrorTitle } from "@/lib/api/error-message"
+import { loadCachedQuery } from "@/lib/api/query-loader"
 import { useMetricRefreshInterval } from "@/hooks/use-metric-refresh-interval"
-import { ApiClientError } from "@/lib/auth/api"
 import { authenticatedPageSectionClassName } from "@/lib/layout"
 import { pageTitle } from "@/lib/page-title"
 import { metricRangeSearchSchema } from "@/lib/schemas/range"
@@ -21,7 +21,10 @@ export const Route = createFileRoute("/_authenticated/admin/metrics")({
   validateSearch: adminMetricsSearchSchema,
   loaderDeps: ({ search }) => ({ timeWindow: search }),
   loader: ({ context: { queryClient }, deps: { timeWindow } }) => {
-    return queryClient.ensureQueryData(adminMetricsQueryOptions(timeWindow))
+    return loadCachedQuery(
+      queryClient,
+      adminMetricsQueryOptions(timeWindow)
+    )
   },
   head: () => ({
     meta: [{ title: pageTitle("Admin Metrics") }],
@@ -42,12 +45,12 @@ function AdminMetricsPage() {
     error,
   } = useQuery(adminMetricsQueryOptions(timeWindow, refreshInterval))
 
-  const errorMessage =
-    error instanceof ApiClientError
-      ? error.message
-      : error
-        ? "Failed to load admin metrics"
-        : null
+  const errorMessage = error
+    ? getApiErrorMessage(error, "Failed to load admin metrics")
+    : null
+  const errorTitle = error
+    ? getApiErrorTitle(error, "Could not load metrics")
+    : null
 
   const handleZoomToRange = useCallback(
     (from: number, to: number) => {
@@ -73,17 +76,16 @@ function AdminMetricsPage() {
       />
 
       {errorMessage ? (
-        <Callout type="danger" title="Could not load metrics">
+        <Callout type="danger" title={errorTitle ?? "Could not load metrics"}>
           {errorMessage}
         </Callout>
       ) : null}
 
-      {isPending && !errorMessage ? (
-        <LoadingState message="Loading metrics…" />
-      ) : null}
-
-      {metrics && dataWindow && !errorMessage ? (
-        <AnimatedContent>
+      <AsyncContent
+        loading={isPending && !errorMessage}
+        loadingMessage="Loading metrics…"
+      >
+        {metrics && dataWindow && !errorMessage ? (
           <AdminMetricsView
             metrics={metrics}
             timeWindow={timeWindow}
@@ -91,8 +93,8 @@ function AdminMetricsPage() {
             onZoomToRange={handleZoomToRange}
             zoomDisabled={isFetching}
           />
-        </AnimatedContent>
-      ) : null}
+        ) : null}
+      </AsyncContent>
     </section>
   )
 }

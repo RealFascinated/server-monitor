@@ -16,7 +16,7 @@ function AgentUpdateTooltip({ latestVersion }: { latestVersion: string }) {
     <span>
       Version <span className="font-medium">{latestVersion}</span> is available.
       Run{" "}
-      <code className="rounded-sm bg-neutral-300/70 px-1 py-0.5 font-mono font-medium text-foreground dark:bg-monitor-gray-500/70">
+      <code className="rounded-sm bg-muted/70 px-1 py-0.5 font-mono font-medium text-foreground">
         monitor-agent update
       </code>{" "}
       on the host to upgrade.
@@ -38,7 +38,7 @@ function AgentVersionLabel({
 
   if (!version) {
     return layout === "settings" ? (
-      <span className="text-xs text-neutral-500">
+      <span className="text-xs text-muted-foreground">
         No agent version reported
       </span>
     ) : (

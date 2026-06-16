@@ -1,13 +1,13 @@
 import { toast } from "sonner"
 
+import { getApiErrorMessage } from "@/lib/api/error-message"
 import { copyToClipboard } from "@/lib/clipboard"
-import { ApiClientError } from "@/lib/auth/api"
 
 const COPY_FAILED_MESSAGE =
   "Could not copy to clipboard. Check browser permissions or use HTTPS."
 
 function getMutationErrorMessage(error: unknown, fallback: string): string {
-  return error instanceof ApiClientError ? error.message : fallback
+  return getApiErrorMessage(error, fallback)
 }
 
 function toastMutationError(

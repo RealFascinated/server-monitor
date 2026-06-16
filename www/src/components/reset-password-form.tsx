@@ -2,10 +2,9 @@ import { useState } from "react"
 import { useMutation } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 
-import { Spinner } from "@/components/spinner"
-import { Button } from "@/components/ui/button"
+import { AuthFormField, AuthFormShell } from "@/components/auth-form-shell"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useAuthForm } from "@/hooks/use-auth-form"
 import { resetPassword } from "@/lib/api/auth/password"
 import { validateNewPassword } from "@/lib/auth/validation"
 import { toastMutationError, toastSuccess } from "@/lib/toast"
@@ -18,10 +17,9 @@ function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const navigate = useNavigate()
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [fieldErrors, setFieldErrors] = useState<{
-    password?: string
-    confirmPassword?: string
-  }>({})
+  const { fieldErrors, setFieldErrors, clearFieldErrors } = useAuthForm<
+    "password" | "confirmPassword"
+  >()
 
   const mutation = useMutation({
     mutationFn: resetPassword,
@@ -36,7 +34,7 @@ function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setFieldErrors({})
+    clearFieldErrors()
 
     if (password !== confirmPassword) {
       setFieldErrors({ confirmPassword: "Passwords do not match" })
@@ -53,9 +51,16 @@ function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   }
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="new-password">New password</Label>
+    <AuthFormShell
+      onSubmit={handleSubmit}
+      isPending={mutation.isPending}
+      submitLabel="Reset password"
+    >
+      <AuthFormField
+        id="new-password"
+        label="New password"
+        error={fieldErrors.password}
+      >
         <Input
           id="new-password"
           type="password"
@@ -66,13 +71,13 @@ function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           disabled={mutation.isPending}
           required
         />
-        {fieldErrors.password ? (
-          <p className="text-xs font-bold text-error">{fieldErrors.password}</p>
-        ) : null}
-      </div>
+      </AuthFormField>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="confirm-password">Confirm new password</Label>
+      <AuthFormField
+        id="confirm-password"
+        label="Confirm new password"
+        error={fieldErrors.confirmPassword}
+      >
         <Input
           id="confirm-password"
           type="password"
@@ -83,18 +88,8 @@ function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           disabled={mutation.isPending}
           required
         />
-        {fieldErrors.confirmPassword ? (
-          <p className="text-xs font-bold text-error">
-            {fieldErrors.confirmPassword}
-          </p>
-        ) : null}
-      </div>
-
-      <Button type="submit" variant="highlighted" disabled={mutation.isPending}>
-        {mutation.isPending ? <Spinner /> : null}
-        Reset password
-      </Button>
-    </form>
+      </AuthFormField>
+    </AuthFormShell>
   )
 }
 

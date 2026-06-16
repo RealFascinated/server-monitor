@@ -1,10 +1,9 @@
 import { useState } from "react"
 import { useMutation } from "@tanstack/react-query"
 
-import { Spinner } from "@/components/spinner"
-import { Button } from "@/components/ui/button"
+import { AuthFormField, AuthFormShell } from "@/components/auth-form-shell"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useAuthForm } from "@/hooks/use-auth-form"
 import { changePassword } from "@/lib/api/user/account"
 import { validateNewPassword } from "@/lib/auth/validation"
 import { toastMutationError, toastSuccess } from "@/lib/toast"
@@ -13,11 +12,9 @@ function ChangePasswordForm() {
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [fieldErrors, setFieldErrors] = useState<{
-    currentPassword?: string
-    newPassword?: string
-    confirmPassword?: string
-  }>({})
+  const { fieldErrors, setFieldErrors, clearFieldErrors } = useAuthForm<
+    "currentPassword" | "newPassword" | "confirmPassword"
+  >()
 
   const mutation = useMutation({
     mutationFn: changePassword,
@@ -26,7 +23,7 @@ function ChangePasswordForm() {
       setCurrentPassword("")
       setNewPassword("")
       setConfirmPassword("")
-      setFieldErrors({})
+      clearFieldErrors()
     },
     onError: (error) => {
       toastMutationError("Could not change password", error, "Request failed")
@@ -35,7 +32,7 @@ function ChangePasswordForm() {
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setFieldErrors({})
+    clearFieldErrors()
 
     if (newPassword !== confirmPassword) {
       setFieldErrors({ confirmPassword: "Passwords do not match" })
@@ -60,9 +57,18 @@ function ChangePasswordForm() {
   }
 
   return (
-    <form className="flex max-w-md flex-col gap-4" onSubmit={handleSubmit}>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="current-password">Current password</Label>
+    <AuthFormShell
+      onSubmit={handleSubmit}
+      isPending={mutation.isPending}
+      submitLabel="Update password"
+      className="max-w-md"
+      submitClassName="self-start"
+    >
+      <AuthFormField
+        id="current-password"
+        label="Current password"
+        error={fieldErrors.currentPassword}
+      >
         <Input
           id="current-password"
           type="password"
@@ -73,15 +79,13 @@ function ChangePasswordForm() {
           disabled={mutation.isPending}
           required
         />
-        {fieldErrors.currentPassword ? (
-          <p className="text-xs font-bold text-error">
-            {fieldErrors.currentPassword}
-          </p>
-        ) : null}
-      </div>
+      </AuthFormField>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="new-password">New password</Label>
+      <AuthFormField
+        id="new-password"
+        label="New password"
+        error={fieldErrors.newPassword}
+      >
         <Input
           id="new-password"
           type="password"
@@ -92,15 +96,13 @@ function ChangePasswordForm() {
           disabled={mutation.isPending}
           required
         />
-        {fieldErrors.newPassword ? (
-          <p className="text-xs font-bold text-error">
-            {fieldErrors.newPassword}
-          </p>
-        ) : null}
-      </div>
+      </AuthFormField>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="confirm-password">Confirm new password</Label>
+      <AuthFormField
+        id="confirm-password"
+        label="Confirm new password"
+        error={fieldErrors.confirmPassword}
+      >
         <Input
           id="confirm-password"
           type="password"
@@ -111,23 +113,8 @@ function ChangePasswordForm() {
           disabled={mutation.isPending}
           required
         />
-        {fieldErrors.confirmPassword ? (
-          <p className="text-xs font-bold text-error">
-            {fieldErrors.confirmPassword}
-          </p>
-        ) : null}
-      </div>
-
-      <Button
-        type="submit"
-        variant="highlighted"
-        disabled={mutation.isPending}
-        className="self-start"
-      >
-        {mutation.isPending ? <Spinner /> : null}
-        Update password
-      </Button>
-    </form>
+      </AuthFormField>
+    </AuthFormShell>
   )
 }
 

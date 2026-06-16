@@ -10,6 +10,7 @@ import { lazy, Suspense } from "react"
 import { Toaster } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { NotFoundView } from "@/components/not-found-view"
+import { OfflineBanner } from "@/components/offline-banner"
 import { AuthProvider } from "@/lib/auth"
 import { APP_NAME } from "@/lib/page-title"
 import { ThemeProvider } from "@/lib/theme"
@@ -64,6 +65,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body>
         <ThemeProvider>
           <TooltipProvider>
+            <OfflineBanner />
             <AuthProvider>{children}</AuthProvider>
             <Toaster richColors closeButton />
           </TooltipProvider>

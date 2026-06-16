@@ -17,10 +17,10 @@ export function getPercentLevel(value: number): PercentLevel {
 }
 
 const percentLevelColorClasses: Record<PercentLevel, string> = {
-  unknown: "text-neutral-500",
-  normal: "text-[#2E9470] dark:text-green-400",
-  warning: "text-[#B8870A] dark:text-warning",
-  critical: "text-[#C44E4E] dark:text-error",
+  unknown: "text-muted-foreground",
+  normal: "text-success",
+  warning: "text-warning",
+  critical: "text-error",
 }
 
 export function percentLevelColorClass(
@@ -29,4 +29,23 @@ export function percentLevelColorClass(
 ): string {
   const level = value == null ? "unknown" : getPercentLevel(value)
   return cn(percentLevelColorClasses[level], className)
+}
+
+export function fleetOnlineStatusColorClass(
+  online: number,
+  offline: number
+): string | undefined {
+  if (online > 0 && offline === 0) {
+    return "text-success"
+  }
+
+  if (online === 0) {
+    return "text-error"
+  }
+
+  return undefined
+}
+
+export function attentionCountColorClass(count: number): string {
+  return count === 0 ? "text-success" : "text-warning"
 }

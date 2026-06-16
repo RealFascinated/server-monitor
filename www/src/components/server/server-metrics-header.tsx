@@ -21,7 +21,7 @@ type ServerMetricsHeaderProps = {
 }
 
 const metricRangeShellClassName =
-  "inline-flex w-full shrink-0 items-stretch gap-0.5 overflow-hidden rounded-sm border border-neutral-200 bg-neutral-100/80 p-1 sm:w-auto dark:border-monitor-gray-300 dark:bg-monitor-gray-200/60"
+  "inline-flex w-full shrink-0 items-stretch gap-0.5 overflow-hidden rounded-sm border border-border bg-muted/80 p-1 sm:w-auto dark:bg-muted/60"
 
 type ServerMetricsToolbarProps = {
   serverId: number
@@ -54,7 +54,7 @@ function ServerMetricsToolbar({
         <Button
           variant="ghost"
           size="sm"
-          className="h-7 shrink-0 gap-1.5 rounded-sm border-0 px-2 text-xs hover:bg-white/70 dark:hover:bg-monitor-gray-300/60"
+          className="h-7 shrink-0 gap-1.5 rounded-sm border-0 px-2 text-xs hover:bg-card/70 dark:hover:bg-accent/60"
           asChild
         >
           <Link
@@ -72,7 +72,7 @@ function ServerMetricsToolbar({
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 shrink-0 gap-1.5 rounded-sm border-0 px-2 text-xs hover:bg-white/70 dark:hover:bg-monitor-gray-300/60"
+            className="h-7 shrink-0 gap-1.5 rounded-sm border-0 px-2 text-xs hover:bg-card/70 dark:hover:bg-accent/60"
             asChild
           >
             <Link
@@ -146,7 +146,7 @@ function ServerMetricsHeader({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-7 shrink-0 rounded-sm border border-neutral-200 bg-neutral-100/80 px-2.5 text-xs hover:bg-white/70 dark:border-monitor-gray-300 dark:bg-monitor-gray-200/60 dark:hover:bg-monitor-gray-300/60"
+                  className="h-7 shrink-0 rounded-sm border border-border bg-muted/80 px-2.5 text-xs hover:bg-card/70 dark:bg-muted/60 dark:hover:bg-muted"
                   asChild
                 >
                   <Link
@@ -163,7 +163,7 @@ function ServerMetricsHeader({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-7 shrink-0 rounded-sm border border-neutral-200 bg-neutral-100/80 px-2.5 text-xs hover:bg-white/70 dark:border-monitor-gray-300 dark:bg-monitor-gray-200/60 dark:hover:bg-monitor-gray-300/60"
+                  className="h-7 shrink-0 rounded-sm border border-border bg-muted/80 px-2.5 text-xs hover:bg-card/70 dark:bg-muted/60 dark:hover:bg-muted"
                   asChild
                 >
                   <Link

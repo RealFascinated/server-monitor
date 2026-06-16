@@ -54,7 +54,7 @@ function DeleteServerButton({
             type="button"
             variant="ghost"
             size="icon-sm"
-            className="text-neutral-400 hover:bg-transparent hover:text-red-600 dark:text-neutral-500 dark:hover:bg-transparent dark:hover:text-red-400"
+            className="text-muted-foreground hover:bg-transparent hover:text-red-600 dark:text-muted-foreground dark:hover:bg-transparent dark:hover:text-red-400"
             aria-label={`Delete ${serverName}`}
           >
             <Trash2 className="size-4" />

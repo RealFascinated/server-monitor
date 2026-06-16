@@ -28,7 +28,7 @@ function MetricStatCard({
   )
 
   return (
-    <Card className="gap-0 overflow-hidden py-0 dark:border-monitor-gray-300">
+    <Card className="gap-0 overflow-hidden py-0">
       <CardContent className="flex flex-col gap-1 px-4 py-3">
         <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
           {title}

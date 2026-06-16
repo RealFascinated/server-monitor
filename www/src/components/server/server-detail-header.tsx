@@ -2,7 +2,7 @@ import type { ReactNode } from "react"
 
 import type { BreadcrumbItem } from "@/components/breadcrumb"
 import { PageHeader } from "@/components/page-header"
-import { serverBreadcrumbItems } from "@/components/server/server-breadcrumb-items"
+import { serverBreadcrumbItems } from "@/lib/servers/server-breadcrumb-items"
 import { ServerMetaSubtitle } from "@/components/server/server-meta-subtitle"
 import { ServerStatusBadge } from "@/components/server/server-status-badge"
 import { useMetricDefaultRange } from "@/hooks/use-metric-default-range"

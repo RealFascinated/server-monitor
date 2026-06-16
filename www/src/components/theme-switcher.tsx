@@ -23,7 +23,7 @@ export function ThemeSwitcher({ className }: { className?: string }) {
       role="group"
       aria-label="Theme"
       className={cn(
-        "inline-flex items-center gap-0.5 rounded-sm bg-neutral-100 p-0.5 dark:bg-monitor-gray-200",
+        "inline-flex items-center gap-0.5 rounded-sm bg-muted p-0.5",
         className
       )}
     >
@@ -40,8 +40,8 @@ export function ThemeSwitcher({ className }: { className?: string }) {
               className={cn(
                 "flex size-6 shrink-0 cursor-help items-center justify-center rounded-sm transition-colors",
                 isActive
-                  ? "bg-white text-monitor dark:bg-monitor-gray-300 dark:text-warning"
-                  : "text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300"
+                  ? "bg-card text-monitor dark:bg-accent dark:text-warning"
+                  : "text-muted-foreground hover:text-muted-foreground dark:text-muted-foreground dark:hover:text-foreground"
               )}
             >
               <Icon className="size-3.5" />

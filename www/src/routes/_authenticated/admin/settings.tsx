@@ -3,11 +3,10 @@ import { createFileRoute } from "@tanstack/react-router"
 
 import { AdminSettingsHeader } from "@/components/admin/admin-settings-header"
 import { AdminSettingsView } from "@/components/admin/admin-settings-view"
-import { AnimatedContent } from "@/components/animated-content"
+import { AsyncContent } from "@/components/animated-content"
 import { Callout } from "@/components/callout"
-import { LoadingState } from "@/components/loading-state"
 import { adminSettingsQueryOptions } from "@/lib/api/admin/settings.queries"
-import { ApiClientError } from "@/lib/auth/api"
+import { getApiErrorMessage, getApiErrorTitle } from "@/lib/api/error-message"
 import { authenticatedPageSectionClassName } from "@/lib/layout"
 import { pageTitle } from "@/lib/page-title"
 
@@ -29,32 +28,31 @@ function AdminSettingsPage() {
     error,
   } = useQuery(adminSettingsQueryOptions())
 
-  const errorMessage =
-    error instanceof ApiClientError
-      ? error.message
-      : error
-        ? "Failed to load admin settings"
-        : null
+  const errorMessage = error
+    ? getApiErrorMessage(error, "Failed to load admin settings")
+    : null
+  const errorTitle = error
+    ? getApiErrorTitle(error, "Could not load settings")
+    : null
 
   return (
     <section className={authenticatedPageSectionClassName}>
       <AdminSettingsHeader />
 
       {errorMessage ? (
-        <Callout type="danger" title="Could not load settings">
+        <Callout type="danger" title={errorTitle ?? "Could not load settings"}>
           {errorMessage}
         </Callout>
       ) : null}
 
-      {isPending && !errorMessage ? (
-        <LoadingState message="Loading settings…" />
-      ) : null}
-
-      {settings && !errorMessage ? (
-        <AnimatedContent>
+      <AsyncContent
+        loading={isPending && !errorMessage}
+        loadingMessage="Loading settings…"
+      >
+        {settings && !errorMessage ? (
           <AdminSettingsView settings={settings} />
-        </AnimatedContent>
-      ) : null}
+        ) : null}
+      </AsyncContent>
     </section>
   )
 }

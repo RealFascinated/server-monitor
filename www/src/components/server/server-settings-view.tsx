@@ -90,7 +90,7 @@ function ServerSettingsView({
             description="Permanently delete this server and all stored metrics."
           />
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-muted-foreground">
               This action cannot be undone.
             </p>
             <DeleteServerButton
@@ -112,7 +112,7 @@ function ServerSettingsView({
             description="Remove your viewer access to this server."
           />
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-muted-foreground">
               You can rejoin if the owner sends a new invite.
             </p>
             <LeaveServerButton

@@ -11,6 +11,7 @@ import {
   serverInvitePreviewQueryOptions,
   userInvitesQueryKey,
 } from "@/lib/api/user/invites.queries"
+import { getApiErrorMessage, getApiErrorTitle } from "@/lib/api/error-message"
 import { userServersQueryKey } from "@/lib/api/user/servers.queries"
 import { useAuth } from "@/lib/auth"
 import { formatDate } from "@/lib/formatter"
@@ -62,9 +63,10 @@ function AcceptInviteView({ token }: AcceptInviteViewProps) {
   })
 
   const previewError = error
-    ? error instanceof Error
-      ? error.message
-      : "Could not load invite"
+    ? getApiErrorMessage(error, "Could not load invite")
+    : null
+  const previewErrorTitle = error
+    ? getApiErrorTitle(error, "Invalid invite")
     : null
   const emailMismatch =
     preview && user
@@ -74,7 +76,7 @@ function AcceptInviteView({ token }: AcceptInviteViewProps) {
   return (
     <div className="mx-auto flex w-full max-w-md flex-col gap-6">
       {previewError ? (
-        <Callout type="danger" title="Invalid invite">
+        <Callout type="danger" title={previewErrorTitle ?? "Invalid invite"}>
           {previewError}
         </Callout>
       ) : null}

@@ -50,7 +50,7 @@ function RoleTag({ role }: { role: ServerRole | "OWNER" }) {
 
   return (
     <SimpleTooltip content={tooltip}>
-      <span className="cursor-help bg-neutral-100 px-2 py-1 text-xs font-bold text-neutral-500 dark:bg-monitor-gray-100">
+      <span className="cursor-help bg-muted px-2 py-1 text-xs font-bold text-muted-foreground">
         {formatRole(role)}
       </span>
     </SimpleTooltip>
@@ -92,7 +92,7 @@ function RemoveMemberButton({
           type="button"
           variant="ghost"
           size="icon-sm"
-          className="text-neutral-400 hover:bg-transparent hover:text-red-600 dark:text-neutral-500 dark:hover:bg-transparent dark:hover:text-red-400"
+          className="text-muted-foreground hover:bg-transparent hover:text-red-600 dark:text-muted-foreground dark:hover:bg-transparent dark:hover:text-red-400"
           aria-label={`Remove ${memberEmail}`}
         >
           <Trash2 className="size-4" />
@@ -150,7 +150,7 @@ function RevokeInviteButton({
           type="button"
           variant="ghost"
           size="icon-sm"
-          className="text-neutral-400 hover:bg-transparent hover:text-red-600 dark:text-neutral-500 dark:hover:bg-transparent dark:hover:text-red-400"
+          className="text-muted-foreground hover:bg-transparent hover:text-red-600 dark:text-muted-foreground dark:hover:bg-transparent dark:hover:text-red-400"
           aria-label={`Revoke invite for ${inviteEmail}`}
         >
           <Trash2 className="size-4" />
@@ -227,7 +227,7 @@ function ServerAccessView({
             tooltip="When this member accepted access to the server."
           />
         ),
-        meta: { className: "text-neutral-500" },
+        meta: { className: "text-muted-foreground" },
         cell: ({ row }) =>
           row.original.joinedAt ? (
             <SimpleTooltip
@@ -297,7 +297,7 @@ function ServerAccessView({
             tooltip="When the invite was created."
           />
         ),
-        meta: { className: "text-neutral-500" },
+        meta: { className: "text-muted-foreground" },
         cell: ({ row }) => (
           <SimpleTooltip
             content={formatDateWithRelative(row.original.createdAt)}
@@ -316,7 +316,7 @@ function ServerAccessView({
             tooltip="Pending invites stop working after this time."
           />
         ),
-        meta: { className: "text-neutral-500" },
+        meta: { className: "text-muted-foreground" },
         cell: ({ row }) => (
           <SimpleTooltip
             content={`${INVITE_EXPIRY_TOOLTIP} ${formatDateWithRelative(row.original.expiresAt)}`}
@@ -368,7 +368,7 @@ function ServerAccessView({
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-4">
-          <h3 className="text-lg font-bold dark:text-white">Members</h3>
+          <h3 className="text-lg font-bold text-foreground">Members</h3>
           {canManage ? <InviteMemberDialog serverId={serverId} /> : null}
         </div>
 
@@ -377,10 +377,10 @@ function ServerAccessView({
 
       {canManage ? (
         <div className="flex flex-col gap-3">
-          <h3 className="text-lg font-bold dark:text-white">Pending invites</h3>
+          <h3 className="text-lg font-bold text-foreground">Pending invites</h3>
 
           {access.pendingInvites.length === 0 ? (
-            <p className="text-neutral-500">No pending invites.</p>
+            <p className="text-muted-foreground">No pending invites.</p>
           ) : (
             <DataTable table={pendingInvitesTable} />
           )}

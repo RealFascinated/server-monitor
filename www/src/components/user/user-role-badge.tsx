@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 const roleStyles: Record<UserRole, string> = {
   ADMIN:
     "bg-monitor/10 text-monitor ring-monitor/20 dark:bg-warning/10 dark:text-warning dark:ring-warning/20",
-  USER: "bg-neutral-100 text-neutral-600 ring-neutral-200 dark:bg-monitor-gray-100 dark:text-neutral-300 dark:ring-monitor-gray-300",
+  USER: "bg-muted text-muted-foreground ring-border",
 }
 
 function UserRoleBadge({ role }: { role: UserRole }) {

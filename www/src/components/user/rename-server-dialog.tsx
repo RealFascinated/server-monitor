@@ -1,4 +1,3 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Pencil } from "lucide-react"
 import { useState } from "react"
 
@@ -20,10 +19,8 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { renameServer } from "@/lib/api/user/servers"
-import { updateServerInCaches } from "@/lib/api/user/servers.queries"
-import { MAX_SERVER_NAME_LENGTH, validateServerName } from "@/lib/server-name"
-import { toastMutationError, toastSuccess } from "@/lib/toast"
+import { useRenameServer } from "@/hooks/use-rename-server"
+import { MAX_SERVER_NAME_LENGTH } from "@/lib/server-name"
 
 type RenameServerDialogProps = {
   serverId: number
@@ -35,34 +32,20 @@ function RenameServerDialog({
   currentName,
 }: RenameServerDialogProps) {
   const [open, setOpen] = useState(false)
-  const [name, setName] = useState(currentName)
-  const [fieldError, setFieldError] = useState<string | null>(null)
-  const inputId = `rename-server-name-${serverId}`
 
-  const queryClient = useQueryClient()
-
-  const mutation = useMutation({
-    mutationFn: (nextName: string) =>
-      renameServer(serverId, { name: nextName }),
-    onSuccess: (server) => {
-      updateServerInCaches(queryClient, server)
-      toastSuccess("Server renamed")
-      setOpen(false)
-      resetForm()
-    },
-    onError: (error) => {
-      toastMutationError(
-        "Could not rename server",
-        error,
-        "Failed to rename server"
-      )
-    },
+  const {
+    name,
+    setName,
+    fieldError,
+    inputId,
+    mutation,
+    resetForm,
+    submit,
+  } = useRenameServer({
+    serverId,
+    currentName,
+    onSuccess: () => setOpen(false),
   })
-
-  function resetForm() {
-    setName(currentName)
-    setFieldError(null)
-  }
 
   function handleOpenChange(nextOpen: boolean) {
     if (mutation.isPending) {
@@ -71,31 +54,11 @@ function RenameServerDialog({
 
     setOpen(nextOpen)
 
-    if (nextOpen) {
-      setName(currentName)
-      setFieldError(null)
-    } else {
-      resetForm()
-    }
+    resetForm()
   }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-
-    const error = validateServerName(name)
-    if (error) {
-      setFieldError(error)
-      return
-    }
-
-    const trimmed = name.trim()
-    if (trimmed === currentName) {
-      setOpen(false)
-      return
-    }
-
-    setFieldError(null)
-    mutation.mutate(trimmed)
+    submit(event, { onUnchanged: () => setOpen(false) })
   }
 
   return (
@@ -107,7 +70,7 @@ function RenameServerDialog({
               type="button"
               variant="ghost"
               size="icon-sm"
-              className="text-neutral-400 hover:bg-transparent hover:text-neutral-600 dark:text-neutral-500 dark:hover:bg-transparent dark:hover:text-white"
+              className="text-muted-foreground hover:bg-transparent hover:text-muted-foreground dark:text-muted-foreground dark:hover:bg-transparent dark:hover:text-white"
               aria-label={`Rename ${currentName}`}
             >
               <Pencil className="size-4" />
@@ -116,7 +79,7 @@ function RenameServerDialog({
         </TooltipTrigger>
         <TooltipContent>Rename server</TooltipContent>
       </Tooltip>
-      <DialogContent className="rounded-sm border border-neutral-200 sm:max-w-lg dark:border-monitor-gray-300">
+      <DialogContent className="rounded-sm border border-border sm:max-w-lg">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Rename server</DialogTitle>
@@ -143,7 +106,7 @@ function RenameServerDialog({
             ) : null}
           </div>
 
-          <DialogFooter className="border-t border-neutral-200 pt-3 dark:border-monitor-gray-200">
+          <DialogFooter>
             <Button
               type="button"
               variant="default"

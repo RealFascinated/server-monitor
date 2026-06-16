@@ -11,7 +11,7 @@ function Label({
     <LabelPrimitive.Root
       data-slot="label"
       className={cn(
-        "text-sm font-medium text-black dark:text-neutral-400",
+        "text-sm font-medium text-foreground",
         className
       )}
       {...props}

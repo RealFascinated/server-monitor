@@ -151,7 +151,7 @@ function CreateServerDialog({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="rounded-sm border border-neutral-200 sm:max-w-2xl dark:border-monitor-gray-300">
+      <DialogContent className="rounded-sm border border-border sm:max-w-2xl">
         {createdServer ? (
           <>
             <DialogHeader>
@@ -169,7 +169,7 @@ function CreateServerDialog({
 
             <AgentInstallPanel ingestToken={createdServer.ingestToken} />
 
-            <DialogFooter className="border-t border-neutral-200 pt-3 dark:border-monitor-gray-200">
+            <DialogFooter>
               <Button
                 type="button"
                 variant="default"
@@ -276,7 +276,7 @@ function CreateServerDialog({
               </div>
             </div>
 
-            <DialogFooter className="border-t border-neutral-200 pt-3 dark:border-monitor-gray-200">
+            <DialogFooter>
               <Button
                 type="button"
                 variant="default"

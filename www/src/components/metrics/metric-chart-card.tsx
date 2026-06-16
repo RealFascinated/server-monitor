@@ -213,8 +213,8 @@ function MetricChartCard({
   )
 
   return (
-    <Card className="flex h-full min-h-0 flex-col gap-0 overflow-hidden py-0 dark:border-monitor-gray-300">
-      <CardHeader className="shrink-0 gap-2 border-b border-border bg-neutral-100/90 px-4 py-3 dark:border-monitor-gray-300 dark:bg-monitor-gray-200/60">
+    <Card className="flex h-full min-h-0 flex-col gap-0 overflow-hidden py-0">
+      <CardHeader className="shrink-0 gap-2 border-b border-border bg-muted/90 px-4 py-3 dark:bg-muted/60">
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <div className="flex min-w-0 items-center gap-0.5">
             {description ? (
@@ -247,7 +247,7 @@ function MetricChartCard({
           showCloseButton
           className="flex h-[min(90vh,calc(100vh-2rem))] w-[min(96vw,calc(100vw-2rem))] max-w-none animate-none! flex-col gap-0 overflow-hidden p-0 sm:max-w-none data-open:animate-none! data-closed:animate-none!"
         >
-          <DialogHeader className="shrink-0 gap-2 border-b border-border bg-neutral-100/90 px-4 py-3 dark:border-monitor-gray-300 dark:bg-monitor-gray-200/60">
+          <DialogHeader className="shrink-0 gap-2 border-b border-border bg-muted/90 px-4 py-3 dark:bg-muted/60">
             <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 pr-8">
               <div className="min-w-0">
                 {description ? (

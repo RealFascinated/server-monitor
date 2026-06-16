@@ -1,38 +1,61 @@
+import { readCssVar } from "@/lib/css-vars"
 import type { ResolvedTheme } from "@/lib/theme/context"
 
-// Distinct hues tuned for the app brand; even spacing avoids muddy near-duplicates.
+export const CHART_COLOR_VARS = [
+  "--chart-1",
+  "--chart-2",
+  "--chart-3",
+  "--chart-4",
+  "--chart-5",
+  "--chart-6",
+  "--chart-7",
+  "--chart-8",
+  "--chart-9",
+  "--chart-10",
+  "--chart-11",
+  "--chart-12",
+] as const
+
 const CHART_PALETTE_LIGHT = [
-  "#7A6FDB", // periwinkle
-  "#4A84E6", // blue
-  "#3AADBE", // cyan
-  "#3FAF87", // emerald
-  "#D4A030", // amber
-  "#DC6B6B", // coral
-  "#D9609F", // rose
-  "#8E84D4", // violet
-  "#3CA89E", // teal
-  "#E08A58", // orange
-  "#6F7CE0", // indigo
-  "#8AAF5A", // lime
+  "#7A6FDB",
+  "#4A84E6",
+  "#3AADBE",
+  "#3FAF87",
+  "#D4A030",
+  "#DC6B6B",
+  "#D9609F",
+  "#8E84D4",
+  "#3CA89E",
+  "#E08A58",
+  "#6F7CE0",
+  "#8AAF5A",
 ] as const
 
 const CHART_PALETTE_DARK = [
-  "#A855F7", // purple
-  "#60A5FA", // blue
-  "#22D3EE", // cyan
-  "#34D399", // emerald
-  "#FBBF24", // amber
-  "#F87171", // red
-  "#F472B6", // rose
-  "#C084FC", // violet
-  "#2DD4BF", // teal
-  "#FB923C", // orange
-  "#818CF8", // indigo
-  "#A3E635", // lime
+  "#A855F7",
+  "#60A5FA",
+  "#22D3EE",
+  "#34D399",
+  "#FBBF24",
+  "#F87171",
+  "#F472B6",
+  "#C084FC",
+  "#2DD4BF",
+  "#FB923C",
+  "#818CF8",
+  "#A3E635",
 ] as const
 
+function fallbackPalette(theme: ResolvedTheme): readonly string[] {
+  return theme === "dark" ? CHART_PALETTE_DARK : CHART_PALETTE_LIGHT
+}
+
 export function getChartColors(theme: ResolvedTheme = "light"): string[] {
-  return theme === "dark" ? [...CHART_PALETTE_DARK] : [...CHART_PALETTE_LIGHT]
+  const fallbacks = fallbackPalette(theme)
+
+  return CHART_COLOR_VARS.map((cssVar, index) =>
+    readCssVar(cssVar, fallbacks[index])
+  )
 }
 
 export function getChartColor(

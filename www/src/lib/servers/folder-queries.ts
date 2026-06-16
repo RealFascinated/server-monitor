@@ -1,6 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query"
 
 import type { ServerFolderResponse } from "@/lib/api/user/folders"
+import { userServerFoldersQueryKey } from "@/lib/api/user/folders.queries"
 
 export function invalidateServerFoldersIfNeeded(
   queryClient: QueryClient,
@@ -10,10 +11,9 @@ export function invalidateServerFoldersIfNeeded(
     return
   }
 
-  const folders = queryClient.getQueryData<ServerFolderResponse[]>([
-    "user",
-    "server-folders",
-  ])
+  const folders = queryClient.getQueryData<ServerFolderResponse[]>(
+    userServerFoldersQueryKey
+  )
 
   const alreadyKnown = folders?.some(
     (folder) =>
@@ -24,7 +24,7 @@ export function invalidateServerFoldersIfNeeded(
 
   if (!alreadyKnown) {
     void queryClient.invalidateQueries({
-      queryKey: ["user", "server-folders"],
+      queryKey: userServerFoldersQueryKey,
     })
   }
 }

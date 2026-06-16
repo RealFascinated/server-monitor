@@ -71,7 +71,7 @@ const navItemClassName = (isActive: boolean, depth: number) =>
     "flex w-full items-center gap-1 rounded-sm py-1 text-left text-xs leading-snug transition-colors",
     depth > 0 ? "pr-2" : "px-2",
     isActive
-      ? "bg-neutral-200/90 font-medium text-foreground dark:bg-monitor-gray-200 dark:text-warning"
+      ? "bg-muted/90 font-medium text-foreground dark:text-warning"
       : "text-muted-foreground hover:bg-muted/80 hover:text-foreground"
   )
 

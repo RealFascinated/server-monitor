@@ -3,9 +3,8 @@ import { memo } from "react"
 import { MetricStatCard } from "@/components/metrics/metric-stat-card"
 import type { ServerResponse } from "@/lib/api/user/servers"
 import { formatCount, formatPercentValue } from "@/lib/formatter"
-import { percentLevelColorClass } from "@/lib/metrics/percent-level"
+import { percentLevelColorClass, fleetOnlineStatusColorClass, attentionCountColorClass } from "@/lib/metrics/percent-level"
 import { computeFleetSummary } from "@/lib/servers/fleet-summary"
-import { cn } from "@/lib/utils"
 
 function FleetSummaryCardsInner({ servers }: { servers: ServerResponse[] }) {
   const summary = computeFleetSummary(servers)
@@ -40,13 +39,7 @@ function FleetSummaryCardsInner({ servers }: { servers: ServerResponse[] }) {
         formatValue={(value) => `${formatCount(Math.round(value))} online`}
         detail={`${summary.offline} offline · ${summary.pending} pending`}
         animate={false}
-        valueClassName={cn(
-          summary.online > 0 && summary.offline === 0
-            ? "text-[#2E9470] dark:text-green-400"
-            : summary.online === 0
-              ? "text-[#C44E4E] dark:text-error"
-              : undefined
-        )}
+        valueClassName={fleetOnlineStatusColorClass(summary.online, summary.offline)}
       />
       <MetricStatCard
         title="Avg CPU"
@@ -81,11 +74,7 @@ function FleetSummaryCardsInner({ servers }: { servers: ServerResponse[] }) {
         value={attentionCount}
         formatValue={(value) => formatCount(Math.round(value))}
         detail={attentionDetail}
-        valueClassName={cn(
-          attentionCount === 0
-            ? "text-[#2E9470] dark:text-green-400"
-            : "text-[#B8870A] dark:text-warning"
-        )}
+        valueClassName={attentionCountColorClass(attentionCount)}
         animate={false}
       />
     </div>

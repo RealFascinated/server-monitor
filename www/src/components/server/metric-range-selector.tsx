@@ -64,7 +64,7 @@ const MOBILE_QUICK_RANGE_ICONS: Record<
 }
 
 const toolbarIconButtonClassName =
-  "flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-white/70 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60 dark:hover:bg-monitor-gray-300/60 dark:hover:text-white"
+  "flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-card/70 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60 dark:hover:bg-accent/60 dark:hover:text-foreground"
 
 const toolbarLabeledButtonClassName =
   "flex h-7 shrink-0 items-center gap-1.5 rounded-sm px-2 text-xs font-medium transition-colors"
@@ -350,8 +350,8 @@ function MetricRangeSelector({
               toolbarLabeledButtonClassName,
               "min-w-0 flex-1 justify-center sm:hidden",
               isActive
-                ? "bg-white text-monitor shadow-sm dark:bg-monitor-gray-300 dark:text-warning"
-                : "text-muted-foreground hover:bg-white/70 hover:text-foreground dark:hover:bg-monitor-gray-300/60 dark:hover:text-white"
+                ? "bg-card text-monitor shadow-sm dark:bg-accent dark:text-warning"
+                : "text-muted-foreground hover:bg-card/70 hover:text-foreground dark:hover:bg-accent/60 dark:hover:text-foreground"
             )}
           >
             <QuickRangeIcon className="size-3.5 shrink-0" aria-hidden />
@@ -369,8 +369,8 @@ function MetricRangeSelector({
               toolbarLabeledButtonClassName,
               "max-w-56 min-w-0 shrink cursor-pointer",
               isQuickRangeActive
-                ? "text-muted-foreground hover:bg-white/70 hover:text-foreground sm:bg-white sm:text-monitor sm:shadow-sm dark:hover:bg-monitor-gray-300/60 dark:hover:text-white dark:sm:bg-monitor-gray-300 dark:sm:text-warning"
-                : "bg-white text-monitor shadow-sm hover:bg-white/90 dark:bg-monitor-gray-300 dark:text-warning dark:hover:bg-monitor-gray-300/90"
+                ? "text-muted-foreground hover:bg-card/70 hover:text-foreground sm:bg-card sm:text-monitor sm:shadow-sm dark:hover:bg-accent/60 dark:hover:text-foreground dark:sm:bg-accent dark:sm:text-warning"
+                : "bg-card text-monitor shadow-sm hover:bg-card/90 dark:bg-accent dark:text-warning dark:hover:bg-accent/90"
             )}
           >
             <Clock className="size-3.5 shrink-0" />
@@ -405,7 +405,7 @@ function MetricRangeSelector({
           aria-label={`Refresh interval: ${activeRefreshInterval.label}`}
           className={cn(
             toolbarLabeledButtonClassName,
-            "hidden w-fit border-0 bg-transparent text-muted-foreground shadow-none hover:bg-white/70 hover:text-foreground focus-visible:ring-1 sm:flex dark:hover:bg-monitor-gray-300/60 dark:hover:text-white [&_svg]:size-3.5"
+            "hidden w-fit border-0 bg-transparent text-muted-foreground shadow-none hover:bg-card/70 hover:text-foreground focus-visible:ring-1 sm:flex dark:hover:bg-accent/60 dark:hover:text-foreground [&_svg]:size-3.5"
           )}
         >
           <Timer className="size-3.5 shrink-0 opacity-70" aria-hidden />

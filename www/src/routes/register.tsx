@@ -17,6 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { isRegistrationEnabled } from "@/lib/api/settings"
+import { getApiErrorMessage, getApiErrorTitle } from "@/lib/api/error-message"
 import { publicSettingsQueryOptions } from "@/lib/api/settings.queries"
 import { useAuth } from "@/lib/auth"
 import { pageTitle } from "@/lib/page-title"
@@ -39,6 +40,7 @@ function RegisterPage() {
     data: settings,
     isPending: settingsPending,
     isError: settingsError,
+    error: settingsLoadError,
   } = useQuery(publicSettingsQueryOptions())
 
   useEffect(() => {
@@ -52,13 +54,22 @@ function RegisterPage() {
   }
 
   if (settingsError) {
+    const errorTitle = settingsLoadError
+      ? getApiErrorTitle(settingsLoadError, "Could not load registration status")
+      : "Could not load registration status"
+    const errorMessage = settingsLoadError
+      ? getApiErrorMessage(
+          settingsLoadError,
+          "Try refreshing the page. If the problem continues, contact an administrator."
+        )
+      : "Try refreshing the page. If the problem continues, contact an administrator."
+
     return (
       <AuthPageShell>
         <Card className="motion-auth-card w-full max-w-md">
           <CardContent className="pt-6">
-            <Callout type="danger" title="Could not load registration status">
-              Try refreshing the page. If the problem continues, contact an
-              administrator.
+            <Callout type="danger" title={errorTitle}>
+              {errorMessage}
             </Callout>
           </CardContent>
         </Card>

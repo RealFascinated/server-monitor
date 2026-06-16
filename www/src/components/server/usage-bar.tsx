@@ -12,7 +12,7 @@ import { PENDING_NO_METRIC_DATA } from "@/lib/tooltips/copy"
 import { cn } from "@/lib/utils"
 
 const barFillClasses: Record<PercentLevel, string> = {
-  unknown: "bg-neutral-400 dark:bg-neutral-500",
+  unknown: "bg-muted-foreground/50",
   normal: "bg-[#2E9470] dark:bg-green-400",
   warning: "bg-[#B8870A] dark:bg-warning",
   critical: "bg-[#C44E4E] dark:bg-error",
@@ -40,7 +40,7 @@ function UsageBar({
       <span className="w-8 shrink-0 text-xs text-muted-foreground">
         {label}
       </span>
-      <div className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-neutral-200 dark:bg-monitor-gray-300">
+      <div className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-muted">
         <div
           className={cn("h-full rounded-full", barFillClasses[level])}
           style={{ width: `${width}%` }}

@@ -1,14 +1,11 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 
 import { Spinner } from "@/components/spinner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { renameServer } from "@/lib/api/user/servers"
-import { updateServerInCaches } from "@/lib/api/user/servers.queries"
-import { MAX_SERVER_NAME_LENGTH, validateServerName } from "@/lib/server-name"
-import { toastMutationError, toastSuccess } from "@/lib/toast"
+import { useRenameServer } from "@/hooks/use-rename-server"
+import { MAX_SERVER_NAME_LENGTH } from "@/lib/server-name"
 
 type RenameServerFormProps = {
   serverId: number
@@ -16,59 +13,24 @@ type RenameServerFormProps = {
 }
 
 function RenameServerForm({ serverId, currentName }: RenameServerFormProps) {
-  const [name, setName] = useState(currentName)
-  const [fieldError, setFieldError] = useState<string | null>(null)
-  const inputId = `rename-server-name-${serverId}`
+  const {
+    name,
+    setName,
+    fieldError,
+    setFieldError,
+    inputId,
+    mutation,
+    resetForm,
+    submit,
+    canSave,
+  } = useRenameServer({ serverId, currentName })
 
   useEffect(() => {
-    setName(currentName)
-    setFieldError(null)
-  }, [currentName])
-
-  const queryClient = useQueryClient()
-
-  const mutation = useMutation({
-    mutationFn: (nextName: string) =>
-      renameServer(serverId, { name: nextName }),
-    onSuccess: (server) => {
-      updateServerInCaches(queryClient, server)
-      setFieldError(null)
-      toastSuccess("Server renamed")
-    },
-    onError: (error) => {
-      toastMutationError(
-        "Could not rename server",
-        error,
-        "Failed to rename server"
-      )
-    },
-  })
-
-  const trimmedName = name.trim()
-  const isUnchanged = trimmedName === currentName
-  const validationError = validateServerName(name)
-  const canSave =
-    !mutation.isPending && !isUnchanged && validationError === null
-
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-
-    const error = validateServerName(name)
-    if (error) {
-      setFieldError(error)
-      return
-    }
-
-    if (trimmedName === currentName) {
-      return
-    }
-
-    setFieldError(null)
-    mutation.mutate(trimmedName)
-  }
+    resetForm()
+  }, [currentName, resetForm])
 
   return (
-    <form onSubmit={handleSubmit} className="flex max-w-md flex-col gap-2">
+    <form onSubmit={submit} className="flex max-w-md flex-col gap-2">
       <Label htmlFor={inputId}>Name</Label>
       <div className="flex gap-2">
         <Input
