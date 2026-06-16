@@ -114,8 +114,11 @@ export function formatCompactCount(value: number, fractionDigits?: number): stri
   }
 
   const sign = value < 0 ? "-" : ""
-  const decimals = fractionDigits ?? (size >= 10 || unitIndex === 0 ? 0 : 1)
-  return `${sign}${formatDecimal(size, decimals)}${units[unitIndex]}`
+  const decimals = fractionDigits ?? (unitIndex === 0 ? 0 : 2)
+  const formatted = new Intl.NumberFormat(undefined, {
+    maximumFractionDigits: decimals,
+  }).format(size)
+  return `${sign}${formatted}${units[unitIndex]}`
 }
 
 export function formatPerMinute(value: number): string {

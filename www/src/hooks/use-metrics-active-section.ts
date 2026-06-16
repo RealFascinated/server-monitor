@@ -89,10 +89,13 @@ function useMetricsActiveSection(
   }, [syncActiveSection, sectionIdsKey])
 
   useEffect(() => {
-    const firstId = leaves[0]?.id ?? ""
-    activeIdRef.current = firstId
-    setActiveId(firstId)
-  }, [sectionIdsKey, leaves])
+    const leafIds = new Set(leavesRef.current.map((leaf) => leaf.id))
+    if (activeIdRef.current && leafIds.has(activeIdRef.current)) {
+      return
+    }
+
+    syncActiveSection()
+  }, [sectionIdsKey, syncActiveSection])
 
   const scrollToSection = useCallback(
     (id: string, behavior: ScrollBehavior = "smooth") => {
