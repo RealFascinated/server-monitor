@@ -26,6 +26,7 @@ import cc.fascinated.monitor.model.persistance.metric.IngestTokenRow;
 import cc.fascinated.monitor.repository.ServerIngestTokenRepository;
 import cc.fascinated.monitor.repository.ServerRepository;
 import cc.fascinated.monitor.util.AuthUtils;
+import cc.fascinated.monitor.util.Semver;
 import cc.fascinated.monitor.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -90,8 +91,7 @@ public class ServerIngestService {
         Instant now = Instant.now();
         ServerStatus previousStatus = server.getStatus();
 
-        // todo: verify agent version
-        server.setAgentVersion(metrics.agentVersion());
+        server.setAgentVersion(Semver.parse(metrics.agentVersion()).toString());
 
         ServerDetails serverDetails = metrics.serverDetails();
         ServerInventoryRow inventory = getOrCreateInventory(server);
