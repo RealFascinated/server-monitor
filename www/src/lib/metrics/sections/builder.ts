@@ -11,6 +11,7 @@ import type {
 type LeafInput = {
   id?: string
   title: string
+  sectionKind?: string
   navLabel?: string
   navPercent?: number | null
   navPercentTooltip?: string
@@ -31,6 +32,7 @@ function createLeaf(input: LeafInput): MetricsSectionLeaf {
     kind: "leaf",
     id: input.id ?? metricSectionId(input.title),
     title: input.title,
+    sectionKind: input.sectionKind,
     navLabel: input.navLabel,
     navPercent: input.navPercent,
     navPercentTooltip: input.navPercentTooltip,

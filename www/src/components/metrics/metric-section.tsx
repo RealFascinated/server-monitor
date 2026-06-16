@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 type MetricSectionProps = {
   id: string
   title: string
+  sectionKind?: string
   icon: LucideIcon
   description?: string
   render: () => ReactNode
@@ -15,6 +16,7 @@ type MetricSectionProps = {
 function MetricSection({
   id,
   title,
+  sectionKind,
   icon: Icon,
   description,
   render,
@@ -35,12 +37,24 @@ function MetricSection({
               "dark:bg-warning"
             )}
           />
-          <h2 className="flex items-center gap-2 text-lg font-bold text-foreground">
+          <h2 className="flex items-center gap-2 text-lg text-foreground">
             <Icon
               className="size-4 shrink-0 text-muted-foreground"
               aria-hidden
             />
-            {title}
+            {sectionKind ? (
+              <>
+                <span className="font-semibold text-muted-foreground">
+                  {sectionKind}
+                </span>
+                <span className="font-normal text-muted-foreground/50" aria-hidden>
+                  –
+                </span>
+                <span className="font-bold">{title}</span>
+              </>
+            ) : (
+              <span className="font-bold">{title}</span>
+            )}
           </h2>
         </div>
         {description ? (

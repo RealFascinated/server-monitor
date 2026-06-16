@@ -102,7 +102,8 @@ function buildServerMetricSections(
 
       addChartSection(group, {
         id: metricSectionId(`disk-${disk.disk}`),
-        title: `Disk ${disk.disk}`,
+        sectionKind: "Disk",
+        title: disk.disk,
         navLabel: disk.disk,
         navPercent: getLatestValue(disk.usagePercent),
         navPercentTooltip,
@@ -122,7 +123,8 @@ function buildServerMetricSections(
           for (const network of metrics.networks ?? []) {
             addChartSection(interfaces, {
               id: metricSectionId(`network-${network.interface}`),
-              title: `Interface ${network.interface}`,
+              sectionKind: "Interface",
+              title: network.interface,
               navLabel: network.interface,
               icon: Network,
               charts: networkCharts(network),
@@ -145,6 +147,7 @@ function buildServerMetricSections(
     for (const gpu of metrics.gpus ?? []) {
       addChartSection(group, {
         id: metricSectionId(`${gpu.gpu}-${gpu.deviceId}`),
+        sectionKind: "GPU",
         title: gpu.gpu,
         navLabel: gpu.gpu,
         icon: Gpu,
@@ -212,7 +215,8 @@ function buildServerMetricSections(
           for (const pool of metrics.zfsPools ?? []) {
             addChartSection(group, {
               id: metricSectionId(`zfs-pool-${pool.pool}`),
-              title: `ZFS pool ${pool.pool}`,
+              sectionKind: "ZFS pool",
+              title: pool.pool,
               navLabel: pool.pool,
               icon: Database,
               description: `Health: ${pool.health} · Scan: ${pool.scanState}`,

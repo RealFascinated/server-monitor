@@ -5,6 +5,7 @@ type MetricsSectionLeaf = {
   kind: "leaf"
   id: string
   title: string
+  sectionKind?: string
   navLabel?: string
   navPercent?: number | null
   navPercentTooltip?: string

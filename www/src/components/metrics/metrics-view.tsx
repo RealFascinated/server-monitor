@@ -52,6 +52,7 @@ function MetricsView({
                 key={section.id}
                 id={section.id}
                 title={section.title}
+                sectionKind={section.sectionKind}
                 icon={section.icon}
                 description={section.description}
                 render={section.render}
