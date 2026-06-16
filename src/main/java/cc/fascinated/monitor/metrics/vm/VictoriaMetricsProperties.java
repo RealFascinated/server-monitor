@@ -47,4 +47,8 @@ public class VictoriaMetricsProperties {
         }
         return getBaseUrl() + "/api/v1/admin/tsdb/delete_series";
     }
+
+    public String getMetricsUrl() {
+        return getBaseUrl() + "/metrics";
+    }
 }

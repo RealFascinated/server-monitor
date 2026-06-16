@@ -1,7 +1,6 @@
 package cc.fascinated.monitor.metrics.server.series;
 
 import cc.fascinated.monitor.metrics.vm.MetricWriteContext;
-import cc.fascinated.monitor.metrics.server.series.VmGaugeSeries;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 

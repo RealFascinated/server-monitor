@@ -29,6 +29,7 @@ public enum PlatformMetricFamily {
     INGEST_DURATION_SECONDS("monitor_platform_ingest_duration_seconds", PlatformSection.INGEST, false, true),
     INGEST_PAYLOAD_BYTES("monitor_platform_ingest_payload_bytes", PlatformSection.INGEST, false, true),
 
+    VM_STORAGE_SIZE_BYTES("monitor_platform_vm_storage_size_bytes", PlatformSection.VM, false),
     VM_QUERIES_TOTAL("monitor_platform_vm_queries_total", PlatformSection.VM, false),
     VM_QUERY_ERRORS_TOTAL("monitor_platform_vm_query_errors_total", PlatformSection.VM, false),
     VM_QUERY_DURATION_SECONDS("monitor_platform_vm_query_duration_seconds", PlatformSection.VM, false, true),

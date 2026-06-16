@@ -200,6 +200,12 @@ function jvmCharts(jvm: JvmMetrics): MetricChartConfig[] {
 function vmCharts(vm: VmMetrics): MetricChartConfig[] {
   return [
     {
+      title: "Storage size",
+      description: "Total VictoriaMetrics time-series data stored on disk.",
+      series: [chartSeries("Size", vm.vmStorageSizeBytes)],
+      valueFormatter: formatMemoryBytes,
+    },
+    {
       title: "Queries and writes per minute",
       description: "VictoriaMetrics query and write operations per minute.",
       series: [
