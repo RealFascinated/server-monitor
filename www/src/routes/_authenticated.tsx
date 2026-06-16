@@ -17,6 +17,7 @@ import { NotFoundView } from "@/components/not-found-view"
 import { useSidebarWidth } from "@/hooks/use-sidebar-width"
 import { Button } from "@/components/ui/button"
 import { userInvitesQueryOptions } from "@/lib/api/user/invites.queries"
+import { userPreferencesQueryOptions } from "@/lib/api/user/preferences.queries"
 import { userServersQueryOptions } from "@/lib/api/user/servers.queries"
 import { logout, useAuth } from "@/lib/auth"
 import { cn } from "@/lib/utils"
@@ -56,6 +57,7 @@ function AuthenticatedLayout() {
     }
     void queryClient.prefetchQuery(userServersQueryOptions())
     void queryClient.prefetchQuery(userInvitesQueryOptions())
+    void queryClient.prefetchQuery(userPreferencesQueryOptions())
   }, [user, queryClient])
 
   useEffect(() => {
