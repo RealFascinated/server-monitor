@@ -1,6 +1,6 @@
 import { MetricStatCard } from "@/components/metrics/metric-stat-card"
 import type { AdminMetricsResponse } from "@/lib/api/admin/metrics"
-import { formatCount, formatMemoryBytes } from "@/lib/formatter"
+import { formatCompactCount, formatCount, formatMemoryBytes } from "@/lib/formatter"
 import { getLatestValue, hasValues } from "@/lib/metrics/series"
 import { cn } from "@/lib/utils"
 
@@ -88,7 +88,7 @@ function AdminOverviewStats({ metrics }: { metrics: AdminMetricsResponse }) {
         detail={
           vmDatapointCount == null
             ? "Total time-series data stored on disk"
-            : `${formatCount(Math.round(vmDatapointCount))} datapoints stored`
+            : `${formatCompactCount(Math.round(vmDatapointCount))} datapoints stored`
         }
       />
     ) : null,
@@ -97,7 +97,7 @@ function AdminOverviewStats({ metrics }: { metrics: AdminMetricsResponse }) {
         key="vm-datapoints"
         title="VictoriaMetrics datapoints"
         value={vmDatapointCount}
-        formatValue={(value) => formatCount(Math.round(value))}
+        formatValue={(value) => formatCompactCount(Math.round(value))}
         detail="Total samples stored in VictoriaMetrics"
       />
     ) : null,

@@ -103,6 +103,21 @@ export function formatCount(value: number): string {
   }).format(value)
 }
 
+export function formatCompactCount(value: number, fractionDigits?: number): string {
+  const units = ["", "K", "M", "B", "T"]
+  let size = Math.abs(value)
+  let unitIndex = 0
+
+  while (size >= 1000 && unitIndex < units.length - 1) {
+    size /= 1000
+    unitIndex++
+  }
+
+  const sign = value < 0 ? "-" : ""
+  const decimals = fractionDigits ?? (size >= 10 || unitIndex === 0 ? 0 : 1)
+  return `${sign}${formatDecimal(size, decimals)}${units[unitIndex]}`
+}
+
 export function formatPerMinute(value: number): string {
   return `${formatCount(value)}/min`
 }

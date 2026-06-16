@@ -10,6 +10,7 @@ import type {
   VmMetrics,
 } from "@/lib/api/admin/metrics"
 import {
+  formatCompactCount,
   formatCount,
   formatDurationSeconds,
   formatMemoryBytes,
@@ -210,7 +211,7 @@ function vmCharts(vm: VmMetrics): MetricChartConfig[] {
       title: "Datapoint count",
       description: "Total samples stored in VictoriaMetrics.",
       series: [chartSeries("Datapoints", vm.vmDatapointCount)],
-      valueFormatter: formatCount,
+      valueFormatter: formatCompactCount,
       yRange: { autoMin: true },
     },
     {
