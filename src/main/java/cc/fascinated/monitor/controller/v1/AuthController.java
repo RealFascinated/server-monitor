@@ -1,11 +1,14 @@
 package cc.fascinated.monitor.controller.v1;
 
+import cc.fascinated.monitor.model.dto.request.auth.ForgotPasswordRequest;
 import cc.fascinated.monitor.model.dto.request.auth.LoginRequest;
 import cc.fascinated.monitor.model.dto.request.auth.RegisterRequest;
+import cc.fascinated.monitor.model.dto.request.auth.ResetPasswordRequest;
 import cc.fascinated.monitor.model.dto.response.auth.AuthTokenResponse;
 import cc.fascinated.monitor.model.dto.response.auth.UserResponse;
 import cc.fascinated.monitor.model.persistance.UserRow;
 import cc.fascinated.monitor.service.AuthService;
+import cc.fascinated.monitor.service.PasswordService;
 import cc.fascinated.monitor.web.auth.AuthenticatedUser;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -15,9 +18,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/v1/auth")
 public class AuthController {
     private final AuthService authService;
+    private final PasswordService passwordService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, PasswordService passwordService) {
         this.authService = authService;
+        this.passwordService = passwordService;
     }
 
     @PostMapping(value = "/register")
@@ -38,5 +43,15 @@ public class AuthController {
     @GetMapping(value = "/@me")
     public UserResponse me(@AuthenticatedUser UserRow user) {
         return UserResponse.from(user);
+    }
+
+    @PostMapping(value = "/forgot-password")
+    public void forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        this.passwordService.requestPasswordReset(request.email());
+    }
+
+    @PostMapping(value = "/reset-password")
+    public void resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        this.passwordService.resetPassword(request.token(), request.password());
     }
 }

@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query"
 import { LogIn, UserRoundX } from "lucide-react"
 import { useEffect } from "react"
 
+import { AuthPageFooter, AuthPageLink } from "@/components/auth-page-footer"
 import { Callout } from "@/components/callout"
 import { LoadingState } from "@/components/loading-state"
 import { AuthForm } from "@/components/auth-form"
@@ -103,15 +104,10 @@ function RegisterPage() {
         </CardHeader>
         <CardContent>
           <AuthForm mode="register" />
-          <p className="pt-4 text-sm text-muted-foreground">
+          <AuthPageFooter>
             Already have an account?{" "}
-            <Link
-              to="/login"
-              className="font-medium text-monitor dark:text-warning"
-            >
-              Sign in
-            </Link>
-          </p>
+            <AuthPageLink to="/login">Sign in</AuthPageLink>
+          </AuthPageFooter>
         </CardContent>
       </Card>
     </AuthPageShell>

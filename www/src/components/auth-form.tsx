@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useNavigate } from "@tanstack/react-router"
+import { Link, useNavigate } from "@tanstack/react-router"
 
 import { Callout } from "@/components/callout"
 import { Spinner } from "@/components/spinner"
@@ -92,7 +92,17 @@ function AuthForm({ mode }: AuthFormProps) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="password">Password</Label>
+        <div className="flex items-center justify-between gap-3">
+          <Label htmlFor="password">Password</Label>
+          {mode === "login" ? (
+            <Link
+              to="/forgot-password"
+              className="text-xs font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            >
+              Forgot password?
+            </Link>
+          ) : null}
+        </div>
         <Input
           id="password"
           type="password"

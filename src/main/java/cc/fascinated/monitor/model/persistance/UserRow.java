@@ -27,6 +27,7 @@ public class UserRow {
     private UserRole role;
 
     @Column(name = "password_hash", nullable = false)
+    @Setter
     private String passwordHash;
 
     @Column(name = "created_at", nullable = false)

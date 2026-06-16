@@ -12,4 +12,8 @@ public interface UserSessionRepository extends JpaRepository<UserSessionRow, Lon
     long countByExpiresAtAfter(Instant now);
 
     void deleteByTokenHash(String tokenHash);
+
+    void deleteByUserId(long userId);
+
+    void deleteByUserIdAndTokenHashNot(long userId, String tokenHash);
 }

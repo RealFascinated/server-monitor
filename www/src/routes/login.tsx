@@ -1,7 +1,8 @@
-import { Link, createFileRoute, useNavigate } from "@tanstack/react-router"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useQuery } from "@tanstack/react-query"
 import { useEffect } from "react"
 
+import { AuthPageFooter, AuthPageLink } from "@/components/auth-page-footer"
 import { LoadingState } from "@/components/loading-state"
 import { AuthForm } from "@/components/auth-form"
 import { AuthPageShell } from "@/components/auth-page-shell"
@@ -58,15 +59,9 @@ function LoginPage() {
         <CardContent>
           <AuthForm mode="login" />
           {registrationEnabled ? (
-            <p className="pt-4 text-sm text-muted-foreground">
-              No account?{" "}
-              <Link
-                to="/register"
-                className="font-medium text-monitor dark:text-warning"
-              >
-                Create one
-              </Link>
-            </p>
+            <AuthPageFooter>
+              No account? <AuthPageLink to="/register">Create one</AuthPageLink>
+            </AuthPageFooter>
           ) : null}
         </CardContent>
       </Card>

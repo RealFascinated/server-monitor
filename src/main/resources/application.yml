@@ -44,6 +44,7 @@ spring:
     locations: classpath:db/migration
 
 monitor:
+  website-url: http://localhost:5173
   agent:
     github-owner: RealFascinated
     github-repo: server-monitor
@@ -59,6 +60,15 @@ monitor:
   metrics:
     enabled: true
     refresh-interval: 30s
+  mail:
+    enabled: false
+    host: localhost
+    port: 1025
+    username: ""
+    password: ""
+    tls: false
+    ssl: false
+    from: Monitor <noreply@localhost>
 
 logging:
   pattern:
