@@ -3,7 +3,7 @@ package cc.fascinated.monitor.web.auth;
 import cc.fascinated.monitor.exception.impl.ForbiddenException;
 import cc.fascinated.monitor.model.domain.user.UserRole;
 import cc.fascinated.monitor.model.persistance.UserRow;
-import cc.fascinated.monitor.service.AuthService;
+import cc.fascinated.monitor.service.SessionService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.NonNull;
 import org.springframework.core.MethodParameter;
@@ -15,10 +15,10 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
 public class AuthenticatedAdminArgumentResolver implements HandlerMethodArgumentResolver {
-    private final AuthService authService;
+    private final SessionService sessionService;
 
-    public AuthenticatedAdminArgumentResolver(AuthService authService) {
-        this.authService = authService;
+    public AuthenticatedAdminArgumentResolver(SessionService sessionService) {
+        this.sessionService = sessionService;
     }
 
     @Override
@@ -32,7 +32,7 @@ public class AuthenticatedAdminArgumentResolver implements HandlerMethodArgument
                                   NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
         HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
         String authorization = request != null ? request.getHeader("Authorization") : null;
-        UserRow user = this.authService.authenticate(authorization);
+        UserRow user = this.sessionService.authenticate(authorization);
         if (user.getRole() != UserRole.ADMIN) {
             throw new ForbiddenException("Admin access required");
         }

@@ -1,7 +1,7 @@
 package cc.fascinated.monitor.web.auth;
 
 import cc.fascinated.monitor.model.persistance.UserRow;
-import cc.fascinated.monitor.service.AuthService;
+import cc.fascinated.monitor.service.SessionService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.NonNull;
 import org.springframework.core.MethodParameter;
@@ -13,10 +13,10 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
 public class AuthenticatedUserArgumentResolver implements HandlerMethodArgumentResolver {
-    private final AuthService authService;
+    private final SessionService sessionService;
 
-    public AuthenticatedUserArgumentResolver(AuthService authService) {
-        this.authService = authService;
+    public AuthenticatedUserArgumentResolver(SessionService sessionService) {
+        this.sessionService = sessionService;
     }
 
     @Override
@@ -30,6 +30,6 @@ public class AuthenticatedUserArgumentResolver implements HandlerMethodArgumentR
                                   NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
         HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
         String authorization = request != null ? request.getHeader("Authorization") : null;
-        return this.authService.authenticate(authorization);
+        return this.sessionService.authenticate(authorization);
     }
 }

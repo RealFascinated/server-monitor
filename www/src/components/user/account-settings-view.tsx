@@ -6,6 +6,7 @@ import { SettingsPreferenceRow } from "@/components/settings/settings-preference
 import { SettingsSectionHeader } from "@/components/settings/settings-section-header"
 import { ThemeSwitcher } from "@/components/theme-switcher"
 import { ChangePasswordForm } from "@/components/user/change-password-form"
+import { UserSessionsSection } from "@/components/user/user-sessions-section"
 import { UserRoleBadge } from "@/components/user/user-role-badge"
 import { Input } from "@/components/ui/input"
 import { SettingsToggle } from "@/components/ui/settings-toggle"
@@ -130,9 +131,10 @@ function AccountSettingsView({ user }: AccountSettingsViewProps) {
       <section className="flex flex-col gap-4">
         <SettingsSectionHeader
           title="Security"
-          description="Update your sign-in password."
+          description="Update your sign-in password and manage active sessions."
         />
         <ChangePasswordForm />
+        <UserSessionsSection />
       </section>
 
       <section className="flex flex-col gap-4">

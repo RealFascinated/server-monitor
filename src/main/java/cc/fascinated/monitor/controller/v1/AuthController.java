@@ -9,6 +9,7 @@ import cc.fascinated.monitor.model.dto.response.auth.UserResponse;
 import cc.fascinated.monitor.model.persistance.UserRow;
 import cc.fascinated.monitor.service.AuthService;
 import cc.fascinated.monitor.service.PasswordService;
+import cc.fascinated.monitor.service.SessionService;
 import cc.fascinated.monitor.web.auth.AuthenticatedUser;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -19,10 +20,16 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthService authService;
     private final PasswordService passwordService;
+    private final SessionService sessionService;
 
-    public AuthController(AuthService authService, PasswordService passwordService) {
+    public AuthController(
+            AuthService authService,
+            PasswordService passwordService,
+            SessionService sessionService
+    ) {
         this.authService = authService;
         this.passwordService = passwordService;
+        this.sessionService = sessionService;
     }
 
     @PostMapping(value = "/register")
@@ -37,7 +44,7 @@ public class AuthController {
 
     @PostMapping(value = "/logout")
     public void logout(HttpServletRequest request) {
-        this.authService.logout(request.getHeader("Authorization"));
+        this.sessionService.logout(request.getHeader("Authorization"));
     }
 
     @GetMapping(value = "/@me")

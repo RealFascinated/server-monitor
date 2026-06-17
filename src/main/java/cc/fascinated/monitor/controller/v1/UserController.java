@@ -8,14 +8,17 @@ import cc.fascinated.monitor.model.dto.response.server.access.ServerInvitePrevie
 import cc.fascinated.monitor.model.dto.response.server.access.ServerMemberResponse;
 import cc.fascinated.monitor.model.dto.response.server.access.UserPendingInviteResponse;
 import cc.fascinated.monitor.model.dto.response.metrics.ServerMetricsResponse;
+import cc.fascinated.monitor.model.dto.response.user.UserSessionResponse;
 import cc.fascinated.monitor.model.persistance.UserRow;
 import cc.fascinated.monitor.server.ServerService;
 import cc.fascinated.monitor.server.access.ServerAccessService;
 import cc.fascinated.monitor.service.PasswordService;
+import cc.fascinated.monitor.service.SessionService;
 import cc.fascinated.monitor.util.AuthUtils;
 import cc.fascinated.monitor.web.auth.AuthenticatedUser;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,15 +36,53 @@ public class UserController {
     private final ServerService serverService;
     private final ServerAccessService serverAccessService;
     private final PasswordService passwordService;
+    private final SessionService sessionService;
 
     public UserController(
             ServerService serverService,
             ServerAccessService serverAccessService,
-            PasswordService passwordService
+            PasswordService passwordService,
+            SessionService sessionService
     ) {
         this.serverService = serverService;
         this.serverAccessService = serverAccessService;
         this.passwordService = passwordService;
+        this.sessionService = sessionService;
+    }
+
+    @GetMapping(value = "/sessions")
+    public List<UserSessionResponse> listSessions(
+            @AuthenticatedUser UserRow user,
+            HttpServletRequest request
+    ) {
+        return this.sessionService.listSessions(
+                user,
+                AuthUtils.extractBearerValue(request.getHeader("Authorization"))
+        );
+    }
+
+    @DeleteMapping(value = "/sessions/others")
+    public void revokeOtherSessions(
+            @AuthenticatedUser UserRow user,
+            HttpServletRequest request
+    ) {
+        this.sessionService.revokeOtherSessions(
+                user,
+                AuthUtils.extractBearerValue(request.getHeader("Authorization"))
+        );
+    }
+
+    @DeleteMapping(value = "/sessions/{sessionId}")
+    public void revokeSession(
+            @AuthenticatedUser UserRow user,
+            HttpServletRequest request,
+            @PathVariable long sessionId
+    ) {
+        this.sessionService.revokeSession(
+                user,
+                sessionId,
+                AuthUtils.extractBearerValue(request.getHeader("Authorization"))
+        );
     }
 
     @PatchMapping(value = "/password")

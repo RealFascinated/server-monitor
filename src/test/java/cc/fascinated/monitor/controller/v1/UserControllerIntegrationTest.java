@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 
 import org.springframework.http.MediaType;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -52,6 +53,87 @@ class UserControllerIntegrationTest extends IntegrationTestBase {
     @Test
     void requiresAuthentication() throws Exception {
         this.mockMvc.perform(get("/v1/user/servers"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void listsActiveSessions() throws Exception {
+        String email = TestAuthSupport.uniqueEmail("sessions");
+        var firstSession = this.auth.register(email, PASSWORD);
+        var secondSession = this.auth.login(email, PASSWORD);
+
+        this.mockMvc.perform(get("/v1/user/sessions")
+                        .header("Authorization", TestAuthSupport.bearer(firstSession.token())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].current").value(true))
+                .andExpect(jsonPath("$[1].current").value(false));
+
+        this.mockMvc.perform(get("/v1/user/sessions")
+                        .header("Authorization", TestAuthSupport.bearer(secondSession.token())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].current").value(true))
+                .andExpect(jsonPath("$[1].current").value(false));
+    }
+
+    @Test
+    void revokesAnotherSession() throws Exception {
+        String email = TestAuthSupport.uniqueEmail("revoke-session");
+        var firstSession = this.auth.register(email, PASSWORD);
+        var secondSession = this.auth.login(email, PASSWORD);
+
+        long otherSessionId = this.objectMapper.readTree(this.mockMvc.perform(get("/v1/user/sessions")
+                        .header("Authorization", TestAuthSupport.bearer(firstSession.token())))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString()).get(1).get("id").asLong();
+
+        this.mockMvc.perform(delete("/v1/user/sessions/{sessionId}", otherSessionId)
+                        .header("Authorization", TestAuthSupport.bearer(firstSession.token())))
+                .andExpect(status().isOk());
+
+        this.mockMvc.perform(get("/v1/auth/@me")
+                        .header("Authorization", TestAuthSupport.bearer(firstSession.token())))
+                .andExpect(status().isOk());
+
+        this.mockMvc.perform(get("/v1/auth/@me")
+                        .header("Authorization", TestAuthSupport.bearer(secondSession.token())))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void rejectsRevokingCurrentSession() throws Exception {
+        var session = this.auth.register(TestAuthSupport.uniqueEmail("revoke-current"), PASSWORD);
+        long sessionId = this.objectMapper.readTree(this.mockMvc.perform(get("/v1/user/sessions")
+                        .header("Authorization", TestAuthSupport.bearer(session.token())))
+                .andReturn()
+                .getResponse()
+                .getContentAsString()).get(0).get("id").asLong();
+
+        this.mockMvc.perform(delete("/v1/user/sessions/{sessionId}", sessionId)
+                        .header("Authorization", TestAuthSupport.bearer(session.token())))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Cannot revoke the current session"));
+    }
+
+    @Test
+    void revokesOtherSessions() throws Exception {
+        String email = TestAuthSupport.uniqueEmail("revoke-others");
+        var firstSession = this.auth.register(email, PASSWORD);
+        var secondSession = this.auth.login(email, PASSWORD);
+        this.auth.login(email, PASSWORD);
+
+        this.mockMvc.perform(delete("/v1/user/sessions/others")
+                        .header("Authorization", TestAuthSupport.bearer(firstSession.token())))
+                .andExpect(status().isOk());
+
+        this.mockMvc.perform(get("/v1/auth/@me")
+                        .header("Authorization", TestAuthSupport.bearer(firstSession.token())))
+                .andExpect(status().isOk());
+
+        this.mockMvc.perform(get("/v1/auth/@me")
+                        .header("Authorization", TestAuthSupport.bearer(secondSession.token())))
                 .andExpect(status().isUnauthorized());
     }
 
