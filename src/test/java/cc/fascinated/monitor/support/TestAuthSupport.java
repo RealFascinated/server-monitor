@@ -13,6 +13,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public final class TestAuthSupport {
+    public static final String TEST_USER_AGENT =
+            "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0";
+
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
 
@@ -23,6 +26,7 @@ public final class TestAuthSupport {
 
     public AuthTokenResponse register(String email, String password) throws Exception {
         MvcResult result = this.mockMvc.perform(post("/v1/auth/register")
+                        .header("User-Agent", TEST_USER_AGENT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"email":"%s","password":"%s"}
@@ -34,6 +38,7 @@ public final class TestAuthSupport {
 
     public AuthTokenResponse login(String email, String password) throws Exception {
         MvcResult result = this.mockMvc.perform(post("/v1/auth/login")
+                        .header("User-Agent", TEST_USER_AGENT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"email":"%s","password":"%s"}

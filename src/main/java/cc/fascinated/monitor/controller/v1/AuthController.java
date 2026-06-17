@@ -33,13 +33,19 @@ public class AuthController {
     }
 
     @PostMapping(value = "/register")
-    public AuthTokenResponse register(@Valid @RequestBody RegisterRequest request) {
-        return this.authService.register(request);
+    public AuthTokenResponse register(
+            @Valid @RequestBody RegisterRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        return this.authService.register(request, httpRequest);
     }
 
     @PostMapping(value = "/login")
-    public AuthTokenResponse login(@Valid @RequestBody LoginRequest request) {
-        return this.authService.login(request);
+    public AuthTokenResponse login(
+            @Valid @RequestBody LoginRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        return this.authService.login(request, httpRequest);
     }
 
     @PostMapping(value = "/logout")

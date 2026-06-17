@@ -4,7 +4,7 @@ import { LogOut, Monitor, Trash2 } from "lucide-react"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { QueryStatusShell } from "@/components/query-status-shell"
 import { SettingsSubsectionHeader } from "@/components/settings/settings-subsection-header"
-import { TimestampCell } from "@/components/timestamp-cell"
+import { SimpleTooltip } from "@/components/simple-tooltip"
 import { Button } from "@/components/ui/button"
 import {
   revokeOtherUserSessions,
@@ -12,6 +12,7 @@ import {
 } from "@/lib/api/user/sessions"
 import type { UserSession } from "@/lib/api/user/sessions"
 import { userSessionsQueryKey, userSessionsQueryOptions } from "@/lib/api/user/sessions.queries"
+import { formatRelativeTime } from "@/lib/formatter"
 import { toastMutationError, toastSuccess } from "@/lib/toast"
 import { cn } from "@/lib/utils"
 
@@ -101,6 +102,18 @@ function RevokeOtherSessionsButton({ disabled }: { disabled: boolean }) {
   )
 }
 
+function sessionDeviceLabel(session: UserSession) {
+  return session.deviceLabel ?? "Unknown device"
+}
+
+function sessionSubtitle(session: UserSession) {
+  const signedIn = `Signed in ${formatRelativeTime(session.createdAt)}`
+  if (session.locationLabel) {
+    return `${session.locationLabel} · ${signedIn}`
+  }
+  return signedIn
+}
+
 function UserSessionsSection() {
   const sessionsQuery = useQuery(userSessionsQueryOptions())
   const sessions = sessionsQuery.data ?? []
@@ -157,7 +170,7 @@ function UserSessionsSection() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="text-sm font-medium">
-                      {session.current ? "This device" : "Other device"}
+                      {sessionDeviceLabel(session)}
                     </p>
                     {session.current ? (
                       <span className="rounded-sm bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-primary uppercase">
@@ -165,11 +178,11 @@ function UserSessionsSection() {
                       </span>
                     ) : null}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Signed in <TimestampCell iso={session.createdAt} />
-                    {" · "}
-                    Expires <TimestampCell iso={session.expiresAt} />
-                  </p>
+                  <SimpleTooltip content={sessionSubtitle(session)}>
+                    <p className="text-xs text-muted-foreground">
+                      {sessionSubtitle(session)}
+                    </p>
+                  </SimpleTooltip>
                 </div>
 
                 {session.current ? null : (

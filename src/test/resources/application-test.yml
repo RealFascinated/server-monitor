@@ -4,6 +4,7 @@ spring:
       enabled: false
 
 monitor:
+  encryption-secret: "0123456789abcdef0123456789abcdef"
   metrics:
     enabled: false
   mail:

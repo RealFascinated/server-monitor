@@ -27,10 +27,25 @@ public class UserSessionRow {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-    public UserSessionRow(Long userId, String tokenHash, Instant expiresAt, Instant createdAt) {
+    @Column(name = "ip_encrypted")
+    private String ipEncrypted;
+
+    @Column(name = "user_agent")
+    private String userAgent;
+
+    public UserSessionRow(
+            Long userId,
+            String tokenHash,
+            Instant expiresAt,
+            Instant createdAt,
+            String ipEncrypted,
+            String userAgent
+    ) {
         this.userId = userId;
         this.tokenHash = tokenHash;
         this.expiresAt = expiresAt;
         this.createdAt = createdAt;
+        this.ipEncrypted = ipEncrypted;
+        this.userAgent = userAgent;
     }
 }

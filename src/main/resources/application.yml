@@ -45,6 +45,10 @@ spring:
 
 monitor:
   website-url: http://localhost:5173
+  encryption-secret: "set_me"
+  maxmind:
+    license: ""
+    database-dir: work/geoip
   agent:
     github-owner: RealFascinated
     github-repo: server-monitor

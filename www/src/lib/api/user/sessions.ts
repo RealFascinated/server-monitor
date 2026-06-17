@@ -5,6 +5,8 @@ export type UserSession = {
   createdAt: string
   expiresAt: string
   current: boolean
+  deviceLabel: string | null
+  locationLabel: string | null
 }
 
 export function listUserSessions(): Promise<UserSession[]> {

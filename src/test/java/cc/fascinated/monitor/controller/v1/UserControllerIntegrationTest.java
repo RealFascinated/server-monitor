@@ -67,7 +67,8 @@ class UserControllerIntegrationTest extends IntegrationTestBase {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].current").value(true))
-                .andExpect(jsonPath("$[1].current").value(false));
+                .andExpect(jsonPath("$[1].current").value(false))
+                .andExpect(jsonPath("$[0].deviceLabel").value("Firefox on Linux"));
 
         this.mockMvc.perform(get("/v1/user/sessions")
                         .header("Authorization", TestAuthSupport.bearer(secondSession.token())))

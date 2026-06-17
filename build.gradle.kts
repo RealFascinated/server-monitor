@@ -36,6 +36,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.security:spring-security-crypto")
 
+    implementation("com.github.ua-parser:uap-java:1.6.1")
+    implementation("com.maxmind.geoip2:geoip2:4.2.1")
+    implementation("org.apache.commons:commons-compress:1.27.1")
+
     compileOnly("org.jetbrains:annotations:26.0.2")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")

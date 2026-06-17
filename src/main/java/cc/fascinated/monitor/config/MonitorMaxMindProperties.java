@@ -6,8 +6,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "monitor")
-public class MonitorProperties {
-    private String websiteUrl = "http://localhost:5173";
-    private String encryptionSecret = "";
+@ConfigurationProperties(prefix = "monitor.maxmind")
+public class MonitorMaxMindProperties {
+    private String license = "";
+    private String databaseDir = "work/geoip";
 }
