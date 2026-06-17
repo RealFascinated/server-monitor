@@ -1,11 +1,10 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation } from "@tanstack/react-query"
 import { LogOut } from "lucide-react"
 
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { Button } from "@/components/ui/button"
+import { useRemoveServerFromUser } from "@/hooks/use-remove-server-from-user"
 import { leaveServer } from "@/lib/api/user/access"
-import { serverAccessQueryKey } from "@/lib/api/user/access.queries"
-import { removeServerFromCaches } from "@/lib/api/user/servers.queries"
 import { SETTINGS_TOOLTIPS } from "@/lib/tooltips/copy"
 import { toastMutationError, toastSuccess } from "@/lib/toast"
 
@@ -20,13 +19,12 @@ function LeaveServerButton({
   serverName,
   onLeft,
 }: LeaveServerButtonProps) {
-  const queryClient = useQueryClient()
+  const { removeFromCaches } = useRemoveServerFromUser(serverId)
 
   const mutation = useMutation({
     mutationFn: () => leaveServer(serverId),
     onSuccess: async () => {
-      removeServerFromCaches(queryClient, serverId)
-      queryClient.removeQueries({ queryKey: serverAccessQueryKey(serverId) })
+      removeFromCaches()
       toastSuccess("Left server")
       onLeft?.()
     },

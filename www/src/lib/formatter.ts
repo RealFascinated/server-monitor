@@ -178,6 +178,10 @@ function isWithinRelativeTimeThreshold(iso: string): boolean {
   )
 }
 
+export function formatServerRole(role: string): string {
+  return role.charAt(0) + role.slice(1).toLowerCase()
+}
+
 export function formatDate(iso: string): string {
   if (isWithinRelativeTimeThreshold(iso)) {
     return formatRelativeTime(iso)

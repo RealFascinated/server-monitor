@@ -10,8 +10,7 @@ import {
   getServerTableColumns,
 } from "@/components/user/server-table-columns"
 import { ServersFolderTable } from "@/components/user/servers-folder-table"
-import { AsyncContent } from "@/components/animated-content"
-import { Callout } from "@/components/callout"
+import { QueryStatusShell } from "@/components/query-status-shell"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useMetricDefaultRange } from "@/hooks/use-metric-default-range"
@@ -97,8 +96,7 @@ function ServersTable() {
     folders.length > 0 &&
     filteredUngroupedIds.length === 0
 
-  const errorMessage = error instanceof Error ? error.message : null
-  const isLoading = (isPending || foldersPending) && !errorMessage
+  const isLoading = (isPending || foldersPending) && !error
   const canOrganize = folders.length > 0 && serverIds.length > 0
   const canReorderFolders = folders.length > 1
   const showEditMode =
@@ -137,14 +135,14 @@ function ServersTable() {
         </div>
       </div>
 
-      {errorMessage ? (
-        <Callout type="danger" title="Could not load servers">
-          {errorMessage}
-        </Callout>
-      ) : null}
-
-      <AsyncContent loading={isLoading} loadingMessage="Loading servers…">
-        <div className="flex flex-col gap-6">
+      <QueryStatusShell
+        error={error}
+        isPending={isLoading}
+        loadingMessage="Loading servers…"
+        fallbackMessage="Failed to load servers"
+        fallbackTitle="Could not load servers"
+        className="flex flex-col gap-6"
+      >
           {servers.length > 0 ? <FleetSummaryCards servers={servers} /> : null}
 
           {editMode && (canOrganize || canReorderFolders) ? (
@@ -228,8 +226,7 @@ function ServersTable() {
               ) : null}
             </div>
           ) : null}
-        </div>
-      </AsyncContent>
+      </QueryStatusShell>
     </div>
   )
 }

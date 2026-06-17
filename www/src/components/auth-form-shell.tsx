@@ -1,4 +1,5 @@
 import { Callout } from "@/components/callout"
+import { FormFieldError } from "@/components/form-field-error"
 import { Spinner } from "@/components/spinner"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -65,9 +66,7 @@ function AuthFormField({ id, label, error, children }: AuthFormFieldProps) {
         label
       )}
       {children}
-      {error ? (
-        <p className="text-xs font-bold text-error">{error}</p>
-      ) : null}
+      {error ? <FormFieldError error={error} /> : null}
     </div>
   )
 }

@@ -6,7 +6,7 @@ import { AuthFormField, AuthFormShell } from "@/components/auth-form-shell"
 import { Input } from "@/components/ui/input"
 import { useAuthForm } from "@/hooks/use-auth-form"
 import { resetPassword } from "@/lib/api/auth/password"
-import { validateNewPassword } from "@/lib/auth/validation"
+import { validateNewPassword, validatePasswordConfirmation } from "@/lib/auth/validation"
 import { toastMutationError, toastSuccess } from "@/lib/toast"
 
 type ResetPasswordFormProps = {
@@ -36,8 +36,9 @@ function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     event.preventDefault()
     clearFieldErrors()
 
-    if (password !== confirmPassword) {
-      setFieldErrors({ confirmPassword: "Passwords do not match" })
+    const confirmError = validatePasswordConfirmation(password, confirmPassword)
+    if (confirmError) {
+      setFieldErrors({ confirmPassword: confirmError })
       return
     }
 

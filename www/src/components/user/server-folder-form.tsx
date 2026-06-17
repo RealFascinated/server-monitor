@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { useEffect, useId, useState } from "react"
 
+import { FormFieldError } from "@/components/form-field-error"
 import { Spinner } from "@/components/spinner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -143,9 +144,7 @@ function ServerFolderForm({
           Remove from folder
         </Button>
       ) : null}
-      {fieldError ? (
-        <p className="text-xs font-bold text-error">{fieldError}</p>
-      ) : null}
+      <FormFieldError error={fieldError} />
     </form>
   )
 }

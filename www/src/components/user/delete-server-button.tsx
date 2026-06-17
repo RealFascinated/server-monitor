@@ -1,12 +1,11 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation } from "@tanstack/react-query"
 import { Trash2 } from "lucide-react"
 
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { Button } from "@/components/ui/button"
+import { useRemoveServerFromUser } from "@/hooks/use-remove-server-from-user"
 import { SETTINGS_TOOLTIPS } from "@/lib/tooltips/copy"
 import { deleteServer } from "@/lib/api/user/servers"
-import { serverAccessQueryKey } from "@/lib/api/user/access.queries"
-import { removeServerFromCaches } from "@/lib/api/user/servers.queries"
 import { toastMutationError, toastSuccess } from "@/lib/toast"
 
 type DeleteServerButtonProps = {
@@ -22,13 +21,12 @@ function DeleteServerButton({
   onDeleted,
   variant = "icon",
 }: DeleteServerButtonProps) {
-  const queryClient = useQueryClient()
+  const { removeFromCaches } = useRemoveServerFromUser(serverId)
 
   const mutation = useMutation({
     mutationFn: () => deleteServer(serverId),
     onSuccess: async () => {
-      removeServerFromCaches(queryClient, serverId)
-      queryClient.removeQueries({ queryKey: serverAccessQueryKey(serverId) })
+      removeFromCaches()
       toastSuccess("Server deleted")
       onDeleted?.()
     },

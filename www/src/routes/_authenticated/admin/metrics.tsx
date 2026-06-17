@@ -4,10 +4,8 @@ import { useCallback } from "react"
 
 import { AdminMetricsHeader } from "@/components/admin/admin-metrics-header"
 import { AdminMetricsView } from "@/components/admin/admin-metrics-view"
-import { AsyncContent } from "@/components/animated-content"
-import { Callout } from "@/components/callout"
+import { QueryStatusShell } from "@/components/query-status-shell"
 import { adminMetricsQueryOptions } from "@/lib/api/admin/metrics.queries"
-import { getApiErrorMessage, getApiErrorTitle } from "@/lib/api/error-message"
 import { loadCachedQuery } from "@/lib/api/query-loader"
 import { useMetricRefreshInterval } from "@/hooks/use-metric-refresh-interval"
 import { authenticatedPageSectionClassName } from "@/lib/layout"
@@ -45,13 +43,6 @@ function AdminMetricsPage() {
     error,
   } = useQuery(adminMetricsQueryOptions(timeWindow, refreshInterval))
 
-  const errorMessage = error
-    ? getApiErrorMessage(error, "Failed to load admin metrics")
-    : null
-  const errorTitle = error
-    ? getApiErrorTitle(error, "Could not load metrics")
-    : null
-
   const handleZoomToRange = useCallback(
     (from: number, to: number) => {
       navigate({
@@ -75,17 +66,14 @@ function AdminMetricsPage() {
         isRefreshing={isFetching}
       />
 
-      {errorMessage ? (
-        <Callout type="danger" title={errorTitle ?? "Could not load metrics"}>
-          {errorMessage}
-        </Callout>
-      ) : null}
-
-      <AsyncContent
-        loading={isPending && !errorMessage}
+      <QueryStatusShell
+        error={error}
+        isPending={isPending}
         loadingMessage="Loading metrics…"
+        fallbackMessage="Failed to load admin metrics"
+        fallbackTitle="Could not load metrics"
       >
-        {metrics && dataWindow && !errorMessage ? (
+        {metrics && dataWindow ? (
           <AdminMetricsView
             metrics={metrics}
             timeWindow={timeWindow}
@@ -94,7 +82,7 @@ function AdminMetricsPage() {
             zoomDisabled={isFetching}
           />
         ) : null}
-      </AsyncContent>
+      </QueryStatusShell>
     </section>
   )
 }

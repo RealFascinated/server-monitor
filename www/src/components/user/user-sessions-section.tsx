@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { LogOut, Trash2 } from "lucide-react"
+import { LogOut, Monitor, Trash2 } from "lucide-react"
 
-import { AsyncContent } from "@/components/animated-content"
-import { Callout } from "@/components/callout"
 import { ConfirmDialog } from "@/components/confirm-dialog"
-import { SimpleTooltip } from "@/components/simple-tooltip"
+import { QueryStatusShell } from "@/components/query-status-shell"
+import { SettingsSubsectionHeader } from "@/components/settings/settings-subsection-header"
+import { TimestampCell } from "@/components/timestamp-cell"
 import { Button } from "@/components/ui/button"
 import {
   revokeOtherUserSessions,
@@ -12,10 +12,13 @@ import {
 } from "@/lib/api/user/sessions"
 import type { UserSession } from "@/lib/api/user/sessions"
 import { userSessionsQueryKey, userSessionsQueryOptions } from "@/lib/api/user/sessions.queries"
-import { getApiErrorMessage, getApiErrorTitle } from "@/lib/api/error-message"
-import { formatDate, formatDateWithRelative } from "@/lib/formatter"
 import { toastMutationError, toastSuccess } from "@/lib/toast"
 import { cn } from "@/lib/utils"
+
+function sessionCountLabel(count: number) {
+  if (count === 1) return "1 active session"
+  return `${count} active sessions`
+}
 
 function RevokeSessionButton({ session }: { session: UserSession }) {
   const queryClient = useQueryClient()
@@ -38,7 +41,7 @@ function RevokeSessionButton({ session }: { session: UserSession }) {
           type="button"
           variant="ghost"
           size="icon-sm"
-          className="text-muted-foreground hover:bg-transparent hover:text-red-600 dark:hover:text-red-400"
+          className="text-muted-foreground hover:bg-transparent hover:text-error"
           aria-label="Revoke session"
         >
           <Trash2 className="size-4" />
@@ -84,7 +87,7 @@ function RevokeOtherSessionsButton({ disabled }: { disabled: boolean }) {
           disabled={disabled || mutation.isPending}
         >
           <LogOut className="size-4" />
-          Sign out other devices
+          Sign out others
         </Button>
       }
       title="Sign out other devices"
@@ -102,79 +105,81 @@ function UserSessionsSection() {
   const sessionsQuery = useQuery(userSessionsQueryOptions())
   const sessions = sessionsQuery.data ?? []
   const otherSessions = sessions.filter((session) => !session.current)
-  const errorMessage = sessionsQuery.error
-    ? getApiErrorMessage(sessionsQuery.error, "Failed to load sessions")
-    : null
-  const errorTitle = sessionsQuery.error
-    ? getApiErrorTitle(sessionsQuery.error, "Could not load sessions")
-    : null
+  const sessionDescription =
+    sessions.length > 0
+      ? sessionCountLabel(sessions.length)
+      : "Devices currently signed in to your account."
 
   return (
-    <div className="flex max-w-xl flex-col gap-4">
-      {errorMessage ? (
-        <Callout type="danger" title={errorTitle ?? "Could not load sessions"}>
-          {errorMessage}
-        </Callout>
-      ) : null}
+    <div className="flex flex-col gap-3">
+      <SettingsSubsectionHeader
+        title="Active sessions"
+        description={sessionDescription}
+        action={
+          !sessionsQuery.error && !sessionsQuery.isPending ? (
+            <RevokeOtherSessionsButton disabled={otherSessions.length === 0} />
+          ) : null
+        }
+      />
 
-      {!errorMessage ? (
-        <AsyncContent
-          loading={sessionsQuery.isPending}
-          loadingMessage="Loading sessions…"
-        >
-          {sessions.length === 0 ? (
+      <QueryStatusShell
+        error={sessionsQuery.error}
+        isPending={sessionsQuery.isPending}
+        loadingMessage="Loading sessions…"
+        fallbackMessage="Failed to load sessions"
+        fallbackTitle="Could not load sessions"
+      >
+        {sessions.length === 0 ? (
+          <div className="rounded-sm border border-dashed border-border bg-muted/30 px-4 py-6 text-center">
             <p className="text-sm text-muted-foreground">No active sessions.</p>
-          ) : (
-            <ul className="flex flex-col gap-2">
-              {sessions.map((session) => (
-                <li
-                  key={session.id}
+          </div>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {sessions.map((session) => (
+              <li
+                key={session.id}
+                className={cn(
+                  "flex items-center gap-3 rounded-sm border border-border bg-card px-3 py-2.5",
+                  session.current && "border-primary/30 bg-primary/5"
+                )}
+              >
+                <div
                   className={cn(
-                    "flex items-center justify-between gap-3 rounded-sm border border-border bg-background px-3 py-2",
-                    session.current && "border-primary/30"
+                    "flex size-8 shrink-0 items-center justify-center rounded-sm",
+                    session.current
+                      ? "bg-primary/10 text-primary"
+                      : "bg-muted text-muted-foreground"
                   )}
                 >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-medium">
-                        {session.current ? "This device" : "Signed-in device"}
-                      </p>
-                      {session.current ? (
-                        <span className="bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">
-                          Current
-                        </span>
-                      ) : null}
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      <SimpleTooltip
-                        content={formatDateWithRelative(session.createdAt)}
-                      >
-                        <span className="cursor-help">
-                          Signed in {formatDate(session.createdAt)}
-                        </span>
-                      </SimpleTooltip>
-                      {" · "}
-                      <SimpleTooltip
-                        content={formatDateWithRelative(session.expiresAt)}
-                      >
-                        <span className="cursor-help">
-                          Expires {formatDate(session.expiresAt)}
-                        </span>
-                      </SimpleTooltip>
+                  <Monitor className="size-4" />
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-sm font-medium">
+                      {session.current ? "This device" : "Other device"}
                     </p>
+                    {session.current ? (
+                      <span className="rounded-sm bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-primary uppercase">
+                        Current
+                      </span>
+                    ) : null}
                   </div>
+                  <p className="text-xs text-muted-foreground">
+                    Signed in <TimestampCell iso={session.createdAt} />
+                    {" · "}
+                    Expires <TimestampCell iso={session.expiresAt} />
+                  </p>
+                </div>
 
-                  {session.current ? null : (
-                    <RevokeSessionButton session={session} />
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
-        </AsyncContent>
-      ) : null}
-
-      <RevokeOtherSessionsButton disabled={otherSessions.length === 0} />
+                {session.current ? null : (
+                  <RevokeSessionButton session={session} />
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </QueryStatusShell>
     </div>
   )
 }

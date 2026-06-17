@@ -1,13 +1,12 @@
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 
-import { AsyncContent } from "@/components/animated-content"
 import { Callout } from "@/components/callout"
+import { QueryStatusShell } from "@/components/query-status-shell"
 import { ServerIncidentsHeader } from "@/components/server/server-incidents-header"
 import { ServerIncidentsView } from "@/components/server/server-incidents-view"
 import { useUserServer } from "@/hooks/use-user-server"
 import { serverIncidentsQueryOptions } from "@/lib/api/user/incidents.queries"
-import { getApiErrorMessage, getApiErrorTitle } from "@/lib/api/error-message"
 import { loadCachedQuery } from "@/lib/api/query-loader"
 import { hasPermission, ServerPermission } from "@/lib/api/user/permissions"
 import type { ServerResponse } from "@/lib/api/user/servers"
@@ -62,13 +61,6 @@ function ServerIncidentsPage() {
     enabled: canViewIncidents,
   })
 
-  const errorMessage = error
-    ? getApiErrorMessage(error, "Failed to load incidents")
-    : null
-  const errorTitle = error
-    ? getApiErrorTitle(error, "Could not load incidents")
-    : null
-
   function handlePageChange(page: number) {
     navigate({
       to: "/servers/$serverId/incidents",
@@ -98,17 +90,14 @@ function ServerIncidentsPage() {
           </Callout>
         ) : null}
 
-        {errorMessage ? (
-          <Callout type="danger" title={errorTitle ?? "Could not load incidents"}>
-            {errorMessage}
-          </Callout>
-        ) : null}
-
-        <AsyncContent
-          loading={canViewIncidents && isPending && !errorMessage}
+        <QueryStatusShell
+          error={canViewIncidents ? error : null}
+          isPending={canViewIncidents && isPending}
           loadingMessage="Loading incidents…"
+          fallbackMessage="Failed to load incidents"
+          fallbackTitle="Could not load incidents"
         >
-          {canViewIncidents && incidentsPage && !errorMessage ? (
+          {canViewIncidents && incidentsPage ? (
             <ServerIncidentsView
               page={incidentsPage}
               pagination={pagination}
@@ -116,7 +105,7 @@ function ServerIncidentsPage() {
               onPageSizeChange={handlePageSizeChange}
             />
           ) : null}
-        </AsyncContent>
+        </QueryStatusShell>
       </div>
     </section>
   )

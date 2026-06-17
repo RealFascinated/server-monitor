@@ -1,6 +1,4 @@
-import { useMutation } from "@tanstack/react-query"
 import { AlertTriangle, Terminal } from "lucide-react"
-import { useState } from "react"
 
 import { AgentInstallPanel } from "@/components/server/agent-install-panel"
 import { AgentVersionLabel } from "@/components/server/agent-version-label"
@@ -8,13 +6,12 @@ import { ServerStatusBadge } from "@/components/server/server-status-badge"
 import { SimpleTooltip } from "@/components/simple-tooltip"
 import { Spinner } from "@/components/spinner"
 import { Button } from "@/components/ui/button"
-import { rotateIngestToken } from "@/lib/api/user/servers"
+import { useRotateIngestToken } from "@/hooks/use-rotate-ingest-token"
 import type { ServerStatus } from "@/lib/api/user/servers"
 import {
   SERVER_TABLE_COLUMN_TOOLTIPS,
   SETTINGS_TOOLTIPS,
 } from "@/lib/tooltips/copy"
-import { toastMutationError, toastSuccess } from "@/lib/toast"
 
 type ServerIngestTokenSectionProps = {
   serverId: number
@@ -27,26 +24,11 @@ function ServerIngestTokenSection({
   status,
   agentVersion,
 }: ServerIngestTokenSectionProps) {
-  const [ingestToken, setIngestToken] = useState<string | null>(null)
-
-  const mutation = useMutation({
-    mutationFn: () => rotateIngestToken(serverId),
-    onSuccess: (response) => {
-      setIngestToken(response.ingestToken)
-      toastSuccess("Token rotated")
-    },
-    onError: (error) => {
-      toastMutationError(
-        "Could not rotate ingest token",
-        error,
-        "Failed to rotate ingest token"
-      )
-    },
+  const { ingestToken, mutation } = useRotateIngestToken({
+    serverId,
+    errorTitle: "Could not rotate ingest token",
+    errorFallback: "Failed to rotate ingest token",
   })
-
-  function handleRotate() {
-    mutation.mutate()
-  }
 
   return (
     <div className="overflow-hidden rounded-sm border border-border">
@@ -80,7 +62,7 @@ function ServerIngestTokenSection({
                   size="sm"
                   className="shrink-0 cursor-help"
                   disabled={mutation.isPending}
-                  onClick={handleRotate}
+                  onClick={() => mutation.mutate()}
                 >
                   {mutation.isPending ? (
                     <Spinner />

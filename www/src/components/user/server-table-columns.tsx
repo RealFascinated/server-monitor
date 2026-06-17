@@ -12,9 +12,8 @@ import {
 } from "@/components/server/usage-percent"
 import { ServerStatusBadge } from "@/components/server/server-status-badge"
 import { SimpleTooltip, TableHeaderTooltip } from "@/components/simple-tooltip"
+import { TimestampCell } from "@/components/timestamp-cell"
 import {
-  formatDate,
-  formatDateWithRelative,
   formatUptime,
   formatUptimeDetailed,
   formatUptimePercent30d,
@@ -212,11 +211,7 @@ export function getServerTableColumns(
       ),
       meta: {
         className: "text-muted-foreground",
-        renderServer: (server) => (
-          <SimpleTooltip content={formatDateWithRelative(server.createdAt)}>
-            <span className="cursor-help">{formatDate(server.createdAt)}</span>
-          </SimpleTooltip>
-        ),
+        renderServer: (server) => <TimestampCell iso={server.createdAt} />,
       },
     },
   ]

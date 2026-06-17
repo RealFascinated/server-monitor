@@ -3,8 +3,8 @@ import { Link } from "@tanstack/react-router"
 import { Plus } from "lucide-react"
 import { useState } from "react"
 
-import { AgentInstallPanel } from "@/components/server/agent-install-panel"
-import { WaitingForServerData } from "@/components/server/waiting-for-server-data"
+import { AgentSetupPanel } from "@/components/server/agent-setup-panel"
+import { FormFieldError } from "@/components/form-field-error"
 import { Spinner } from "@/components/spinner"
 import { Button } from "@/components/ui/button"
 import {
@@ -165,9 +165,10 @@ function CreateServerDialog({
               </DialogDescription>
             </DialogHeader>
 
-            <WaitingForServerData serverId={createdServer.serverId} />
-
-            <AgentInstallPanel ingestToken={createdServer.ingestToken} />
+            <AgentSetupPanel
+              serverId={createdServer.serverId}
+              ingestToken={createdServer.ingestToken}
+            />
 
             <DialogFooter>
               <Button
@@ -213,9 +214,7 @@ function CreateServerDialog({
                   required
                   autoFocus
                 />
-                {fieldError ? (
-                  <p className="text-xs font-bold text-error">{fieldError}</p>
-                ) : null}
+                <FormFieldError error={fieldError} />
               </div>
 
               <div className="flex flex-col gap-2">
@@ -270,9 +269,7 @@ function CreateServerDialog({
                     autoFocus
                   />
                 ) : null}
-                {folderError ? (
-                  <p className="text-xs font-bold text-error">{folderError}</p>
-                ) : null}
+                <FormFieldError error={folderError} />
               </div>
             </div>
 

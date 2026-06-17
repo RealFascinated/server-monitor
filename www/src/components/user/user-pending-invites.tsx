@@ -1,35 +1,20 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
 import {
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
 import type { ColumnDef, SortingState } from "@tanstack/react-table"
-import { useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
-import { AsyncContent } from "@/components/animated-content"
-import { Callout } from "@/components/callout"
-import { SimpleTooltip, TableHeaderTooltip } from "@/components/simple-tooltip"
+import { buildInviteTableColumns } from "@/components/invite-table-columns"
+import { QueryStatusShell } from "@/components/query-status-shell"
 import { Spinner } from "@/components/spinner"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/data-table"
-import { useMetricDefaultRange } from "@/hooks/use-metric-default-range"
+import { useAcceptServerInvite } from "@/hooks/use-accept-server-invite"
 import { useUserInvites } from "@/hooks/use-user-invites"
 import { acceptServerInviteById } from "@/lib/api/user/invites"
 import type { UserPendingInvite } from "@/lib/api/user/invites"
-import { getApiErrorMessage, getApiErrorTitle } from "@/lib/api/error-message"
-import { userInvitesQueryKey } from "@/lib/api/user/invites.queries"
-import { userServersQueryKey } from "@/lib/api/user/servers.queries"
-import { formatDate, formatDateWithRelative } from "@/lib/formatter"
-import { toastMutationError } from "@/lib/toast"
-import {
-  INVITE_EXPIRY_TOOLTIP,
-  SERVER_ROLE_TOOLTIPS,
-} from "@/lib/tooltips/copy"
-
-function formatRole(role: string): string {
-  return role.charAt(0) + role.slice(1).toLowerCase()
-}
+import { SERVER_ROLE_TOOLTIPS } from "@/lib/tooltips/copy"
 
 function AcceptInviteButton({
   inviteId,
@@ -38,30 +23,9 @@ function AcceptInviteButton({
   inviteId: number
   serverName: string
 }) {
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
-  const { defaultRange } = useMetricDefaultRange()
-
-  const mutation = useMutation({
+  const mutation = useAcceptServerInvite({
     mutationFn: () => acceptServerInviteById(inviteId),
-    onSuccess: async (member) => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: userServersQueryKey }),
-        queryClient.invalidateQueries({ queryKey: userInvitesQueryKey }),
-      ])
-      await navigate({
-        to: "/servers/$serverId",
-        params: { serverId: String(member.serverId) },
-        search: { range: defaultRange },
-      })
-    },
-    onError: (mutationError) => {
-      toastMutationError(
-        `Could not accept invite to ${serverName}`,
-        mutationError,
-        "Failed to accept invite"
-      )
-    },
+    errorServerName: serverName,
   })
 
   return (
@@ -80,7 +44,7 @@ function AcceptInviteButton({
   )
 }
 
-const columns: ColumnDef<UserPendingInvite>[] = [
+const inviteColumns: ColumnDef<UserPendingInvite>[] = [
   {
     accessorKey: "serverName",
     header: "Server",
@@ -93,65 +57,17 @@ const columns: ColumnDef<UserPendingInvite>[] = [
     meta: { className: "text-muted-foreground" },
     cell: ({ row }) => row.original.invitedByEmail,
   },
-  {
-    accessorKey: "role",
-    header: () => (
-      <TableHeaderTooltip label="Role" tooltip={SERVER_ROLE_TOOLTIPS.VIEWER} />
-    ),
-    cell: ({ row }) => (
-      <SimpleTooltip content={SERVER_ROLE_TOOLTIPS.VIEWER}>
-        <span className="cursor-help">{formatRole(row.original.role)}</span>
-      </SimpleTooltip>
-    ),
-  },
-  {
-    accessorKey: "createdAt",
-    header: () => (
-      <TableHeaderTooltip
-        label="Received"
-        tooltip="When the invite was sent to your account."
-      />
-    ),
-    meta: { className: "text-muted-foreground" },
-    cell: ({ row }) => (
-      <SimpleTooltip content={formatDateWithRelative(row.original.createdAt)}>
-        <span className="cursor-help">
-          {formatDate(row.original.createdAt)}
-        </span>
-      </SimpleTooltip>
-    ),
-  },
-  {
-    accessorKey: "expiresAt",
-    header: () => (
-      <TableHeaderTooltip
-        label="Expires"
-        tooltip="Accept the invite before this time."
-      />
-    ),
-    meta: { className: "text-muted-foreground" },
-    cell: ({ row }) => (
-      <SimpleTooltip
-        content={`${INVITE_EXPIRY_TOOLTIP} ${formatDateWithRelative(row.original.expiresAt)}`}
-      >
-        <span className="cursor-help">
-          {formatDate(row.original.expiresAt)}
-        </span>
-      </SimpleTooltip>
-    ),
-  },
-  {
-    id: "actions",
-    enableSorting: false,
-    header: () => <span className="sr-only">Actions</span>,
-    meta: { className: "w-0" },
-    cell: ({ row }) => (
+  ...buildInviteTableColumns<UserPendingInvite>({
+    roleTooltip: SERVER_ROLE_TOOLTIPS.VIEWER,
+    sentTooltip: "When the invite was sent to your account.",
+    expiresTooltip: "Accept the invite before this time.",
+    actionsCell: ({ row }) => (
       <AcceptInviteButton
         inviteId={row.original.inviteId}
         serverName={row.original.serverName}
       />
     ),
-  },
+  }),
 ]
 
 function UserPendingInvites() {
@@ -160,7 +76,7 @@ function UserPendingInvites() {
 
   const table = useReactTable({
     data: invites,
-    columns,
+    columns: inviteColumns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getRowId: (row) => String(row.inviteId),
@@ -168,35 +84,21 @@ function UserPendingInvites() {
     onSortingChange: setSorting,
   })
 
-  const errorMessage = error
-    ? getApiErrorMessage(error, "Failed to load invites")
-    : null
-  const errorTitle = error
-    ? getApiErrorTitle(error, "Could not load invites")
-    : null
-
   return (
-    <div className="flex flex-col gap-3">
-      {errorMessage ? (
-        <Callout type="danger" title={errorTitle ?? "Could not load invites"}>
-          {errorMessage}
-        </Callout>
+    <QueryStatusShell
+      error={error}
+      isPending={isPending}
+      loadingMessage="Loading invites…"
+      fallbackMessage="Failed to load invites"
+      fallbackTitle="Could not load invites"
+      className="flex flex-col gap-3"
+    >
+      {invites.length === 0 ? (
+        <p className="text-muted-foreground">No pending invites.</p>
       ) : null}
 
-      {!errorMessage ? (
-        <AsyncContent
-          loading={isPending}
-          loadingMessage="Loading invites…"
-          className="flex flex-col gap-3"
-        >
-          {invites.length === 0 ? (
-            <p className="text-muted-foreground">No pending invites.</p>
-          ) : null}
-
-          {invites.length > 0 ? <DataTable table={table} /> : null}
-        </AsyncContent>
-      ) : null}
-    </div>
+      {invites.length > 0 ? <DataTable table={table} /> : null}
+    </QueryStatusShell>
   )
 }
 

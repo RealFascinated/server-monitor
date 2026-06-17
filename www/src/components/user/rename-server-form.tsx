@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 
+import { FormFieldError } from "@/components/form-field-error"
 import { Spinner } from "@/components/spinner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -57,9 +58,7 @@ function RenameServerForm({ serverId, currentName }: RenameServerFormProps) {
           Save
         </Button>
       </div>
-      {fieldError ? (
-        <p className="text-xs font-bold text-error">{fieldError}</p>
-      ) : null}
+      <FormFieldError error={fieldError} />
     </form>
   )
 }

@@ -1,10 +1,8 @@
-import { useMutation } from "@tanstack/react-query"
 import { Terminal } from "lucide-react"
 import { useState } from "react"
 
 import { Callout } from "@/components/callout"
-import { AgentInstallPanel } from "@/components/server/agent-install-panel"
-import { WaitingForServerData } from "@/components/server/waiting-for-server-data"
+import { AgentSetupPanel } from "@/components/server/agent-setup-panel"
 import { Spinner } from "@/components/spinner"
 import { Button } from "@/components/ui/button"
 import {
@@ -16,8 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { rotateIngestToken } from "@/lib/api/user/servers"
-import { toastMutationError, toastSuccess } from "@/lib/toast"
+import { useRotateIngestToken } from "@/hooks/use-rotate-ingest-token"
 
 type ServerAgentSetupDialogProps = {
   serverId: number
@@ -29,27 +26,11 @@ function ServerAgentSetupDialog({
   serverName,
 }: ServerAgentSetupDialogProps) {
   const [open, setOpen] = useState(false)
-  const [ingestToken, setIngestToken] = useState<string | null>(null)
-
-  const mutation = useMutation({
-    mutationFn: () => rotateIngestToken(serverId),
-    onSuccess: (response) => {
-      setIngestToken(response.ingestToken)
-      toastSuccess("Token rotated")
-    },
-    onError: (error) => {
-      toastMutationError(
-        "Could not issue ingest token",
-        error,
-        "Failed to issue ingest token"
-      )
-    },
+  const { ingestToken, mutation, resetToken } = useRotateIngestToken({
+    serverId,
+    errorTitle: "Could not issue ingest token",
+    errorFallback: "Failed to issue ingest token",
   })
-
-  function resetState() {
-    setIngestToken(null)
-    mutation.reset()
-  }
 
   function handleOpenChange(nextOpen: boolean) {
     if (mutation.isPending) {
@@ -59,12 +40,8 @@ function ServerAgentSetupDialog({
     setOpen(nextOpen)
 
     if (!nextOpen) {
-      resetState()
+      resetToken()
     }
-  }
-
-  function handleIssueToken() {
-    mutation.mutate()
   }
 
   return (
@@ -89,9 +66,7 @@ function ServerAgentSetupDialog({
               </DialogDescription>
             </DialogHeader>
 
-            <WaitingForServerData serverId={serverId} />
-
-            <AgentInstallPanel ingestToken={ingestToken} />
+            <AgentSetupPanel serverId={serverId} ingestToken={ingestToken} />
 
             <DialogFooter>
               <Button
@@ -132,7 +107,7 @@ function ServerAgentSetupDialog({
                 type="button"
                 variant="highlighted"
                 disabled={mutation.isPending}
-                onClick={handleIssueToken}
+                onClick={() => mutation.mutate()}
               >
                 {mutation.isPending ? <Spinner /> : null}
                 Issue ingest token

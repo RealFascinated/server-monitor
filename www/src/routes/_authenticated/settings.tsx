@@ -19,7 +19,7 @@ function AccountSettingsPage() {
 
   return (
     <section className={authenticatedPageSectionClassName}>
-      <AccountSettingsHeader />
+      <AccountSettingsHeader email={user?.email} />
       <AsyncContent loading={!user} loadingMessage="Loading account…">
         {user ? <AccountSettingsView user={user} /> : null}
       </AsyncContent>

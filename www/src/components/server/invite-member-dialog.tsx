@@ -15,29 +15,15 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormFieldError } from "@/components/form-field-error"
 import { inviteServerMember } from "@/lib/api/user/access"
 import type { ServerInviteCreatedResponse } from "@/lib/api/user/access"
 import { serverAccessQueryKey } from "@/lib/api/user/access.queries"
+import { validateRequiredEmail } from "@/lib/auth/validation"
 import { copyWithToast, toastMutationError, toastSuccess } from "@/lib/toast"
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 type InviteMemberDialogProps = {
   serverId: number
-}
-
-function validateEmail(email: string): string | null {
-  const trimmed = email.trim()
-
-  if (!trimmed) {
-    return "Email is required"
-  }
-
-  if (!EMAIL_PATTERN.test(trimmed)) {
-    return "Enter a valid email address"
-  }
-
-  return null
 }
 
 function buildInviteUrl(invite: ServerInviteCreatedResponse): string {
@@ -101,7 +87,7 @@ function InviteMemberDialog({ serverId }: InviteMemberDialogProps) {
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    const error = validateEmail(email)
+    const error = validateRequiredEmail(email)
     if (error) {
       setFieldError(error)
       return
@@ -198,9 +184,7 @@ function InviteMemberDialog({ serverId }: InviteMemberDialogProps) {
                 autoFocus
                 placeholder="bob@gmail.com"
               />
-              {fieldError ? (
-                <p className="text-xs font-bold text-error">{fieldError}</p>
-              ) : null}
+              <FormFieldError error={fieldError} />
             </div>
 
             <DialogFooter>

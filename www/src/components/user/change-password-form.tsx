@@ -5,7 +5,7 @@ import { AuthFormField, AuthFormShell } from "@/components/auth-form-shell"
 import { Input } from "@/components/ui/input"
 import { useAuthForm } from "@/hooks/use-auth-form"
 import { changePassword } from "@/lib/api/user/account"
-import { validateNewPassword } from "@/lib/auth/validation"
+import { validateNewPassword, validatePasswordConfirmation } from "@/lib/auth/validation"
 import { toastMutationError, toastSuccess } from "@/lib/toast"
 
 function ChangePasswordForm() {
@@ -34,8 +34,12 @@ function ChangePasswordForm() {
     event.preventDefault()
     clearFieldErrors()
 
-    if (newPassword !== confirmPassword) {
-      setFieldErrors({ confirmPassword: "Passwords do not match" })
+    const confirmError = validatePasswordConfirmation(
+      newPassword,
+      confirmPassword
+    )
+    if (confirmError) {
+      setFieldErrors({ confirmPassword: confirmError })
       return
     }
 

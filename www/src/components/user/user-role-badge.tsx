@@ -1,7 +1,10 @@
-import { SimpleTooltip } from "@/components/simple-tooltip"
 import type { UserRole } from "@/lib/auth/types"
-import { USER_ROLE_LABELS, USER_ROLE_TOOLTIPS } from "@/lib/tooltips/copy"
 import { cn } from "@/lib/utils"
+
+const roleLabels: Record<UserRole, string> = {
+  ADMIN: "Admin",
+  USER: "User",
+}
 
 const roleStyles: Record<UserRole, string> = {
   ADMIN:
@@ -11,16 +14,14 @@ const roleStyles: Record<UserRole, string> = {
 
 function UserRoleBadge({ role }: { role: UserRole }) {
   return (
-    <SimpleTooltip content={USER_ROLE_TOOLTIPS[role]}>
-      <span
-        className={cn(
-          "inline-flex w-fit cursor-help items-center rounded-sm px-2 py-0.5 text-xs font-semibold tracking-wide uppercase ring-1 ring-inset",
-          roleStyles[role]
-        )}
-      >
-        {USER_ROLE_LABELS[role]}
-      </span>
-    </SimpleTooltip>
+    <span
+      className={cn(
+        "inline-flex w-fit items-center rounded-sm px-2 py-0.5 text-xs font-semibold tracking-wide uppercase ring-1 ring-inset",
+        roleStyles[role]
+      )}
+    >
+      {roleLabels[role]}
+    </span>
   )
 }
 

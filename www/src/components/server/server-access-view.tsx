@@ -8,9 +8,12 @@ import type { ColumnDef, SortingState } from "@tanstack/react-table"
 import { Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
 
+import { buildInviteTableColumns } from "@/components/invite-table-columns"
 import { ConfirmDialog } from "@/components/confirm-dialog"
-import { SimpleTooltip, TableHeaderTooltip } from "@/components/simple-tooltip"
+import { TableHeaderTooltip } from "@/components/simple-tooltip"
 import { InviteMemberDialog } from "@/components/server/invite-member-dialog"
+import { RoleTag } from "@/components/server/role-tag"
+import { TimestampCell } from "@/components/timestamp-cell"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/data-table"
 import { removeServerMember, revokeServerInvite } from "@/lib/api/user/access"
@@ -20,11 +23,6 @@ import type {
   ServerAccessListResponse,
 } from "@/lib/api/user/access"
 import type { ServerRole } from "@/lib/api/user/servers"
-import { formatDate, formatDateWithRelative } from "@/lib/formatter"
-import {
-  INVITE_EXPIRY_TOOLTIP,
-  SERVER_ROLE_TOOLTIPS,
-} from "@/lib/tooltips/copy"
 import { toastMutationError, toastSuccess } from "@/lib/toast"
 
 type ServerAccessViewProps = {
@@ -39,22 +37,6 @@ type AccessMemberRow = {
   role: ServerRole | "OWNER"
   joinedAt: string | null
   memberUserId: number | null
-}
-
-function formatRole(role: string): string {
-  return role.charAt(0) + role.slice(1).toLowerCase()
-}
-
-function RoleTag({ role }: { role: ServerRole | "OWNER" }) {
-  const tooltip = SERVER_ROLE_TOOLTIPS[role]
-
-  return (
-    <SimpleTooltip content={tooltip}>
-      <span className="cursor-help bg-muted px-2 py-1 text-xs font-bold text-muted-foreground">
-        {formatRole(role)}
-      </span>
-    </SimpleTooltip>
-  )
 }
 
 function RemoveMemberButton({
@@ -230,13 +212,7 @@ function ServerAccessView({
         meta: { className: "text-muted-foreground" },
         cell: ({ row }) =>
           row.original.joinedAt ? (
-            <SimpleTooltip
-              content={formatDateWithRelative(row.original.joinedAt)}
-            >
-              <span className="cursor-help">
-                {formatDate(row.original.joinedAt)}
-              </span>
-            </SimpleTooltip>
+            <TimestampCell iso={row.original.joinedAt} />
           ) : (
             "—"
           ),
@@ -279,67 +255,18 @@ function ServerAccessView({
         meta: { className: "font-bold" },
         cell: ({ row }) => row.original.email,
       },
-      {
-        accessorKey: "role",
-        header: () => (
-          <TableHeaderTooltip
-            label="Role"
-            tooltip="Viewer invites grant read-only access to this server's metrics."
-          />
-        ),
-        cell: ({ row }) => <RoleTag role={row.original.role} />,
-      },
-      {
-        accessorKey: "createdAt",
-        header: () => (
-          <TableHeaderTooltip
-            label="Sent"
-            tooltip="When the invite was created."
-          />
-        ),
-        meta: { className: "text-muted-foreground" },
-        cell: ({ row }) => (
-          <SimpleTooltip
-            content={formatDateWithRelative(row.original.createdAt)}
-          >
-            <span className="cursor-help">
-              {formatDate(row.original.createdAt)}
-            </span>
-          </SimpleTooltip>
-        ),
-      },
-      {
-        accessorKey: "expiresAt",
-        header: () => (
-          <TableHeaderTooltip
-            label="Expires"
-            tooltip="Pending invites stop working after this time."
-          />
-        ),
-        meta: { className: "text-muted-foreground" },
-        cell: ({ row }) => (
-          <SimpleTooltip
-            content={`${INVITE_EXPIRY_TOOLTIP} ${formatDateWithRelative(row.original.expiresAt)}`}
-          >
-            <span className="cursor-help">
-              {formatDate(row.original.expiresAt)}
-            </span>
-          </SimpleTooltip>
-        ),
-      },
-      {
-        id: "actions",
-        enableSorting: false,
-        header: () => <span className="sr-only">Actions</span>,
-        meta: { className: "w-0" },
-        cell: ({ row }) => (
+      ...buildInviteTableColumns<PendingServerInvite>({
+        roleTooltip:
+          "Viewer invites grant read-only access to this server's metrics.",
+        sentTooltip: "When the invite was created.",
+        actionsCell: ({ row }) => (
           <RevokeInviteButton
             serverId={serverId}
             inviteId={row.original.inviteId}
             inviteEmail={row.original.email}
           />
         ),
-      },
+      }),
     ],
     [serverId]
   )

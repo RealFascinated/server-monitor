@@ -2,8 +2,8 @@ import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useCallback, useDeferredValue, useEffect } from "react"
 
-import { AsyncContent } from "@/components/animated-content"
 import { Callout } from "@/components/callout"
+import { QueryStatusShell } from "@/components/query-status-shell"
 import { ServerAgentSetupDialog } from "@/components/server/server-agent-setup-dialog"
 import { ServerMetricsHeader } from "@/components/server/server-metrics-header"
 import { ServerMetricsView } from "@/components/server/server-metrics-view"
@@ -11,7 +11,6 @@ import { ServerOfflineBanner } from "@/components/server/server-offline-banner"
 import { useUserServer } from "@/hooks/use-user-server"
 import { useMetricRefreshInterval } from "@/hooks/use-metric-refresh-interval"
 import { userServerMetricsQueryOptions } from "@/lib/api/user/metrics.queries"
-import { getApiErrorMessage, getApiErrorTitle } from "@/lib/api/error-message"
 import { loadCachedQuery } from "@/lib/api/query-loader"
 import { hasPermission, ServerPermission } from "@/lib/api/user/permissions"
 import { authenticatedPageSectionClassName } from "@/lib/layout"
@@ -60,12 +59,9 @@ function ServerMetricsPage() {
       ? deferredMetrics
       : undefined
 
-  const errorMessage = error
-    ? getApiErrorMessage(error, "Failed to load server metrics")
-    : null
-  const errorTitle = error
-    ? getApiErrorTitle(error, "Could not load metrics")
-    : null
+  const showLoading =
+    (isPending && !metricsForServer) ||
+    (metricsForServer != null && !readyMetrics)
 
   const handleZoomToRange = useCallback(
     (from: number, to: number) => {
@@ -78,10 +74,6 @@ function ServerMetricsPage() {
     },
     [navigate, numericServerId]
   )
-
-  const showLoading =
-    (isPending && !metricsForServer && !errorMessage) ||
-    (metricsForServer != null && !readyMetrics)
 
   useEffect(() => {
     window.scrollTo({ top: 0 })
@@ -128,17 +120,14 @@ function ServerMetricsPage() {
           </Callout>
         ) : null}
 
-        {errorMessage ? (
-          <Callout type="danger" title={errorTitle ?? "Could not load metrics"}>
-            {errorMessage}
-          </Callout>
-        ) : null}
-
-        <AsyncContent
-          loading={showLoading && !errorMessage}
+        <QueryStatusShell
+          error={error}
+          isPending={showLoading}
           loadingMessage="Loading metrics…"
+          fallbackMessage="Failed to load server metrics"
+          fallbackTitle="Could not load metrics"
         >
-          {readyMetrics && !errorMessage ? (
+          {readyMetrics ? (
             <ServerMetricsView
               metrics={readyMetrics}
               timeWindow={timeWindow}
@@ -147,7 +136,7 @@ function ServerMetricsPage() {
               zoomDisabled={isFetching}
             />
           ) : null}
-        </AsyncContent>
+        </QueryStatusShell>
       </div>
     </section>
   )

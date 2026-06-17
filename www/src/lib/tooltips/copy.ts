@@ -1,5 +1,4 @@
 import type { ServerStatus, ServerRole } from "@/lib/api/user/servers"
-import type { UserRole } from "@/lib/auth/types"
 
 export const PENDING_NO_METRIC_DATA =
   "No data yet. The agent may be offline or still connecting."
@@ -28,16 +27,6 @@ export const SERVER_TABLE_COLUMN_TOOLTIPS = {
     "Monitor Agent version installed on the host. Shows — when the agent has not reported a version.",
   created: "When this server was registered in Monitor.",
 } as const
-
-export const USER_ROLE_TOOLTIPS: Record<UserRole, string> = {
-  ADMIN: "Can manage all servers and users across the account.",
-  USER: "Can access servers shared with this account.",
-}
-
-export const USER_ROLE_LABELS: Record<UserRole, string> = {
-  ADMIN: "Admin",
-  USER: "User",
-}
 
 export const SERVER_ROLE_TOOLTIPS: Record<ServerRole | "OWNER", string> = {
   OWNER: "Full control: rename, delete, rotate tokens, and manage access.",

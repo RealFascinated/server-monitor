@@ -2,7 +2,11 @@ import { User } from "lucide-react"
 
 import { PageHeader } from "@/components/page-header"
 
-function AccountSettingsHeader() {
+type AccountSettingsHeaderProps = {
+  email?: string
+}
+
+function AccountSettingsHeader({ email }: AccountSettingsHeaderProps) {
   return (
     <PageHeader
       sticky
@@ -12,7 +16,15 @@ function AccountSettingsHeader() {
       ]}
       icon={User}
       title="Account"
-      description="Your profile and personal preferences."
+      subtitle={
+        email ? (
+          <p className="truncate text-sm text-foreground">{email}</p>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            Your profile, security, and personal preferences.
+          </p>
+        )
+      }
     />
   )
 }

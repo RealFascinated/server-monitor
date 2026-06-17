@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router"
 import { useQuery } from "@tanstack/react-query"
-import { useEffect, useState } from "react"
 
 import { Callout } from "@/components/callout"
+import { useLiveNow } from "@/hooks/use-live-now"
 import { serverOpenIncidentQueryOptions } from "@/lib/api/user/incidents.queries"
 import type { ServerStatus } from "@/lib/api/user/servers"
 import { userServerStatusQueryOptions } from "@/lib/api/user/servers.queries"
@@ -23,21 +23,7 @@ function ServerOfflineBanner({ serverId, status }: ServerOfflineBannerProps) {
     enabled: status === "OFFLINE",
   })
 
-  const [now, setNow] = useState(() => Date.now())
-
-  useEffect(() => {
-    if (status !== "OFFLINE") {
-      return
-    }
-
-    const interval = window.setInterval(() => {
-      setNow(Date.now())
-    }, 30_000)
-
-    return () => {
-      window.clearInterval(interval)
-    }
-  }, [status])
+  const now = useLiveNow({ enabled: status === "OFFLINE" })
 
   if (status !== "OFFLINE") {
     return null

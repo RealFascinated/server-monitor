@@ -13,6 +13,27 @@ export function validateEmail(email: string): string | null {
   return null
 }
 
+export function validateRequiredEmail(email: string): string | null {
+  const trimmed = email.trim()
+
+  if (!trimmed) {
+    return "Email is required"
+  }
+
+  return validateEmail(trimmed)
+}
+
+export function validatePasswordConfirmation(
+  password: string,
+  confirmPassword: string
+): string | null {
+  if (password !== confirmPassword) {
+    return "Passwords do not match"
+  }
+
+  return null
+}
+
 export function validateNewPassword(password: string): string | null {
   if (password.length < MIN_PASSWORD_LENGTH) {
     return `Password must be at least ${MIN_PASSWORD_LENGTH} characters`

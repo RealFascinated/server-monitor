@@ -1,6 +1,7 @@
 import { Pencil } from "lucide-react"
 import { useState } from "react"
 
+import { FormFieldError } from "@/components/form-field-error"
 import { Spinner } from "@/components/spinner"
 import { Button } from "@/components/ui/button"
 import {
@@ -101,9 +102,7 @@ function RenameServerDialog({
               required
               autoFocus
             />
-            {fieldError ? (
-              <p className="text-xs font-bold text-error">{fieldError}</p>
-            ) : null}
+            <FormFieldError error={fieldError} />
           </div>
 
           <DialogFooter>

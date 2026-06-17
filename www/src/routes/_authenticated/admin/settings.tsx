@@ -3,10 +3,8 @@ import { createFileRoute } from "@tanstack/react-router"
 
 import { AdminSettingsHeader } from "@/components/admin/admin-settings-header"
 import { AdminSettingsView } from "@/components/admin/admin-settings-view"
-import { AsyncContent } from "@/components/animated-content"
-import { Callout } from "@/components/callout"
+import { QueryStatusShell } from "@/components/query-status-shell"
 import { adminSettingsQueryOptions } from "@/lib/api/admin/settings.queries"
-import { getApiErrorMessage, getApiErrorTitle } from "@/lib/api/error-message"
 import { authenticatedPageSectionClassName } from "@/lib/layout"
 import { pageTitle } from "@/lib/page-title"
 
@@ -28,31 +26,19 @@ function AdminSettingsPage() {
     error,
   } = useQuery(adminSettingsQueryOptions())
 
-  const errorMessage = error
-    ? getApiErrorMessage(error, "Failed to load admin settings")
-    : null
-  const errorTitle = error
-    ? getApiErrorTitle(error, "Could not load settings")
-    : null
-
   return (
     <section className={authenticatedPageSectionClassName}>
       <AdminSettingsHeader />
 
-      {errorMessage ? (
-        <Callout type="danger" title={errorTitle ?? "Could not load settings"}>
-          {errorMessage}
-        </Callout>
-      ) : null}
-
-      <AsyncContent
-        loading={isPending && !errorMessage}
+      <QueryStatusShell
+        error={error}
+        isPending={isPending}
         loadingMessage="Loading settings…"
+        fallbackMessage="Failed to load admin settings"
+        fallbackTitle="Could not load settings"
       >
-        {settings && !errorMessage ? (
-          <AdminSettingsView settings={settings} />
-        ) : null}
-      </AsyncContent>
+        {settings ? <AdminSettingsView settings={settings} /> : null}
+      </QueryStatusShell>
     </section>
   )
 }

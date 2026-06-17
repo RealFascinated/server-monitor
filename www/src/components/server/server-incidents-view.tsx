@@ -1,21 +1,19 @@
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import type { ColumnDef } from "@tanstack/react-table"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo } from "react"
 
 import { SimpleTooltip } from "@/components/simple-tooltip"
+import { TimestampCell } from "@/components/timestamp-cell"
 import { Pagination } from "@/components/pagination"
 import { DataTable } from "@/components/ui/data-table"
+import { useLiveNow } from "@/hooks/use-live-now"
 import type { Page } from "@/lib/api/pagination"
 import type { IncidentResponse } from "@/lib/api/user/incidents"
 import {
   getIncidentDurationMs,
   getIncidentStatus,
 } from "@/lib/api/user/incidents"
-import {
-  formatDate,
-  formatDateWithRelative,
-  formatDurationSeconds,
-} from "@/lib/formatter"
+import { formatDurationSeconds } from "@/lib/formatter"
 import type { PageSearchParams } from "@/lib/schemas/pagination"
 import { INCIDENT_STATUS_TOOLTIPS } from "@/lib/tooltips/copy"
 import { cn } from "@/lib/utils"
@@ -52,21 +50,7 @@ function IncidentStatusBadge({ incident }: { incident: IncidentResponse }) {
 
 function IncidentDuration({ incident }: { incident: IncidentResponse }) {
   const isOngoing = getIncidentStatus(incident) === "ongoing"
-  const [now, setNow] = useState(() => Date.now())
-
-  useEffect(() => {
-    if (!isOngoing) {
-      return
-    }
-
-    const interval = window.setInterval(() => {
-      setNow(Date.now())
-    }, 30_000)
-
-    return () => {
-      window.clearInterval(interval)
-    }
-  }, [isOngoing])
+  const now = useLiveNow({ enabled: isOngoing })
 
   const durationSeconds = Math.max(
     0,
@@ -74,14 +58,6 @@ function IncidentDuration({ incident }: { incident: IncidentResponse }) {
   )
 
   return <span>{formatDurationSeconds(durationSeconds)}</span>
-}
-
-function TimestampCell({ iso }: { iso: string }) {
-  return (
-    <SimpleTooltip content={formatDateWithRelative(iso)}>
-      <span className="cursor-help">{formatDate(iso)}</span>
-    </SimpleTooltip>
-  )
 }
 
 function ServerIncidentsView({

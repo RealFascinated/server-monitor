@@ -23,38 +23,24 @@ type ServerMetricsHeaderProps = {
 const metricRangeShellClassName =
   "inline-flex w-full shrink-0 items-stretch gap-0.5 overflow-hidden rounded-sm border border-border bg-muted/80 p-1 sm:w-auto dark:bg-muted/60"
 
-type ServerMetricsToolbarProps = {
+type ServerMetricsNavLinksProps = {
   serverId: number
-  timeWindow: MetricTimeWindow
-  refreshInterval: MetricRefreshInterval
-  onRefreshIntervalChange: (value: MetricRefreshInterval) => void
-  onRefresh: () => void
-  isRefreshing: boolean
-  onTimeWindowChange: (value: MetricTimeWindow) => void
-  showSettings?: boolean
+  variant: "toolbar" | "header"
 }
 
-function ServerMetricsToolbar({
-  serverId,
-  timeWindow,
-  refreshInterval,
-  onRefreshIntervalChange,
-  onRefresh,
-  isRefreshing,
-  onTimeWindowChange,
-  showSettings = true,
-}: ServerMetricsToolbarProps) {
+function ServerMetricsNavLinks({ serverId, variant }: ServerMetricsNavLinksProps) {
+  const buttonClass =
+    variant === "toolbar"
+      ? "h-7 shrink-0 gap-1.5 rounded-sm border-0 px-2 text-xs hover:bg-card/70 dark:hover:bg-accent/60"
+      : "h-7 shrink-0 rounded-sm border border-border bg-muted/80 px-2.5 text-xs hover:bg-card/70 dark:bg-muted/60 dark:hover:bg-muted"
+
   return (
-    <div
-      className={metricRangeShellClassName}
-      role="toolbar"
-      aria-label="Server actions"
-    >
+    <>
       <SimpleTooltip content="Incident history">
         <Button
           variant="ghost"
           size="sm"
-          className="h-7 shrink-0 gap-1.5 rounded-sm border-0 px-2 text-xs hover:bg-card/70 dark:hover:bg-accent/60"
+          className={buttonClass}
           asChild
         >
           <Link
@@ -67,24 +53,54 @@ function ServerMetricsToolbar({
         </Button>
       </SimpleTooltip>
 
-      {showSettings ? (
-        <SimpleTooltip content="Server settings">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 shrink-0 gap-1.5 rounded-sm border-0 px-2 text-xs hover:bg-card/70 dark:hover:bg-accent/60"
-            asChild
+      <SimpleTooltip content="Server settings">
+        <Button
+          variant="ghost"
+          size="sm"
+          className={buttonClass}
+          asChild
+        >
+          <Link
+            to="/servers/$serverId/settings"
+            params={{ serverId: String(serverId) }}
           >
-            <Link
-              to="/servers/$serverId/settings"
-              params={{ serverId: String(serverId) }}
-            >
-              <Settings className="size-3.5" />
-              <span className="hidden sm:inline">Settings</span>
-            </Link>
-          </Button>
-        </SimpleTooltip>
-      ) : null}
+            <Settings className="size-3.5" />
+            <span className="hidden sm:inline">Settings</span>
+          </Link>
+        </Button>
+      </SimpleTooltip>
+    </>
+  )
+}
+
+type ServerMetricsToolbarProps = {
+  serverId: number
+  timeWindow: MetricTimeWindow
+  refreshInterval: MetricRefreshInterval
+  onRefreshIntervalChange: (value: MetricRefreshInterval) => void
+  onRefresh: () => void
+  isRefreshing: boolean
+  onTimeWindowChange: (value: MetricTimeWindow) => void
+  showNav?: boolean
+}
+
+function ServerMetricsToolbar({
+  serverId,
+  timeWindow,
+  refreshInterval,
+  onRefreshIntervalChange,
+  onRefresh,
+  isRefreshing,
+  onTimeWindowChange,
+  showNav = true,
+}: ServerMetricsToolbarProps) {
+  return (
+    <div
+      className={metricRangeShellClassName}
+      role="toolbar"
+      aria-label="Server actions"
+    >
+      {showNav ? <ServerMetricsNavLinks serverId={serverId} variant="toolbar" /> : null}
 
       <MetricRangeSelector
         value={timeWindow}
@@ -142,46 +158,14 @@ function ServerMetricsHeader({
             </div>
 
             <div className="flex shrink-0 items-center gap-1 lg:hidden">
-              <SimpleTooltip content="Incident history">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 shrink-0 rounded-sm border border-border bg-muted/80 px-2.5 text-xs hover:bg-card/70 dark:bg-muted/60 dark:hover:bg-muted"
-                  asChild
-                >
-                  <Link
-                    to="/servers/$serverId/incidents"
-                    params={{ serverId: String(serverId) }}
-                  >
-                    <History className="size-3.5" />
-                    <span className="hidden sm:inline">Incidents</span>
-                  </Link>
-                </Button>
-              </SimpleTooltip>
-
-              <SimpleTooltip content="Server settings">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 shrink-0 rounded-sm border border-border bg-muted/80 px-2.5 text-xs hover:bg-card/70 dark:bg-muted/60 dark:hover:bg-muted"
-                  asChild
-                >
-                  <Link
-                    to="/servers/$serverId/settings"
-                    params={{ serverId: String(serverId) }}
-                  >
-                    <Settings className="size-3.5" />
-                    <span className="hidden sm:inline">Settings</span>
-                  </Link>
-                </Button>
-              </SimpleTooltip>
+              <ServerMetricsNavLinks serverId={serverId} variant="header" />
             </div>
           </>
         }
       />
 
       <div className="sticky top-14 z-30 mb-6 w-full bg-background/95 py-1.5 backdrop-blur-sm lg:hidden">
-        <ServerMetricsToolbar {...toolbarProps} showSettings={false} />
+        <ServerMetricsToolbar {...toolbarProps} showNav={false} />
       </div>
     </>
   )

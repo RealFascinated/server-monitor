@@ -1,4 +1,5 @@
 import { SimpleTooltip } from "@/components/simple-tooltip"
+import { SettingsPreferenceRow } from "@/components/settings/settings-preference-row"
 import { SettingsToggle } from "@/components/ui/settings-toggle"
 import { useAdminSettingUpdate } from "@/hooks/use-admin-setting-update"
 import type { AdminSettingResponse } from "@/lib/api/admin/settings"
@@ -33,20 +34,17 @@ function AdminBooleanSetting({
   )
 
   return (
-    <div className="flex max-w-xl items-start justify-between gap-8">
-      <div className="flex flex-col gap-1.5">
-        <p className="text-sm font-medium">{label}</p>
-        <p className="text-xs font-bold text-muted-foreground">{description}</p>
-      </div>
-
-      <div className="shrink-0 pt-0.5">
-        {tooltip ? (
+    <SettingsPreferenceRow
+      label={label}
+      description={description}
+      control={
+        tooltip ? (
           <SimpleTooltip content={tooltip}>{control}</SimpleTooltip>
         ) : (
           control
-        )}
-      </div>
-    </div>
+        )
+      }
+    />
   )
 }
 
