@@ -18,6 +18,9 @@ type MetricChartConfig = {
   seriesFormatters?: ((value: number) => string)[]
   yRange?: ChartYRange
   thresholds?: ChartThreshold[]
+  rightYRange?: ChartYRange
+  rightThresholds?: ChartThreshold[]
+  rightValueFormatter?: (value: number) => string
   showCurrentValues?: boolean
   mode?: MetricChartMode
   tooltipColumnSize?: number

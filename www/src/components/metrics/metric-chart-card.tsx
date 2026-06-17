@@ -40,6 +40,9 @@ type MetricChartCardProps = {
   seriesFormatters?: ((value: number) => string)[]
   yRange?: ChartYRange
   thresholds?: ChartThreshold[]
+  rightYRange?: ChartYRange
+  rightThresholds?: ChartThreshold[]
+  rightValueFormatter?: (value: number) => string
   showCurrentValues?: boolean
   mode?: MetricChartMode
   tooltipColumnSize?: number
@@ -56,6 +59,9 @@ type MetricChartPanelProps = {
   seriesFormatters?: ((value: number) => string)[]
   yRange?: ChartYRange
   thresholds?: ChartThreshold[]
+  rightYRange?: ChartYRange
+  rightThresholds?: ChartThreshold[]
+  rightValueFormatter?: (value: number) => string
   mode?: MetricChartMode
   tooltipColumnSize?: number
   tooltipSort?: (a: TooltipSortEntry, b: TooltipSortEntry) => number
@@ -70,6 +76,9 @@ function MetricChartPanel({
   seriesFormatters,
   yRange,
   thresholds,
+  rightYRange,
+  rightThresholds,
+  rightValueFormatter,
   mode,
   tooltipColumnSize,
   tooltipSort,
@@ -87,10 +96,14 @@ function MetricChartPanel({
           data={built.data}
           labels={built.labels}
           negated={built.negated}
+          seriesAxes={built.axes}
           height={height}
           valueFormatter={valueFormatter}
           seriesFormatters={seriesFormatters}
           yRange={yRange}
+          rightYRange={rightYRange}
+          rightThresholds={rightThresholds}
+          rightValueFormatter={rightValueFormatter}
           thresholds={thresholds}
           mode={mode}
           tooltipColumnSize={tooltipColumnSize}
@@ -111,6 +124,9 @@ function MetricChartCard({
   seriesFormatters,
   yRange,
   thresholds,
+  rightYRange,
+  rightThresholds,
+  rightValueFormatter,
   showCurrentValues,
   mode,
   tooltipColumnSize,
@@ -236,6 +252,9 @@ function MetricChartCard({
           seriesFormatters={seriesFormatters}
           yRange={yRange}
           thresholds={thresholds}
+          rightYRange={rightYRange}
+          rightThresholds={rightThresholds}
+          rightValueFormatter={rightValueFormatter}
           mode={mode}
           tooltipColumnSize={tooltipColumnSize}
           tooltipSort={tooltipSort}
@@ -274,6 +293,9 @@ function MetricChartCard({
               seriesFormatters={seriesFormatters}
               yRange={yRange}
               thresholds={thresholds}
+              rightYRange={rightYRange}
+              rightThresholds={rightThresholds}
+              rightValueFormatter={rightValueFormatter}
               mode={mode}
               tooltipColumnSize={tooltipColumnSize}
               tooltipSort={tooltipSort}

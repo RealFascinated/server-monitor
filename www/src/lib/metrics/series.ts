@@ -3,18 +3,26 @@ import { alignValuesToTimestamps } from "@/lib/metrics/timestamps"
 import type { MetricsTimeGrid } from "@/lib/metrics/timestamps"
 import type uPlot from "uplot"
 
+export type ChartAxis = "left" | "right"
+
 export type ChartSeries = {
   label: string
   values: MetricValues
   negate?: boolean
+  axis?: ChartAxis
 }
 
 export function chartSeries(
   label: string,
   values: MetricValues,
-  options?: { negate?: boolean }
+  options?: { negate?: boolean; axis?: ChartAxis }
 ): ChartSeries {
-  return { label, values: values ?? null, negate: options?.negate }
+  return {
+    label,
+    values: values ?? null,
+    negate: options?.negate,
+    axis: options?.axis,
+  }
 }
 
 export function hasAnyValues(...fields: (MetricValues | undefined)[]): boolean {
@@ -138,7 +146,12 @@ export function buildMultiSeriesData(
   gridTimestamps: number[],
   sourceTimestamps: number[] | null,
   series: ChartSeries[]
-): { data: uPlot.AlignedData; labels: string[]; negated: boolean[] } | null {
+): {
+  data: uPlot.AlignedData
+  labels: string[]
+  negated: boolean[]
+  axes: ChartAxis[]
+} | null {
   const activeSeries = series.filter((entry) => hasValues(entry.values))
 
   if (activeSeries.length === 0 || gridTimestamps.length === 0) {
@@ -148,6 +161,7 @@ export function buildMultiSeriesData(
   const data: uPlot.AlignedData = [gridTimestamps]
   const labels: string[] = []
   const negated: boolean[] = []
+  const axes: ChartAxis[] = []
 
   for (const entry of activeSeries) {
     const aligned = alignValuesToTimestamps(
@@ -166,13 +180,14 @@ export function buildMultiSeriesData(
     )
     labels.push(entry.label)
     negated.push(entry.negate ?? false)
+    axes.push(entry.axis ?? "left")
   }
 
   if (labels.length === 0) {
     return null
   }
 
-  return { data, labels, negated }
+  return { data, labels, negated, axes }
 }
 
 export function stackAlignedData(data: uPlot.AlignedData): {

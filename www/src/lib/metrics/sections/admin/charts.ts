@@ -21,6 +21,11 @@ import {
 import type { MetricChartConfig } from "@/lib/metrics/chart-config"
 import { chartSeries, getLatestValue, hasValues } from "@/lib/metrics/series"
 
+const JVM_CPU_RIGHT_AXIS = {
+  rightYRange: { max: 1 },
+  rightValueFormatter: (value: number) => formatPercentValue(value * 100),
+} as const
+
 function parseHttpEntries(
   http: HttpMetrics | null | undefined
 ): HttpMetricsEntry[] {
@@ -155,22 +160,37 @@ function ingestCharts(ingest: IngestMetrics): MetricChartConfig[] {
 }
 
 function jvmCharts(jvm: JvmMetrics): MetricChartConfig[] {
-  const charts: MetricChartConfig[] = [
+  const heapSeries = [
+    chartSeries("Used", jvm.jvmHeapUsedBytes),
+    chartSeries("Max", jvm.jvmHeapMaxBytes),
+    chartSeries("Non-heap", jvm.jvmNonheapUsedBytes),
+  ]
+
+  if (hasValues(jvm.jvmProcessRssBytes)) {
+    heapSeries.push(chartSeries("RSS", jvm.jvmProcessRssBytes))
+  }
+
+  heapSeries.push(
+    chartSeries("CPU", jvm.jvmProcessCpuLoad, { axis: "right" })
+  )
+
+  const heapFormatters = [
+    formatMemoryBytes,
+    formatMemoryBytes,
+    formatMemoryBytes,
+    ...(hasValues(jvm.jvmProcessRssBytes) ? [formatMemoryBytes] : []),
+    (value: number) => formatPercentValue(value * 100),
+  ]
+
+  return [
     {
       title: "Heap memory",
-      description: "JVM heap used, max, and non-heap memory.",
-      series: [
-        chartSeries("Used", jvm.jvmHeapUsedBytes),
-        chartSeries("Max", jvm.jvmHeapMaxBytes),
-        chartSeries("Non-heap", jvm.jvmNonheapUsedBytes),
-      ],
+      description:
+        "JVM heap used, max, and non-heap memory. Process CPU utilization is on the right axis.",
+      series: heapSeries,
       valueFormatter: formatMemoryBytes,
-    },
-    {
-      title: "CPU load",
-      description: "JVM process CPU utilization (0–100%).",
-      series: [chartSeries("CPU", jvm.jvmProcessCpuLoad)],
-      valueFormatter: (value) => formatPercentValue(value * 100),
+      seriesFormatters: heapFormatters,
+      ...JVM_CPU_RIGHT_AXIS,
     },
     {
       title: "Threads",
@@ -185,17 +205,6 @@ function jvmCharts(jvm: JvmMetrics): MetricChartConfig[] {
       valueFormatter: formatDurationSeconds,
     },
   ]
-
-  if (hasValues(jvm.jvmProcessRssBytes)) {
-    charts.splice(1, 0, {
-      title: "Process RSS",
-      description: "Resident set size of the Monitor backend process.",
-      series: [chartSeries("RSS", jvm.jvmProcessRssBytes)],
-      valueFormatter: formatMemoryBytes,
-    })
-  }
-
-  return charts
 }
 
 function vmCharts(vm: VmMetrics): MetricChartConfig[] {

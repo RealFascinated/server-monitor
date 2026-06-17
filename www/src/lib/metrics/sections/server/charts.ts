@@ -1,6 +1,7 @@
 import type {
   DiskMetrics,
   GpuMetrics,
+  MetricValues,
   NetworkMetrics,
   ServerMetricsResponse,
   TemperatureMetrics,
@@ -33,6 +34,15 @@ import {
 } from "@/lib/formatter"
 
 const PERCENT_Y_RANGE = { max: 100 } as const
+
+const PERCENT_RIGHT_AXIS = {
+  rightYRange: PERCENT_Y_RANGE,
+  rightValueFormatter: formatPercentValue,
+} as const
+
+function percentSeries(label: string, values: MetricValues) {
+  return chartSeries(label, values, { axis: "right" })
+}
 
 function loadAverageThresholds(
   coreCount: number
@@ -87,19 +97,16 @@ function diskCharts(disk: DiskMetrics): MetricChartConfig[] {
     },
     {
       title: "Throughput",
-      description: "Disk read and write bytes per second.",
+      description:
+        "Disk read and write bytes per second. I/O utilization is on the right axis.",
       series: [
         chartSeries("Read", disk.ioReadBps),
         chartSeries("Write", disk.ioWriteBps, { negate: true }),
+        percentSeries("I/O usage", disk.ioUsagePct),
       ],
       valueFormatter: formatRate,
-    },
-    {
-      title: "I/O usage",
-      description: "Disk utilization as a percentage of capacity.",
-      series: [chartSeries("Usage", disk.ioUsagePct)],
-      valueFormatter: formatPercentValue,
-      yRange: PERCENT_Y_RANGE,
+      seriesFormatters: [formatRate, formatRate, formatPercentValue],
+      ...PERCENT_RIGHT_AXIS,
     },
     {
       title: "I/O wait",
@@ -173,14 +180,6 @@ function networkCharts(network: NetworkMetrics): MetricChartConfig[] {
 function gpuCharts(gpu: GpuMetrics): MetricChartConfig[] {
   return [
     {
-      title: "Usage",
-      description: "GPU core utilization.",
-      series: [chartSeries("Usage", gpu.usagePercent)],
-      valueFormatter: formatPercentValue,
-      yRange: PERCENT_Y_RANGE,
-      thresholds: PERCENT_THRESHOLDS,
-    },
-    {
       title: "Encode/decode",
       description:
         "Video encoder and decoder utilization on supported GPUs (for example NVENC/NVDEC on NVIDIA).",
@@ -194,12 +193,20 @@ function gpuCharts(gpu: GpuMetrics): MetricChartConfig[] {
     },
     {
       title: "Memory",
-      description: "GPU memory used vs total.",
+      description:
+        "GPU memory used vs total. Core utilization is on the right axis.",
       series: [
         chartSeries("Used", gpu.memoryUsedBytes),
         chartSeries("Total", gpu.memoryTotalBytes),
+        percentSeries("Usage", gpu.usagePercent),
       ],
       valueFormatter: formatMemoryBytes,
+      seriesFormatters: [
+        formatMemoryBytes,
+        formatMemoryBytes,
+        formatPercentValue,
+      ],
+      ...PERCENT_RIGHT_AXIS,
     },
     {
       title: "Temperature",
@@ -437,10 +444,11 @@ function hostSystemCharts(
       series: [
         chartSeries("Open", host.fdOpen),
         chartSeries("Max", host.fdMax),
-        chartSeries("Usage", host.fdUsagePct),
+        percentSeries("Usage", host.fdUsagePct),
       ],
       valueFormatter: formatCount,
       seriesFormatters: [formatCount, formatCount, formatPercentValue],
+      ...PERCENT_RIGHT_AXIS,
     },
   ]
 }

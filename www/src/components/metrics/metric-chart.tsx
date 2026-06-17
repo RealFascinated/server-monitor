@@ -12,6 +12,7 @@ import {
 import { createThresholdDrawHook } from "@/lib/metrics/chart-thresholds"
 import type { ChartThreshold } from "@/lib/metrics/chart-thresholds"
 import { stackAlignedData } from "@/lib/metrics/series"
+import type { ChartAxis } from "@/lib/metrics/series"
 import {
   bindChartZoomNavigate,
   useMetricsChartZoom,
@@ -34,12 +35,16 @@ type MetricChartProps = {
   data: uPlot.AlignedData
   labels: string[]
   negated?: boolean[]
+  seriesAxes?: ChartAxis[]
   height?: number
   sizeRef?: RefObject<HTMLElement | null>
   valueFormatter?: (value: number) => string
   seriesFormatters?: ((value: number) => string)[]
   yRange?: ChartYRange
+  rightYRange?: ChartYRange
+  rightValueFormatter?: (value: number) => string
   thresholds?: ChartThreshold[]
+  rightThresholds?: ChartThreshold[]
   mode?: MetricChartMode
   tooltipColumnSize?: number
   tooltipSort?: (a: TooltipSortEntry, b: TooltipSortEntry) => number
@@ -49,12 +54,16 @@ function MetricChart({
   data,
   labels,
   negated = [],
+  seriesAxes = [],
   height = 260,
   sizeRef,
   valueFormatter,
   seriesFormatters,
   yRange,
+  rightYRange,
+  rightValueFormatter,
   thresholds,
+  rightThresholds,
   mode = "line",
   tooltipColumnSize,
   tooltipSort,
@@ -69,12 +78,18 @@ function MetricChart({
   const chartZoom = useMetricsChartZoom()
   const chartZoomRef = useRef(chartZoom)
   const yMax = yRange?.max ?? null
+  const rightYMax = rightYRange?.max ?? null
   const labelsKey = labels.join("\0")
   const negatedKey = negated.map(String).join("\0")
+  const seriesAxesKey = seriesAxes.join("\0")
   const thresholdsKey =
     thresholds?.map((entry) => `${entry.level}:${entry.value}`).join("|") ?? ""
+  const rightThresholdsKey =
+    rightThresholds?.map((entry) => `${entry.level}:${entry.value}`).join("|") ??
+    ""
   const stacked = mode === "stack"
   const bidirectional = negated.some(Boolean)
+  const hasRightAxis = seriesAxes.some((axis) => axis === "right")
 
   const prepared = useMemo(() => {
     if (!stacked) {
@@ -128,6 +143,10 @@ function MetricChart({
         valueFormatter: (value) =>
           valueFormatterRef.current?.(value) ?? String(value),
         yRange,
+        rightYRange,
+        rightValueFormatter: (value) =>
+          rightValueFormatter?.(value) ?? String(value),
+        seriesAxes,
         stacked,
         bands: prepared.bands,
         bidirectional,
@@ -161,8 +180,17 @@ function MetricChart({
         ...(syncKey ? { setScale: [createChartZoomSyncHook(syncKey)] } : {}),
       }
 
-      if (thresholds && thresholds.length > 0) {
-        hooks.drawAxes = [createThresholdDrawHook(thresholds, resolvedTheme)]
+      const drawAxesHooks: Array<(u: uPlot) => void> = []
+      if (!hasRightAxis && thresholds && thresholds.length > 0) {
+        drawAxesHooks.push(createThresholdDrawHook(thresholds, resolvedTheme, "y"))
+      }
+      if (!hasRightAxis && rightThresholds && rightThresholds.length > 0) {
+        drawAxesHooks.push(
+          createThresholdDrawHook(rightThresholds, resolvedTheme, "y2")
+        )
+      }
+      if (drawAxesHooks.length > 0) {
+        hooks.drawAxes = drawAxesHooks
       }
 
       options.hooks = hooks
@@ -218,12 +246,18 @@ function MetricChart({
     labelsKey,
     height,
     yMax,
+    rightYMax,
     thresholdsKey,
+    rightThresholdsKey,
     stacked,
     bidirectional,
     negatedKey,
+    seriesAxesKey,
+    hasRightAxis,
     prepared.bands,
     thresholds,
+    rightThresholds,
+    rightValueFormatter,
     syncKey,
     tooltipColumnSize,
     tooltipSort,

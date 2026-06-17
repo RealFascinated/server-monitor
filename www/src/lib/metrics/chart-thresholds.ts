@@ -48,7 +48,8 @@ function thresholdStroke(pxRatio: number) {
 
 export function createThresholdDrawHook(
   thresholds: ChartThreshold[],
-  theme: ResolvedTheme
+  theme: ResolvedTheme,
+  scale: "y" | "y2" = "y"
 ): (u: uPlot) => void {
   return (u) => {
     if (thresholds.length === 0) {
@@ -66,7 +67,7 @@ export function createThresholdDrawHook(
     ctx.save()
 
     for (const threshold of thresholds) {
-      const yPos = u.valToPos(threshold.value, "y", true)
+      const yPos = u.valToPos(threshold.value, scale, true)
       if (yPos < yTop || yPos > yBottom) {
         continue
       }

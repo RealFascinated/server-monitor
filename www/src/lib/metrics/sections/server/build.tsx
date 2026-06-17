@@ -31,7 +31,7 @@ import {
   zfsPoolCharts,
 } from "@/lib/metrics/sections/server/charts"
 import type { MetricsTimeGrid } from "@/lib/metrics/timestamps"
-import { formatMemoryBytes, formatNumber } from "@/lib/formatter"
+import { formatCount, formatMemoryBytes, formatPercentValue } from "@/lib/formatter"
 
 function buildServerMetricSections(
   metrics: ServerMetricsResponse,
@@ -176,12 +176,21 @@ function buildServerMetricSections(
             },
             {
               title: "ARC efficiency",
-              description: "Cache hit ratio and misses per second.",
+              description:
+                "Cache misses per second. Hit ratio is on the right axis.",
               series: [
-                chartSeries("Hit ratio", metrics.zfsArc.hitRatio),
                 chartSeries("Misses/s", metrics.zfsArc.missesPerSecond),
+                chartSeries("Hit ratio", metrics.zfsArc.hitRatio, {
+                  axis: "right",
+                }),
               ],
-              valueFormatter: formatNumber,
+              valueFormatter: formatCount,
+              seriesFormatters: [
+                (value) => `${formatCount(value)}/s`,
+                formatPercentValue,
+              ],
+              rightYRange: { max: 100 },
+              rightValueFormatter: formatPercentValue,
             },
           ],
           timeGrid,
