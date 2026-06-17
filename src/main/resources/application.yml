@@ -45,7 +45,7 @@ spring:
 
 monitor:
   website-url: http://localhost:5173
-  encryption-secret: "set_me"
+  encryption-secret: "set_me" # openssl rand -hex 32
   maxmind:
     license: ""
     database-dir: work/geoip

@@ -70,7 +70,7 @@ public class EncryptionService {
         }
 
         byte[] keyBytes;
-        if (secret.length() == KEY_LENGTH_BYTES * 2 && secret.chars().allMatch(Character::isLetterOrDigit)) {
+        if (secret.length() == KEY_LENGTH_BYTES * 2 && secret.chars().allMatch(c -> Character.digit(c, 16) >= 0)) {
             keyBytes = HexFormat.of().parseHex(secret);
         } else {
             keyBytes = Base64.getDecoder().decode(secret);
