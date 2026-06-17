@@ -89,11 +89,11 @@ public class ServerService {
             return;
         }
         Instant cutoff = Instant.now().minus(this.serverProperties.getOfflineThreshold());
-        List<ServerRow> staleServers = this.serverRepository.findStaleServers(cutoff);
+        List<ServerRow> staleServers = this.serverRepository.findStaleServers(cutoff, ServerStatus.ONLINE);
         if (staleServers.isEmpty()) {
             return;
         }
-        int updated = this.serverRepository.markStaleServersOffline(cutoff);
+        int updated = this.serverRepository.markStaleServersOffline(cutoff, ServerStatus.OFFLINE, ServerStatus.ONLINE);
         if (updated > 0) {
             log.info("Marked {} server(s) offline (no update since {})", updated, cutoff);
             for (ServerRow server : staleServers) {

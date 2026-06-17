@@ -5,6 +5,7 @@ import com.maxmind.db.CHMCache;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;
+import com.maxmind.geoip2.record.City;
 import com.maxmind.geoip2.record.Country;
 import com.maxmind.geoip2.record.Subdivision;
 import jakarta.annotation.PostConstruct;
@@ -79,7 +80,7 @@ public class MaxMindService {
             CityResponse city = this.cityReader.city(InetAddress.getByName(ip));
             Country country = city.getCountry();
             String countryName = country != null ? country.getName() : null;
-            com.maxmind.geoip2.record.City cityRecord = city.getCity();
+            City cityRecord = city.getCity();
             String cityName = cityRecord != null ? cityRecord.getName() : null;
             Subdivision subdivision = city.getMostSpecificSubdivision();
             String regionName = subdivision != null ? subdivision.getName() : null;

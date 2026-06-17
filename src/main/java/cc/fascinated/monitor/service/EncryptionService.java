@@ -8,6 +8,7 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
+import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.HexFormat;
 
@@ -19,7 +20,7 @@ public class EncryptionService {
     private static final int TAG_LENGTH_BITS = 128;
 
     private final SecretKeySpec key;
-    private final java.security.SecureRandom secureRandom = new java.security.SecureRandom();
+    private final SecureRandom secureRandom = new SecureRandom();
 
     public EncryptionService(MonitorProperties monitorProperties) {
         this.key = new SecretKeySpec(parseSecret(monitorProperties.getEncryptionSecret()), "AES");

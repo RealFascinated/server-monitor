@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
+import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadMXBean;
 
 @Component
@@ -22,7 +23,7 @@ public class JvmMetricsCollector {
         ctx.gauge(PlatformMetricFamily.JVM_THREAD_COUNT.metricName(), threads.getThreadCount());
         ctx.gauge(PlatformMetricFamily.JVM_UPTIME_SECONDS.metricName(), ManagementFactory.getRuntimeMXBean().getUptime() / 1000.0);
 
-        java.lang.management.OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
+        OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
         if (osBean instanceof com.sun.management.OperatingSystemMXBean sunOs) {
             double cpuLoad = sunOs.getProcessCpuLoad();
             if (cpuLoad >= 0) {
