@@ -1,5 +1,6 @@
 package cc.fascinated.monitor.server;
 
+import cc.fascinated.monitor.exception.impl.BadRequestException;
 import cc.fascinated.monitor.exception.impl.NotFoundException;
 import cc.fascinated.monitor.exception.impl.UnauthorizedException;
 import cc.fascinated.monitor.metrics.platform.collector.PlatformMetricsRecorder;
@@ -26,7 +27,6 @@ import cc.fascinated.monitor.model.persistance.metric.IngestTokenRow;
 import cc.fascinated.monitor.repository.ServerIngestTokenRepository;
 import cc.fascinated.monitor.repository.ServerRepository;
 import cc.fascinated.monitor.util.AuthUtils;
-import cc.fascinated.monitor.util.Semver;
 import cc.fascinated.monitor.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -91,7 +91,11 @@ public class ServerIngestService {
         Instant now = Instant.now();
         ServerStatus previousStatus = server.getStatus();
 
-        server.setAgentVersion(Semver.parse(metrics.agentVersion()).toString());
+        String agentVersion = metrics.agentVersion();
+        if (agentVersion == null || agentVersion.isBlank()) {
+            throw new BadRequestException("agent version is required");
+        }
+        server.setAgentVersion(agentVersion.trim());
 
         ServerDetails serverDetails = metrics.serverDetails();
         ServerInventoryRow inventory = getOrCreateInventory(server);

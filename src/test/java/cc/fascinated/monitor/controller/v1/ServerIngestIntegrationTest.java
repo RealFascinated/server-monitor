@@ -49,6 +49,25 @@ class ServerIngestIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
+    void ingestAcceptsNonSemverAgentVersion() throws Exception {
+        var server = this.auth.createServer(this.bearerToken, "master-agent-host");
+        String payload = TestFixtures.minimalIngestPayload().replace(
+                "\"agentVersion\": \"1.0.0\"",
+                "\"agentVersion\": \"master-abc1234\"");
+
+        this.mockMvc.perform(post("/v1/servers/ingest")
+                        .header("Authorization", TestAuthSupport.bearer(server.ingestToken().toString()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isOk());
+
+        this.mockMvc.perform(get("/v1/servers/{serverId}", server.serverId())
+                        .header("Authorization", TestAuthSupport.bearer(this.bearerToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.agentVersion").value("master-abc1234"));
+    }
+
+    @Test
     void rejectsInvalidIngestToken() throws Exception {
         this.mockMvc.perform(post("/v1/servers/ingest")
                         .header("Authorization", TestAuthSupport.bearer("00000000-0000-0000-0000-000000000001"))
