@@ -10,6 +10,8 @@ import cc.fascinated.monitor.model.persistance.UserSessionRow;
 import cc.fascinated.monitor.repository.UserRepository;
 import cc.fascinated.monitor.repository.UserSessionRepository;
 import cc.fascinated.monitor.util.AuthUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.List;
 
+@Slf4j
 @Service
 public class SessionService {
     private static final int SESSION_TOKEN_BYTES = 32;
@@ -31,6 +34,15 @@ public class SessionService {
     public SessionService(UserRepository userRepository, UserSessionRepository userSessionRepository) {
         this.userRepository = userRepository;
         this.userSessionRepository = userSessionRepository;
+    }
+    
+    @Scheduled(cron = "0 0 * * * *")
+    @Transactional
+    public void deleteExpiredSessions() {
+        long deleted = this.userSessionRepository.deleteByExpiresAtLessThanEqual(Instant.now());
+        if (deleted > 0) {
+            log.info("Deleted {} expired session(s)", deleted);
+        }
     }
 
     @Transactional
