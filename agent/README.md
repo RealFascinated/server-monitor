@@ -45,8 +45,10 @@ Optional `config.yml` (see `config-example.yml`). Environment variables override
 Self-hosted example:
 
 ```bash
-export MONITOR_API_ENDPOINT=http://your-server:8080/api/v1/servers/ingest
+export MONITOR_API_ENDPOINT=http://your-server:8080/v1/servers/ingest
 ```
+
+Or pass `--api-endpoint` when using `install.sh` / `-ApiEndpoint` with `install.ps1`. The dashboard agent tab includes the correct URL automatically.
 
 ## Docker
 

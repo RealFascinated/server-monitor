@@ -1,4 +1,4 @@
-import { env } from "@/env/client"
+import { getApiBaseUrl } from "@/lib/public-config"
 
 export const AGENT_INSTALL_SH_URL =
   "https://raw.githubusercontent.com/RealFascinated/Monitor-API/master/agent/install.sh"
@@ -19,17 +19,22 @@ export type AgentInstallMethod =
   | "unraid"
   | "unraid-nvidia"
 
+function shellQuote(value: string): string {
+  return `'${value.replace(/'/g, `'\\''`)}'`
+}
+
 export function getIngestApiEndpoint(): string {
-  const base = env.VITE_API_URL.replace(/\/$/, "")
-  return `${base}/v1/servers/ingest`
+  return `${getApiBaseUrl()}/v1/servers/ingest`
 }
 
 export function buildLinuxInstallCommand(ingestToken: string): string {
-  return `curl -fsSL ${AGENT_INSTALL_SH_URL} | sudo bash -s -- install ${ingestToken}`
+  const endpoint = getIngestApiEndpoint()
+  return `curl -fsSL ${AGENT_INSTALL_SH_URL} | sudo bash -s -- install ${ingestToken} --api-endpoint ${shellQuote(endpoint)}`
 }
 
 export function buildWindowsInstallCommand(ingestToken: string): string {
-  return `Set-ExecutionPolicy Bypass -Scope Process -Force; & ([ScriptBlock]::Create((iwr ${AGENT_INSTALL_PS1_URL} -UseBasicParsing).Content)) install ${ingestToken}`
+  const endpoint = getIngestApiEndpoint()
+  return `Set-ExecutionPolicy Bypass -Scope Process -Force; & ([ScriptBlock]::Create((iwr ${AGENT_INSTALL_PS1_URL} -UseBasicParsing).Content)) install ${ingestToken} -ApiEndpoint '${endpoint.replace(/'/g, "''")}'`
 }
 
 export function buildDockerCompose(

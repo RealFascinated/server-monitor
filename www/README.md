@@ -8,10 +8,11 @@ Dashboard for Monitor. TanStack Start, React, TypeScript, shadcn/ui.
 
 ```bash
 bun install
-VITE_API_URL=http://localhost:8080 bun dev
+cp .env.example .env
+bun dev
 ```
 
-Runs on port 3000. Point it at a running API (default `http://localhost:8080`).
+Runs on port 3000.
 
 ```bash
 docker build -t monitor-www .

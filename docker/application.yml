@@ -41,7 +41,10 @@ spring:
     locations: classpath:db/migration
 
 monitor:
-  website-url: http://localhost:5173
+  website-url: http://localhost:3000
+  maxmind:
+    license: ""
+    database-dir: work/geoip
   agent:
     github-owner: RealFascinated
     github-repo: server-monitor
