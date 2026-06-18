@@ -97,16 +97,20 @@ function diskCharts(disk: DiskMetrics): MetricChartConfig[] {
     },
     {
       title: "Throughput",
-      description:
-        "Disk read and write bytes per second. I/O utilization is on the right axis.",
+      description: "Disk read and write bytes per second.",
       series: [
         chartSeries("Read", disk.ioReadBps),
         chartSeries("Write", disk.ioWriteBps, { negate: true }),
-        percentSeries("I/O usage", disk.ioUsagePct),
       ],
       valueFormatter: formatRate,
-      seriesFormatters: [formatRate, formatRate, formatPercentValue],
-      ...PERCENT_RIGHT_AXIS,
+    },
+    {
+      title: "I/O usage",
+      description: "Disk I/O utilization as a percentage of capacity.",
+      series: [chartSeries("Usage", disk.ioUsagePct)],
+      valueFormatter: formatPercentValue,
+      yRange: PERCENT_Y_RANGE,
+      thresholds: PERCENT_THRESHOLDS,
     },
     {
       title: "I/O wait",
