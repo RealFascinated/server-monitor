@@ -1,4 +1,4 @@
-import { getApiBaseUrl } from "@/lib/public-config"
+import { env } from "@/env"
 
 export const AGENT_INSTALL_SH_URL =
   "https://raw.githubusercontent.com/RealFascinated/Monitor-API/master/agent/install.sh"
@@ -24,7 +24,7 @@ function shellQuote(value: string): string {
 }
 
 export function getIngestApiEndpoint(): string {
-  return `${getApiBaseUrl()}/v1/servers/ingest`
+  return `${env.VITE_API_URL}/v1/servers/ingest`
 }
 
 export function buildLinuxInstallCommand(ingestToken: string): string {

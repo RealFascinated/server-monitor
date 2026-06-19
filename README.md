@@ -36,7 +36,7 @@ Stop the stack: `docker compose down`. Add `-v` to delete database and metrics d
 
 ### Self-hosting notes
 
-Web UI: port `3000`. API: port `8080`. Set `MONITOR_PUBLIC_API_URL` to the URL browsers and agents use to reach the API.
+Web UI: port `3000`. API: port `8080`. Set `VITE_API_URL` in `www/.env` (or as a Docker build arg when building the www image) to the URL browsers use to reach the API.
 
 **After first login**, consider disabling open registration under **Admin → Settings** if this is a private instance.
 
@@ -55,7 +55,7 @@ When mail is disabled, password-reset and invite links are written to the **API 
 #### Production checklist
 
 - Put TLS in front of both the web UI and API (or terminate at your reverse proxy)
-- Set `MONITOR_WEBSITE_URL` and `MONITOR_PUBLIC_API_URL` to your public HTTPS URLs
+- Set `MONITOR_WEBSITE_URL` and build/configure `VITE_API_URL` for the www image to your public HTTPS URLs
 - Do not expose VictoriaMetrics (`8428`) publicly — remove that port mapping or firewall it
 - Back up the `postgres_data` and `victoriametrics_data` Docker volumes regularly
 - Use the install commands from the dashboard (they include your ingest API URL) or pass `--api-endpoint` / `MONITOR_API_ENDPOINT` manually

@@ -61,8 +61,6 @@ services:
     depends_on:
       api:
         condition: service_healthy
-    environment:
-      MONITOR_PUBLIC_API_URL: ${MONITOR_PUBLIC_API_URL:-http://localhost:8080}
     ports:
       - "${WWW_PORT:-3000}:3000"
     healthcheck:
@@ -82,7 +80,7 @@ services:
   #   environment:
   #     MONITOR_CONFIG_FILE: "-"
   #     MONITOR_INGEST_TOKEN: ${MONITOR_INGEST_TOKEN:-}
-  #     MONITOR_API_ENDPOINT: ${MONITOR_PUBLIC_API_URL:-http://localhost:8080}/v1/servers/ingest
+  #     MONITOR_API_ENDPOINT: ${VITE_API_URL:-http://localhost:8080}/v1/servers/ingest
   #     MONITOR_PUSH_SCHEDULE: "*/15 * * * * *"
   #     MONITOR_ENABLE_DOCKER: "true"
   #     MONITOR_ENABLE_GPU: "true"

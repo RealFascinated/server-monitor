@@ -1,4 +1,4 @@
-import { queryOptions } from "@tanstack/react-query"
+import { keepPreviousData, queryOptions } from "@tanstack/react-query"
 
 import { getUserServerMetrics } from "@/lib/api/user/metrics"
 import type { MetricTimeWindow } from "@/lib/metrics/time-window"
@@ -28,6 +28,7 @@ export function userServerMetricsQueryOptions(
   return queryOptions({
     queryKey: userServerMetricsQueryKey.detail(serverId, window),
     queryFn: () => getUserServerMetrics(serverId, window),
+    placeholderData: keepPreviousData,
     refetchInterval: getMetricRefreshIntervalMs(refreshInterval),
   })
 }

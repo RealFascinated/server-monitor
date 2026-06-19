@@ -1,4 +1,4 @@
-import { queryOptions } from "@tanstack/react-query"
+import { keepPreviousData, queryOptions } from "@tanstack/react-query"
 
 import { getAdminMetrics } from "@/lib/api/admin/metrics"
 import type { MetricTimeWindow } from "@/lib/metrics/time-window"
@@ -13,6 +13,7 @@ export function adminMetricsQueryOptions(
   return queryOptions({
     queryKey: ["admin", "metrics", metricTimeWindowQueryKey(window)],
     queryFn: () => getAdminMetrics(window),
+    placeholderData: keepPreviousData,
     refetchInterval: getMetricRefreshIntervalMs(refreshInterval),
   })
 }

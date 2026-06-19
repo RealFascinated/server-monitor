@@ -1,4 +1,4 @@
-import { getApiBaseUrl } from "@/lib/public-config"
+import { env } from "@/env"
 import type { ApiError } from "@/lib/auth/types"
 import { clearToken, getToken } from "@/lib/auth/token"
 import { createNetworkError, NetworkError } from "@/lib/network"
@@ -43,7 +43,7 @@ export async function apiFetch<T>(
 
   let response: Response
   try {
-    response = await fetch(`${getApiBaseUrl()}${path}`, {
+    response = await fetch(`${env.VITE_API_URL}${path}`, {
       ...init,
       headers,
     })

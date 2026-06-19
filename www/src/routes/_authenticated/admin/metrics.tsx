@@ -68,7 +68,7 @@ function AdminMetricsPage() {
 
       <QueryStatusShell
         error={error}
-        isPending={isPending}
+        isPending={isPending && !metrics}
         loadingMessage="Loading metrics…"
         fallbackMessage="Failed to load admin metrics"
         fallbackTitle="Could not load metrics"

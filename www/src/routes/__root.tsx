@@ -12,8 +12,6 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 import { NotFoundView } from "@/components/not-found-view"
 import { OfflineBanner } from "@/components/offline-banner"
 import { AuthProvider } from "@/lib/auth"
-import { loadPublicConfigFromEnv } from "@/env/public-config"
-import { PublicConfigProvider } from "@/lib/public-config-context"
 import { APP_NAME } from "@/lib/page-title"
 import { ThemeProvider } from "@/lib/theme"
 import { themeInitScript } from "@/lib/theme/script"
@@ -28,9 +26,6 @@ const Devtools: ComponentType = import.meta.env.DEV
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
 }>()({
-  loader: () => ({
-    publicConfig: loadPublicConfigFromEnv(),
-  }),
   head: () => ({
     meta: [
       {
@@ -61,8 +56,6 @@ export const Route = createRootRouteWithContext<{
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-  const { publicConfig } = Route.useLoaderData()
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -70,15 +63,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body>
-        <PublicConfigProvider config={publicConfig}>
-          <ThemeProvider>
-            <TooltipProvider>
-              <OfflineBanner />
-              <AuthProvider>{children}</AuthProvider>
-              <Toaster richColors closeButton />
-            </TooltipProvider>
-          </ThemeProvider>
-        </PublicConfigProvider>
+        <ThemeProvider>
+          <TooltipProvider>
+            <OfflineBanner />
+            <AuthProvider>{children}</AuthProvider>
+            <Toaster richColors closeButton />
+          </TooltipProvider>
+        </ThemeProvider>
         {import.meta.env.DEV ? (
           <Suspense fallback={null}>
             <Devtools />
