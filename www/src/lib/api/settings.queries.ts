@@ -7,5 +7,6 @@ export function publicSettingsQueryOptions() {
     queryKey: ["settings", "public"],
     queryFn: getPublicSettings,
     staleTime: 60_000,
+    retry: false,
   })
 }

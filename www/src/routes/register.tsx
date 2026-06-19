@@ -4,7 +4,6 @@ import { LogIn, UserRoundX } from "lucide-react"
 import { useEffect } from "react"
 
 import { AuthPageFooter, AuthPageLink } from "@/components/auth-page-footer"
-import { Callout } from "@/components/callout"
 import { LoadingState } from "@/components/loading-state"
 import { AuthForm } from "@/components/auth-form"
 import { AuthPageShell } from "@/components/auth-page-shell"
@@ -17,8 +16,8 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { isRegistrationEnabled } from "@/lib/api/settings"
-import { getApiErrorMessage, getApiErrorTitle } from "@/lib/api/error-message"
 import { publicSettingsQueryOptions } from "@/lib/api/settings.queries"
+import { loadCachedQuery } from "@/lib/api/query-loader"
 import { useAuth } from "@/lib/auth"
 import { pageTitle } from "@/lib/page-title"
 
@@ -28,7 +27,7 @@ export const Route = createFileRoute("/register")({
     meta: [{ title: pageTitle("Create account") }],
   }),
   loader: ({ context: { queryClient } }) => {
-    return queryClient.ensureQueryData(publicSettingsQueryOptions())
+    return loadCachedQuery(queryClient, publicSettingsQueryOptions())
   },
   component: RegisterPage,
 })
@@ -36,12 +35,9 @@ export const Route = createFileRoute("/register")({
 function RegisterPage() {
   const { user, isLoading } = useAuth()
   const navigate = useNavigate()
-  const {
-    data: settings,
-    isPending: settingsPending,
-    isError: settingsError,
-    error: settingsLoadError,
-  } = useQuery(publicSettingsQueryOptions())
+  const { data: settings, isPending: settingsPending } = useQuery(
+    publicSettingsQueryOptions()
+  )
 
   useEffect(() => {
     if (!isLoading && user) {
@@ -53,31 +49,7 @@ function RegisterPage() {
     return <LoadingState message="Checking session…" centered />
   }
 
-  if (settingsError) {
-    const errorTitle = settingsLoadError
-      ? getApiErrorTitle(settingsLoadError, "Could not load registration status")
-      : "Could not load registration status"
-    const errorMessage = settingsLoadError
-      ? getApiErrorMessage(
-          settingsLoadError,
-          "Try refreshing the page. If the problem continues, contact an administrator."
-        )
-      : "Try refreshing the page. If the problem continues, contact an administrator."
-
-    return (
-      <AuthPageShell>
-        <Card className="motion-auth-card w-full max-w-md">
-          <CardContent className="pt-6">
-            <Callout type="danger" title={errorTitle}>
-              {errorMessage}
-            </Callout>
-          </CardContent>
-        </Card>
-      </AuthPageShell>
-    )
-  }
-
-  if (!isRegistrationEnabled(settings)) {
+  if (!settings || !isRegistrationEnabled(settings)) {
     return (
       <AuthPageShell>
         <Card className="motion-auth-card w-full max-w-md">

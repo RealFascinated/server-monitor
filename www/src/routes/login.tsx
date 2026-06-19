@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/card"
 import { isRegistrationEnabled } from "@/lib/api/settings"
 import { publicSettingsQueryOptions } from "@/lib/api/settings.queries"
+import { loadCachedQuery } from "@/lib/api/query-loader"
 import { useAuth } from "@/lib/auth"
 import { pageTitle } from "@/lib/page-title"
 
@@ -24,7 +25,7 @@ export const Route = createFileRoute("/login")({
     meta: [{ title: pageTitle("Sign in") }],
   }),
   loader: ({ context: { queryClient } }) => {
-    return queryClient.ensureQueryData(publicSettingsQueryOptions())
+    return loadCachedQuery(queryClient, publicSettingsQueryOptions())
   },
   component: LoginPage,
 })
