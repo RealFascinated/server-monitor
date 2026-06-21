@@ -40,7 +40,7 @@ dependencies {
     implementation("com.maxmind.geoip2:geoip2:4.2.1")
     implementation("org.apache.commons:commons-compress:1.27.1")
 
-    compileOnly("org.jetbrains:annotations:26.0.2")
+    compileOnly("org.jetbrains:annotations:26.1.0")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
