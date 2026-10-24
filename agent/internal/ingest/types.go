@@ -27,8 +27,20 @@ type SmartMetric struct {
 	TemperatureCelsius *float64 `json:"temperatureCelsius,omitempty"`
 	PowerOnHours       *int64   `json:"powerOnHours,omitempty"`
 
-	ReallocatedSectors *int64 `json:"reallocatedSectors,omitempty"`
-	PendingSectors     *int64 `json:"pendingSectors,omitempty"`
+	ReallocatedSectors   *int64 `json:"reallocatedSectors,omitempty"`
+	ReallocatedEvents    *int64 `json:"reallocatedEvents,omitempty"`
+	PendingSectors       *int64 `json:"pendingSectors,omitempty"`
+	ReportedUncorrect    *int64 `json:"reportedUncorrect,omitempty"`
+	OfflineUncorrectable *int64 `json:"offlineUncorrectable,omitempty"`
+	UdmaCrcErrors        *int64 `json:"udmaCrcErrors,omitempty"`
+
+	LoadCycleCount       *int64 `json:"loadCycleCount,omitempty"`
+	StartStopCounts      *int64 `json:"startStopCounts,omitempty"`
+	PowerCycleCount      *int64 `json:"powerCycleCount,omitempty"`
+	PowerOffRetracts     *int64 `json:"powerOffRetracts,omitempty"`
+	HeliumPercent        *int64 `json:"heliumPercent,omitempty"`
+	ErrorLogEntries      *int64 `json:"errorLogEntries,omitempty"`
+	EnduranceUsedPercent *int64 `json:"enduranceUsedPercent,omitempty"`
 
 	PercentageUsed   *int64 `json:"percentageUsed,omitempty"`
 	AvailableSpare   *int64 `json:"availableSpare,omitempty"`

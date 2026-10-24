@@ -34,7 +34,14 @@ public final class TestFixtures {
         return minimalIngestPayload().replace("\"diskMetrics\": []",
                 "\"diskMetrics\": [], \"smartMetrics\": ["
                         + "{\"device\": \"sda\", \"model\": \"WDC WD40EFRX\", \"healthPassed\": true, "
-                        + "\"temperatureCelsius\": 34, \"powerOnHours\": 41234, \"reallocatedSectors\": 8, \"pendingSectors\": 0},"
+                        + "\"temperatureCelsius\": 34, \"powerOnHours\": 41234, \"powerCycleCount\": 214, "
+                        + "\"reallocatedSectors\": 8, \"reallocatedEvents\": 3, \"pendingSectors\": 0, "
+                        + "\"reportedUncorrect\": 0, \"offlineUncorrectable\": 0, \"udmaCrcErrors\": 12, "
+                        + "\"loadCycleCount\": 19042, \"startStopCounts\": 301, \"powerOffRetracts\": 41, "
+                        + "\"heliumPercent\": 100, \"errorLogEntries\": 7, "
+                        + "\"dataWrittenBytes\": 512000, \"dataReadBytes\": 1024000},"
+                        + "{\"device\": \"sdf\", \"model\": \"Samsung SSD 870 EVO\", \"healthPassed\": true, "
+                        + "\"powerOnHours\": 29788, \"enduranceUsedPercent\": 2, \"dataWrittenBytes\": 11874000000},"
                         + "{\"device\": \"nvme0\", \"model\": \"Samsung SSD 980 PRO\", \"healthPassed\": true, "
                         + "\"percentageUsed\": 4, \"availableSpare\": 96, \"mediaErrors\": 0, \"unsafeShutdowns\": 7, "
                         + "\"dataWrittenBytes\": 1024000000, \"dataReadBytes\": 512000000}]");

@@ -53,6 +53,10 @@ class VmMetricCatalogTest {
         assertEquals("percentageUsed", VmMetricCatalog.fieldName(SmartSeries.PERCENTAGE_USED));
         assertEquals("dataWrittenBytes", VmMetricCatalog.fieldName(SmartSeries.DATA_WRITTEN_BYTES));
         assertEquals("dataReadBytes", VmMetricCatalog.fieldName(SmartSeries.DATA_READ_BYTES));
+        assertEquals("udmaCrcErrors", VmMetricCatalog.fieldName(SmartSeries.UDMA_CRC_ERRORS));
+        assertEquals("offlineUncorrectable", VmMetricCatalog.fieldName(SmartSeries.OFFLINE_UNCORRECTABLE));
+        assertEquals("startStopCounts", VmMetricCatalog.fieldName(SmartSeries.START_STOP_COUNTS));
+        assertEquals("enduranceUsedPercent", VmMetricCatalog.fieldName(SmartSeries.ENDURANCE_USED_PERCENT));
         assertEquals("smartDevices", MetricFamily.SMART.section().jsonKey());
         assertEquals(List.of("device"), List.of(MetricFamily.SMART.groupingLabels()));
     }

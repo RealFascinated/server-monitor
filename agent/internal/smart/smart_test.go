@@ -21,12 +21,36 @@ const sataJSON = `{
  "smart_status":{"passed":true},
  "temperature":{"current":34},
  "power_on_time":{"hours":41234},
+ "power_cycle_count":214,
+ "ata_smart_error_log":{"summary":{"count":7}},
  "ata_smart_attributes":{"table":[
   {"id":1,"name":"Raw_Read_Error_Rate","raw":{"value":0}},
+  {"id":4,"name":"Start_Stop_Count","raw":{"value":301}},
   {"id":5,"name":"Reallocated_Sector_Ct","raw":{"value":8}},
+  {"id":22,"name":"Helium_Level","raw":{"value":100}},
+  {"id":187,"name":"Reported_Uncorrect","raw":{"value":1}},
+  {"id":188,"name":"Command_Timeout","raw":{"value":4295032833}},
+  {"id":192,"name":"Power-Off_Retract_Count","raw":{"value":41}},
+  {"id":193,"name":"Load_Cycle_Count","raw":{"value":19042}},
+  {"id":196,"name":"Reallocated_Event_Count","raw":{"value":3}},
   {"id":197,"name":"Current_Pending_Sector","raw":{"value":2}},
+  {"id":198,"name":"Offline_Uncorrectable","raw":{"value":0}},
+  {"id":199,"name":"UDMA_CRC_Error_Count","raw":{"value":12}},
+  {"id":241,"name":"Total_LBAs_Written","raw":{"value":1000}},
+  {"id":242,"name":"Total_LBAs_Read","raw":{"value":2000}},
   {"id":9,"name":"Power_On_Hours","raw":{"value":41234}}]},
  "smartctl":{"exit_status":0}}`
+
+// Endurance comes from the ATA general statistics log, and wear leveling is a vendor attribute
+// whose raw value means something different per manufacturer.
+const sataSsdJSON = `{
+ "device":{"name":"/dev/sdf","type":"sat","protocol":"ATA"},
+ "model_name":"Samsung SSD 870 EVO 250GB",
+ "smart_status":{"passed":true},
+ "power_on_time":{"hours":29788},
+ "endurance_used":{"current_percent":2},
+ "ata_smart_attributes":{"table":[
+  {"id":177,"name":"Wear_Leveling_Count","raw":{"value":47}}]}}`
 
 const nvmeJSON = `{
  "device":{"name":"/dev/nvme0","type":"nvme","protocol":"NVMe"},
@@ -56,8 +80,20 @@ func TestParseDeviceSata(t *testing.T) {
 	if *metric.TemperatureCelsius != 34 || *metric.PowerOnHours != 41234 {
 		t.Fatalf("temperature/hours = %v/%v", *metric.TemperatureCelsius, *metric.PowerOnHours)
 	}
-	if *metric.ReallocatedSectors != 8 || *metric.PendingSectors != 2 {
-		t.Fatalf("sectors = %v/%v", *metric.ReallocatedSectors, *metric.PendingSectors)
+	if *metric.ReallocatedSectors != 8 || *metric.PendingSectors != 2 || *metric.ReallocatedEvents != 3 {
+		t.Fatalf("sectors = %v/%v/%v", *metric.ReallocatedSectors, *metric.PendingSectors, *metric.ReallocatedEvents)
+	}
+	if *metric.ReportedUncorrect != 1 || *metric.OfflineUncorrectable != 0 || *metric.UdmaCrcErrors != 12 {
+		t.Fatalf("errors = %v/%v/%v", *metric.ReportedUncorrect, *metric.OfflineUncorrectable, *metric.UdmaCrcErrors)
+	}
+	if *metric.LoadCycleCount != 19042 || *metric.StartStopCounts != 301 || *metric.PowerOffRetracts != 41 {
+		t.Fatalf("cycles = %v/%v/%v", *metric.LoadCycleCount, *metric.StartStopCounts, *metric.PowerOffRetracts)
+	}
+	if *metric.PowerCycleCount != 214 || *metric.ErrorLogEntries != 7 || *metric.HeliumPercent != 100 {
+		t.Fatalf("log/helium = %v/%v/%v", *metric.PowerCycleCount, *metric.ErrorLogEntries, *metric.HeliumPercent)
+	}
+	if *metric.DataWrittenBytes != 1000*512 || *metric.DataReadBytes != 2000*512 {
+		t.Fatalf("ata totals = %d/%d bytes, want LBAs counted in 512 byte sectors", *metric.DataWrittenBytes, *metric.DataReadBytes)
 	}
 	if metric.PercentageUsed != nil || metric.MediaErrors != nil {
 		t.Fatal("NVMe fields must be empty for a SATA disk")
@@ -68,6 +104,19 @@ func TestParseDeviceNeverReportsTheSerialNumber(t *testing.T) {
 	metric, _ := parseDevice([]byte(sataJSON), "sda")
 	if strings.Contains(strings.ToLower(metric.Model+metric.Device), "secret") {
 		t.Fatalf("serial number present in %+v", metric)
+	}
+}
+
+func TestParseDeviceSataSsdReportsEndurance(t *testing.T) {
+	metric, ok := parseDevice([]byte(sataSsdJSON), "sdf")
+	if !ok {
+		t.Fatal("expected a reading")
+	}
+	if metric.EnduranceUsedPercent == nil || *metric.EnduranceUsedPercent != 2 {
+		t.Fatalf("endurance = %v, want 2 percent", metric.EnduranceUsedPercent)
+	}
+	if metric.PercentageUsed != nil {
+		t.Fatal("the vendor wear leveling attribute must not be reported as NVMe wear")
 	}
 }
 
@@ -112,9 +161,11 @@ func TestParseScan(t *testing.T) {
 }
 
 type fakeSmartctl struct {
-	sda     string
-	calls   [][]string
-	scanErr error
+	sda string
+	// sdaNeedsHint stands for a bridge that only answers when the device type is pinned.
+	sdaNeedsHint bool
+	calls        [][]string
+	scanErr      error
 }
 
 func (f *fakeSmartctl) run(args ...string) ([]byte, error) {
@@ -127,6 +178,9 @@ func (f *fakeSmartctl) run(args ...string) ([]byte, error) {
 	}
 	switch args[len(args)-1] {
 	case "/dev/sda":
+		if f.sdaNeedsHint && !hasFlag(args, "-d") {
+			return []byte(standbyJSON), errors.New("exit status 2")
+		}
 		// smartctl exits non-zero when it found a problem but still prints valid JSON.
 		return []byte(f.sda), errors.New("exit status 4")
 	case "/dev/nvme0":
@@ -135,8 +189,27 @@ func (f *fakeSmartctl) run(args ...string) ([]byte, error) {
 	return nil, errors.New("unexpected device")
 }
 
+func hasFlag(args []string, flag string) bool {
+	for _, arg := range args {
+		if arg == flag {
+			return true
+		}
+	}
+	return false
+}
+
 func newTestCollector(f *fakeSmartctl, clock *time.Time) *collector {
 	return &collector{run: f.run, now: func() time.Time { return *clock }, last: map[string]reading{}}
+}
+
+func invocationsFor(calls [][]string, device string) []string {
+	var out []string
+	for _, call := range calls {
+		if call[len(call)-1] == device {
+			out = append(out, strings.Join(call, " "))
+		}
+	}
+	return out
 }
 
 func TestCollectQueriesEveryDeviceWithoutWakingSleepingDisks(t *testing.T) {
@@ -148,9 +221,32 @@ func TestCollectQueriesEveryDeviceWithoutWakingSleepingDisks(t *testing.T) {
 	if len(metrics) != 2 || metrics[0].Device != "sda" || metrics[1].Device != "nvme0" {
 		t.Fatalf("metrics = %+v", metrics)
 	}
-	query := strings.Join(fake.calls[1], " ")
-	if query != "-a --json -n standby -d sat /dev/sda" {
-		t.Fatalf("query = %q, want standby-safe invocation with the scanned device type", query)
+	// The device type from --scan must not be pinned up front: for a SATA disk behind an HBA it
+	// is often "scsi", which answers with SCSI pages and no ATA attributes at all.
+	calls := invocationsFor(fake.calls, "/dev/sda")
+	if len(calls) != 1 || calls[0] != "-a --json -n standby /dev/sda" {
+		t.Fatalf("calls = %q, want one standby-safe autodetected invocation", calls)
+	}
+}
+
+func TestCollectFallsBackToTheScannedDeviceType(t *testing.T) {
+	fake := &fakeSmartctl{sda: sataJSON, sdaNeedsHint: true}
+	now := time.Unix(1_700_000_000, 0)
+
+	metrics := newTestCollector(fake, &now).collect()
+
+	var sda *ingest.SmartMetric
+	for i := range metrics {
+		if metrics[i].Device == "sda" {
+			sda = &metrics[i]
+		}
+	}
+	if sda == nil {
+		t.Fatalf("metrics = %+v, want the disk reported after the retry", metrics)
+	}
+	calls := invocationsFor(fake.calls, "/dev/sda")
+	if len(calls) != 2 || calls[1] != "-a --json -n standby -d sat /dev/sda" {
+		t.Fatalf("calls = %q, want the scanned device type retried second", calls)
 	}
 }
 

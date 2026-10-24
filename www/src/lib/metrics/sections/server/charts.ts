@@ -19,7 +19,7 @@ import type {
   MetricChartConfig,
   TooltipSortEntry,
 } from "@/lib/metrics/chart-config"
-import { chartSeries } from "@/lib/metrics/series"
+import { chartSeries, hasSeriesData } from "@/lib/metrics/series"
 import {
   formatCelsius,
   formatCount,
@@ -189,8 +189,12 @@ function formatHealthStatus(value: number): string {
   return ""
 }
 
+/**
+ * A disk only reports the counters its own interface has, so a chart it can never fill is noise.
+ * A disk reporting nothing at all keeps them, which is a fresh agent rather than a wrong one.
+ */
 function smartCharts(disk: SmartDeviceMetrics): MetricChartConfig[] {
-  return [
+  const charts: MetricChartConfig[] = [
     {
       title: "Health",
       description:
@@ -207,12 +211,13 @@ function smartCharts(disk: SmartDeviceMetrics): MetricChartConfig[] {
       thresholds: TEMPERATURE_THRESHOLDS,
     },
     {
-      title: "NVMe wear",
+      title: "Wear",
       description:
-        "Percentage of the drive's rated endurance used, and the spare capacity still available. Wear above 100% is possible once the rating is exceeded.",
+        "Percentage of the drive's rated endurance used, and the spare capacity still available. NVMe drives report both, many SATA SSDs report endurance used instead, spinning disks report neither. Wear above 100% is possible once the rating is exceeded.",
       series: [
         percentSeries("Used", disk.percentageUsed),
         percentSeries("Spare", disk.availableSpare),
+        percentSeries("Endurance", disk.enduranceUsedPercent),
       ],
       valueFormatter: formatPercentValue,
       ...PERCENT_RIGHT_AXIS,
@@ -220,33 +225,79 @@ function smartCharts(disk: SmartDeviceMetrics): MetricChartConfig[] {
     {
       title: "Bad sectors",
       description:
-        "Reallocated and pending sectors on SATA drives. A rising count is an early sign of a failing disk.",
+        "Sectors the drive has moved out of service, sectors waiting to be moved, and the events that triggered reallocation. A rising count is an early sign of a failing disk.",
       series: [
         chartSeries("Reallocated", disk.reallocatedSectors),
+        chartSeries("Reallocated events", disk.reallocatedEvents),
         chartSeries("Pending", disk.pendingSectors),
       ],
       valueFormatter: formatCount,
     },
     {
-      title: "NVMe errors",
+      title: "Uncorrectable data",
       description:
-        "Media and data integrity errors, and shutdowns without a clean power-down, as counted by the drive.",
+        "Reads the drive could not recover with its own error correction. The two ATA counts cover SATA disks and media errors cover NVMe; any increase means the drive gave up on data it could not read back.",
       series: [
+        chartSeries("Reported uncorrect", disk.reportedUncorrect),
+        chartSeries("Offline uncorrectable", disk.offlineUncorrectable),
         chartSeries("Media errors", disk.mediaErrors),
-        chartSeries("Unsafe shutdowns", disk.unsafeShutdowns),
       ],
       valueFormatter: formatCount,
+    },
+    {
+      title: "Interface errors",
+      description:
+        "CRC errors the drive counted on the SATA link. They point at the cable, port or backplane rather than at the disk itself.",
+      series: [chartSeries("UDMA CRC errors", disk.udmaCrcErrors)],
+      valueFormatter: formatCount,
+    },
+    {
+      title: "Error log",
+      description:
+        "Entries the drive has recorded in its ATA error log over its whole life, including the failed commands behind the other counts on this page.",
+      series: [chartSeries("Error log entries", disk.errorLogEntries)],
+      valueFormatter: formatCount,
+    },
+    {
+      title: "Unsafe shutdowns",
+      description:
+        "Power-loss events the drive noticed. NVMe counts shutdowns without a clean power-down; ATA counts the emergency head parks they forced.",
+      series: [
+        chartSeries("Unsafe shutdowns", disk.unsafeShutdowns),
+        chartSeries("Power-off retracts", disk.powerOffRetracts),
+      ],
+      valueFormatter: formatCount,
+    },
+    {
+      title: "Cycle counts",
+      description:
+        "Mechanical cycles accumulated over the drive's life. Head load cycles carry a rated limit, usually in the hundreds of thousands, and are the one to watch on desktop and surveillance drives.",
+      series: [
+        chartSeries("Load cycles", disk.loadCycleCount),
+        chartSeries("Start-stop", disk.startStopCounts),
+        chartSeries("Power cycles", disk.powerCycleCount),
+      ],
+      valueFormatter: formatCount,
+    },
+    {
+      title: "Helium seal",
+      description:
+        "Helium pressure inside a sealed drive. Anything below 100% means the seal has leaked. Only helium-filled drives report it.",
+      series: [percentSeries("Seal", disk.heliumPercent)],
+      valueFormatter: formatPercentValue,
+      ...PERCENT_RIGHT_AXIS,
     },
     {
       title: "Power-on hours",
       description: "Hours the drive has spent powered on over its whole life.",
       series: [chartSeries("Power-on hours", disk.powerOnHours)],
       valueFormatter: formatCount,
+      seriesFormatters: [(hours) => formatDurationSeconds(hours * 3_600)],
     },
     {
       title: "Usage",
       description:
-        "Total data written to and read from the drive over its life. Both counters come from the NVMe health log, so SATA drives report neither.",
+        "Total data written to and read from the drive over its life. NVMe drives report both from their health log; on SATA drives they come from vendor attributes, which many desktop and surveillance drives omit.",
       series: [
         chartSeries("Written", disk.dataWrittenBytes),
         chartSeries("Read", disk.dataReadBytes),
@@ -254,6 +305,8 @@ function smartCharts(disk: SmartDeviceMetrics): MetricChartConfig[] {
       valueFormatter: formatMemoryBytes,
     },
   ]
+  const filled = charts.filter((chart) => hasSeriesData(chart.series))
+  return filled.length > 0 ? filled : charts
 }
 
 function gpuCharts(gpu: GpuMetrics): MetricChartConfig[] {

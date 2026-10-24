@@ -92,8 +92,19 @@ export type SmartDeviceMetrics = {
   healthPassed?: MetricValues
   temperatureCelsius?: MetricValues
   powerOnHours?: MetricValues
+  powerCycleCount?: MetricValues
   reallocatedSectors?: MetricValues
+  reallocatedEvents?: MetricValues
   pendingSectors?: MetricValues
+  reportedUncorrect?: MetricValues
+  offlineUncorrectable?: MetricValues
+  udmaCrcErrors?: MetricValues
+  loadCycleCount?: MetricValues
+  startStopCounts?: MetricValues
+  powerOffRetracts?: MetricValues
+  heliumPercent?: MetricValues
+  errorLogEntries?: MetricValues
+  enduranceUsedPercent?: MetricValues
   percentageUsed?: MetricValues
   availableSpare?: MetricValues
   mediaErrors?: MetricValues
