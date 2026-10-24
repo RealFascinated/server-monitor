@@ -1,5 +1,8 @@
-import { getCoreRowModel, useReactTable } from "@tanstack/react-table"
-import type { ColumnDef } from "@tanstack/react-table"
+import {
+  getCoreRowModel,
+  useLegacyTable as useReactTable,
+} from "@tanstack/react-table/legacy"
+import type { LegacyColumnDef as ColumnDef } from "@tanstack/react-table/legacy"
 import { ShieldCheck } from "lucide-react"
 import { useMemo } from "react"
 

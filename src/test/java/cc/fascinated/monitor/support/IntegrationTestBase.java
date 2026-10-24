@@ -10,7 +10,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.junit.jupiter.api.BeforeEach;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.lang.reflect.Field;
@@ -26,7 +26,7 @@ public abstract class IntegrationTestBase {
 
     // Started once per JVM: Spring caches the application context across test classes, so the
     // containers must outlive any single class (per-class @Container lifecycle leaves a stale JDBC URL).
-    static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>(POSTGRES_IMAGE)
+    static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer(POSTGRES_IMAGE)
             .withDatabaseName("monitor")
             .withUsername("monitor")
             .withPassword("monitor");

@@ -1,9 +1,10 @@
 import {
   getCoreRowModel,
   getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
-import type { ColumnDef, SortingState } from "@tanstack/react-table"
+  useLegacyTable as useReactTable,
+} from "@tanstack/react-table/legacy"
+import type { SortingState } from "@tanstack/react-table"
+import type { LegacyColumnDef as ColumnDef } from "@tanstack/react-table/legacy"
 import { GripVertical, Plus } from "lucide-react"
 import type { DragEvent } from "react"
 import { memo, useMemo, useState } from "react"

@@ -1,5 +1,9 @@
 import { flexRender } from "@tanstack/react-table"
-import type { Row, Table as TanStackTable } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
+import type {
+  LegacyRow as Row,
+  LegacyTable as TanStackTable,
+} from "@tanstack/react-table/legacy"
 import { ArrowDown, ArrowUp, ArrowUpDown, GripVertical } from "lucide-react"
 import type { ReactNode } from "react"
 
@@ -14,7 +18,7 @@ import {
 import { beginServerDrag } from "@/lib/servers/drag"
 import { cn } from "@/lib/utils"
 
-type RowDragConfig<TData> = {
+type RowDragConfig<TData extends RowData> = {
   draggingRowId: string | null
   getServerId: (row: Row<TData>) => number
   getServerLabel: (row: Row<TData>) => string
@@ -22,7 +26,7 @@ type RowDragConfig<TData> = {
   onDragEnd: () => void
 }
 
-type DataTableProps<TData> = {
+type DataTableProps<TData extends RowData> = {
   table: TanStackTable<TData>
   rowDrag?: RowDragConfig<TData>
   renderRowCells?: (row: Row<TData>) => ReactNode
@@ -41,7 +45,7 @@ function SortIndicator({ direction }: { direction: false | "asc" | "desc" }) {
   return <ArrowUpDown className="size-3.5 shrink-0 opacity-40" aria-hidden />
 }
 
-function DataTable<TData>({
+function DataTable<TData extends RowData>({
   table,
   rowDrag,
   renderRowCells,

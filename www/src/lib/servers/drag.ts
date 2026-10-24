@@ -5,10 +5,6 @@ export const FOLDER_DRAG_MIME = "application/x-monitor-folder-id"
 
 function setupDragImage(event: DragEvent<HTMLElement>): void {
   const dataTransfer = event.dataTransfer
-  if (!dataTransfer) {
-    return
-  }
-
   const element = event.currentTarget
   const rect = element.getBoundingClientRect()
   dataTransfer.setDragImage(element, rect.width / 2, rect.height / 2)
@@ -36,10 +32,6 @@ export function beginServerDrag(
   serverId: number
 ): void {
   const dataTransfer = event.dataTransfer
-  if (!dataTransfer) {
-    return
-  }
-
   writeServerDragData(dataTransfer, serverId)
   setupDragImage(event)
 }
@@ -49,10 +41,6 @@ export function beginFolderDrag(
   folderId: number
 ): void {
   const dataTransfer = event.dataTransfer
-  if (!dataTransfer) {
-    return
-  }
-
   writeFolderDragData(dataTransfer, folderId)
   setupDragImage(event)
 }

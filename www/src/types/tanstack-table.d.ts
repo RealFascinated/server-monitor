@@ -1,9 +1,9 @@
-import "@tanstack/react-table"
+import "@tanstack/table-core"
 
 import type { ServerResponse } from "@/lib/api/user/servers"
 
-declare module "@tanstack/react-table" {
-  interface ColumnMeta<TData, TValue> {
+declare module "@tanstack/table-core" {
+  interface ColumnMeta<TFeatures, TData, TValue> {
     className?: string
     renderServer?: (server: ServerResponse) => React.ReactNode
   }

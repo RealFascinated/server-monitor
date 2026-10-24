@@ -1,5 +1,5 @@
 import { memo } from "react"
-import type { Row } from "@tanstack/react-table"
+import type { LegacyRow as Row } from "@tanstack/react-table/legacy"
 import { GripVertical } from "lucide-react"
 
 import { TableCell, TableRow } from "@/components/ui/table"

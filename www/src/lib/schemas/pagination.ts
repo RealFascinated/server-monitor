@@ -23,10 +23,8 @@ export function pageSearchSchema(options: PageSearchSchemaOptions = {}) {
       page: z.coerce.number().int().min(1).optional(),
       count: z.coerce.number().int().min(1).max(maxCount).optional(),
     })
-    .transform(
-      (search): PageSearchParams => ({
-        page: search.page ?? 1,
-        count: search.count ?? defaultCount,
-      })
-    )
+    .transform((search): PageSearchParams => ({
+      page: search.page ?? 1,
+      count: search.count ?? defaultCount,
+    }))
 }

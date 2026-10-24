@@ -2,7 +2,7 @@
 # NVIDIA variant: Ubuntu + CUDA base (glibc). Use with the NVIDIA Container Toolkit and
 # --gpus all so nvidia-smi and driver libraries are injected from the host.
 
-FROM golang:1.25-alpine AS build
+FROM golang:1.26-alpine AS build
 
 WORKDIR /src
 

@@ -9,8 +9,7 @@ export type MetricTimeWindow =
   | { kind: "custom"; from: number; to: number }
 
 export type MetricTimeWindowSearch =
-  | { range: MetricTimeRange }
-  | { from: number; to: number }
+  { range: MetricTimeRange } | { from: number; to: number }
 
 export function metricTimeWindowToEpochWindow(window: MetricTimeWindow): {
   from: number

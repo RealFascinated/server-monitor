@@ -250,7 +250,7 @@ class ServerIngestIntegrationTest extends IntegrationTestBase {
 
         String newToken = this.objectMapper.readTree(rotated.getResponse().getContentAsString())
                 .get("ingestToken")
-                .asText();
+                .asString();
 
         this.mockMvc.perform(post("/v1/servers/heartbeat")
                         .header("Authorization", TestAuthSupport.bearer(newToken)))

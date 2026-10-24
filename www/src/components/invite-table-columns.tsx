@@ -1,4 +1,4 @@
-import type { ColumnDef } from "@tanstack/react-table"
+import type { LegacyColumnDef as ColumnDef } from "@tanstack/react-table/legacy"
 
 import { RoleTag } from "@/components/server/role-tag"
 import { TableHeaderTooltip } from "@/components/simple-tooltip"

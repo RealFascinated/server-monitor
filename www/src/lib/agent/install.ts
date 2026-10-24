@@ -12,12 +12,7 @@ export const AGENT_DOCKER_IMAGE_NVIDIA =
   "ghcr.io/realfascinated/monitor-agent:nvidia"
 
 export type AgentInstallMethod =
-  | "linux"
-  | "windows"
-  | "docker"
-  | "docker-nvidia"
-  | "unraid"
-  | "unraid-nvidia"
+  "linux" | "windows" | "docker" | "docker-nvidia" | "unraid" | "unraid-nvidia"
 
 function shellQuote(value: string): string {
   return `'${value.replace(/'/g, `'\\''`)}'`

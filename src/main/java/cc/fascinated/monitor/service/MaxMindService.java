@@ -78,12 +78,12 @@ public class MaxMindService {
 
         try {
             CityResponse city = this.cityReader.city(InetAddress.getByName(ip));
-            Country country = city.getCountry();
-            String countryName = country != null ? country.getName() : null;
-            City cityRecord = city.getCity();
-            String cityName = cityRecord != null ? cityRecord.getName() : null;
-            Subdivision subdivision = city.getMostSpecificSubdivision();
-            String regionName = subdivision != null ? subdivision.getName() : null;
+            Country country = city.country();
+            String countryName = country != null ? country.name() : null;
+            City cityRecord = city.city();
+            String cityName = cityRecord != null ? cityRecord.name() : null;
+            Subdivision subdivision = city.mostSpecificSubdivision();
+            String regionName = subdivision != null ? subdivision.name() : null;
 
             if (cityName != null && countryName != null) {
                 return Optional.of(cityName + ", " + countryName);

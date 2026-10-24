@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router"
-import type { ColumnDef } from "@tanstack/react-table"
+import type { LegacyColumnDef as ColumnDef } from "@tanstack/react-table/legacy"
 import type { ReactNode } from "react"
 
 import { DeleteServerButton } from "@/components/user/delete-server-button"

@@ -53,7 +53,7 @@ class ServerAccessIntegrationTest extends IntegrationTestBase {
                 .asLong();
         String inviteToken = this.objectMapper.readTree(invite.getResponse().getContentAsString())
                 .get("token")
-                .asText();
+                .asString();
 
         this.mockMvc.perform(get("/v1/user/invites/preview")
                         .header("Authorization", TestAuthSupport.bearer(this.memberToken))

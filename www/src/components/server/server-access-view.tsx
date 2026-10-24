@@ -2,9 +2,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import {
   getCoreRowModel,
   getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
-import type { ColumnDef, SortingState } from "@tanstack/react-table"
+  useLegacyTable as useReactTable,
+} from "@tanstack/react-table/legacy"
+import type { SortingState } from "@tanstack/react-table"
+import type { LegacyColumnDef as ColumnDef } from "@tanstack/react-table/legacy"
 import { Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
 

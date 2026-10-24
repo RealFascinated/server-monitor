@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # Default image: small Alpine build for AMD/Intel GPU (sysfs) and hosts without NVIDIA.
 
-FROM golang:1.25-alpine AS build
+FROM golang:1.26-alpine AS build
 
 WORKDIR /src
 
