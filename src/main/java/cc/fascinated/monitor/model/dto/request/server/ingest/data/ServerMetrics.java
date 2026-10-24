@@ -31,6 +31,9 @@ public record ServerMetrics(
         Long oomKillsTotal,
         Long oomKillsPerSecond,
         Double cpuPowerWatts,
+        @Nullable Boolean clockSynced,
+        @Nullable Double clockErrorMs,
+        @Nullable Double clockOffsetMs,
         @Nullable List<CpuCoreMetric> cpuCoreMetrics,
         @Nullable List<TemperatureMetric> temperatureMetrics
 ) {}

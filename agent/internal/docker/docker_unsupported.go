@@ -4,6 +4,6 @@ package docker
 
 import "fascinated.cc/monitor/agent/internal/ingest"
 
-func CollectContainerMetrics() []ingest.DockerContainerMetric {
+func CollectContainerMetrics(allowCLIFallback bool) []ingest.DockerContainerMetric {
 	return []ingest.DockerContainerMetric{}
 }

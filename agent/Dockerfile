@@ -18,7 +18,7 @@ RUN CGO_ENABLED=0 go build \
 
 FROM alpine:3.21
 
-RUN apk add --no-cache ca-certificates docker-cli util-linux zfs
+RUN apk add --no-cache ca-certificates docker-cli smartmontools util-linux zfs
 
 COPY --from=build /monitor-agent /usr/local/bin/monitor-agent
 COPY config-example.yml /etc/monitor-agent/config-example.yml

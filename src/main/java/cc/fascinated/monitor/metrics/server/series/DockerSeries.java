@@ -13,7 +13,11 @@ import java.math.BigDecimal;
 @Accessors(fluent = true)
 public enum DockerSeries implements VmMetricFamily {
     CPU_USAGE("monitor_container_cpu_usage"),
-    MEMORY_USAGE("monitor_container_memory_usage");
+    MEMORY_USAGE("monitor_container_memory_usage"),
+    NETWORK_RX_BYTES_PER_SECOND("monitor_container_network_rx_bytes_per_second"),
+    NETWORK_TX_BYTES_PER_SECOND("monitor_container_network_tx_bytes_per_second"),
+    BLOCK_READ_BYTES_PER_SECOND("monitor_container_block_read_bytes_per_second"),
+    BLOCK_WRITE_BYTES_PER_SECOND("monitor_container_block_write_bytes_per_second");
 
     private final String metricName;
 
@@ -36,5 +40,9 @@ public enum DockerSeries implements VmMetricFamily {
         BigDecimal cpuUsage = container.cpuUsage();
         CPU_USAGE.writeNullable(labeled, cpuUsage != null ? cpuUsage.doubleValue() : null);
         MEMORY_USAGE.writeNullable(labeled, container.memoryUsage());
+        NETWORK_RX_BYTES_PER_SECOND.writeNullable(labeled, container.networkRxBytesPerSecond());
+        NETWORK_TX_BYTES_PER_SECOND.writeNullable(labeled, container.networkTxBytesPerSecond());
+        BLOCK_READ_BYTES_PER_SECOND.writeNullable(labeled, container.blockReadBytesPerSecond());
+        BLOCK_WRITE_BYTES_PER_SECOND.writeNullable(labeled, container.blockWriteBytesPerSecond());
     }
 }

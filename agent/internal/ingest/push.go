@@ -5,10 +5,11 @@ import (
 	"fmt"
 )
 
-func Push(config *Config, data Data, agentVersion string) error {
+// Push sends one sample and returns the size of the JSON payload.
+func Push(config *Config, data Data, agentVersion string) (int, error) {
 	body, err := json.Marshal(data)
 	if err != nil {
-		return fmt.Errorf("marshal ingest data: %w", err)
+		return 0, fmt.Errorf("marshal ingest data: %w", err)
 	}
-	return postWithRetry("push ingest data", config.ApiEndpoint, config.IngestToken, agentVersion, body)
+	return len(body), postIngest("push ingest data", config.ApiEndpoint, config.IngestToken, agentVersion, body)
 }

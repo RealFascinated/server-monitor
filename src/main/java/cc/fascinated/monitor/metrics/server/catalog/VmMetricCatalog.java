@@ -4,6 +4,7 @@ import cc.fascinated.monitor.metrics.vm.query.Promql;
 import cc.fascinated.monitor.metrics.server.series.VmGaugeSeries;
 import cc.fascinated.monitor.metrics.server.series.CpuCoreSeries;
 import cc.fascinated.monitor.metrics.server.series.DiskSeries;
+import cc.fascinated.monitor.metrics.server.series.SmartSeries;
 import cc.fascinated.monitor.metrics.server.series.DockerSeries;
 import cc.fascinated.monitor.metrics.server.series.GpuSeries;
 import cc.fascinated.monitor.metrics.server.series.HostSeries;
@@ -76,6 +77,7 @@ public class VmMetricCatalog {
         addFamily(metrics, ZfsArcSeries.values());
         addFamily(metrics, ZfsPoolSeries.values());
         addFamily(metrics, TcpConnectionSeries.values());
+        addFamily(metrics, SmartSeries.values());
         return metrics.toArray(VmMetricFamily[]::new);
     }
 

@@ -35,6 +35,9 @@ export type HostMetrics = {
   cpuClockMhz?: MetricValues
   cpuPowerWatts?: MetricValues
   batteryPct?: MetricValues
+  clockSynced?: MetricValues
+  clockErrorMs?: MetricValues
+  clockOffsetMs?: MetricValues
 }
 
 export type CpuCoreMetrics = {
@@ -83,10 +86,29 @@ export type GpuMetrics = {
   powerWatts?: MetricValues
 }
 
+export type SmartDeviceMetrics = {
+  device: string
+  model: string
+  healthPassed?: MetricValues
+  temperatureCelsius?: MetricValues
+  powerOnHours?: MetricValues
+  reallocatedSectors?: MetricValues
+  pendingSectors?: MetricValues
+  percentageUsed?: MetricValues
+  availableSpare?: MetricValues
+  mediaErrors?: MetricValues
+  unsafeShutdowns?: MetricValues
+  dataWrittenBytes?: MetricValues
+}
+
 export type ContainerMetrics = {
   container: string
   cpuUsage?: MetricValues
   memoryUsage?: MetricValues
+  networkRxBytesPerSecond?: MetricValues
+  networkTxBytesPerSecond?: MetricValues
+  blockReadBytesPerSecond?: MetricValues
+  blockWriteBytesPerSecond?: MetricValues
 }
 
 export type TemperatureMetrics = {
@@ -139,6 +161,7 @@ export type ServerMetricsResponse = {
   disks?: DiskMetrics[] | null
   networks?: NetworkMetrics[] | null
   gpus?: GpuMetrics[] | null
+  smartDevices?: SmartDeviceMetrics[] | null
   containers?: ContainerMetrics[] | null
   temperatures?: TemperatureMetrics[] | null
   zfsArc?: ZfsArcMetrics | null

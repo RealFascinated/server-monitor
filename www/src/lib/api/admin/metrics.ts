@@ -42,6 +42,21 @@ export type HttpMetricsEntry = {
 
 export type HttpMetrics = Record<string, HttpMetricsEntry>
 
+export type AgentsMetrics = {
+  agentRssBytesMax?: MetricValues
+  agentRssBytesAvg?: MetricValues
+  agentHeapInUseBytesMax?: MetricValues
+  agentGoroutinesMax?: MetricValues
+  agentOpenFdsMax?: MetricValues
+  agentPushDurationMsAvg?: MetricValues
+  agentPushDurationMsMax?: MetricValues
+  agentPushPayloadBytesAvg?: MetricValues
+  agentPushFailuresPerMinute?: MetricValues
+  agentBufferedSamplesTotal?: MetricValues
+  agentBufferOldestAgeSecondsMax?: MetricValues
+  agentBufferDroppedPerMinute?: MetricValues
+}
+
 export type IngestMetrics = {
   ingestAuthFailuresTotal?: MetricValues
   ingestDurationSeconds?: MetricValues
@@ -77,6 +92,7 @@ export type AdminMetricsResponse = {
   timestamps: number[] | null
   overview?: OverviewMetrics | null
   fleet?: FleetMetrics | null
+  agents?: AgentsMetrics | null
   http?: HttpMetrics | null
   ingest?: IngestMetrics | null
   jvm?: JvmMetrics | null

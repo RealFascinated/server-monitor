@@ -6,12 +6,17 @@ import (
 )
 
 const (
+	defaultBatchEndpoint       = "https://monitor.fascinated.cc/api/v1/servers/ingest/batch"
 	defaultHeartbeatEndpoint   = "https://monitor.fascinated.cc/api/v1/servers/heartbeat"
 	defaultAgentUpdateEndpoint = "https://monitor.fascinated.cc/api/v1/agent/update"
 )
 
 func (c *Config) HeartbeatURL() string {
 	return siblingEndpoint(c.ApiEndpoint, "heartbeat", defaultHeartbeatEndpoint)
+}
+
+func (c *Config) BatchURL() string {
+	return siblingEndpoint(c.ApiEndpoint, "ingest/batch", defaultBatchEndpoint)
 }
 
 func (c *Config) UpdateURL() string {

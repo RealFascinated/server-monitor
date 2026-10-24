@@ -2,6 +2,8 @@ package ingest
 
 type Data struct {
 	AgentVersion     string                  `json:"agentVersion"`
+	// Timestamp is when the sample was collected (unix seconds). Buffered samples are replayed with it.
+	Timestamp        int64                   `json:"timestamp,omitempty"`
 	ServerDetails    ServerDetails           `json:"serverDetails"`
 	ServerMetrics    ServerMetrics           `json:"serverMetrics"`
 	InterfaceMetrics []InterfaceMetrics      `json:"interfaceMetrics"`
@@ -11,6 +13,45 @@ type Data struct {
 	DockerContainers     []DockerContainerMetric `json:"dockerContainers,omitempty"`
 	GPUMetrics           []GPUMetric             `json:"gpuMetrics,omitempty"`
 	TCPConnectionMetrics []TCPConnectionMetric   `json:"tcpConnectionMetrics,omitempty"`
+	AgentMetrics         *AgentMetrics           `json:"agentMetrics,omitempty"`
+	SmartMetrics         []SmartMetric           `json:"smartMetrics,omitempty"`
+}
+
+// SmartMetric is the health of one physical disk as reported by smartctl. Fields that do not
+// apply to the disk's type (SATA attributes on NVMe and the reverse) are omitted.
+type SmartMetric struct {
+	Device string `json:"device"`
+	Model  string `json:"model"`
+
+	HealthPassed       *bool    `json:"healthPassed,omitempty"`
+	TemperatureCelsius *float64 `json:"temperatureCelsius,omitempty"`
+	PowerOnHours       *int64   `json:"powerOnHours,omitempty"`
+
+	ReallocatedSectors *int64 `json:"reallocatedSectors,omitempty"`
+	PendingSectors     *int64 `json:"pendingSectors,omitempty"`
+
+	PercentageUsed   *int64 `json:"percentageUsed,omitempty"`
+	AvailableSpare   *int64 `json:"availableSpare,omitempty"`
+	MediaErrors      *int64 `json:"mediaErrors,omitempty"`
+	UnsafeShutdowns  *int64 `json:"unsafeShutdowns,omitempty"`
+	DataWrittenBytes *int64 `json:"dataWrittenBytes,omitempty"`
+}
+
+// AgentMetrics describes the agent process itself (resource usage and push health), shown to admins in fleet metrics.
+type AgentMetrics struct {
+	RssBytes             int64 `json:"rssBytes"`
+	Goroutines           int64 `json:"goroutines"`
+	HeapInUseBytes       int64 `json:"heapInUseBytes"`
+	OpenFds              int64 `json:"openFds"`
+	UptimeSeconds        int64 `json:"uptimeSeconds"`
+	LastPushDurationMs   int64 `json:"lastPushDurationMs"`
+	LastPushPayloadBytes int64 `json:"lastPushPayloadBytes"`
+	PushFailuresTotal    int64 `json:"pushFailuresTotal"`
+
+	BufferedSamples        int64 `json:"bufferedSamples"`
+	BufferedBytes          int64 `json:"bufferedBytes"`
+	BufferOldestAgeSeconds int64 `json:"bufferOldestAgeSeconds"`
+	BufferDroppedTotal     int64 `json:"bufferDroppedTotal"`
 }
 
 type GPUMetric struct {
@@ -85,6 +126,9 @@ type ServerMetrics struct {
 	BatteryPercent           *float64 `json:"batteryPercent,omitempty"`
 	OomKillsTotal            int64   `json:"oomKillsTotal"`
 	OomKillsPerSecond        int64   `json:"oomKillsPerSecond"`
+	ClockSynced              *bool    `json:"clockSynced,omitempty"`
+	ClockErrorMs             *float64 `json:"clockErrorMs,omitempty"`
+	ClockOffsetMs            *float64 `json:"clockOffsetMs,omitempty"`
 	CPUCoreMetrics           []CPUCoreMetric      `json:"cpuCoreMetrics,omitempty"`
 	TemperatureMetrics       []TemperatureMetric  `json:"temperatureMetrics,omitempty"`
 }
@@ -132,6 +176,12 @@ type DockerContainerMetric struct {
 	ContainerName string   `json:"containerName"`
 	CPUUsage      *float64 `json:"cpuUsage,omitempty"`
 	MemoryUsage   int64    `json:"memoryUsage"`
+
+	// Rates are omitted when unknown (first sample, counter reset, host networking, CLI fallback).
+	NetworkRxBytesPerSecond  *int64 `json:"networkRxBytesPerSecond,omitempty"`
+	NetworkTxBytesPerSecond  *int64 `json:"networkTxBytesPerSecond,omitempty"`
+	BlockReadBytesPerSecond  *int64 `json:"blockReadBytesPerSecond,omitempty"`
+	BlockWriteBytesPerSecond *int64 `json:"blockWriteBytesPerSecond,omitempty"`
 }
 
 type DiskMetric struct {

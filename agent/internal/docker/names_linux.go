@@ -70,21 +70,21 @@ func cachedContainerName(id string) string {
 	return ""
 }
 
-// Shared client with keep-alives off: a client built per call leaks its idle connection
-// (and the transport's goroutines) every time, since the docker daemon never closes it.
+// Shared client with keep-alives off: a client built per call would hold its idle connection
+// (and the transport's goroutines) open indefinitely, since the docker daemon never closes it.
 var dockerClient = &http.Client{
 	Transport: &http.Transport{
 		DisableKeepAlives: true,
 		DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
 			var dialer net.Dialer
-			return dialer.DialContext(ctx, "unix", linuxSocketPath())
+			return dialer.DialContext(ctx, "unix", socketPath())
 		},
 	},
 	Timeout: 3 * time.Second,
 }
 
 func fetchContainerNames() map[string]string {
-	if linuxSocketPath() == "" {
+	if socketPath() == "" {
 		return nil
 	}
 
@@ -127,6 +127,9 @@ func fetchContainerNames() map[string]string {
 	}
 	return out
 }
+
+// socketPath is a variable so tests can point the resolver at a fake daemon.
+var socketPath = linuxSocketPath
 
 func linuxSocketPath() string {
 	candidates := []string{

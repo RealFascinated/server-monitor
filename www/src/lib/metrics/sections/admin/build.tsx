@@ -1,4 +1,5 @@
 import {
+  Bot,
   Coffee,
   Database,
   Globe,
@@ -14,6 +15,7 @@ import { createMetricsSectionBuilder } from "@/lib/metrics/sections/builder"
 import { addChartSection } from "@/lib/metrics/sections/chart-section"
 import type { MetricsSectionNode } from "@/lib/metrics/sections/types"
 import {
+  agentsCharts,
   fleetCharts,
   fleetOsCharts,
   fleetVersionCharts,
@@ -64,6 +66,13 @@ function buildAdminMetricSections(
     title: "Ingest",
     icon: Upload,
     charts: ingestCharts(metrics.ingest ?? {}),
+    timeGrid,
+  })
+
+  addChartSection(builder, {
+    title: "Agents",
+    icon: Bot,
+    charts: agentsCharts(metrics.agents ?? {}),
     timeGrid,
   })
 

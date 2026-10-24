@@ -210,3 +210,56 @@ func unsetConfigEnv(t *testing.T) {
 		}
 	}
 }
+
+func TestLoadConfigCollectorFlagsDefaultOn(t *testing.T) {
+	t.Chdir(t.TempDir())
+	t.Setenv(configFileEnvVar, "")
+	unsetConfigEnv(t)
+	t.Setenv(ConfigEnvVar("ingest_token"), "token")
+
+	cfg, err := LoadConfig()
+	if err != nil {
+		t.Fatalf("LoadConfig: %v", err)
+	}
+	flags := map[string]bool{
+		"tcp":                 cfg.EnableTCP,
+		"thermal":             cfg.EnableThermal,
+		"cpu_cores":           cfg.EnableCPUCores,
+		"docker_cli_fallback": cfg.EnableDockerCLIFallback,
+		"battery":             cfg.EnableBattery,
+	}
+	for name, enabled := range flags {
+		if !enabled {
+			t.Fatalf("expected enable_%s to default to true", name)
+		}
+	}
+}
+
+func TestLoadConfigCollectorFlagsFileAndEnv(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "config.yml")
+	content := "ingest_token: token\nenable_tcp: false\nenable_thermal: false\n"
+	if err := os.WriteFile(path, []byte(content), 0o600); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+	t.Setenv(configFileEnvVar, path)
+	unsetConfigEnv(t)
+	t.Setenv(ConfigEnvVar("enable_thermal"), "true")
+	t.Setenv(ConfigEnvVar("enable_docker_cli_fallback"), "false")
+
+	cfg, err := LoadConfig()
+	if err != nil {
+		t.Fatalf("LoadConfig: %v", err)
+	}
+	if cfg.EnableTCP {
+		t.Fatal("expected enable_tcp false from file")
+	}
+	if !cfg.EnableThermal {
+		t.Fatal("expected env to override enable_thermal to true")
+	}
+	if cfg.EnableDockerCLIFallback {
+		t.Fatal("expected enable_docker_cli_fallback false from env")
+	}
+	if !cfg.EnableCPUCores || !cfg.EnableBattery {
+		t.Fatal("unset flags should stay enabled")
+	}
+}

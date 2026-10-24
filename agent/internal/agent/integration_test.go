@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"sync/atomic"
@@ -41,8 +42,27 @@ func TestAgentPushWhenSamplerReady(t *testing.T) {
 		t.Fatal("sampler not ready after two ticks")
 	}
 
+	ctx, cancel := context.WithCancel(context.Background())
+	done := make(chan struct{})
+	go func() {
+		a.sender.Run(ctx)
+		close(done)
+	}()
+	defer func() {
+		cancel()
+		<-done
+	}()
+
 	a.pushOnce()
 
+	deadline := time.After(5 * time.Second)
+	for pushes.Load() == 0 {
+		select {
+		case <-deadline:
+			t.Fatal("sample was never delivered")
+		case <-time.After(5 * time.Millisecond):
+		}
+	}
 	if pushes.Load() != 1 {
 		t.Fatalf("expected 1 push, got %d", pushes.Load())
 	}

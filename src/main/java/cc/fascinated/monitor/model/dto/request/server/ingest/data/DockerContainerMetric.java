@@ -13,5 +13,13 @@ public record DockerContainerMetric(
         @DecimalMax(value = "100", message = "CPU usage must be at most 100")
         BigDecimal cpuUsage,
         @Min(value = 0, message = "Memory usage must be at least 0")
-        Long memoryUsage
+        Long memoryUsage,
+        @Min(value = 0, message = "Network receive rate must be at least 0")
+        Long networkRxBytesPerSecond,
+        @Min(value = 0, message = "Network transmit rate must be at least 0")
+        Long networkTxBytesPerSecond,
+        @Min(value = 0, message = "Block read rate must be at least 0")
+        Long blockReadBytesPerSecond,
+        @Min(value = 0, message = "Block write rate must be at least 0")
+        Long blockWriteBytesPerSecond
 ) {}

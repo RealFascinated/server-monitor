@@ -8,7 +8,11 @@ public final class LabeledCounterAccumulator {
     private final ConcurrentHashMap<String, AtomicLong> values = new ConcurrentHashMap<>();
 
     public void increment(String labelKey) {
-        this.values.computeIfAbsent(labelKey, ignored -> new AtomicLong()).incrementAndGet();
+        add(labelKey, 1);
+    }
+
+    public void add(String labelKey, long delta) {
+        this.values.computeIfAbsent(labelKey, ignored -> new AtomicLong()).addAndGet(delta);
     }
 
     public Map<String, Long> snapshot() {

@@ -15,7 +15,8 @@ public enum MetricSection {
     TEMPERATURES("temperatures", false),
     ZFS_ARC("zfsArc", true),
     ZFS_POOLS("zfsPools", false),
-    TCP_CONNECTIONS("tcpConnections", false);
+    TCP_CONNECTIONS("tcpConnections", false),
+    SMART_DEVICES("smartDevices", false);
 
     private final String jsonKey;
     private final boolean scalar;

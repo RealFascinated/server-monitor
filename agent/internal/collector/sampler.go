@@ -32,6 +32,14 @@ func NewSampler(opts Options) *Sampler {
 			HasZFS:       opts.HasZFS,
 			EnableDocker: opts.EnableDocker,
 			EnableGPU:    opts.EnableGPU,
+
+			EnableTCP:               opts.EnableTCP,
+			EnableThermal:           opts.EnableThermal,
+			EnableCPUCores:          opts.EnableCPUCores,
+			EnableDockerCLIFallback: opts.EnableDockerCLIFallback,
+			EnableBattery:           opts.EnableBattery,
+			EnableTimesync:          opts.EnableTimesync,
+			EnableSmart:             opts.EnableSmart,
 		}),
 	}
 }

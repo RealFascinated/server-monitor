@@ -1,13 +1,18 @@
 package cc.fascinated.monitor.metrics.server.catalog;
 
+import cc.fascinated.monitor.metrics.server.series.AgentSeries;
+import cc.fascinated.monitor.metrics.server.series.DockerSeries;
 import cc.fascinated.monitor.metrics.server.series.DiskSeries;
 import cc.fascinated.monitor.metrics.server.series.HostSeries;
+import cc.fascinated.monitor.metrics.server.series.SmartSeries;
 import cc.fascinated.monitor.metrics.server.series.TemperatureSeries;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -27,6 +32,35 @@ class VmMetricCatalogTest {
     void fieldName_stripsPrefixAndCamelCases() {
         assertEquals("cpuUsage", VmMetricCatalog.fieldName(HostSeries.CPU_USAGE));
         assertEquals("usedBytes", VmMetricCatalog.fieldName(DiskSeries.USED_BYTES));
+    }
+
+    @Test
+    void agentSeries_areNotServedPerServer() {
+        assertNull(VmMetricCatalog.familyOf(AgentSeries.RSS_BYTES.metricName()));
+        assertFalse(VmMetricCatalog.allGaugeNames().contains(AgentSeries.RSS_BYTES.metricName()));
+    }
+
+    @Test
+    void clockSeries_mapToHostSectionFields() {
+        assertEquals(MetricFamily.HOST, VmMetricCatalog.familyOf(HostSeries.CLOCK_SYNCED.metricName()));
+        assertEquals("clockSynced", VmMetricCatalog.fieldName(HostSeries.CLOCK_SYNCED));
+        assertEquals("clockOffsetMs", VmMetricCatalog.fieldName(HostSeries.CLOCK_OFFSET_MS));
+    }
+
+    @Test
+    void smartSeries_mapToSmartDevicesSection() {
+        assertEquals(MetricFamily.SMART, VmMetricCatalog.familyOf(SmartSeries.PERCENTAGE_USED.metricName()));
+        assertEquals("percentageUsed", VmMetricCatalog.fieldName(SmartSeries.PERCENTAGE_USED));
+        assertEquals("dataWrittenBytes", VmMetricCatalog.fieldName(SmartSeries.DATA_WRITTEN_BYTES));
+        assertEquals("smartDevices", MetricFamily.SMART.section().jsonKey());
+        assertEquals(List.of("device"), List.of(MetricFamily.SMART.groupingLabels()));
+    }
+
+    @Test
+    void dockerIoSeries_mapToContainerSectionFields() {
+        assertEquals(MetricFamily.DOCKER, VmMetricCatalog.familyOf(DockerSeries.NETWORK_RX_BYTES_PER_SECOND.metricName()));
+        assertEquals("networkRxBytesPerSecond", VmMetricCatalog.fieldName(DockerSeries.NETWORK_RX_BYTES_PER_SECOND));
+        assertEquals("blockWriteBytesPerSecond", VmMetricCatalog.fieldName(DockerSeries.BLOCK_WRITE_BYTES_PER_SECOND));
     }
 
     @Test

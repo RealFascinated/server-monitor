@@ -18,6 +18,8 @@ public class PlatformMetricsRecorder {
     private final MonitorMetricsProperties monitorMetricsProperties;
     private final CounterAccumulator ingests = new CounterAccumulator();
     private final CounterAccumulator ingestAuthFailures = new CounterAccumulator();
+    private final CounterAccumulator ingestBackfilledSamples = new CounterAccumulator();
+    private final LabeledCounterAccumulator ingestRejectedSamples = new LabeledCounterAccumulator();
     private final HistogramAccumulator ingestDuration = new HistogramAccumulator(HistogramAccumulator.DURATION_BUCKETS);
     private final HistogramAccumulator ingestPayloadBytes = new HistogramAccumulator(HistogramAccumulator.PAYLOAD_BUCKETS);
 
@@ -48,6 +50,20 @@ public class PlatformMetricsRecorder {
             return;
         }
         this.ingestAuthFailures.increment();
+    }
+
+    public void recordBackfilledSamples(int accepted) {
+        if (!this.monitorMetricsProperties.isEnabled() || accepted <= 0) {
+            return;
+        }
+        this.ingestBackfilledSamples.add(accepted);
+    }
+
+    public void recordRejectedSamples(String reason, int count) {
+        if (!this.monitorMetricsProperties.isEnabled() || count <= 0) {
+            return;
+        }
+        this.ingestRejectedSamples.add(reason, count);
     }
 
     public void recordVmQuery(double durationSeconds, boolean success) {
@@ -90,6 +106,11 @@ public class PlatformMetricsRecorder {
     private void writeIngest(PrometheusWriteContext ctx) {
         ctx.counter(PlatformMetricFamily.INGESTS_TOTAL.metricName(), this.ingests.get());
         ctx.counter(PlatformMetricFamily.INGEST_AUTH_FAILURES_TOTAL.metricName(), this.ingestAuthFailures.get());
+        ctx.counter(PlatformMetricFamily.INGEST_BACKFILLED_SAMPLES_TOTAL.metricName(), this.ingestBackfilledSamples.get());
+        for (Map.Entry<String, Long> entry : this.ingestRejectedSamples.snapshot().entrySet()) {
+            ctx.counter(PlatformMetricFamily.INGEST_REJECTED_SAMPLES_TOTAL.metricName(), entry.getValue(),
+                    Map.of("reason", entry.getKey()));
+        }
         ctx.histogram(PlatformMetricFamily.INGEST_DURATION_SECONDS.metricName(), this.ingestDuration, Map.of());
         ctx.histogram(PlatformMetricFamily.INGEST_PAYLOAD_BYTES.metricName(), this.ingestPayloadBytes, Map.of());
     }

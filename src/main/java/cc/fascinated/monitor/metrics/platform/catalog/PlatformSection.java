@@ -9,6 +9,7 @@ public enum PlatformSection {
     OVERVIEW("overview"),
     FLEET("fleet"),
     INGEST("ingest"),
+    AGENTS("agents"),
     VM("vm"),
     JVM("jvm"),
     HTTP("http");

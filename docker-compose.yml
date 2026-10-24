@@ -22,6 +22,8 @@ services:
     command:
       - "-storageDataPath=/storage"
       - "-retentionPeriod=12"
+      # Agents replay buffered samples after an outage; if a reply is lost the same samples arrive twice.
+      - "-dedup.minScrapeInterval=1s"
       - "-httpListenAddr=:8428"
       - "-deleteAuthKey=${VM_DELETE_KEY:-changeme}"
     volumes:

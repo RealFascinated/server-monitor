@@ -24,11 +24,13 @@ type statsLine struct {
 
 var bytePattern = regexp.MustCompile(`^(-?[0-9.]+)(TiB|GiB|MiB|KiB|B|TB|GB|MB|KB)$`)
 
-func CollectContainerMetrics() []ingest.DockerContainerMetric {
+// CollectContainerMetrics prefers the cgroup collector. The docker CLI fallback is slow
+// (it shells out several times), so it only runs when allowCLIFallback is set.
+func CollectContainerMetrics(allowCLIFallback bool) []ingest.DockerContainerMetric {
 	if metrics := collectFromCgroups(); len(metrics) > 0 {
 		return metrics
 	}
-	if !dockerCLIAvailable() {
+	if !allowCLIFallback || !dockerCLIAvailable() {
 		return []ingest.DockerContainerMetric{}
 	}
 	warnCgroupFallbackOnce()

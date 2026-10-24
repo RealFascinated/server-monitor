@@ -4,9 +4,12 @@ import cc.fascinated.monitor.model.dto.request.server.ServerCreateRequest;
 import cc.fascinated.monitor.model.dto.request.server.ServerMemberInviteRequest;
 import cc.fascinated.monitor.model.dto.request.server.ServerRenameRequest;
 import cc.fascinated.monitor.model.dto.request.server.UpdateServerFolderRequest;
+import cc.fascinated.monitor.model.dto.request.server.ingest.IngestBatchRequest;
 import cc.fascinated.monitor.model.dto.request.server.ingest.IngestServerMetrics;
+import cc.fascinated.monitor.web.ingest.IngestRequestFilter;
 import cc.fascinated.monitor.model.dto.response.server.CreatedServerResponse;
 import cc.fascinated.monitor.model.dto.response.server.IncidentResponse;
+import cc.fascinated.monitor.model.dto.response.server.IngestBatchResponse;
 import cc.fascinated.monitor.model.dto.response.server.IngestTokenResponse;
 import cc.fascinated.monitor.model.dto.response.server.ServerFolderAssignmentResponse;
 import cc.fascinated.monitor.model.dto.response.server.ServerResponse;
@@ -143,10 +146,12 @@ public class ServerController {
     @PostMapping(value = "/ingest")
     public void ingestMetrics(@AuthenticatedServer ServerRow server, @RequestBody IngestServerMetrics metrics,
                               HttpServletRequest request) {
-        long payloadBytes = request.getContentLengthLong();
-        if (payloadBytes < 0) {
-            payloadBytes = 0;
-        }
-        this.serverIngestService.ingestMetrics(server, metrics, payloadBytes);
+        this.serverIngestService.ingestMetrics(server, metrics, IngestRequestFilter.payloadBytes(request));
+    }
+
+    @PostMapping(value = "/ingest/batch")
+    public IngestBatchResponse ingestBatch(@AuthenticatedServer ServerRow server, @RequestBody IngestBatchRequest batch,
+                                           HttpServletRequest request) {
+        return this.serverIngestService.ingestBatch(server, batch, IngestRequestFilter.payloadBytes(request));
     }
 }

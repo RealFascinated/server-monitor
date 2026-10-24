@@ -24,16 +24,41 @@ type fileConfig struct {
 	IngestToken  string `yaml:"ingest_token"`
 	ApiEndpoint  string `yaml:"api_endpoint"`
 	PushSchedule string `yaml:"push_schedule"`
+	PprofAddr    string `yaml:"pprof_addr"`
 	EnableDocker *bool  `yaml:"enable_docker"`
 	EnableGPU    *bool  `yaml:"enable_gpu"`
+
+	EnableTCP               *bool `yaml:"enable_tcp"`
+	EnableThermal           *bool `yaml:"enable_thermal"`
+	EnableCPUCores          *bool `yaml:"enable_cpu_cores"`
+	EnableDockerCLIFallback *bool `yaml:"enable_docker_cli_fallback"`
+	EnableBattery           *bool `yaml:"enable_battery"`
+	EnableTimesync          *bool `yaml:"enable_timesync"`
+	EnableSmart             *bool `yaml:"enable_smart"`
+
+	EnablePushBuffer *bool  `yaml:"enable_push_buffer"`
+	BufferMaxAge     string `yaml:"buffer_max_age"`
+	BufferMaxBytes   string `yaml:"buffer_max_bytes"`
+	BufferMaxSamples string `yaml:"buffer_max_samples"`
 }
 
 type Config struct {
 	IngestToken  string
 	ApiEndpoint  string
 	PushSchedule string
+	PprofAddr    string
 	EnableDocker bool
 	EnableGPU    bool
+
+	EnableTCP               bool
+	EnableThermal           bool
+	EnableCPUCores          bool
+	EnableDockerCLIFallback bool
+	EnableBattery           bool
+	EnableTimesync          bool
+	EnableSmart             bool
+
+	PushBuffer BufferConfig
 }
 
 // ConfigEnvVar returns the environment variable for a config YAML key (e.g. ingest_token -> MONITOR_INGEST_TOKEN).
@@ -69,15 +94,24 @@ func loadConfig(requireToken bool) (*Config, error) {
 		IngestToken:  strings.TrimSpace(raw.IngestToken),
 		ApiEndpoint:  strings.TrimSpace(raw.ApiEndpoint),
 		PushSchedule: schedule,
-		EnableDocker: true,
-		EnableGPU:    true,
+		PprofAddr:    strings.TrimSpace(raw.PprofAddr),
+		EnableDocker: boolOrDefault(raw.EnableDocker, true),
+		EnableGPU:    boolOrDefault(raw.EnableGPU, true),
+
+		EnableTCP:               boolOrDefault(raw.EnableTCP, true),
+		EnableThermal:           boolOrDefault(raw.EnableThermal, true),
+		EnableCPUCores:          boolOrDefault(raw.EnableCPUCores, true),
+		EnableDockerCLIFallback: boolOrDefault(raw.EnableDockerCLIFallback, true),
+		EnableBattery:           boolOrDefault(raw.EnableBattery, true),
+		EnableTimesync:          boolOrDefault(raw.EnableTimesync, true),
+		EnableSmart:             boolOrDefault(raw.EnableSmart, true),
 	}
-	if raw.EnableDocker != nil {
-		config.EnableDocker = *raw.EnableDocker
+
+	buffer, err := resolveBufferConfig(raw)
+	if err != nil {
+		return nil, fmt.Errorf("config: %w", err)
 	}
-	if raw.EnableGPU != nil {
-		config.EnableGPU = *raw.EnableGPU
-	}
+	config.PushBuffer = buffer
 
 	if config.ApiEndpoint == "" {
 		config.ApiEndpoint = defaultAPIEndpoint
@@ -89,6 +123,13 @@ func loadConfig(requireToken bool) (*Config, error) {
 		)
 	}
 	return config, nil
+}
+
+func boolOrDefault(value *bool, fallback bool) bool {
+	if value == nil {
+		return fallback
+	}
+	return *value
 }
 
 func loadFileConfig() (fileConfig, string, error) {

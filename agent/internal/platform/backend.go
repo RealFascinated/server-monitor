@@ -9,6 +9,14 @@ type Options struct {
 	HasZFS       bool
 	EnableDocker bool
 	EnableGPU    bool
+
+	EnableTCP               bool
+	EnableThermal           bool
+	EnableCPUCores          bool
+	EnableDockerCLIFallback bool
+	EnableBattery           bool
+	EnableTimesync          bool
+	EnableSmart             bool
 }
 
 type TickUpdate struct {
@@ -26,6 +34,7 @@ type SlowUpdate struct {
 	DockerContainers     []ingest.DockerContainerMetric
 	GPUMetrics           []ingest.GPUMetric
 	TCPConnectionMetrics []ingest.TCPConnectionMetric
+	SmartMetrics         []ingest.SmartMetric
 	ServerMetrics        ingest.ServerMetrics
 	Mounts               []disk.Mount
 	HasMounts            bool

@@ -19,7 +19,9 @@ import (
 	"fascinated.cc/monitor/agent/internal/memory"
 	"fascinated.cc/monitor/agent/internal/oom"
 	"fascinated.cc/monitor/agent/internal/network"
+	"fascinated.cc/monitor/agent/internal/smart"
 	"fascinated.cc/monitor/agent/internal/thermal"
+	"fascinated.cc/monitor/agent/internal/timesync"
 	"fascinated.cc/monitor/agent/internal/zfs"
 )
 
@@ -164,7 +166,12 @@ func (b *linuxBackend) Tick(ready bool) (TickUpdate, error) {
 	metrics.RunningProcesses = avg.RunningProcesses
 
 	memory.ApplyTo(&metrics, memory.Read())
-	battery.ApplyTo(&metrics, battery.Read())
+	if b.opts.EnableBattery {
+		battery.ApplyTo(&metrics, battery.Read())
+	}
+	if !b.opts.EnableCPUCores {
+		metrics.CPUCoreMetrics = nil
+	}
 	fd.ApplyTo(&metrics, fd.Read())
 	oomAfter, hasOom := oom.Read()
 	if hasOom {
@@ -257,18 +264,33 @@ func (b *linuxBackend) RefreshSlow() (SlowUpdate, error) {
 
 	if b.opts.EnableDocker {
 		dockerStart := time.Now()
-		update.DockerContainers = docker.CollectContainerMetrics()
+		update.DockerContainers = docker.CollectContainerMetrics(b.opts.EnableDockerCLIFallback)
 		profilePhase("slow_docker", dockerStart)
 	}
 	if b.opts.EnableGPU {
 		update.GPUMetrics = gpupkg.Collect()
 	}
 
-	tcpStart := time.Now()
-	update.TCPConnectionMetrics = connections.CollectTCP()
-	profilePhase("slow_tcp", tcpStart)
+	if b.opts.EnableTCP {
+		tcpStart := time.Now()
+		update.TCPConnectionMetrics = connections.CollectTCP()
+		profilePhase("slow_tcp", tcpStart)
+	}
 
-	update.ServerMetrics.TemperatureMetrics = thermal.ToIngest(thermal.ReadTemperatures())
+	if b.opts.EnableThermal {
+		update.ServerMetrics.TemperatureMetrics = thermal.ToIngest(thermal.ReadTemperatures())
+	}
+
+	if b.opts.EnableSmart {
+		update.SmartMetrics = smart.Read()
+	}
+
+	if b.opts.EnableTimesync {
+		clock := timesync.Read()
+		update.ServerMetrics.ClockSynced = clock.Synced
+		update.ServerMetrics.ClockErrorMs = clock.ErrorMs
+		update.ServerMetrics.ClockOffsetMs = clock.OffsetMs
+	}
 
 	mounts, err := disk.ListMounts()
 	if err == nil {

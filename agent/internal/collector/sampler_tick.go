@@ -52,6 +52,9 @@ func (s *Sampler) storeSlow(update platform.SlowUpdate) {
 	if update.TCPConnectionMetrics != nil {
 		s.slow.TCPConnectionMetrics = update.TCPConnectionMetrics
 	}
+	if update.SmartMetrics != nil {
+		s.slow.SmartMetrics = update.SmartMetrics
+	}
 	s.slow.ServerMetrics = update.ServerMetrics
 	if update.HasMounts {
 		s.slow.Mounts = update.Mounts

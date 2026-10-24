@@ -7,6 +7,7 @@ import java.util.List;
 
 public record IngestServerMetrics(
         String agentVersion,
+        @Nullable Long timestamp,
         ServerDetails serverDetails,
         ServerMetrics serverMetrics,
         List<InterfaceMetrics> interfaceMetrics,
@@ -15,5 +16,7 @@ public record IngestServerMetrics(
         @Nullable List<ZfsPoolMetric> zfsPoolMetrics,
         @Nullable ZfsArcMetrics zfsArcMetrics,
         @Nullable List<DockerContainerMetric> dockerContainers,
-        @Nullable List<TcpConnectionMetric> tcpConnectionMetrics
+        @Nullable List<TcpConnectionMetric> tcpConnectionMetrics,
+        @Nullable AgentMetrics agentMetrics,
+        @Nullable List<SmartMetric> smartMetrics
 ) {}

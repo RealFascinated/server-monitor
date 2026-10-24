@@ -9,6 +9,10 @@ public final class CounterAccumulator {
         this.value.incrementAndGet();
     }
 
+    public void add(long delta) {
+        this.value.addAndGet(delta);
+    }
+
     public long get() {
         return this.value.get();
     }

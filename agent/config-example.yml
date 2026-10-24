@@ -4,3 +4,19 @@ api_endpoint: "https://monitor.fascinated.cc/api/v1/servers/ingest"
 push_schedule: "*/5 * * * * *"
 enable_docker: true
 enable_gpu: true
+enable_tcp: true
+enable_thermal: true
+enable_cpu_cores: true
+enable_docker_cli_fallback: true
+enable_battery: true
+# Disk health from smartctl (smartmontools). Linux only; needs root and does nothing if smartctl is missing.
+enable_smart: true
+# Report host clock sync state (reads the kernel and chrony; makes no network requests).
+enable_timesync: true
+# Keep samples in memory while the API is unreachable and replay them afterwards.
+enable_push_buffer: true
+# buffer_max_age: 6h        # the API ignores samples older than 6h
+# buffer_max_bytes: 16MiB   # samples are stored compressed
+# buffer_max_samples: 5000  # optional extra cap
+# Optional: serve Go pprof on this address (e.g. 127.0.0.1:6060) to profile a live agent. Off by default.
+# pprof_addr: ""

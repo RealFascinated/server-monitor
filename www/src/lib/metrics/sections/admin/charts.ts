@@ -1,4 +1,5 @@
 import type {
+  AgentsMetrics,
   FleetMetrics,
   FleetOsMetrics,
   FleetVersionMetrics,
@@ -159,6 +160,79 @@ function ingestCharts(ingest: IngestMetrics): MetricChartConfig[] {
   ]
 }
 
+function agentsCharts(agents: AgentsMetrics): MetricChartConfig[] {
+  return [
+    {
+      title: "Agent memory",
+      description:
+        "Resident memory and Go heap used by the monitoring agents. The largest and the average across all servers reporting.",
+      series: [
+        chartSeries("RSS (max)", agents.agentRssBytesMax),
+        chartSeries("RSS (avg)", agents.agentRssBytesAvg),
+        chartSeries("Heap in use (max)", agents.agentHeapInUseBytesMax),
+      ],
+      valueFormatter: formatMemoryBytes,
+    },
+    {
+      title: "Agent goroutines & file descriptors",
+      description:
+        "Highest goroutine and open file descriptor counts held by any single agent.",
+      series: [
+        chartSeries("Goroutines (max)", agents.agentGoroutinesMax),
+        chartSeries("Open fds (max)", agents.agentOpenFdsMax),
+      ],
+      valueFormatter: formatCount,
+    },
+    {
+      title: "Agent push",
+      description:
+        "How long the previous push took and how large its payload was, averaged across agents. The slowest agent is shown as the maximum.",
+      series: [
+        chartSeries("Duration (avg)", agents.agentPushDurationMsAvg),
+        chartSeries("Duration (max)", agents.agentPushDurationMsMax),
+        chartSeries("Payload (avg)", agents.agentPushPayloadBytesAvg, {
+          axis: "right",
+        }),
+      ],
+      valueFormatter: formatMilliseconds,
+      seriesFormatters: [
+        formatMilliseconds,
+        formatMilliseconds,
+        formatMemoryBytes,
+      ],
+      rightValueFormatter: formatMemoryBytes,
+    },
+    {
+      title: "Agent push failures",
+      description: "Failed agent pushes per minute across the fleet.",
+      series: [chartSeries("Failures", agents.agentPushFailuresPerMinute)],
+      valueFormatter: formatPerMinute,
+    },
+    {
+      title: "Agent push buffer",
+      description:
+        "Samples agents are holding because the API could not be reached, and samples dropped per minute after a buffer filled or aged out.",
+      series: [
+        chartSeries("Buffered", agents.agentBufferedSamplesTotal),
+        chartSeries("Dropped / min", agents.agentBufferDroppedPerMinute, {
+          axis: "right",
+        }),
+      ],
+      valueFormatter: formatCount,
+      rightValueFormatter: formatPerMinute,
+    },
+    {
+      title: "Agent buffer age",
+      description:
+        "Age of the oldest sample any agent is still waiting to deliver. Samples older than 6 hours are discarded.",
+      series: [
+        chartSeries("Oldest sample", agents.agentBufferOldestAgeSecondsMax),
+      ],
+      valueFormatter: formatDurationSeconds,
+    },
+  ]
+}
+
 function jvmCharts(jvm: JvmMetrics): MetricChartConfig[] {
   const heapSeries = [
     chartSeries("Used", jvm.jvmHeapUsedBytes),
@@ -170,9 +244,7 @@ function jvmCharts(jvm: JvmMetrics): MetricChartConfig[] {
     heapSeries.push(chartSeries("RSS", jvm.jvmProcessRssBytes))
   }
 
-  heapSeries.push(
-    chartSeries("CPU", jvm.jvmProcessCpuLoad, { axis: "right" })
-  )
+  heapSeries.push(chartSeries("CPU", jvm.jvmProcessCpuLoad, { axis: "right" }))
 
   const heapFormatters = [
     formatMemoryBytes,
@@ -276,6 +348,7 @@ function httpCharts(entries: HttpMetricsEntry[]): MetricChartConfig[] {
 
 export type { MetricChartConfig } from "@/lib/metrics/chart-config"
 export {
+  agentsCharts,
   fleetCharts,
   fleetOsCharts,
   fleetVersionCharts,

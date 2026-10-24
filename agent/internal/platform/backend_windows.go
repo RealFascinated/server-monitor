@@ -19,6 +19,7 @@ import (
 	"fascinated.cc/monitor/agent/internal/memory"
 	"fascinated.cc/monitor/agent/internal/network"
 	"fascinated.cc/monitor/agent/internal/thermal"
+	"fascinated.cc/monitor/agent/internal/timesync"
 	"fascinated.cc/monitor/agent/internal/zfs"
 
 	"github.com/shirou/gopsutil/v4/cpu"
@@ -135,7 +136,12 @@ func (b *windowsBackend) Tick(ready bool) (TickUpdate, error) {
 	})
 	profilePhase("tick_cpu", cpuStart)
 	memory.ApplyTo(&metrics, memory.Read())
-	battery.ApplyTo(&metrics, battery.Read())
+	if b.opts.EnableBattery {
+		battery.ApplyTo(&metrics, battery.Read())
+	}
+	if !b.opts.EnableCPUCores {
+		metrics.CPUCoreMetrics = nil
+	}
 
 	avg := loadavg.Read()
 	metrics.Load1 = avg.Load1
@@ -202,7 +208,7 @@ func (b *windowsBackend) RefreshSlow() (SlowUpdate, error) {
 
 	if b.opts.EnableDocker {
 		dockerStart := time.Now()
-		update.DockerContainers = docker.CollectContainerMetrics()
+		update.DockerContainers = docker.CollectContainerMetrics(b.opts.EnableDockerCLIFallback)
 		profilePhase("slow_docker", dockerStart)
 	}
 
@@ -214,12 +220,22 @@ func (b *windowsBackend) RefreshSlow() (SlowUpdate, error) {
 	} else {
 		memory.OverlayFromLHM(&update.ServerMetrics, snap)
 		cpupkg.OverlayFromLHM(&update.ServerMetrics, snap)
-		if temps := thermal.FromLHMSnapshot(snap); len(temps) > 0 {
+		if !b.opts.EnableCPUCores {
+			update.ServerMetrics.CPUCoreMetrics = nil
+		}
+		if temps := thermal.FromLHMSnapshot(snap); b.opts.EnableThermal && len(temps) > 0 {
 			update.ServerMetrics.TemperatureMetrics = temps
 		}
 		if b.opts.EnableGPU {
 			update.GPUMetrics = gpupkg.FromLHM(snap)
 		}
+	}
+
+	if b.opts.EnableTimesync {
+		clock := timesync.Read()
+		update.ServerMetrics.ClockSynced = clock.Synced
+		update.ServerMetrics.ClockErrorMs = clock.ErrorMs
+		update.ServerMetrics.ClockOffsetMs = clock.OffsetMs
 	}
 
 	mounts, err := disk.ListMounts()

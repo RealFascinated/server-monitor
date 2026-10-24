@@ -21,6 +21,7 @@ type SlowSnapshot struct {
 	DockerContainers     []ingest.DockerContainerMetric
 	GPUMetrics           []ingest.GPUMetric
 	TCPConnectionMetrics []ingest.TCPConnectionMetric
+	SmartMetrics         []ingest.SmartMetric
 	ServerMetrics        ingest.ServerMetrics
 	Mounts               []disk.Mount
 	HasMounts            bool
@@ -58,6 +59,9 @@ func cloneSlowSnapshot(s SlowSnapshot) SlowSnapshot {
 	if s.TCPConnectionMetrics != nil {
 		out.TCPConnectionMetrics = append([]ingest.TCPConnectionMetric(nil), s.TCPConnectionMetrics...)
 	}
+	if s.SmartMetrics != nil {
+		out.SmartMetrics = append([]ingest.SmartMetric(nil), s.SmartMetrics...)
+	}
 	if len(s.ServerMetrics.TemperatureMetrics) > 0 {
 		out.ServerMetrics.TemperatureMetrics = append([]ingest.TemperatureMetric(nil), s.ServerMetrics.TemperatureMetrics...)
 	}
@@ -84,6 +88,7 @@ func Assemble(fast FastSnapshot, slow SlowSnapshot) Result {
 		DockerContainers:     slow.DockerContainers,
 		GPUMetrics:           slow.GPUMetrics,
 		TCPConnectionMetrics: slow.TCPConnectionMetrics,
+		SmartMetrics:         slow.SmartMetrics,
 	}
 	overlaySlowServerMetrics(&result.ServerMetrics, slow.ServerMetrics)
 	if slow.HasMounts {

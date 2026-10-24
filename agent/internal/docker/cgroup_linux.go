@@ -26,6 +26,7 @@ type containerCgroup struct {
 type cgroupCPUState struct {
 	usageUsec uint64
 	at        time.Time
+	io        ioCounters
 }
 
 var cgroupCollector struct {
@@ -68,7 +69,8 @@ func collectFromCgroups() []ingest.DockerContainerMetric {
 		if !ok {
 			continue
 		}
-		next[container.id] = cgroupCPUState{usageUsec: usageUsec, at: now}
+		counters := readIOCounters(container.dir)
+		next[container.id] = cgroupCPUState{usageUsec: usageUsec, at: now, io: counters}
 
 		var cpuUsage *float64
 		if prev, found := cgroupCollector.prev[container.id]; found {
@@ -91,17 +93,33 @@ func collectFromCgroups() []ingest.DockerContainerMetric {
 			}
 		}
 
-		memUsage := readCgroupMemoryBytes(container.dir)
-		metrics = append(metrics, ingest.DockerContainerMetric{
+		metric := ingest.DockerContainerMetric{
 			ContainerName: resolveContainerName(container.id),
 			CPUUsage:      cpuUsage,
-			MemoryUsage:   memUsage,
-		})
+			MemoryUsage:   readCgroupMemoryBytes(container.dir),
+		}
+		if prev, found := cgroupCollector.prev[container.id]; found {
+			applyIORates(&metric, prev, counters, now)
+		}
+		metrics = append(metrics, metric)
 	}
 
 	cgroupCollector.prev = next
 	cgroupCollector.prevAt = now
 	return metrics
+}
+
+// applyIORates fills the network and block I/O rates from two readings of the same container.
+func applyIORates(metric *ingest.DockerContainerMetric, prev cgroupCPUState, current ioCounters, now time.Time) {
+	seconds := now.Sub(prev.at).Seconds()
+	if prev.io.hasNet && current.hasNet {
+		metric.NetworkRxBytesPerSecond = counterRate(prev.io.rxBytes, current.rxBytes, true, seconds)
+		metric.NetworkTxBytesPerSecond = counterRate(prev.io.txBytes, current.txBytes, true, seconds)
+	}
+	if prev.io.hasBlock && current.hasBlock {
+		metric.BlockReadBytesPerSecond = counterRate(prev.io.blkReadBytes, current.blkReadBytes, true, seconds)
+		metric.BlockWriteBytesPerSecond = counterRate(prev.io.blkWriteBytes, current.blkWriteBytes, true, seconds)
+	}
 }
 
 func discoverDockerCgroups() []containerCgroup {

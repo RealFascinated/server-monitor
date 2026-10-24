@@ -62,12 +62,13 @@ class UserControllerIntegrationTest extends IntegrationTestBase {
         var firstSession = this.auth.register(email, PASSWORD);
         var secondSession = this.auth.login(email, PASSWORD);
 
+        // Sessions are listed newest first, so the second sign-in comes before the first.
         this.mockMvc.perform(get("/v1/user/sessions")
                         .header("Authorization", TestAuthSupport.bearer(firstSession.token())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].current").value(true))
-                .andExpect(jsonPath("$[1].current").value(false))
+                .andExpect(jsonPath("$[0].current").value(false))
+                .andExpect(jsonPath("$[1].current").value(true))
                 .andExpect(jsonPath("$[0].deviceLabel").value("Firefox on Linux"));
 
         this.mockMvc.perform(get("/v1/user/sessions")
@@ -83,12 +84,17 @@ class UserControllerIntegrationTest extends IntegrationTestBase {
         var firstSession = this.auth.register(email, PASSWORD);
         var secondSession = this.auth.login(email, PASSWORD);
 
-        long otherSessionId = this.objectMapper.readTree(this.mockMvc.perform(get("/v1/user/sessions")
+        long otherSessionId = -1;
+        for (var session : this.objectMapper.readTree(this.mockMvc.perform(get("/v1/user/sessions")
                         .header("Authorization", TestAuthSupport.bearer(firstSession.token())))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
-                .getContentAsString()).get(1).get("id").asLong();
+                .getContentAsString())) {
+            if (!session.get("current").asBoolean()) {
+                otherSessionId = session.get("id").asLong();
+            }
+        }
 
         this.mockMvc.perform(delete("/v1/user/sessions/{sessionId}", otherSessionId)
                         .header("Authorization", TestAuthSupport.bearer(firstSession.token())))

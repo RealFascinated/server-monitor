@@ -10,6 +10,7 @@ import (
 	"fascinated.cc/monitor/agent/internal/collector"
 	"fascinated.cc/monitor/agent/internal/host"
 	"fascinated.cc/monitor/agent/internal/ingest"
+	"fascinated.cc/monitor/agent/internal/selfstats"
 	"fascinated.cc/monitor/agent/internal/zfs"
 	"github.com/robfig/cron/v3"
 )
@@ -27,7 +28,10 @@ type Agent struct {
 	ServerDetails ingest.ServerDetails
 	HasZFS        bool
 
-	sampler *collector.Sampler
+	samplerMu sync.RWMutex
+	sampler   *collector.Sampler
+
+	sender *ingest.Sender
 
 	configMu sync.RWMutex
 	cronMu   sync.Mutex
@@ -41,16 +45,21 @@ func New(config *Config, version string) *Agent {
 		version = DefaultVersion
 	}
 	details, hasZFS := host.PopulateDetails()
-	return &Agent{
+	a := &Agent{
 		Version:       version,
 		Config:        config,
 		ServerDetails: details,
 		HasZFS:        hasZFS,
 	}
+	a.sender = ingest.NewSender(version, a.currentConfig)
+	a.sender.Observe = selfstats.RecordPush
+	return a
 }
 
 func (a *Agent) Run(ctx context.Context) {
 	a.refreshSampler()
+
+	go a.sender.Run(ctx)
 
 	schedule := a.pushSchedule()
 	if err := a.startCron(schedule); err != nil {
@@ -61,10 +70,12 @@ func (a *Agent) Run(ctx context.Context) {
 
 	slog.Info("agent started", "schedule", schedule)
 
+	selfstats.ServePprof(ctx, a.currentConfig().PprofAddr)
+
 	go a.runSampleLoop(ctx)
 	go a.runSlowLoop(ctx)
 	go a.runHeartbeatLoop(ctx)
-	a.sampler.WaitReady(3 * sampleInterval)
+	a.currentSampler().WaitReady(3 * sampleInterval)
 	a.pushOnce()
 
 	reloadCh := reloadSignal()
@@ -99,11 +110,29 @@ func (a *Agent) Run(ctx context.Context) {
 func (a *Agent) refreshSampler() {
 	config := a.currentConfig()
 	a.HasZFS = zfs.Available()
-	a.sampler = collector.NewSampler(collector.Options{
+	sampler := collector.NewSampler(collector.Options{
 		HasZFS:       a.HasZFS,
 		EnableDocker: config.EnableDocker,
 		EnableGPU:    config.EnableGPU,
+
+		EnableTCP:               config.EnableTCP,
+		EnableThermal:           config.EnableThermal,
+		EnableCPUCores:          config.EnableCPUCores,
+		EnableDockerCLIFallback: config.EnableDockerCLIFallback,
+		EnableBattery:           config.EnableBattery,
+		EnableTimesync:          config.EnableTimesync,
+		EnableSmart:             config.EnableSmart,
 	})
+
+	a.samplerMu.Lock()
+	a.sampler = sampler
+	a.samplerMu.Unlock()
+}
+
+func (a *Agent) currentSampler() *collector.Sampler {
+	a.samplerMu.RLock()
+	defer a.samplerMu.RUnlock()
+	return a.sampler
 }
 
 func (a *Agent) runSampleLoop(ctx context.Context) {
@@ -114,10 +143,11 @@ func (a *Agent) runSampleLoop(ctx context.Context) {
 			timer.Stop()
 			return
 		case <-timer.C:
-			if a.sampler == nil {
+			sampler := a.currentSampler()
+			if sampler == nil {
 				continue
 			}
-			if err := a.sampler.Tick(); err != nil {
+			if err := sampler.Tick(); err != nil {
 				slog.Warn("sample tick", "err", err)
 			}
 		}
@@ -154,10 +184,11 @@ func (a *Agent) runSlowLoop(ctx context.Context) {
 			timer.Stop()
 			return
 		case <-timer.C:
-			if a.sampler == nil {
+			sampler := a.currentSampler()
+			if sampler == nil {
 				continue
 			}
-			if err := a.sampler.RefreshSlow(); err != nil {
+			if err := sampler.RefreshSlow(); err != nil {
 				slog.Warn("slow metrics refresh", "err", err)
 			}
 		}
@@ -216,7 +247,6 @@ func (a *Agent) currentConfig() *Config {
 }
 
 func (a *Agent) pushOnce() {
-	config := a.currentConfig()
 	collectStart := time.Now()
 
 	if uptime, err := host.UptimeSeconds(); err != nil {
@@ -227,33 +257,39 @@ func (a *Agent) pushOnce() {
 
 	a.ServerDetails.Ip = host.GetIP()
 
-	if a.sampler == nil {
+	sampler := a.currentSampler()
+	if sampler == nil {
 		slog.Error("collect metrics", "err", "sampler not initialized")
 		return
 	}
 
-	ready, clockMHz, sample := a.sampler.PushSnapshot()
+	ready, clockMHz, sample := sampler.PushSnapshot()
 	if !ready {
 		slog.Warn("metrics not ready, skipping push")
 		return
 	}
 	a.ServerDetails.CPUClockMhz = clockMHz
 
-	if err := ingest.Push(config, buildIngestData(a.Version, a.ServerDetails, sample), a.Version); err != nil {
-		slog.Error("push metrics", "err", err)
+	data := buildIngestData(a.Version, a.ServerDetails, sample)
+	data.Timestamp = collectStart.Unix()
+	data.AgentMetrics = selfstats.Collect()
+	selfstats.AddBufferStats(data.AgentMetrics, a.sender.Stats())
+
+	if err := a.sender.Submit(data); err != nil {
+		slog.Error("queue metrics", "err", err)
 		return
 	}
-
-	slog.Info("metrics pushed", "duration", time.Since(collectStart).Round(time.Millisecond))
+	slog.Debug("metrics queued", "duration", time.Since(collectStart).Round(time.Millisecond))
 }
 
 func (a *Agent) PrintOnce() {
 	collectStart := time.Now()
 	a.refreshSampler()
-	if a.sampler == nil {
+	sampler := a.currentSampler()
+	if sampler == nil {
 		return
 	}
-	if err := a.sampler.RunOnce(sampleInterval); err != nil {
+	if err := sampler.RunOnce(sampleInterval); err != nil {
 		slog.Error("collect metrics", "err", err)
 		return
 	}
@@ -264,7 +300,7 @@ func (a *Agent) PrintOnce() {
 		a.ServerDetails.UptimeSeconds = uptime
 	}
 	a.ServerDetails.Ip = host.GetIP()
-	_, clockMHz, sample := a.sampler.PushSnapshot()
+	_, clockMHz, sample := sampler.PushSnapshot()
 	a.ServerDetails.CPUClockMhz = clockMHz
 	if err := ingest.Print(buildIngestData(a.Version, a.ServerDetails, sample)); err != nil {
 		slog.Error("print metrics", "err", err)
@@ -285,6 +321,7 @@ func buildIngestData(version string, details ingest.ServerDetails, sample collec
 		DockerContainers:     sample.DockerContainers,
 		GPUMetrics:           sample.GPUMetrics,
 		TCPConnectionMetrics: sample.TCPConnectionMetrics,
+		SmartMetrics:         sample.SmartMetrics,
 	}
 }
 

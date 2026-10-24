@@ -1,10 +1,12 @@
 package cc.fascinated.monitor.exception;
 
 import cc.fascinated.monitor.model.dto.response.error.ErrorResponse;
+import cc.fascinated.monitor.web.ingest.PayloadTooLargeException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -23,6 +25,23 @@ public final class ExceptionControllerAdvice {
     public ResponseEntity<ErrorResponse> handleAsyncRequestTimeout(AsyncRequestTimeoutException ex) {
         log.warn("Async request timed out: {}", ex.getMessage());
         return new ResponseEntity<>(new ErrorResponse(HttpStatus.SERVICE_UNAVAILABLE, "Request timed out. Please try again."), HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    /**
+     * An unreadable request body is the client's fault: too large, bad gzip or malformed JSON.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleUnreadableBody(HttpMessageNotReadableException ex) {
+        for (Throwable cause = ex; cause != null; cause = cause.getCause()) {
+            if (cause instanceof PayloadTooLargeException) {
+                return error(HttpStatus.CONTENT_TOO_LARGE, cause.getMessage());
+            }
+        }
+        return error(HttpStatus.BAD_REQUEST, "Request body could not be read");
+    }
+
+    private static ResponseEntity<ErrorResponse> error(HttpStatus status, String message) {
+        return new ResponseEntity<>(new ErrorResponse(status, message), status);
     }
 
     /**

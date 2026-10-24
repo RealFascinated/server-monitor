@@ -17,4 +17,5 @@ type Result struct {
 	DockerContainers     []ingest.DockerContainerMetric
 	GPUMetrics           []ingest.GPUMetric
 	TCPConnectionMetrics []ingest.TCPConnectionMetric
+	SmartMetrics         []ingest.SmartMetric
 }

@@ -5,6 +5,7 @@ import cc.fascinated.monitor.config.MonitorProperties;
 import cc.fascinated.monitor.exception.impl.InternalServerException;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -24,11 +25,11 @@ public class MailService {
     public MailService(
             MonitorMailProperties mailProperties,
             MonitorProperties monitorProperties,
-            @Nullable JavaMailSender mailSender
+            ObjectProvider<JavaMailSender> mailSender
     ) {
         this.mailProperties = mailProperties;
         this.monitorProperties = monitorProperties;
-        this.mailSender = mailSender;
+        this.mailSender = mailSender.getIfAvailable();
     }
 
     public void sendPasswordResetEmail(String to, String token) {

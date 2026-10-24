@@ -99,7 +99,7 @@ func TestPushSuccess(t *testing.T) {
 	defer srv.Close()
 
 	cfg := &Config{ApiEndpoint: srv.URL, IngestToken: "secret"}
-	if err := Push(cfg, Data{}, "1.0"); err != nil {
+	if _, err := Push(cfg, Data{}, "1.0"); err != nil {
 		t.Fatalf("Push: %v", err)
 	}
 	if attempts != 2 {
@@ -116,7 +116,7 @@ func TestPushNoRetryOnClientError(t *testing.T) {
 	defer srv.Close()
 
 	cfg := &Config{ApiEndpoint: srv.URL, IngestToken: "secret"}
-	err := Push(cfg, Data{}, "")
+	_, err := Push(cfg, Data{}, "")
 	if err == nil {
 		t.Fatal("expected error")
 	}

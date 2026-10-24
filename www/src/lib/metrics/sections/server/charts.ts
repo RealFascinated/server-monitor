@@ -4,6 +4,7 @@ import type {
   MetricValues,
   NetworkMetrics,
   ServerMetricsResponse,
+  SmartDeviceMetrics,
   TemperatureMetrics,
   TcpConnectionMetrics,
   ZfsPoolMetrics,
@@ -181,6 +182,67 @@ function networkCharts(network: NetworkMetrics): MetricChartConfig[] {
   ]
 }
 
+function smartCharts(disk: SmartDeviceMetrics): MetricChartConfig[] {
+  return [
+    {
+      title: "Health",
+      description:
+        "Overall SMART self-assessment: 1 while the drive reports it is healthy, 0 once it reports it is failing or about to fail.",
+      series: [chartSeries("Passed", disk.healthPassed)],
+      valueFormatter: formatCount,
+    },
+    {
+      title: "Temperature",
+      description: "Drive temperature as reported by the drive itself.",
+      series: [chartSeries("Temperature", disk.temperatureCelsius)],
+      valueFormatter: formatCelsius,
+      thresholds: TEMPERATURE_THRESHOLDS,
+    },
+    {
+      title: "NVMe wear",
+      description:
+        "Percentage of the drive's rated endurance used, and the spare capacity still available. Wear above 100% is possible once the rating is exceeded.",
+      series: [
+        percentSeries("Used", disk.percentageUsed),
+        percentSeries("Spare", disk.availableSpare),
+      ],
+      valueFormatter: formatPercentValue,
+    },
+    {
+      title: "Bad sectors",
+      description:
+        "Reallocated and pending sectors on SATA drives. A rising count is an early sign of a failing disk.",
+      series: [
+        chartSeries("Reallocated", disk.reallocatedSectors),
+        chartSeries("Pending", disk.pendingSectors),
+      ],
+      valueFormatter: formatCount,
+    },
+    {
+      title: "NVMe errors",
+      description:
+        "Media and data integrity errors, and shutdowns without a clean power-down, as counted by the drive.",
+      series: [
+        chartSeries("Media errors", disk.mediaErrors),
+        chartSeries("Unsafe shutdowns", disk.unsafeShutdowns),
+      ],
+      valueFormatter: formatCount,
+    },
+    {
+      title: "Usage",
+      description:
+        "Hours powered on and total data written over the drive's life.",
+      series: [
+        chartSeries("Power-on hours", disk.powerOnHours),
+        chartSeries("Written", disk.dataWrittenBytes, { axis: "right" }),
+      ],
+      valueFormatter: formatCount,
+      seriesFormatters: [formatCount, formatMemoryBytes],
+      rightValueFormatter: formatMemoryBytes,
+    },
+  ]
+}
+
 function gpuCharts(gpu: GpuMetrics): MetricChartConfig[] {
   return [
     {
@@ -256,6 +318,47 @@ function containerCharts(
         chartSeries(container.container, container.memoryUsage)
       ),
       valueFormatter: formatMemoryBytes,
+      showCurrentValues: false,
+    },
+    {
+      title: "Network received",
+      description:
+        "Per-container inbound traffic stacked. Containers on host networking are not listed, and the agent needs access to the host's processes (pid: host when containerised).",
+      mode: "stack",
+      series: items.map((container) =>
+        chartSeries(container.container, container.networkRxBytesPerSecond)
+      ),
+      valueFormatter: formatNetworkRate,
+      showCurrentValues: false,
+    },
+    {
+      title: "Network sent",
+      description: "Per-container outbound traffic stacked.",
+      mode: "stack",
+      series: items.map((container) =>
+        chartSeries(container.container, container.networkTxBytesPerSecond)
+      ),
+      valueFormatter: formatNetworkRate,
+      showCurrentValues: false,
+    },
+    {
+      title: "Disk read",
+      description: "Per-container block device reads stacked.",
+      mode: "stack",
+      series: items.map((container) =>
+        chartSeries(container.container, container.blockReadBytesPerSecond)
+      ),
+      valueFormatter: formatRate,
+      showCurrentValues: false,
+    },
+    {
+      title: "Disk write",
+      description: "Per-container block device writes stacked.",
+      mode: "stack",
+      series: items.map((container) =>
+        chartSeries(container.container, container.blockWriteBytesPerSecond)
+      ),
+      valueFormatter: formatRate,
       showCurrentValues: false,
     },
   ]
@@ -454,6 +557,23 @@ function hostSystemCharts(
       seriesFormatters: [formatCount, formatCount, formatPercentValue],
       ...PERCENT_RIGHT_AXIS,
     },
+    {
+      title: "Clock accuracy",
+      description:
+        "How far this host's clock is from its time source (positive means ahead), and the kernel's own estimate of its error. Offset is only reported where the time daemon exposes it (chrony, Windows Time).",
+      series: [
+        chartSeries("Offset", host.clockOffsetMs),
+        chartSeries("Error estimate", host.clockErrorMs),
+      ],
+      valueFormatter: formatMilliseconds,
+    },
+    {
+      title: "Clock synchronised",
+      description:
+        "1 while the host reports its clock as synchronised to a time source, 0 while it is not. A drifting clock quietly breaks TLS, logs and scheduled jobs.",
+      series: [chartSeries("Synced", host.clockSynced)],
+      valueFormatter: formatCount,
+    },
   ]
 }
 
@@ -510,6 +630,7 @@ export {
   hostMemoryCharts,
   hostSystemCharts,
   networkCharts,
+  smartCharts,
   tcpCharts,
   zfsPoolCharts,
 }

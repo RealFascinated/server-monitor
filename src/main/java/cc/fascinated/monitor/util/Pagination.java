@@ -23,6 +23,9 @@ public class Pagination<T> {
     }
 
     public Page<T> getPage(int page, Function<PageCallback, List<T>> fetcher) {
+        if (this.itemsPerPage > 0 && this.totalItems == 0 && page == 1) {
+            return empty();
+        }
         int skip = (page - 1) * this.itemsPerPage;
         if (this.itemsPerPage == 0 || skip >= this.totalItems || page < 1) {
             throw new BadRequestException("Invalid or unknown page '%s'".formatted(page));

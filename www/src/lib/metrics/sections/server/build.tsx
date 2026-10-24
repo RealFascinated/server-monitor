@@ -7,6 +7,7 @@ import {
   Gauge,
   Gpu,
   HardDrive,
+  HeartPulse,
   MemoryStick,
   Network,
   Thermometer,
@@ -27,11 +28,16 @@ import {
   hostMemoryCharts,
   hostSystemCharts,
   networkCharts,
+  smartCharts,
   tcpCharts,
   zfsPoolCharts,
 } from "@/lib/metrics/sections/server/charts"
 import type { MetricsTimeGrid } from "@/lib/metrics/timestamps"
-import { formatCount, formatMemoryBytes, formatPercentValue } from "@/lib/formatter"
+import {
+  formatCount,
+  formatMemoryBytes,
+  formatPercentValue,
+} from "@/lib/formatter"
 
 function buildServerMetricSections(
   metrics: ServerMetricsResponse,
@@ -136,6 +142,24 @@ function buildServerMetricSections(
       })
     }
   })
+
+  builder.group(
+    { id: "smart", title: "Disk health", icon: HeartPulse },
+    (group) => {
+      for (const disk of metrics.smartDevices ?? []) {
+        addChartSection(group, {
+          id: metricSectionId(`smart-${disk.device}`),
+          sectionKind: "Disk",
+          title: disk.device,
+          navLabel: disk.device,
+          icon: HeartPulse,
+          description: disk.model || undefined,
+          charts: smartCharts(disk),
+          timeGrid,
+        })
+      }
+    }
+  )
 
   addChartSection(builder, {
     title: "Docker",

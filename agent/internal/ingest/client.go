@@ -17,14 +17,19 @@ const (
 
 var httpClient = &http.Client{Timeout: requestTimeout}
 
-func postWithRetry(op, url, token, agentVersion string, body []byte) error {
+func postWithRetry(op, url, token, agentVersion string, body []byte, contentEncoding string) error {
+	return postAttempts(maxRetries, op, url, token, agentVersion, body, contentEncoding)
+}
+
+// postAttempts tries up to attempts times, sleeping between retriable failures.
+func postAttempts(attempts int, op, url, token, agentVersion string, body []byte, contentEncoding string) error {
 	var lastErr error
-	for attempt := 1; attempt <= maxRetries; attempt++ {
-		lastErr = post(op, url, token, agentVersion, body)
+	for attempt := 1; attempt <= attempts; attempt++ {
+		lastErr = postEncoded(op, url, token, agentVersion, body, contentEncoding)
 		if lastErr == nil {
 			return nil
 		}
-		if attempt == maxRetries || !shouldRetry(lastErr) {
+		if attempt == attempts || !shouldRetry(lastErr) {
 			return lastErr
 		}
 		time.Sleep(retryBackoff)
@@ -33,6 +38,10 @@ func postWithRetry(op, url, token, agentVersion string, body []byte) error {
 }
 
 func post(op, url, token, agentVersion string, body []byte) error {
+	return postEncoded(op, url, token, agentVersion, body, "")
+}
+
+func postEncoded(op, url, token, agentVersion string, body []byte, contentEncoding string) error {
 	var bodyReader io.Reader
 	if body != nil {
 		bodyReader = bytes.NewReader(body)
@@ -44,6 +53,9 @@ func post(op, url, token, agentVersion string, body []byte) error {
 	}
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")
+		if contentEncoding != "" {
+			req.Header.Set("Content-Encoding", contentEncoding)
+		}
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
 	if agentVersion != "" {
@@ -55,6 +67,10 @@ func post(op, url, token, agentVersion string, body []byte) error {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode < http.StatusBadRequest {
+		recordServerFeatures(resp.Header)
+	}
 
 	if resp.StatusCode >= http.StatusBadRequest {
 		responseBody, _ := io.ReadAll(io.LimitReader(resp.Body, maxErrorBody))
@@ -82,5 +98,5 @@ func shouldRetry(err error) bool {
 	if !ok {
 		return true
 	}
-	return statusErr.status >= http.StatusInternalServerError
+	return statusErr.status >= http.StatusInternalServerError || statusErr.status == http.StatusTooManyRequests
 }

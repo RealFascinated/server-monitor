@@ -11,6 +11,9 @@ func overlaySlowServerMetrics(dest *ingest.ServerMetrics, src ingest.ServerMetri
 	if len(src.CPUCoreMetrics) > 0 {
 		dest.CPUCoreMetrics = src.CPUCoreMetrics
 	}
+	dest.ClockSynced = src.ClockSynced
+	dest.ClockErrorMs = src.ClockErrorMs
+	dest.ClockOffsetMs = src.ClockOffsetMs
 	if src.CPUPowerWatts > 0 {
 		dest.CPUPowerWatts = src.CPUPowerWatts
 	}

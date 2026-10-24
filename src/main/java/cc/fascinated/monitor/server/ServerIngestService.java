@@ -4,6 +4,7 @@ import cc.fascinated.monitor.exception.impl.BadRequestException;
 import cc.fascinated.monitor.exception.impl.NotFoundException;
 import cc.fascinated.monitor.exception.impl.UnauthorizedException;
 import cc.fascinated.monitor.metrics.platform.collector.PlatformMetricsRecorder;
+import cc.fascinated.monitor.metrics.server.series.AgentSeries;
 import cc.fascinated.monitor.metrics.server.series.CpuCoreSeries;
 import cc.fascinated.monitor.metrics.server.series.DiskSeries;
 import cc.fascinated.monitor.metrics.server.series.DockerSeries;
@@ -11,6 +12,7 @@ import cc.fascinated.monitor.metrics.server.series.GpuSeries;
 import cc.fascinated.monitor.metrics.server.series.HostSeries;
 import cc.fascinated.monitor.metrics.server.series.NetworkSeries;
 import cc.fascinated.monitor.metrics.server.series.ServerStatusSeries;
+import cc.fascinated.monitor.metrics.server.series.SmartSeries;
 import cc.fascinated.monitor.metrics.server.series.TcpConnectionSeries;
 import cc.fascinated.monitor.metrics.server.series.TemperatureSeries;
 import cc.fascinated.monitor.metrics.server.series.ZfsArcSeries;
@@ -18,14 +20,21 @@ import cc.fascinated.monitor.metrics.server.series.ZfsPoolSeries;
 import cc.fascinated.monitor.metrics.vm.MetricWriteContext;
 import cc.fascinated.monitor.metrics.vm.VictoriaMetricsWriteClient;
 import cc.fascinated.monitor.model.domain.server.ServerStatus;
+import cc.fascinated.monitor.model.dto.request.server.ingest.IngestBatchRequest;
 import cc.fascinated.monitor.model.dto.request.server.ingest.IngestServerMetrics;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerDetails;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ServerMetrics;
+import cc.fascinated.monitor.model.dto.response.server.IngestBatchResponse;
 import cc.fascinated.monitor.model.persistance.ServerInventoryRow;
 import cc.fascinated.monitor.model.persistance.ServerRow;
 import cc.fascinated.monitor.model.persistance.metric.IngestTokenRow;
 import cc.fascinated.monitor.repository.ServerIngestTokenRepository;
 import cc.fascinated.monitor.repository.ServerRepository;
+import cc.fascinated.monitor.server.ingest.BackfillLimiter;
+import cc.fascinated.monitor.server.ingest.IngestBatchValidator;
+import cc.fascinated.monitor.server.ingest.IngestBatchValidator.AcceptedSample;
+import cc.fascinated.monitor.server.ingest.IngestBatchValidator.BatchPlan;
+import cc.fascinated.monitor.server.ingest.IngestSampleChecker;
 import cc.fascinated.monitor.util.AuthUtils;
 import cc.fascinated.monitor.util.Utils;
 import lombok.extern.slf4j.Slf4j;
@@ -45,17 +54,26 @@ public class ServerIngestService {
     private final PlatformMetricsRecorder platformMetricsRecorder;
     private final VictoriaMetricsWriteClient victoriaMetricsWriteClient;
     private final IncidentService incidentService;
+    private final IngestSampleChecker sampleChecker;
+    private final IngestBatchValidator batchValidator;
+    private final BackfillLimiter backfillLimiter;
 
     public ServerIngestService(ServerRepository serverRepository,
                                ServerIngestTokenRepository serverIngestTokenRepository,
                                PlatformMetricsRecorder platformMetricsRecorder,
                                VictoriaMetricsWriteClient victoriaMetricsWriteClient,
-                               IncidentService incidentService) {
+                               IncidentService incidentService,
+                               IngestSampleChecker sampleChecker,
+                               IngestBatchValidator batchValidator,
+                               BackfillLimiter backfillLimiter) {
         this.serverRepository = serverRepository;
         this.serverIngestTokenRepository = serverIngestTokenRepository;
         this.platformMetricsRecorder = platformMetricsRecorder;
         this.victoriaMetricsWriteClient = victoriaMetricsWriteClient;
         this.incidentService = incidentService;
+        this.sampleChecker = sampleChecker;
+        this.batchValidator = batchValidator;
+        this.backfillLimiter = backfillLimiter;
     }
 
     public ServerRow authenticateIngestRequest(String authorizationHeader) {
@@ -91,11 +109,72 @@ public class ServerIngestService {
         Instant now = Instant.now();
         ServerStatus previousStatus = server.getStatus();
 
-        String agentVersion = metrics.agentVersion();
-        if (agentVersion == null || agentVersion.isBlank()) {
-            throw new BadRequestException("agent version is required");
+        String rejection = this.sampleChecker.rejectReason(metrics);
+        if (rejection != null) {
+            this.platformMetricsRecorder.recordRejectedSamples(rejection, 1);
+            throw new BadRequestException("ingest payload rejected: " + rejection);
         }
-        server.setAgentVersion(agentVersion.trim());
+
+        applyLatestSample(server, metrics, now);
+        server.setLastHeartbeat(now);
+        server.setStatus(ServerStatus.ONLINE);
+
+        StringBuilder buffer = new StringBuilder();
+        MetricWriteContext ctx = new MetricWriteContext(buffer, server.getId(), now.getEpochSecond());
+        writeSeries(ctx, metrics);
+        ServerStatusSeries.writeOnline(ctx);
+        this.victoriaMetricsWriteClient.flush(buffer.toString());
+
+        this.serverRepository.save(server);
+
+        if (previousStatus == ServerStatus.OFFLINE) {
+            this.incidentService.resolveOpenOutage(server.getId(), now);
+        }
+
+        this.platformMetricsRecorder.recordIngest((System.nanoTime() - startedNanos) / 1_000_000_000.0, payloadBytes);
+    }
+
+    /**
+     * Writes samples the agent buffered while it could not reach us. Samples keep their own
+     * (skew-corrected) timestamps. They never touch status, heartbeat or incidents: the live push
+     * path owns those, and a backlog must not make a server look newly online.
+     */
+    @Transactional
+    public IngestBatchResponse ingestBatch(ServerRow server, IngestBatchRequest batch, long payloadBytes) {
+        long startedNanos = System.nanoTime();
+        Instant now = Instant.now();
+
+        BatchPlan plan = this.batchValidator.plan(batch, now);
+        this.backfillLimiter.acquire(server.getId(), plan.accepted().size());
+        try {
+            plan.skipped().forEach(this.platformMetricsRecorder::recordRejectedSamples);
+
+            List<AcceptedSample> accepted = plan.accepted();
+            if (!accepted.isEmpty()) {
+                StringBuilder buffer = new StringBuilder();
+                for (AcceptedSample sample : accepted) {
+                    writeSeries(new MetricWriteContext(buffer, server.getId(), sample.timestamp().getEpochSecond()),
+                            sample.metrics());
+                }
+                this.victoriaMetricsWriteClient.flush(buffer.toString());
+
+                AcceptedSample newest = accepted.getLast();
+                if (server.getLastUpdated() == null || newest.timestamp().isAfter(server.getLastUpdated())) {
+                    applyLatestSample(server, newest.metrics(), newest.timestamp());
+                    this.serverRepository.save(server);
+                }
+                this.platformMetricsRecorder.recordBackfilledSamples(accepted.size());
+            }
+
+            this.platformMetricsRecorder.recordIngest((System.nanoTime() - startedNanos) / 1_000_000_000.0, payloadBytes);
+            return new IngestBatchResponse(accepted.size(), plan.skipped());
+        } finally {
+            this.backfillLimiter.release(server.getId());
+        }
+    }
+
+    private void applyLatestSample(ServerRow server, IngestServerMetrics metrics, Instant sampledAt) {
+        server.setAgentVersion(metrics.agentVersion().trim());
 
         ServerDetails serverDetails = metrics.serverDetails();
         ServerInventoryRow inventory = getOrCreateInventory(server);
@@ -108,12 +187,10 @@ public class ServerIngestService {
         inventory.setCpuModel(serverDetails.cpuModel());
         inventory.setSocketCount(serverDetails.socketCount());
         server.setLastUptimeSeconds(serverDetails.uptimeSeconds());
-        server.setLastUpdated(now);
-        server.setLastHeartbeat(now);
-        server.setStatus(ServerStatus.ONLINE);
+        server.setLastUpdated(sampledAt);
+    }
 
-        StringBuilder buffer = new StringBuilder();
-        MetricWriteContext ctx = new MetricWriteContext(buffer, server.getId(), now.getEpochSecond());
+    private static void writeSeries(MetricWriteContext ctx, IngestServerMetrics metrics) {
         ServerMetrics serverMetrics = metrics.serverMetrics();
         HostSeries.write(ctx, serverMetrics, metrics.serverDetails());
         Utils.forEach(serverMetrics.cpuCoreMetrics(), core -> CpuCoreSeries.write(ctx, core));
@@ -127,16 +204,10 @@ public class ServerIngestService {
         Utils.forEach(metrics.zfsPoolMetrics(), pool -> ZfsPoolSeries.write(ctx, pool));
         Utils.forEach(metrics.dockerContainers(), container -> DockerSeries.write(ctx, container));
         Utils.forEach(metrics.tcpConnectionMetrics(), tcp -> TcpConnectionSeries.write(ctx, tcp));
-        ServerStatusSeries.writeOnline(ctx);
-        this.victoriaMetricsWriteClient.flush(buffer.toString());
-
-        this.serverRepository.save(server);
-
-        if (previousStatus == ServerStatus.OFFLINE) {
-            this.incidentService.resolveOpenOutage(server.getId(), now);
+        Utils.forEach(metrics.smartMetrics(), disk -> SmartSeries.write(ctx, disk));
+        if (metrics.agentMetrics() != null) {
+            AgentSeries.write(ctx, metrics.agentMetrics());
         }
-
-        this.platformMetricsRecorder.recordIngest((System.nanoTime() - startedNanos) / 1_000_000_000.0, payloadBytes);
     }
 
     public void writeServerStatusOffline(List<Long> serverIds) {
