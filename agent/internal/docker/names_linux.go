@@ -45,6 +45,10 @@ func resolveContainerName(id string) string {
 		namesCache.entries = make(map[string]containerNameEntry)
 	}
 	now := time.Now()
+	if names != nil {
+		// Drop containers that no longer exist so the cache doesn't grow with container churn.
+		clear(namesCache.entries)
+	}
 	for cid, name := range names {
 		namesCache.entries[cid] = containerNameEntry{name: name, at: now}
 	}
@@ -66,23 +70,25 @@ func cachedContainerName(id string) string {
 	return ""
 }
 
+// Shared client with keep-alives off: a client built per call leaks its idle connection
+// (and the transport's goroutines) every time, since the docker daemon never closes it.
+var dockerClient = &http.Client{
+	Transport: &http.Transport{
+		DisableKeepAlives: true,
+		DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
+			var dialer net.Dialer
+			return dialer.DialContext(ctx, "unix", linuxSocketPath())
+		},
+	},
+	Timeout: 3 * time.Second,
+}
+
 func fetchContainerNames() map[string]string {
-	socketPath := linuxSocketPath()
-	if socketPath == "" {
+	if linuxSocketPath() == "" {
 		return nil
 	}
 
-	client := &http.Client{
-		Transport: &http.Transport{
-			DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
-				var dialer net.Dialer
-				return dialer.DialContext(ctx, "unix", socketPath)
-			},
-		},
-		Timeout: 3 * time.Second,
-	}
-
-	resp, err := client.Get("http://localhost/containers/json?all=true")
+	resp, err := dockerClient.Get("http://localhost/containers/json?all=true")
 	if err != nil {
 		return nil
 	}
