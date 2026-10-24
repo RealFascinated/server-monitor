@@ -99,6 +99,7 @@ export type SmartDeviceMetrics = {
   mediaErrors?: MetricValues
   unsafeShutdowns?: MetricValues
   dataWrittenBytes?: MetricValues
+  dataReadBytes?: MetricValues
 }
 
 export type ContainerMetrics = {

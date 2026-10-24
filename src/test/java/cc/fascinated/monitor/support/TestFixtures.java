@@ -37,7 +37,7 @@ public final class TestFixtures {
                         + "\"temperatureCelsius\": 34, \"powerOnHours\": 41234, \"reallocatedSectors\": 8, \"pendingSectors\": 0},"
                         + "{\"device\": \"nvme0\", \"model\": \"Samsung SSD 980 PRO\", \"healthPassed\": true, "
                         + "\"percentageUsed\": 4, \"availableSpare\": 96, \"mediaErrors\": 0, \"unsafeShutdowns\": 7, "
-                        + "\"dataWrittenBytes\": 1024000000}]");
+                        + "\"dataWrittenBytes\": 1024000000, \"dataReadBytes\": 512000000}]");
     }
 
     /** A sample as the agent's push buffer would send it: the normal payload plus its own timestamp. */

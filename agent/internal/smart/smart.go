@@ -177,6 +177,7 @@ type deviceOutput struct {
 		MediaErrors      *int64 `json:"media_errors"`
 		UnsafeShutdowns  *int64 `json:"unsafe_shutdowns"`
 		DataUnitsWritten *int64 `json:"data_units_written"`
+		DataUnitsRead    *int64 `json:"data_units_read"`
 	} `json:"nvme_smart_health_information_log"`
 }
 
@@ -230,6 +231,10 @@ func parseDevice(out []byte, name string) (ingest.SmartMetric, bool) {
 		if doc.Nvme.DataUnitsWritten != nil {
 			written := *doc.Nvme.DataUnitsWritten * nvmeDataUnitBytes
 			metric.DataWrittenBytes = &written
+		}
+		if doc.Nvme.DataUnitsRead != nil {
+			read := *doc.Nvme.DataUnitsRead * nvmeDataUnitBytes
+			metric.DataReadBytes = &read
 		}
 	}
 	return metric, true

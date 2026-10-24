@@ -19,7 +19,8 @@ public enum SmartSeries implements VmMetricFamily {
     AVAILABLE_SPARE("monitor_smart_available_spare"),
     MEDIA_ERRORS("monitor_smart_media_errors"),
     UNSAFE_SHUTDOWNS("monitor_smart_unsafe_shutdowns"),
-    DATA_WRITTEN_BYTES("monitor_smart_data_written_bytes");
+    DATA_WRITTEN_BYTES("monitor_smart_data_written_bytes"),
+    DATA_READ_BYTES("monitor_smart_data_read_bytes");
 
     private final String metricName;
 
@@ -49,5 +50,6 @@ public enum SmartSeries implements VmMetricFamily {
         MEDIA_ERRORS.writeNullable(labeled, disk.mediaErrors());
         UNSAFE_SHUTDOWNS.writeNullable(labeled, disk.unsafeShutdowns());
         DATA_WRITTEN_BYTES.writeNullable(labeled, disk.dataWrittenBytes());
+        DATA_READ_BYTES.writeNullable(labeled, disk.dataReadBytes());
     }
 }

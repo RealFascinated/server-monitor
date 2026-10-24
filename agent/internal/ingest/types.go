@@ -35,6 +35,7 @@ type SmartMetric struct {
 	MediaErrors      *int64 `json:"mediaErrors,omitempty"`
 	UnsafeShutdowns  *int64 `json:"unsafeShutdowns,omitempty"`
 	DataWrittenBytes *int64 `json:"dataWrittenBytes,omitempty"`
+	DataReadBytes    *int64 `json:"dataReadBytes,omitempty"`
 }
 
 // AgentMetrics describes the agent process itself (resource usage and push health), shown to admins in fleet metrics.

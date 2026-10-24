@@ -19,5 +19,6 @@ public record SmartMetric(
         @Nullable @Min(0) Long availableSpare,
         @Nullable @Min(0) Long mediaErrors,
         @Nullable @Min(0) Long unsafeShutdowns,
-        @Nullable @Min(0) Long dataWrittenBytes
+        @Nullable @Min(0) Long dataWrittenBytes,
+        @Nullable @Min(0) Long dataReadBytes
 ) {}

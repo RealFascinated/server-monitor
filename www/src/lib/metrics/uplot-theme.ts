@@ -264,7 +264,7 @@ export function buildUPlotOptions({
     scales: {
       x: { time: true },
       y: buildYScale(yRange, bidirectional),
-      ...(hasRightAxis ? { y2: buildYScale(rightYRange ?? { max: 100 }) } : {}),
+      ...(hasRightAxis ? { y2: buildYScale(rightYRange) } : {}),
     },
     // Extra padding keeps top/bottom tick labels from being clipped.
     padding: [14, hasRightAxis ? 8 : 16, 12, 8],

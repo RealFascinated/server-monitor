@@ -182,14 +182,22 @@ function networkCharts(network: NetworkMetrics): MetricChartConfig[] {
   ]
 }
 
+/** SMART health arrives as 1 and 0, which reads better on the axis and legend as words. */
+function formatHealthStatus(value: number): string {
+  if (value >= 1) return "OK"
+  if (value <= 0) return "BAD"
+  return ""
+}
+
 function smartCharts(disk: SmartDeviceMetrics): MetricChartConfig[] {
   return [
     {
       title: "Health",
       description:
-        "Overall SMART self-assessment: 1 while the drive reports it is healthy, 0 once it reports it is failing or about to fail.",
-      series: [chartSeries("Passed", disk.healthPassed)],
-      valueFormatter: formatCount,
+        "The drive's own SMART self-assessment. BAD means it has reported itself as failing or about to fail.",
+      series: [chartSeries("Status", disk.healthPassed)],
+      valueFormatter: formatHealthStatus,
+      yRange: { max: 1 },
     },
     {
       title: "Temperature",
@@ -207,6 +215,7 @@ function smartCharts(disk: SmartDeviceMetrics): MetricChartConfig[] {
         percentSeries("Spare", disk.availableSpare),
       ],
       valueFormatter: formatPercentValue,
+      ...PERCENT_RIGHT_AXIS,
     },
     {
       title: "Bad sectors",
@@ -229,16 +238,20 @@ function smartCharts(disk: SmartDeviceMetrics): MetricChartConfig[] {
       valueFormatter: formatCount,
     },
     {
+      title: "Power-on hours",
+      description: "Hours the drive has spent powered on over its whole life.",
+      series: [chartSeries("Power-on hours", disk.powerOnHours)],
+      valueFormatter: formatCount,
+    },
+    {
       title: "Usage",
       description:
-        "Hours powered on and total data written over the drive's life.",
+        "Total data written to and read from the drive over its life. Both counters come from the NVMe health log, so SATA drives report neither.",
       series: [
-        chartSeries("Power-on hours", disk.powerOnHours),
-        chartSeries("Written", disk.dataWrittenBytes, { axis: "right" }),
+        chartSeries("Written", disk.dataWrittenBytes),
+        chartSeries("Read", disk.dataReadBytes),
       ],
-      valueFormatter: formatCount,
-      seriesFormatters: [formatCount, formatMemoryBytes],
-      rightValueFormatter: formatMemoryBytes,
+      valueFormatter: formatMemoryBytes,
     },
   ]
 }

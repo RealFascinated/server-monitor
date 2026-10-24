@@ -85,6 +85,9 @@ func TestParseDeviceNvme(t *testing.T) {
 	if *metric.DataWrittenBytes != 2000*512_000 {
 		t.Fatalf("data written = %d bytes, want 2000 data units of 512000", *metric.DataWrittenBytes)
 	}
+	if *metric.DataReadBytes != 1000*512_000 {
+		t.Fatalf("data read = %d bytes, want 1000 data units of 512000", *metric.DataReadBytes)
+	}
 	if metric.ReallocatedSectors != nil {
 		t.Fatal("SATA fields must be empty for an NVMe disk")
 	}

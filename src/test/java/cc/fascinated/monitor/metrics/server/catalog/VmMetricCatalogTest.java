@@ -52,6 +52,7 @@ class VmMetricCatalogTest {
         assertEquals(MetricFamily.SMART, VmMetricCatalog.familyOf(SmartSeries.PERCENTAGE_USED.metricName()));
         assertEquals("percentageUsed", VmMetricCatalog.fieldName(SmartSeries.PERCENTAGE_USED));
         assertEquals("dataWrittenBytes", VmMetricCatalog.fieldName(SmartSeries.DATA_WRITTEN_BYTES));
+        assertEquals("dataReadBytes", VmMetricCatalog.fieldName(SmartSeries.DATA_READ_BYTES));
         assertEquals("smartDevices", MetricFamily.SMART.section().jsonKey());
         assertEquals(List.of("device"), List.of(MetricFamily.SMART.groupingLabels()));
     }
