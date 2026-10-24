@@ -7,5 +7,8 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	goleak.VerifyTestMain(m)
+	// gopsutil starts one load-average sampler on Windows and keeps it for the life of the process.
+	goleak.VerifyTestMain(m,
+		goleak.IgnoreAnyFunction("github.com/shirou/gopsutil/v4/load.loadAvgGoroutine"),
+	)
 }
