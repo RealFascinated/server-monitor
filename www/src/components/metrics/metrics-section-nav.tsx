@@ -71,7 +71,7 @@ const navItemClassName = (isActive: boolean, depth: number) =>
     "flex w-full items-center gap-1 rounded-sm py-1 text-left text-xs leading-snug transition-colors",
     depth > 0 ? "pr-2" : "px-2",
     isActive
-      ? "bg-muted/90 font-medium text-foreground dark:text-warning"
+      ? "bg-muted/90 font-medium text-foreground"
       : "text-muted-foreground hover:bg-muted/80 hover:text-foreground"
   )
 
@@ -89,7 +89,7 @@ function NavLeafButton({
   const percent = section.navPercent != null && (
     <span
       className={cn(
-        "ml-auto shrink-0 text-[10px] tabular-nums",
+        "ml-auto shrink-0 text-xs tabular-nums",
         percentLevelColorClass(section.navPercent)
       )}
     >
@@ -160,7 +160,7 @@ function NavGroup({
         />
         <span className="truncate">{group.title}</span>
         {group.showChildCount !== false ? (
-          <span className="ml-auto shrink-0 text-[10px] text-muted-foreground tabular-nums">
+          <span className="ml-auto shrink-0 text-xs text-muted-foreground tabular-nums">
             {group.children.length}
           </span>
         ) : null}
@@ -298,9 +298,9 @@ function MetricsSectionNav({
       className="hidden w-48 shrink-0 xl:block 2xl:w-52"
       aria-label="Metric sections"
     >
-      <div className="sticky top-[calc(var(--metrics-header-offset)+1rem)] z-20 flex max-h-[calc(100svh-var(--metrics-header-offset)-2rem)] flex-col overflow-hidden rounded-sm border border-sidebar-border bg-sidebar shadow-sm">
+      <div className="sticky top-[calc(var(--metrics-header-offset)+1rem)] z-20 flex max-h-[calc(100svh-var(--metrics-header-offset)-2rem)] flex-col overflow-hidden rounded-lg border border-sidebar-border bg-sidebar shadow-xs">
         <div className="border-b border-sidebar-border px-3 py-2">
-          <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">
+          <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
             Sections
           </p>
         </div>

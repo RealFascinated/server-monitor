@@ -118,7 +118,7 @@ function InviteMemberDialog({ serverId }: InviteMemberDialogProps) {
           Invite member
         </Button>
       </DialogTrigger>
-      <DialogContent className="rounded-sm border border-border sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg">
         {createdInvite && inviteUrl ? (
           <>
             <DialogHeader>

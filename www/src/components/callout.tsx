@@ -5,14 +5,14 @@ import type { VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const calloutVariants = cva(
-  "relative flex flex-col gap-1 rounded-sm border p-3 text-sm",
+  "relative flex flex-col gap-1 rounded-lg border p-3 text-sm",
   {
     variants: {
       type: {
         warning:
           "border-warning-300 bg-warning-50 dark:border-warning-800 dark:bg-warning-900/30",
         danger:
-          "border-destructive/30 bg-destructive/10 dark:border-destructive/40 dark:bg-destructive/15",
+          "border-destructive/25 bg-destructive/5 dark:border-destructive/30 dark:bg-destructive/10",
         info: "border-chart-2/30 bg-chart-2/10 dark:border-chart-2/40 dark:bg-chart-2/15",
         success:
           "border-success/30 bg-success/10 dark:border-success/40 dark:bg-success/15",
@@ -28,7 +28,7 @@ const titleVariants = cva("text-sm font-bold", {
   variants: {
     type: {
       warning: "text-warning-800 dark:text-warning-300",
-      danger: "text-destructive",
+      danger: "text-red-700 dark:text-red-300",
       info: "text-chart-2",
       success: "text-success",
     },
@@ -42,7 +42,7 @@ const bodyVariants = cva("text-sm", {
   variants: {
     type: {
       warning: "text-warning-700 dark:text-warning-200",
-      danger: "text-destructive/90",
+      danger: "text-foreground/80",
       info: "text-foreground",
       success: "text-foreground",
     },

@@ -1,3 +1,4 @@
+import { OctagonAlert, TriangleAlert } from "lucide-react"
 import type { ReactElement, ReactNode } from "react"
 
 import {
@@ -12,7 +13,11 @@ import {
   memoryUsagePercent,
 } from "@/lib/formatter"
 import { PENDING_NO_METRIC_DATA } from "@/lib/tooltips/copy"
-import { percentLevelColorClass } from "@/lib/metrics/percent-level"
+import {
+  getPercentLevel,
+  percentLevelColorClass,
+} from "@/lib/metrics/percent-level"
+import { cn } from "@/lib/utils"
 
 function ColoredPercent({
   value,
@@ -21,8 +26,26 @@ function ColoredPercent({
   value: number | null
   className?: string
 }) {
+  const level = value == null ? "unknown" : getPercentLevel(value)
+
   return (
-    <span className={percentLevelColorClass(value, className)}>
+    <span
+      className={cn(
+        "inline-flex items-center gap-1",
+        percentLevelColorClass(value, className)
+      )}
+    >
+      {level === "warning" ? (
+        <TriangleAlert aria-hidden className="size-3 shrink-0" />
+      ) : null}
+      {level === "critical" ? (
+        <OctagonAlert aria-hidden className="size-3 shrink-0" />
+      ) : null}
+      {level === "warning" || level === "critical" ? (
+        <span className="sr-only">
+          {level === "critical" ? "Critical: " : "High: "}
+        </span>
+      ) : null}
       {formatPercent(value)}
     </span>
   )
@@ -35,7 +58,7 @@ function withMetricTooltip(content: ReactNode, node: ReactElement) {
 
   return (
     <SimpleTooltip content={content}>
-      <span className="cursor-help">{node}</span>
+      <span className="tooltip-hint">{node}</span>
     </SimpleTooltip>
   )
 }

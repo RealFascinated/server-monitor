@@ -22,9 +22,9 @@ function SettingsToggle({
       disabled={disabled}
       onClick={() => onCheckedChange(!checked)}
       className={cn(
-        "relative h-5 w-9 shrink-0 rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-monitor focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none disabled:cursor-not-allowed dark:focus-visible:ring-warning dark:focus-visible:ring-offset-base",
+        "relative h-5 w-9 shrink-0 rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none disabled:cursor-not-allowed dark:focus-visible:ring-offset-base",
         checked
-          ? "bg-monitor disabled:bg-monitor/70 dark:bg-warning dark:disabled:bg-warning/70"
+          ? "bg-primary disabled:bg-primary/70"
           : "bg-muted ring-1 ring-inset ring-border disabled:bg-muted/80 dark:bg-muted-foreground/30 dark:ring-border dark:disabled:bg-muted-foreground/20"
       )}
     >

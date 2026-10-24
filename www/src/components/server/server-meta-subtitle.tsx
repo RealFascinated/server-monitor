@@ -1,14 +1,9 @@
-import { Box, Clock, Cpu, Globe, HardDrive, MemoryStick } from "lucide-react"
+import { Box, Clock, Cpu, Globe } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
 import { SimpleTooltip } from "@/components/simple-tooltip"
 import type { ServerInventory, ServerResponse } from "@/lib/api/user/servers"
-import {
-  formatMemoryBytes,
-  formatMemoryUsage,
-  formatUptime,
-  formatUptimeDetailed,
-} from "@/lib/formatter"
+import { formatUptime, formatUptimeDetailed } from "@/lib/formatter"
 import { cn } from "@/lib/utils"
 
 type ServerMetaSubtitleProps = {

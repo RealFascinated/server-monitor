@@ -8,6 +8,7 @@ import {
   memoryUsagePercent,
 } from "@/lib/formatter"
 import { percentLevelColorClass } from "@/lib/metrics/percent-level"
+import type { ServerSparklines } from "@/lib/metrics/sparkline"
 
 function serverOverviewHasData(
   server: Pick<ServerResponse, "cpu" | "memory" | "disk"> | undefined
@@ -19,7 +20,18 @@ function serverOverviewHasData(
   )
 }
 
-function ServerOverviewStats({ serverId }: { serverId: number }) {
+type ServerOverviewStatsProps = {
+  serverId: number
+  /** History for the selected range, drawn beside CPU and memory. */
+  trends?: ServerSparklines
+  rangeLabel?: string
+}
+
+function ServerOverviewStats({
+  serverId,
+  trends,
+  rangeLabel,
+}: ServerOverviewStatsProps) {
   const { data: server } = useUserServer(serverId)
   if (!server) {
     return null
@@ -46,6 +58,9 @@ function ServerOverviewStats({ serverId }: { serverId: number }) {
         detail={cpuModel ?? undefined}
         detailTooltip={cpuInventoryTooltip ?? undefined}
         valueClassName={percentLevelColorClass(cpuUsage)}
+        progress={cpuUsage}
+        trend={trends?.cpu}
+        trendLabel={rangeLabel ? `CPU, ${rangeLabel}` : "CPU trend"}
       />
     ) : null,
     memUsage != null ? (
@@ -54,7 +69,7 @@ function ServerOverviewStats({ serverId }: { serverId: number }) {
         title="Memory"
         value={memPercent ?? 0}
         formatValue={(value) =>
-          memPercent == null ? "—" : formatPercentValue(value)
+          memPercent == null ? "-" : formatPercentValue(value)
         }
         detail={
           memTotal != null
@@ -62,6 +77,9 @@ function ServerOverviewStats({ serverId }: { serverId: number }) {
             : formatMemoryBytes(memUsage)
         }
         valueClassName={percentLevelColorClass(memPercent)}
+        progress={memPercent}
+        trend={trends?.memory}
+        trendLabel={rangeLabel ? `Memory, ${rangeLabel}` : "Memory trend"}
       />
     ) : null,
     diskUsage != null ? (
@@ -70,7 +88,7 @@ function ServerOverviewStats({ serverId }: { serverId: number }) {
         title="Root Disk"
         value={diskPercent ?? 0}
         formatValue={(value) =>
-          diskPercent == null ? "—" : formatPercentValue(value)
+          diskPercent == null ? "-" : formatPercentValue(value)
         }
         detail={
           diskTotal != null
@@ -78,6 +96,7 @@ function ServerOverviewStats({ serverId }: { serverId: number }) {
             : formatMemoryBytes(diskUsage)
         }
         valueClassName={percentLevelColorClass(diskPercent)}
+        progress={diskPercent}
       />
     ) : null,
   ].filter(Boolean)

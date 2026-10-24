@@ -103,7 +103,7 @@ export function formatSeriesRangeTooltip(
     return latestLabel ? `Steady at ${latestLabel}` : formatValue(range.min)
   }
 
-  const rangeLabel = `${formatValue(range.min)} – ${formatValue(range.max)} in range`
+  const rangeLabel = `${formatValue(range.min)} to ${formatValue(range.max)} in range`
   return latestLabel ? `${rangeLabel} · now ${latestLabel}` : rangeLabel
 }
 

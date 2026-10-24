@@ -25,7 +25,7 @@ type BreadcrumbProps = {
 }
 
 const breadcrumbLinkClassName =
-  "shrink-0 rounded-sm text-muted-foreground transition-colors hover:text-monitor focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-monitor dark:hover:text-warning dark:focus-visible:ring-warning"
+  "shrink-0 rounded-sm text-muted-foreground transition-colors hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
 
 function Breadcrumb({ items, className }: BreadcrumbProps) {
   return (

@@ -42,7 +42,7 @@ function AgentVersionLabel({
         No agent version reported
       </span>
     ) : (
-      <span>—</span>
+      <span>-</span>
     )
   }
 

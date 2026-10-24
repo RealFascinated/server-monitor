@@ -1,4 +1,5 @@
-import { useLayoutEffect, useRef, type ReactNode } from "react"
+import { useLayoutEffect, useRef } from "react"
+import type { ReactNode } from "react"
 import type { LucideIcon } from "lucide-react"
 
 import { Breadcrumb } from "@/components/breadcrumb"
@@ -37,31 +38,33 @@ function PageHeader({
 
     const el = headerRef.current
     if (!el) return
+    const header: HTMLElement = el
 
     const section = el.closest("section")
     if (!section) return
+    const target: HTMLElement = section
 
     const media = window.matchMedia("(min-width: 1024px)")
 
     function syncOffset() {
       if (media.matches) {
-        section.style.setProperty(
+        target.style.setProperty(
           "--metrics-header-offset",
-          `${el.getBoundingClientRect().height}px`
+          `${header.getBoundingClientRect().height}px`
         )
       } else {
-        section.style.removeProperty("--metrics-header-offset")
+        target.style.removeProperty("--metrics-header-offset")
       }
     }
 
     syncOffset()
     const observer = new ResizeObserver(syncOffset)
-    observer.observe(el)
+    observer.observe(header)
     media.addEventListener("change", syncOffset)
     return () => {
       observer.disconnect()
       media.removeEventListener("change", syncOffset)
-      section.style.removeProperty("--metrics-header-offset")
+      target.style.removeProperty("--metrics-header-offset")
     }
   }, [sticky])
 
@@ -80,9 +83,9 @@ function PageHeader({
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <div className="flex min-w-0 flex-wrap items-center gap-2">
             {Icon ? (
-              <Icon className="size-4 shrink-0 text-monitor dark:text-warning" />
+              <Icon className="size-4 shrink-0 text-brand" />
             ) : null}
-            <h1 className="text-xl">{title}</h1>
+            <h1>{title}</h1>
             {titleAddon}
           </div>
 

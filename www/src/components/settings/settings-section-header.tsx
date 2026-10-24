@@ -7,8 +7,10 @@ function SettingsSectionHeader({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <h2 className="text-xl font-bold text-foreground">{title}</h2>
-      <p className="text-xs font-bold text-muted-foreground">{description}</p>
+      <h2 className="text-xl font-semibold tracking-tight text-foreground">
+        {title}
+      </h2>
+      <p className="text-sm text-muted-foreground">{description}</p>
     </div>
   )
 }

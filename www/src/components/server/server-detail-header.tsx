@@ -4,6 +4,7 @@ import type { BreadcrumbItem } from "@/components/breadcrumb"
 import { PageHeader } from "@/components/page-header"
 import { serverBreadcrumbItems } from "@/lib/servers/server-breadcrumb-items"
 import { ServerMetaSubtitle } from "@/components/server/server-meta-subtitle"
+import { ServerTabs } from "@/components/server/server-tabs"
 import { ServerStatusBadge } from "@/components/server/server-status-badge"
 import { useMetricDefaultRange } from "@/hooks/use-metric-default-range"
 import type { ServerResponse } from "@/lib/api/user/servers"
@@ -43,7 +44,12 @@ function ServerDetailHeader({
       titleAddon={server ? <ServerStatusBadge status={server.status} /> : null}
       subtitle={server ? <ServerMetaSubtitle server={server} /> : null}
       actions={actions}
-      footer={footer}
+      footer={
+        <>
+          <ServerTabs serverId={serverId} />
+          {footer}
+        </>
+      }
     />
   )
 }

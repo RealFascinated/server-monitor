@@ -191,9 +191,8 @@ function ServersFolderTableInner({
   return (
     <section
       className={cn(
-        "flex flex-col gap-2 rounded-sm",
-        showDropTarget &&
-          "bg-monitor/5 ring-2 ring-monitor ring-inset dark:bg-warning/5 dark:ring-warning",
+        "flex flex-col gap-2 rounded-lg",
+        showDropTarget && "bg-primary/5 ring-2 ring-primary ring-inset",
         isDraggingFolder && "opacity-40"
       )}
       {...dragHandlers}
@@ -225,7 +224,7 @@ function ServersFolderTableInner({
                 <button
                   type="button"
                   aria-label={`Create server in ${title}`}
-                  className="flex size-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  className="flex size-5 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 >
                   <Plus className="size-3" />
                 </button>
@@ -279,8 +278,8 @@ function ServersFolderTableInner({
       ) : (
         <p
           className={cn(
-            "rounded-sm border border-dashed border-border px-3 py-6 text-center text-sm text-muted-foreground",
-            isDropTarget && "border-monitor dark:border-warning"
+            "rounded-lg border border-dashed border-border px-3 py-6 text-center text-sm text-muted-foreground",
+            isDropTarget && "border-primary"
           )}
           {...(editMode
             ? {

@@ -43,6 +43,7 @@ function ServerMetricsPage() {
     data: metrics,
     isPending,
     isFetching,
+    dataUpdatedAt,
     refetch,
     error,
   } = useQuery(
@@ -89,6 +90,7 @@ function ServerMetricsPage() {
         onRefreshIntervalChange={setRefreshInterval}
         onRefresh={() => void refetch()}
         isRefreshing={isFetching}
+        dataUpdatedAt={dataUpdatedAt}
       />
 
       <div className="flex flex-col gap-6">

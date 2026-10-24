@@ -18,6 +18,35 @@ const barFillClasses: Record<PercentLevel, string> = {
   critical: "bg-[#C44E4E] dark:bg-error",
 }
 
+function UsageMeter({
+  value,
+  className,
+}: {
+  value: number | null
+  className?: string
+}) {
+  const level = value == null ? "unknown" : getPercentLevel(value)
+  const width = value == null ? 0 : Math.min(100, Math.max(0, value))
+
+  return (
+    <div
+      aria-hidden
+      className={cn(
+        "h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-muted",
+        className
+      )}
+    >
+      <div
+        className={cn(
+          "h-full rounded-full transition-[width] duration-500",
+          barFillClasses[level]
+        )}
+        style={{ width: `${width}%` }}
+      />
+    </div>
+  )
+}
+
 function UsageBar({
   label,
   value,
@@ -29,8 +58,6 @@ function UsageBar({
   status?: ServerStatus
   tooltip?: ReactNode
 }) {
-  const level = value == null ? "unknown" : getPercentLevel(value)
-  const width = value == null ? 0 : Math.min(100, Math.max(0, value))
   const pendingTooltip =
     value == null && status === "PENDING" ? PENDING_NO_METRIC_DATA : null
   const content = tooltip ?? pendingTooltip
@@ -40,12 +67,7 @@ function UsageBar({
       <span className="w-8 shrink-0 text-xs text-muted-foreground">
         {label}
       </span>
-      <div className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-muted">
-        <div
-          className={cn("h-full rounded-full", barFillClasses[level])}
-          style={{ width: `${width}%` }}
-        />
-      </div>
+      <UsageMeter value={value} />
       <span
         className={cn(
           "w-10 shrink-0 text-right text-xs font-medium tabular-nums",
@@ -64,4 +86,4 @@ function UsageBar({
   return <SimpleTooltip content={content}>{bar}</SimpleTooltip>
 }
 
-export { UsageBar }
+export { UsageBar, UsageMeter }

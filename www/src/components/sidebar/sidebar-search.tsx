@@ -5,9 +5,12 @@ import { Input } from "@/components/ui/input"
 export function SidebarSearch({
   value,
   onChange,
+  showInput,
 }: {
   value: string
   onChange: (value: string) => void
+  /** Small fleets rely on Quick find; the inline filter only earns its space on long lists. */
+  showInput: boolean
 }) {
   return (
     <>
@@ -16,20 +19,24 @@ export function SidebarSearch({
           Servers
         </p>
       </div>
-      <div className="relative my-2 shrink-0 px-2">
-        <Search
-          aria-hidden
-          className="pointer-events-none absolute top-1/2 left-4 size-3.5 -translate-y-1/2 text-muted-foreground"
-        />
-        <Input
-          type="search"
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          placeholder="Search servers…"
-          aria-label="Search servers"
-          className="h-7 pl-8 text-xs"
-        />
-      </div>
+      {showInput ? (
+        <div className="relative my-2 shrink-0 px-2">
+          <Search
+            aria-hidden
+            className="pointer-events-none absolute top-1/2 left-4 size-3.5 -translate-y-1/2 text-muted-foreground"
+          />
+          <Input
+            type="search"
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+            placeholder="Search servers…"
+            aria-label="Search servers"
+            className="h-7 pl-8 text-xs"
+          />
+        </div>
+      ) : (
+        <div className="mb-1" />
+      )}
     </>
   )
 }

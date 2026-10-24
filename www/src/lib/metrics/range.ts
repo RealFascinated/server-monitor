@@ -12,7 +12,7 @@ export type MetricTimeRange =
   | "1y"
   | "2y"
 
-/** Lookback durations in seconds — must match API MetricTimeRange. */
+/** Lookback durations in seconds. Must match API MetricTimeRange. */
 export const METRIC_RANGE_LOOKBACK_SECONDS: Record<MetricTimeRange, number> = {
   "1h": 3_600,
   "3h": 10_800,

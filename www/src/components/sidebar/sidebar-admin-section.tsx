@@ -28,8 +28,8 @@ function SidebarAdminLink({
       search={search}
       onClick={onNavigate}
       className={cn(
-        "flex min-h-7 w-full items-center gap-3 rounded-sm px-2 py-1 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted",
-        "[&.active]:bg-muted [&.active]:text-foreground dark:[&.active]:text-warning",
+        "flex min-h-7 w-full items-center gap-3 rounded-md px-2 py-1 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted",
+        "[&.active]:bg-muted [&.active]:text-brand",
         compact && "justify-center px-0",
         compact && "cursor-pointer"
       )}

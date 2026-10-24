@@ -214,7 +214,7 @@ function ServerAccessView({
           row.original.joinedAt ? (
             <TimestampCell iso={row.original.joinedAt} />
           ) : (
-            "—"
+            "-"
           ),
       },
     ]

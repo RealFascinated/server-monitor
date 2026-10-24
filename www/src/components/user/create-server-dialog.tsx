@@ -151,7 +151,7 @@ function CreateServerDialog({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="rounded-sm border border-border sm:max-w-2xl">
+      <DialogContent className="border border-border sm:max-w-2xl">
         {createdServer ? (
           <>
             <DialogHeader>

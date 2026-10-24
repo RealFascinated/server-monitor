@@ -3,10 +3,25 @@ import { memo } from "react"
 import { MetricStatCard } from "@/components/metrics/metric-stat-card"
 import type { ServerResponse } from "@/lib/api/user/servers"
 import { formatCount, formatPercentValue } from "@/lib/formatter"
-import { percentLevelColorClass, fleetOnlineStatusColorClass, attentionCountColorClass } from "@/lib/metrics/percent-level"
+import {
+  percentLevelColorClass,
+  fleetOnlineStatusColorClass,
+  attentionCountColorClass,
+} from "@/lib/metrics/percent-level"
+import type { FleetFilter } from "@/lib/servers/fleet-filter"
 import { computeFleetSummary } from "@/lib/servers/fleet-summary"
 
-function FleetSummaryCardsInner({ servers }: { servers: ServerResponse[] }) {
+type FleetSummaryCardsProps = {
+  servers: ServerResponse[]
+  activeFilter: FleetFilter
+  onFilterChange: (filter: FleetFilter) => void
+}
+
+function FleetSummaryCardsInner({
+  servers,
+  activeFilter,
+  onFilterChange,
+}: FleetSummaryCardsProps) {
   const summary = computeFleetSummary(servers)
 
   function onlineMetricDetail(
@@ -36,16 +51,20 @@ function FleetSummaryCardsInner({ servers }: { servers: ServerResponse[] }) {
       <MetricStatCard
         title="Fleet status"
         value={summary.online}
-        formatValue={(value) => `${formatCount(Math.round(value))} online`}
+        formatValue={(value) => formatCount(Math.round(value))}
+        valueSuffix="online"
         detail={`${summary.offline} offline · ${summary.pending} pending`}
         animate={false}
-        valueClassName={fleetOnlineStatusColorClass(summary.online, summary.offline)}
+        valueClassName={fleetOnlineStatusColorClass(
+          summary.online,
+          summary.offline
+        )}
       />
       <MetricStatCard
         title="Avg CPU"
         value={summary.avgCpuPercent ?? 0}
         formatValue={(value) =>
-          summary.avgCpuPercent == null ? "—" : formatPercentValue(value)
+          summary.avgCpuPercent == null ? "-" : formatPercentValue(value)
         }
         detail={onlineMetricDetail(
           summary.avgCpuPercent,
@@ -53,13 +72,14 @@ function FleetSummaryCardsInner({ servers }: { servers: ServerResponse[] }) {
           "No CPU data yet"
         )}
         valueClassName={percentLevelColorClass(summary.avgCpuPercent)}
+        progress={summary.avgCpuPercent}
         animate={false}
       />
       <MetricStatCard
         title="Avg memory"
         value={summary.avgMemPercent ?? 0}
         formatValue={(value) =>
-          summary.avgMemPercent == null ? "—" : formatPercentValue(value)
+          summary.avgMemPercent == null ? "-" : formatPercentValue(value)
         }
         detail={onlineMetricDetail(
           summary.avgMemPercent,
@@ -67,6 +87,7 @@ function FleetSummaryCardsInner({ servers }: { servers: ServerResponse[] }) {
           "No memory data yet"
         )}
         valueClassName={percentLevelColorClass(summary.avgMemPercent)}
+        progress={summary.avgMemPercent}
         animate={false}
       />
       <MetricStatCard
@@ -76,6 +97,15 @@ function FleetSummaryCardsInner({ servers }: { servers: ServerResponse[] }) {
         detail={attentionDetail}
         valueClassName={attentionCountColorClass(attentionCount)}
         animate={false}
+        onSelect={() =>
+          onFilterChange(activeFilter === "attention" ? "all" : "attention")
+        }
+        selected={activeFilter === "attention"}
+        selectLabel={
+          activeFilter === "attention"
+            ? "Needs attention: showing only these servers. Click to show all servers."
+            : `Needs attention: ${attentionCount}. Click to show only these servers.`
+        }
       />
     </div>
   )

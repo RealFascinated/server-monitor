@@ -75,7 +75,7 @@ function CopyableField({
       <div className="flex gap-2">
         <pre
           id={id}
-          className="min-w-0 flex-1 overflow-x-auto rounded-sm border border-border bg-muted px-3 py-2 font-mono text-xs"
+          className="min-w-0 flex-1 overflow-x-auto rounded-md border border-border bg-muted px-3 py-2 font-mono text-xs"
         >
           {value}
         </pre>
@@ -141,7 +141,7 @@ function AgentInstallPanel({ ingestToken }: AgentInstallPanelProps) {
       <div className="flex flex-col gap-3">
         <Label>Install method</Label>
         <div
-          className="inline-flex flex-wrap items-stretch gap-0.5 overflow-hidden rounded-sm border border-border bg-muted/80 p-0.5"
+          className="inline-flex flex-wrap items-stretch gap-0.5 overflow-hidden rounded-md border border-border bg-muted/80 p-0.5"
           role="toolbar"
           aria-label="Install method"
         >
@@ -157,7 +157,7 @@ function AgentInstallPanel({ ingestToken }: AgentInstallPanelProps) {
                   size="sm"
                   variant="ghost"
                   className={cn(
-                    "h-7 cursor-pointer rounded-sm border-0 px-2.5 text-xs",
+                    "h-7 cursor-pointer rounded-md border-0 px-2.5 text-xs",
                     method === option.value
                       ? "bg-background text-foreground shadow-sm"
                       : "text-muted-foreground hover:bg-background/70"
@@ -202,7 +202,7 @@ function AgentInstallPanel({ ingestToken }: AgentInstallPanelProps) {
           </div>
           <pre
             id="install-command"
-            className="max-h-64 overflow-auto rounded-sm border border-border bg-muted p-3 font-mono text-xs whitespace-pre-wrap"
+            className="max-h-64 overflow-auto rounded-md border border-border bg-muted p-3 font-mono text-xs whitespace-pre-wrap"
           >
             {installContent}
           </pre>

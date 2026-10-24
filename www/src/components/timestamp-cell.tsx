@@ -11,7 +11,7 @@ type TimestampCellProps = {
 function TimestampCell({ iso, tooltip, className }: TimestampCellProps) {
   return (
     <SimpleTooltip content={tooltip ?? formatDateWithRelative(iso)}>
-      <span className={cn("cursor-help", className)}>{formatDate(iso)}</span>
+      <span className={cn("tooltip-hint", className)}>{formatDate(iso)}</span>
     </SimpleTooltip>
   )
 }

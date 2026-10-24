@@ -14,7 +14,7 @@ function SettingsPreferenceGroup({
   return (
     <div
       className={cn(
-        "flex max-w-xl flex-col overflow-hidden rounded-sm border border-border bg-card [&>*:not(:last-child)]:border-b [&>*:not(:last-child)]:border-border",
+        "flex max-w-xl flex-col overflow-hidden rounded-lg border border-border bg-card [&>*:not(:last-child)]:border-b [&>*:not(:last-child)]:border-border",
         className
       )}
     >

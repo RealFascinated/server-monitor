@@ -58,7 +58,9 @@ function AccountSettingsView({ user }: AccountSettingsViewProps) {
         <Card className="max-w-xl gap-0 py-0 shadow-none">
           <CardContent className="flex flex-col gap-3 py-4">
             <div className="flex flex-wrap items-center gap-2.5">
-              <p className="text-base font-medium text-foreground">{user.email}</p>
+              <p className="font-medium text-base text-foreground">
+                {user.email}
+              </p>
               <UserRoleBadge role={user.role} />
             </div>
             <p className="text-sm text-muted-foreground">
@@ -84,7 +86,7 @@ function AccountSettingsView({ user }: AccountSettingsViewProps) {
               title="Password"
               description="Choose a strong password you do not use elsewhere."
             />
-            <div className="rounded-sm border border-border bg-card px-4 py-4">
+            <div className="rounded-lg border border-border bg-card px-4 py-4">
               <ChangePasswordForm />
             </div>
           </div>

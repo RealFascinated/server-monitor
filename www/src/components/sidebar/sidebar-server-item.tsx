@@ -47,7 +47,7 @@ export const SidebarServerItem = memo(
       )
     }, [queryClient, server.serverId, defaultRange])
 
-    const serverTooltip = `${server.serverName} — ${SERVER_STATUS_TOOLTIPS[server.status]}`
+    const serverTooltip = `${server.serverName}: ${SERVER_STATUS_TOOLTIPS[server.status]}`
 
     const link = (
       <Link
@@ -58,8 +58,8 @@ export const SidebarServerItem = memo(
         onMouseEnter={prefetchServer}
         onFocus={prefetchServer}
         className={cn(
-          "flex w-full shrink-0 rounded-sm text-sm font-medium text-muted-foreground transition-colors hover:bg-muted",
-          "[&.active]:bg-muted [&.active]:text-foreground dark:[&.active]:text-warning",
+          "flex w-full shrink-0 rounded-md text-sm font-medium text-muted-foreground transition-colors hover:bg-muted",
+          "[&.active]:bg-muted [&.active]:text-brand",
           nested && !compact && "pl-4",
           compact
             ? "min-h-7 cursor-pointer items-center justify-center gap-3 px-0 py-1"
@@ -86,7 +86,7 @@ export const SidebarServerItem = memo(
           >
             <span className="truncate leading-tight">{server.serverName}</span>
             {detailed && (visibility.cpu || visibility.ram) ? (
-              <span className="truncate text-[11px] leading-tight text-muted-foreground">
+              <span className="truncate text-xs leading-tight text-muted-foreground">
                 {visibility.cpu ? (
                   <>
                     CPU{" "}

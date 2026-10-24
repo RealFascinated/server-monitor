@@ -28,15 +28,8 @@ function MetricSection({
         "flex scroll-mt-[calc(var(--metrics-header-offset)+1rem)] flex-col gap-4"
       )}
     >
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 border-b border-border pb-2">
         <div className="flex items-center gap-2.5">
-          <span
-            aria-hidden
-            className={cn(
-              "h-4 w-0.5 shrink-0 rounded-full bg-monitor",
-              "dark:bg-warning"
-            )}
-          />
           <h2 className="flex items-center gap-2 text-lg text-foreground">
             <Icon
               className="size-4 shrink-0 text-muted-foreground"
@@ -47,8 +40,11 @@ function MetricSection({
                 <span className="font-semibold text-muted-foreground">
                   {sectionKind}
                 </span>
-                <span className="font-normal text-muted-foreground/50" aria-hidden>
-                  –
+                <span
+                  className="font-normal text-muted-foreground/50"
+                  aria-hidden
+                >
+                  /
                 </span>
                 <span className="font-bold">{title}</span>
               </>
@@ -58,7 +54,7 @@ function MetricSection({
           </h2>
         </div>
         {description ? (
-          <p className="ml-3 text-sm text-muted-foreground">{description}</p>
+          <p className="text-sm text-muted-foreground">{description}</p>
         ) : null}
       </div>
       <div className="w-full">{render()}</div>

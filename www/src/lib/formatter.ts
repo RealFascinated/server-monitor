@@ -1,6 +1,6 @@
 export function formatDurationSeconds(seconds: number): string {
   if (!Number.isFinite(seconds) || seconds < 0) {
-    return "—"
+    return "-"
   }
 
   const days = Math.floor(seconds / 86_400)
@@ -15,7 +15,7 @@ export function formatDurationSeconds(seconds: number): string {
 
 export function formatUptime(seconds: number | null): string {
   if (seconds == null) {
-    return "—"
+    return "-"
   }
 
   const days = Math.floor(seconds / 86_400)
@@ -35,7 +35,7 @@ export function formatUptime(seconds: number | null): string {
 
 export function formatPercent(value: number | null): string {
   if (value == null) {
-    return "—"
+    return "-"
   }
 
   return formatPercentValue(value)
@@ -54,7 +54,7 @@ export function formatPercentValue(value: number, fractionDigits = 1): string {
 
 export function formatUptimePercent30d(value: number | null): string {
   if (value == null) {
-    return "—"
+    return "-"
   }
 
   return formatPercentValue(value, 2)

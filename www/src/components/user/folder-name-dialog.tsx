@@ -16,10 +16,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  createServerFolder,
-  renameServerFolder,
-} from "@/lib/api/user/folders"
+import { createServerFolder, renameServerFolder } from "@/lib/api/user/folders"
 import type { ServerFolderResponse } from "@/lib/api/user/folders"
 import { userServerFoldersQueryKey } from "@/lib/api/user/folders.queries"
 import { userServersQueryKey } from "@/lib/api/user/servers.queries"
@@ -91,7 +88,7 @@ function FolderNameDialog({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="rounded-sm border border-border">
+      <DialogContent className="border border-border">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
@@ -172,7 +169,9 @@ function CreateFolderDialog() {
       initialName=""
       submitLabel="Create"
       isPending={mutation.isPending}
-      onSubmit={(folderName) => mutation.mutateAsync(folderName)}
+      onSubmit={async (folderName) => {
+        await mutation.mutateAsync(folderName)
+      }}
     />
   )
 }
@@ -234,7 +233,9 @@ function RenameFolderDialog({
       unchangedName={currentName}
       submitLabel="Save"
       isPending={mutation.isPending}
-      onSubmit={(nextName) => mutation.mutateAsync(nextName)}
+      onSubmit={async (nextName) => {
+        await mutation.mutateAsync(nextName)
+      }}
     />
   )
 }

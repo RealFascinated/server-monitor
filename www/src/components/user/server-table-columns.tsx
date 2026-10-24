@@ -10,6 +10,7 @@ import {
   DiskPercent,
   MemoryPercent,
 } from "@/components/server/usage-percent"
+import { ServerSparkline } from "@/components/server/server-sparkline"
 import { ServerStatusBadge } from "@/components/server/server-status-badge"
 import { SimpleTooltip, TableHeaderTooltip } from "@/components/simple-tooltip"
 import { TimestampCell } from "@/components/timestamp-cell"
@@ -46,7 +47,7 @@ function renderUptime(server: ServerResponse): ReactNode {
 
   return (
     <SimpleTooltip content={tooltip}>
-      <span className={cn("cursor-help", className)}>{formatted}</span>
+      <span className={cn("tooltip-hint", className)}>{formatted}</span>
     </SimpleTooltip>
   )
 }
@@ -62,7 +63,7 @@ function renderUptime30d(server: ServerResponse): ReactNode {
 
   return (
     <SimpleTooltip content={tooltip}>
-      <span className={cn("cursor-help", className)}>{formatted}</span>
+      <span className={cn("tooltip-hint", className)}>{formatted}</span>
     </SimpleTooltip>
   )
 }
@@ -83,7 +84,7 @@ export function getServerTableColumns(
               to="/servers/$serverId"
               params={{ serverId: String(server.serverId) }}
               search={{ range: defaultRange }}
-              className="text-monitor hover:underline dark:text-warning"
+              className="text-foreground hover:text-brand hover:underline"
             >
               {server.serverName}
             </Link>
@@ -137,7 +138,10 @@ export function getServerTableColumns(
       ),
       meta: {
         renderServer: (server) => (
-          <CpuPercent cpu={server.cpu} status={server.status} />
+          <div className="flex items-center justify-between gap-3">
+            <CpuPercent cpu={server.cpu} status={server.status} />
+            <ServerSparkline server={server} metric="cpu" />
+          </div>
         ),
       },
     },
@@ -155,11 +159,14 @@ export function getServerTableColumns(
       ),
       meta: {
         renderServer: (server) => (
-          <MemoryPercent
-            usage={server.memory?.usage ?? null}
-            max={server.memory?.max ?? null}
-            status={server.status}
-          />
+          <div className="flex items-center justify-between gap-3">
+            <MemoryPercent
+              usage={server.memory?.usage ?? null}
+              max={server.memory?.max ?? null}
+              status={server.status}
+            />
+            <ServerSparkline server={server} metric="memory" />
+          </div>
         ),
       },
     },
@@ -195,6 +202,7 @@ export function getServerTableColumns(
         />
       ),
       meta: {
+        className: "hidden xl:table-cell",
         renderServer: (server) => (
           <AgentVersionLabel version={server.agentVersion} />
         ),
@@ -210,7 +218,7 @@ export function getServerTableColumns(
         />
       ),
       meta: {
-        className: "text-muted-foreground",
+        className: "hidden text-muted-foreground 2xl:table-cell",
         renderServer: (server) => <TimestampCell iso={server.createdAt} />,
       },
     },
@@ -237,10 +245,6 @@ export function getServerTableColumns(
             server.permissions,
             ServerPermission.DELETE_SERVER
           )
-
-          if (!canRename && !canDelete) {
-            return null
-          }
 
           return (
             <div className="flex items-center">

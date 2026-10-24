@@ -34,19 +34,12 @@ function RenameServerDialog({
 }: RenameServerDialogProps) {
   const [open, setOpen] = useState(false)
 
-  const {
-    name,
-    setName,
-    fieldError,
-    inputId,
-    mutation,
-    resetForm,
-    submit,
-  } = useRenameServer({
-    serverId,
-    currentName,
-    onSuccess: () => setOpen(false),
-  })
+  const { name, setName, fieldError, inputId, mutation, resetForm, submit } =
+    useRenameServer({
+      serverId,
+      currentName,
+      onSuccess: () => setOpen(false),
+    })
 
   function handleOpenChange(nextOpen: boolean) {
     if (mutation.isPending) {
@@ -80,7 +73,7 @@ function RenameServerDialog({
         </TooltipTrigger>
         <TooltipContent>Rename server</TooltipContent>
       </Tooltip>
-      <DialogContent className="rounded-sm border border-border sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Rename server</DialogTitle>

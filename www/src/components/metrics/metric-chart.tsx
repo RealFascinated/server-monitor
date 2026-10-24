@@ -19,6 +19,10 @@ import {
 } from "@/lib/metrics/chart-zoom"
 import { buildUPlotOptions, getChartColors } from "@/lib/metrics/uplot-theme"
 import {
+  createIncidentDrawHook,
+  useMetricsChartIncidents,
+} from "@/lib/metrics/chart-annotations"
+import {
   createChartZoomSyncHook,
   registerMetricsChartSync,
   unregisterMetricsChartSync,
@@ -76,6 +80,7 @@ function MetricChart({
   const { resolvedTheme } = useTheme()
   const syncKey = useMetricsChartSyncKey() ?? undefined
   const chartZoom = useMetricsChartZoom()
+  const incidentSpans = useMetricsChartIncidents()
   const chartZoomRef = useRef(chartZoom)
   const yMax = yRange?.max ?? null
   const rightYMax = rightYRange?.max ?? null
@@ -180,6 +185,10 @@ function MetricChart({
         ...(syncKey ? { setScale: [createChartZoomSyncHook(syncKey)] } : {}),
       }
 
+      if (incidentSpans.length > 0) {
+        hooks.drawClear = [createIncidentDrawHook(incidentSpans, resolvedTheme)]
+      }
+
       const drawAxesHooks: Array<(u: uPlot) => void> = []
       if (!hasRightAxis && thresholds && thresholds.length > 0) {
         drawAxesHooks.push(createThresholdDrawHook(thresholds, resolvedTheme, "y"))
@@ -261,6 +270,7 @@ function MetricChart({
     syncKey,
     tooltipColumnSize,
     tooltipSort,
+    incidentSpans,
   ])
 
   useLayoutEffect(() => {

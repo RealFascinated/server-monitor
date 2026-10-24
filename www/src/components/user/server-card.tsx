@@ -43,7 +43,7 @@ function ServerCardUptime({ server }: { server: ServerResponse }) {
 
   return (
     <SimpleTooltip content={tooltip}>
-      <span className={cn("cursor-help", className)}>{formatted}</span>
+      <span className={cn("tooltip-hint", className)}>{formatted}</span>
     </SimpleTooltip>
   )
 }
@@ -89,7 +89,7 @@ const ServerCard = memo(
           params={{ serverId: String(server.serverId) }}
           search={{ range: defaultRange }}
           className={cn(
-            "flex min-w-0 flex-1 items-center gap-3 rounded-sm border border-border bg-card px-3 py-2.5 transition-colors hover:bg-card-hover active:bg-muted"
+            "flex min-w-0 flex-1 items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 transition-colors hover:bg-card-hover active:bg-muted"
           )}
         >
           <div className="flex min-w-0 flex-1 flex-col gap-2">

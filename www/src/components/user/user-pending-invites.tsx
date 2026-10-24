@@ -4,7 +4,9 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import type { ColumnDef, SortingState } from "@tanstack/react-table"
+import { MailCheck } from "lucide-react"
 import { useState } from "react"
+import { EmptyState } from "@/components/empty-state"
 import { buildInviteTableColumns } from "@/components/invite-table-columns"
 import { QueryStatusShell } from "@/components/query-status-shell"
 import { Spinner } from "@/components/spinner"
@@ -94,7 +96,11 @@ function UserPendingInvites() {
       className="flex flex-col gap-3"
     >
       {invites.length === 0 ? (
-        <p className="text-muted-foreground">No pending invites.</p>
+        <EmptyState
+          icon={MailCheck}
+          title="No pending invites"
+          description="When someone shares a server with your email address, the invite shows up here to accept."
+        />
       ) : null}
 
       {invites.length > 0 ? <DataTable table={table} /> : null}

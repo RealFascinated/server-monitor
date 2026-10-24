@@ -336,7 +336,7 @@ function hostCpuCharts(
     {
       title: "Load average",
       description:
-        "Runnable and blocked tasks averaged over 1, 5, and 15 minutes. Compare to logical CPU count — sustained load near or above core count indicates saturation.",
+        "Runnable and blocked tasks averaged over 1, 5, and 15 minutes. Compare to logical CPU count. Sustained load near or above core count indicates saturation.",
       series: [
         chartSeries("1 min", host.load1),
         chartSeries("5 min", host.load5),

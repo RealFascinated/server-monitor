@@ -28,10 +28,10 @@ function CountBadge({
       className={cn(
         "flex shrink-0 items-center justify-center rounded-full leading-none tabular-nums",
         compact
-          ? "absolute -top-1 -right-1.5 h-4 min-w-4 px-0.5 text-[9px]"
-          : "h-5 min-w-5 px-1 text-[10px]",
+          ? "absolute -top-1 -right-1.5 h-4 min-w-4 px-0.5 text-[10px]"
+          : "h-5 min-w-5 px-1 text-[11px]",
         variant === "accent"
-          ? "bg-monitor font-semibold text-white dark:bg-warning dark:text-foreground"
+          ? "bg-primary font-semibold text-primary-foreground"
           : "bg-muted font-medium text-muted-foreground",
         className
       )}

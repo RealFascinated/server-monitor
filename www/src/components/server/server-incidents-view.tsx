@@ -1,7 +1,9 @@
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import type { ColumnDef } from "@tanstack/react-table"
+import { ShieldCheck } from "lucide-react"
 import { useMemo } from "react"
 
+import { EmptyState } from "@/components/empty-state"
 import { SimpleTooltip } from "@/components/simple-tooltip"
 import { TimestampCell } from "@/components/timestamp-cell"
 import { Pagination } from "@/components/pagination"
@@ -38,7 +40,7 @@ function IncidentStatusBadge({ incident }: { incident: IncidentResponse }) {
     <SimpleTooltip content={INCIDENT_STATUS_TOOLTIPS[status]}>
       <span
         className={cn(
-          "inline-flex cursor-help rounded-sm px-2 py-0.5 text-xs font-medium capitalize",
+          "inline-flex rounded-sm px-2 py-0.5 text-xs font-medium capitalize",
           incidentStatusStyles[status]
         )}
       >
@@ -85,7 +87,7 @@ function ServerIncidentsView({
           row.original.resolvedAt ? (
             <TimestampCell iso={row.original.resolvedAt} />
           ) : (
-            <span className="text-muted-foreground">—</span>
+            <span className="text-muted-foreground">-</span>
           ),
       },
       {
@@ -105,10 +107,11 @@ function ServerIncidentsView({
 
   if (page.totalItems === 0) {
     return (
-      <p className="text-sm text-muted-foreground">
-        No outages recorded yet. Incidents are created automatically when the
-        agent stops reporting heartbeats.
-      </p>
+      <EmptyState
+        icon={ShieldCheck}
+        title="No outages recorded"
+        description="Incidents are created automatically when the agent stops reporting heartbeats."
+      />
     )
   }
 

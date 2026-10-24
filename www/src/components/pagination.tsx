@@ -58,7 +58,7 @@ function Pagination({
     >
       <div className="flex flex-wrap items-center gap-3">
         <p className="text-xs text-muted-foreground">
-          Showing {formatCount(range.start)}–{formatCount(range.end)} of{" "}
+          Showing {formatCount(range.start)}-{formatCount(range.end)} of{" "}
           {formatCount(page.totalItems)} {pluralize(page.totalItems, itemLabel)}
         </p>
 

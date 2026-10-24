@@ -52,7 +52,7 @@ function ServerAgentSetupDialog({
           Install agent
         </Button>
       </DialogTrigger>
-      <DialogContent className="rounded-sm border border-border sm:max-w-2xl">
+      <DialogContent className="sm:max-w-2xl">
         {ingestToken ? (
           <>
             <DialogHeader>

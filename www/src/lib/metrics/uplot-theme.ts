@@ -107,6 +107,17 @@ function withAlpha(color: string, alpha: number): string {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`
 }
 
+/** Soft vertical fade under a line; only used when a chart has a single series. */
+function gradientFill(color: string) {
+  return (self: uPlot) => {
+    const { top, height } = self.bbox
+    const gradient = self.ctx.createLinearGradient(0, top, 0, top + height)
+    gradient.addColorStop(0, withAlpha(color, 0.22))
+    gradient.addColorStop(1, withAlpha(color, 0))
+    return gradient
+  }
+}
+
 type BuildUPlotOptionsParams = {
   theme: ResolvedTheme
   labels: string[]
@@ -138,7 +149,9 @@ function buildAxisConfig({
     font: AXIS_FONT,
     gap: 8,
     size: (_self, values) => measureAxisWidth(values),
-    grid: showGrid ? { stroke: gridColor } : { show: false },
+    grid: showGrid
+      ? { stroke: withAlpha(gridColor, 0.6), width: 1 }
+      : { show: false },
     ticks: { stroke: axisColor },
     values: (_self, ticks) => ticks.map((value) => formatValue(value)),
   }
@@ -172,6 +185,7 @@ export function buildUPlotOptions({
   const formatRightAxisValue = (value: number) =>
     rightValueFormatter ? rightValueFormatter(value) : String(value)
   const hasRightAxis = seriesAxes.some((axis) => axis === "right")
+  const singleSeries = labels.length === 1 && !bidirectional
   const leftAxis = buildAxisConfig({
     axisColor,
     gridColor,
@@ -202,12 +216,14 @@ export function buildUPlotOptions({
         stroke: colors[index % colors.length],
         fill: stacked
           ? withAlpha(colors[index % colors.length], 0.35)
-          : undefined,
+          : singleSeries
+            ? gradientFill(colors[index % colors.length])
+            : undefined,
         width: stacked ? 1 : 2,
         spanGaps: false,
         value: (_self: uPlot, rawValue: number | null, seriesIndex: number) => {
           if (rawValue == null) {
-            return "—"
+            return "-"
           }
 
           const display =
@@ -226,7 +242,7 @@ export function buildUPlotOptions({
         font: AXIS_FONT,
         gap: 4,
         size: X_AXIS_HEIGHT,
-        grid: { stroke: gridColor },
+        grid: { stroke: withAlpha(gridColor, 0.35), width: 1 },
         ticks: { stroke: axisColor, size: 4 },
         values: (_self, splits, _axisIdx, _foundSpace, foundIncr) =>
           formatChartAxisTicks(splits, foundIncr),

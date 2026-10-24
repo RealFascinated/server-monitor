@@ -17,7 +17,7 @@ import type {
  * lists where a loading state inside the page is acceptable.
  *
  * Prefer `queryClient.ensureQueryData` when the route must block until data
- * is available — e.g. settings forms, auth gates, or parent loaders that
+ * is available, e.g. settings forms, auth gates, or parent loaders that
  * other routes depend on (see `resolveUserServer`).
  */
 export function loadCachedQuery<

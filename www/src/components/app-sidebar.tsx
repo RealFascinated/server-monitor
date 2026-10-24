@@ -7,6 +7,7 @@ import { MobileSidebarDrawer } from "@/components/sidebar/mobile-sidebar-drawer"
 import { SidebarAdminSection } from "@/components/sidebar/sidebar-admin-section"
 import { SidebarFolderTree } from "@/components/sidebar/sidebar-folder-tree"
 import { SidebarNav } from "@/components/sidebar/sidebar-nav"
+import { SidebarQuickFind } from "@/components/sidebar/sidebar-quick-find"
 import { SidebarResizeHandle } from "@/components/sidebar/sidebar-resize-handle"
 import { MonitorLogo } from "@/components/monitor-logo"
 import { Spinner } from "@/components/spinner"
@@ -171,6 +172,7 @@ export function AppSidebar({
             )}
           />
         </button>
+        <SidebarQuickFind compact={compact} onNavigate={handleNavigate} />
         <SidebarNav compact={compact} onNavigate={handleNavigate} />
         {user.role === "ADMIN" ? (
           <SidebarAdminSection

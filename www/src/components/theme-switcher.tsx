@@ -23,7 +23,7 @@ export function ThemeSwitcher({ className }: { className?: string }) {
       role="group"
       aria-label="Theme"
       className={cn(
-        "inline-flex items-center gap-0.5 rounded-sm bg-muted p-0.5",
+        "inline-flex items-center gap-0.5 rounded-md bg-muted p-0.5",
         className
       )}
     >
@@ -38,9 +38,9 @@ export function ThemeSwitcher({ className }: { className?: string }) {
               aria-label={label}
               aria-pressed={isActive}
               className={cn(
-                "flex size-6 shrink-0 cursor-help items-center justify-center rounded-sm transition-colors",
+                "flex size-6 shrink-0 cursor-help items-center justify-center rounded-md transition-colors",
                 isActive
-                  ? "bg-card text-monitor dark:bg-accent dark:text-warning"
+                  ? "bg-card text-brand dark:bg-accent"
                   : "text-muted-foreground hover:text-muted-foreground dark:text-muted-foreground dark:hover:text-foreground"
               )}
             >

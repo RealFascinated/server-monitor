@@ -2,6 +2,7 @@ import { memo, useMemo, useRef, useState } from "react"
 import type { RefObject } from "react"
 import { Maximize2 } from "lucide-react"
 
+import { InfoHint } from "@/components/info-hint"
 import { SimpleTooltip } from "@/components/simple-tooltip"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -165,15 +166,14 @@ function MetricChartCard({
   }
 
   const titleNode = (
-    <CardTitle
-      className={cn(
-        "text-sm font-bold text-foreground",
-        description && "cursor-help"
-      )}
-    >
+    <CardTitle className="text-sm font-semibold text-foreground">
       {title}
     </CardTitle>
   )
+
+  const infoNode = description ? (
+    <InfoHint label={`About ${title}`}>{description}</InfoHint>
+  ) : null
 
   const currentValuesNode = shouldShowCurrentValues ? (
     <div className="flex flex-wrap justify-end gap-x-3 gap-y-1.5">
@@ -230,14 +230,11 @@ function MetricChartCard({
 
   return (
     <Card className="flex h-full min-h-0 flex-col gap-0 overflow-hidden py-0">
-      <CardHeader className="shrink-0 gap-2 border-b border-border bg-muted/90 px-4 py-3 dark:bg-muted/60">
+      <CardHeader className="shrink-0 gap-1 border-b border-border/60 px-4 py-3">
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <div className="flex min-w-0 items-center gap-0.5">
-            {description ? (
-              <SimpleTooltip content={description}>{titleNode}</SimpleTooltip>
-            ) : (
-              titleNode
-            )}
+            {titleNode}
+            {infoNode}
             {expandButton}
           </div>
           {currentValuesNode}
@@ -266,20 +263,13 @@ function MetricChartCard({
           showCloseButton
           className="flex h-[min(90vh,calc(100vh-2rem))] w-[min(96vw,calc(100vw-2rem))] max-w-none animate-none! flex-col gap-0 overflow-hidden p-0 sm:max-w-none data-open:animate-none! data-closed:animate-none!"
         >
-          <DialogHeader className="shrink-0 gap-2 border-b border-border bg-muted/90 px-4 py-3 dark:bg-muted/60">
+          <DialogHeader className="shrink-0 gap-1 border-b border-border/60 px-4 py-3">
             <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 pr-8">
-              <div className="min-w-0">
-                {description ? (
-                  <SimpleTooltip content={description}>
-                    <DialogTitle className="cursor-help text-sm font-bold text-foreground">
-                      {title}
-                    </DialogTitle>
-                  </SimpleTooltip>
-                ) : (
-                  <DialogTitle className="text-sm font-bold text-foreground">
-                    {title}
-                  </DialogTitle>
-                )}
+              <div className="flex min-w-0 items-center gap-0.5">
+                <DialogTitle className="text-sm font-semibold text-foreground">
+                  {title}
+                </DialogTitle>
+                {infoNode}
               </div>
               {currentValuesNode}
             </div>

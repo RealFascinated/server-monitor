@@ -17,7 +17,7 @@ function AuthPageLink({ to, children }: AuthPageLinkProps) {
   return (
     <Link
       to={to}
-      className="font-medium text-monitor underline-offset-4 hover:underline dark:text-warning"
+      className="font-medium text-brand underline-offset-4 hover:underline"
     >
       {children}
     </Link>

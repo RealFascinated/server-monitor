@@ -1,14 +1,14 @@
 ---
-description: Monitor design system — tokens, components, and interactive states
+description: Monitor design system - tokens, components, and interactive states
 globs: www/**/*.{tsx,css}
 alwaysApply: false
 ---
 
 # Monitor Design System
 
-Replicate Monitor's visual design in this app. Use Tailwind utilities with `cn()` / CVA. Define theme tokens in `src/styles.css` (`@theme`, CSS variables) — don't scatter one-off hex values in components.
+Replicate Monitor's visual design in this app. Use Tailwind utilities with `cn()` / CVA. Define theme tokens in `src/styles.css` (`@theme`, CSS variables) - don't scatter one-off hex values in components.
 
-**Dark mode**: class-based — `.dark` on `<html>`. Variant: `@custom-variant dark (&:where(.dark, .dark *));`
+**Dark mode**: class-based - `.dark` on `<html>`. Variant: `@custom-variant dark (&:where(.dark, .dark *));`
 
 **Default border override**: `border-color: var(--color-monitor-gray-200)` (`#202020`) instead of `currentcolor`.
 
@@ -16,7 +16,7 @@ Replicate Monitor's visual design in this app. Use Tailwind utilities with `cn()
 
 ## 1. Design Tokens
 
-### Colors — Brand / Accent
+### Colors - Brand / Accent
 
 | Token | Hex | Usage |
 |---|---|---|
@@ -25,7 +25,8 @@ Replicate Monitor's visual design in this app. Use Tailwind utilities with `cn()
 | `monitor-100` | `#7317ff` | Highlighted button hover (dark), scrollbar thumb |
 | `monitor-200` | `#5a12c7` | Highlighted button text (light) |
 | `monitor-300` | `#4a0fa3` | Deepest brand shade |
-| `warning` / `warning-400` | `#fcd452` | Primary accent (dark mode) |
+| `brand` (`--brand`) | `#6b16ed` light · `#a78bfa` dark | Single accent in both themes (text, rings, active nav, filled controls via `primary`) |
+| `warning` / `warning-400` | `#fcd452` | **Warning state only** (callouts, degraded status). Never use as the accent |
 
 ### Warning Scale (dark accent + callouts)
 
@@ -57,12 +58,16 @@ Page `gray-50` · components `white` · borders `neutral-200` · text `black` ·
 
 | Context | Light | Dark |
 |---|---|---|
-| Primary accent | `monitor` | `warning` |
-| Focus ring | `ring-monitor` | `ring-warning` |
-| Input focus bar | `#6b16ed` | `#fcd452` |
-| Active nav | `text-black` | `text-warning` |
-| Helper/highlight | `text-monitor` | `text-warning` |
-| Spinner | `text-monitor` | `text-warning` |
+Use the theme-aware tokens instead of `dark:` pairs; they resolve to `#6b16ed` in light and `#a78bfa` in dark.
+
+| Context | Class |
+|---|---|
+| Accent text / icons / links | `text-brand` |
+| Filled accent (badges, toggles) | `bg-primary text-primary-foreground` |
+| Focus ring | `ring-ring` |
+| Input focus bar | `var(--ring)` |
+| Active nav | `[&.active]:text-brand` |
+| Spinner | `text-brand` |
 
 ### Background Hierarchy
 
@@ -96,16 +101,16 @@ Page `gray-50` · components `white` · borders `neutral-200` · text `black` ·
 
 ## 2. Typography
 
-Font: **Inter**, sans-serif (`font-display: swap`). Body: `text-sm antialiased`.
+Font: **Geist Variable** (falls back to Inter, then system sans). Body: `text-sm antialiased`.
 
-**CRITICAL — dark mode headings**: h1–h4, card titles, modal titles MUST be `dark:text-white`. Default body in dark is `neutral-400` (`#a3a3a3`); headings without override are nearly invisible.
+Headings use `text-foreground` (set globally for h1-h4); do not hardcode `text-black dark:text-white`.
 
 | Element | Classes |
 |---|---|
-| h1 | `text-3xl font-bold dark:text-white` |
-| h2 | `text-xl font-bold dark:text-white` |
-| h3 | `text-lg font-bold dark:text-white` |
-| h4 | `text-base font-bold dark:text-white` |
+| h1 | `text-2xl font-semibold tracking-tight` |
+| h2 | `text-xl font-semibold tracking-tight` |
+| h3 | `text-lg font-semibold` |
+| h4 | `text-base font-semibold` |
 | Labels | `text-sm font-medium` |
 | Badge/status | `text-xs font-bold` |
 | Box description | `text-xs font-bold text-neutral-500` |
@@ -126,8 +131,8 @@ Font: **Inter**, sans-serif (`font-display: swap`). Body: `text-sm antialiased`.
 
 | Context | Radius |
 |---|---|
-| Inputs, buttons, cards, modals | `rounded-sm` |
-| Callouts | `rounded-lg` |
+| Inputs, buttons, menus, tooltips (`--radius-sm`, 6px) | `rounded-sm` |
+| Cards, tables, callouts, modals, popovers | `rounded-lg` (12px) |
 | Badges | `rounded-full` |
 | Monitor-box variant | `rounded` |
 
@@ -135,14 +140,14 @@ Font: **Inter**, sans-serif (`font-display: swap`). Body: `text-sm antialiased`.
 
 ## 4. Focus & Input Shadows
 
-**Buttons, links, checkboxes** — ring system (not inputs):
+**Buttons, links, checkboxes** - ring system (not inputs):
 
 ```
 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-monitor
 dark:focus-visible:ring-warning focus-visible:ring-offset-2 dark:focus-visible:ring-offset-base
 ```
 
-**Inputs & selects** — inset box-shadow (not ring). Enables dirty-state left bar:
+**Inputs & selects** - inset box-shadow (not ring). Enables dirty-state left bar:
 
 ```
 /* default light */  inset 4px 0 0 transparent, inset 0 0 0 2px #e5e5e5
@@ -152,15 +157,15 @@ dark:focus-visible:ring-warning focus-visible:ring-offset-2 dark:focus-visible:r
 /* disabled/readonly */ none
 ```
 
-Input-sticky variant uses 1px inset border instead of 2px. **Textareas** use a normal border + ring focus — NOT the inset left-bar system.
+Input-sticky variant uses 1px inset border instead of 2px. **Textareas** use a normal border + ring focus - NOT the inset left-bar system.
 
 ---
 
 ## 5. Components
 
-Use CVA variants (`default`, `highlighted`, `error`) — not string flags with switch chains.
+Use CVA variants (`default`, `highlighted`, `error`) - not string flags with switch chains.
 
-### Button — Default
+### Button - Default
 
 ```
 flex gap-2 justify-center items-center px-2 h-8 text-sm text-black normal-case rounded-sm
@@ -172,7 +177,7 @@ disabled:bg-transparent disabled:text-neutral-300
 + focus ring classes above
 ```
 
-### Button — Highlighted (`variant: highlighted`)
+### Button - Highlighted (`variant: highlighted`)
 
 ```
 text-monitor-200 dark:text-white bg-monitor-50 dark:bg-monitor/20
@@ -180,7 +185,7 @@ border-monitor dark:border-monitor-100 hover:bg-monitor hover:text-white
 dark:hover:bg-monitor-100 dark:hover:text-white
 ```
 
-### Button — Error (`variant: error`)
+### Button - Error (`variant: error`)
 
 ```
 text-red-800 dark:text-red-300 bg-red-50 dark:bg-red-900/30
@@ -188,7 +193,7 @@ border-red-300 dark:border-red-800 hover:bg-red-300 hover:text-white
 dark:hover:bg-red-800 dark:hover:text-white
 ```
 
-Loading: spinner SVG `animate-spin` beside content — `text-monitor dark:text-warning`.
+Loading: spinner SVG `animate-spin` beside content - `text-monitor dark:text-warning`.
 
 ### Input / Select
 
@@ -223,7 +228,7 @@ dark:disabled:bg-base dark:disabled:cursor-not-allowed + focus ring
 
 Container: `flex flex-row items-center gap-4 pr-2 py-1 min-w-fit dark:hover:bg-monitor-gray-100 cursor-pointer`
 
-### Box / Card — Standard
+### Box / Card - Standard
 
 ```
 relative flex lg:flex-row flex-col p-2 transition-colors cursor-pointer min-h-[4rem]
@@ -232,7 +237,7 @@ border-neutral-200 dark:border-monitor-gray-300 hover:bg-neutral-100
 dark:hover:bg-monitor-100 dark:hover:text-white rounded-sm
 ```
 
-**On hover, child text must flip** — description (`neutral-500`) is invisible on purple hover:
+**On hover, child text must flip** - description (`neutral-500`) is invisible on purple hover:
 
 ```
 hover:[&_.box-title]:text-black hover:[&_.box-description]:text-black
@@ -371,7 +376,26 @@ section { margin-bottom: 3rem; }
 
 ## 8. Implementation Notes
 
-- Extend `src/styles.css` `@theme` with `monitor`, `monitor-*`, `monitor-gray-*`, `warning-*`, `success`, `error`, `base` — map shadcn semantic tokens (`primary`, `background`, etc.) to Monitor values when adopting the system.
+- Extend `src/styles.css` `@theme` with `monitor`, `monitor-*`, `monitor-gray-*`, `warning-*`, `success`, `error`, `base` - map shadcn semantic tokens (`primary`, `background`, etc.) to Monitor values when adopting the system.
 - Prefer Tailwind token classes (`bg-monitor-gray-100`) over raw hex in JSX.
 - shadcn components: override variants via CVA to match Monitor patterns; keep Radix behaviour, swap visual classes.
-- Composition over one-off markup — extract reusable `StatusIndicator`, `MonitorBox`, `Callout` when used more than once.
+- Composition over one-off markup - extract reusable `StatusIndicator`, `MonitorBox`, `Callout` when used more than once.
+
+---
+
+## 9. Status, trends and affordances
+
+- **Status is never colour-only.** `ServerStatusDot` differs by shape (filled pulsing dot = online, crossed circle = offline, dashed circle = pending); badges carry the status text.
+- **Minimum text size is `text-xs` (12px)** except for numeric count badges (`text-[11px]`).
+- **Light-mode status text** uses darker shades (`text-green-700`, `text-warning-700`); the bright `success`/`warning` tokens are for dark mode, fills and dots.
+- **Trends**: use `<Sparkline>` (currentColor, colour via `percentTrendColorClass`) for last-hour/range history and `<UsageMeter>` for current fill. Stat cards accept `trend`, `progress`, and `onSelect` (filter toggle).
+- **Tooltips are extras.** Anything needed to understand a screen (chart descriptions, status) is shown inline. Hover-only text values use the `tooltip-hint` utility (dotted underline) so they are discoverable.
+- **Motion**: entrance fades are ≤150ms and respect `prefers-reduced-motion`.
+- **Outages** are shaded on charts via `MetricsChartAnnotationsProvider`.
+- **Quick find**: `Ctrl/⌘ K` opens the command palette (`openCommandPalette()` from anywhere).
+- **Usage levels are never colour-only.** Warning/critical percentages (`ColoredPercent`) add a triangle/octagon icon and screen-reader text.
+- **Server pages share one tab bar** (`ServerTabs`: Overview · Incidents · Settings) rendered by `ServerDetailHeader`; do not add per-page nav buttons.
+- **Empty states** use `<EmptyState>` (icon, title, one-line help, optional action), never a bare paragraph.
+- **Settings pages**: section = `h2` (`text-xl font-semibold`) + `text-sm` muted description; consecutive sections are separated by a hairline divider (`SettingsPageContent`). Containers are `rounded-lg`, small controls `rounded-md`.
+- **Form fields** draw their border from `--input-border` (stronger than `--border`) so they stay visible on cards in both themes.
+- **Progressive density**: low-value table columns (Agent, Created) hide below `xl` / `2xl`; the sidebar server filter only appears for large fleets.

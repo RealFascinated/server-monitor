@@ -64,10 +64,10 @@ const MOBILE_QUICK_RANGE_ICONS: Record<
 }
 
 const toolbarIconButtonClassName =
-  "flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-card/70 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60 dark:hover:bg-accent/60 dark:hover:text-foreground"
+  "flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-card/70 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60 dark:hover:bg-accent/60 dark:hover:text-foreground"
 
 const toolbarLabeledButtonClassName =
-  "flex h-7 shrink-0 items-center gap-1.5 rounded-sm px-2 text-xs font-medium transition-colors"
+  "flex h-7 shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-medium transition-colors"
 
 type MetricRangeSelectorProps = {
   value: MetricTimeWindow
@@ -106,7 +106,7 @@ function MetricRangePopoverPanel({
   return (
     <div className="relative">
       <section className="border-b border-border/60 p-2 sm:w-54 sm:border-r sm:border-b-0">
-        <p className="flex items-center gap-1.5 py-1 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+        <p className="flex items-center gap-1.5 py-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
           <History className="size-3.5 shrink-0 opacity-70" aria-hidden />
           Quick ranges
         </p>
@@ -126,7 +126,7 @@ function MetricRangePopoverPanel({
                 key={group.id}
                 className="[&:not(:first-child)]:mt-2.5 [&:not(:first-child)]:border-t [&:not(:first-child)]:border-border/50 [&:not(:first-child)]:pt-2"
               >
-                <p className="pb-0.5 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                <p className="pb-0.5 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                   {group.label}
                 </p>
 
@@ -143,7 +143,7 @@ function MetricRangePopoverPanel({
                         aria-selected={isActive}
                         onClick={() => onApplyPreset(option.value)}
                         className={cn(
-                          "flex w-full cursor-pointer items-center justify-between gap-2 rounded-sm px-2 py-1.5 text-left text-xs transition-colors",
+                          "flex w-full cursor-pointer items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left text-xs transition-colors",
                           isActive
                             ? "bg-foreground/10 font-medium text-foreground"
                             : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground"
@@ -168,7 +168,7 @@ function MetricRangePopoverPanel({
       </section>
 
       <section className="p-3 sm:absolute sm:top-0 sm:right-0 sm:left-54 sm:border-l sm:border-border/60">
-        <p className="mb-2.5 flex items-center gap-1.5 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+        <p className="mb-2.5 flex items-center gap-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase">
           <CalendarRange className="size-3.5 shrink-0 opacity-70" aria-hidden />
           Custom range
         </p>
@@ -350,7 +350,7 @@ function MetricRangeSelector({
               toolbarLabeledButtonClassName,
               "min-w-0 flex-1 justify-center sm:hidden",
               isActive
-                ? "bg-card text-monitor shadow-sm dark:bg-accent dark:text-warning"
+                ? "bg-card text-brand shadow-sm dark:bg-accent"
                 : "text-muted-foreground hover:bg-card/70 hover:text-foreground dark:hover:bg-accent/60 dark:hover:text-foreground"
             )}
           >
@@ -369,8 +369,8 @@ function MetricRangeSelector({
               toolbarLabeledButtonClassName,
               "max-w-56 min-w-0 shrink cursor-pointer",
               isQuickRangeActive
-                ? "text-muted-foreground hover:bg-card/70 hover:text-foreground sm:bg-card sm:text-monitor sm:shadow-sm dark:hover:bg-accent/60 dark:hover:text-foreground dark:sm:bg-accent dark:sm:text-warning"
-                : "bg-card text-monitor shadow-sm hover:bg-card/90 dark:bg-accent dark:text-warning dark:hover:bg-accent/90"
+                ? "text-muted-foreground hover:bg-card/70 hover:text-foreground sm:bg-card sm:text-brand sm:shadow-sm dark:hover:bg-accent/60 dark:hover:text-foreground dark:sm:bg-accent"
+                : "bg-card text-brand shadow-sm hover:bg-card/90 dark:bg-accent dark:hover:bg-accent/90"
             )}
           >
             <Clock className="size-3.5 shrink-0" />

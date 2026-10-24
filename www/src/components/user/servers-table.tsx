@@ -5,6 +5,8 @@ import { useQuery } from "@tanstack/react-query"
 import { CreateFolderDialog } from "@/components/user/folder-name-dialog"
 import { CreateServerDialog } from "@/components/user/create-server-dialog"
 import { FleetSummaryCards } from "@/components/user/fleet-summary-cards"
+import { FirstServerPrompt } from "@/components/user/first-server-prompt"
+import { ServersFilterBar } from "@/components/user/servers-filter-bar"
 import {
   filterServerIdsBySearch,
   getServerTableColumns,
@@ -24,6 +26,12 @@ import type { ServerFolderResponse } from "@/lib/api/user/folders"
 import { userServerFoldersQueryOptions } from "@/lib/api/user/folders.queries"
 import { hasPermission, ServerPermission } from "@/lib/api/user/permissions"
 import { serversById } from "@/lib/api/user/servers.queries"
+import {
+  countByFleetFilter,
+  serverMatchesFilter,
+  sortServerIds,
+} from "@/lib/servers/fleet-filter"
+import type { FleetFilter, ServerSort } from "@/lib/servers/fleet-filter"
 
 const EMPTY_FOLDERS: ServerFolderResponse[] = []
 
@@ -31,6 +39,8 @@ function ServersTable() {
   const { defaultRange } = useMetricDefaultRange()
   const [searchQuery, setSearchQuery] = useState("")
   const [editMode, setEditMode] = useState(false)
+  const [fleetFilter, setFleetFilter] = useState<FleetFilter>("all")
+  const [sortKey, setSortKey] = useState<ServerSort>("attention")
 
   const serverIds = useServerIds()
   const { byFolder, ungroupedIds } = useServerFolderLayout()
@@ -64,23 +74,40 @@ function ServersTable() {
     [showActionsColumn, defaultRange]
   )
 
+  // Reorganising only makes sense on the full, user-ordered list.
+  const activeFilter: FleetFilter = editMode ? "all" : fleetFilter
+  const activeSort: ServerSort = editMode ? "custom" : sortKey
+  const fleetCounts = useMemo(() => countByFleetFilter(servers), [servers])
+
+  const visibleIds = useMemo(
+    () => (ids: number[]) =>
+      sortServerIds(
+        filterServerIdsBySearch(
+          ids.filter((id) => serverMatchesFilter(serversMap[id], activeFilter)),
+          searchQuery,
+          serversMap
+        ),
+        serversMap,
+        activeSort
+      ),
+    [activeFilter, activeSort, searchQuery, serversMap]
+  )
+
   const filteredUngroupedIds = useMemo(
-    () => filterServerIdsBySearch(ungroupedIds, searchQuery, serversMap),
-    [ungroupedIds, searchQuery, serversMap]
+    () => visibleIds(ungroupedIds),
+    [ungroupedIds, visibleIds]
   )
 
   const folderSections = useMemo(
     () =>
       folders.map((folder) => ({
         folder,
-        serverIds: filterServerIdsBySearch(
-          byFolder.get(folder.name) ?? [],
-          searchQuery,
-          serversMap
-        ),
+        serverIds: visibleIds(byFolder.get(folder.name) ?? []),
       })),
-    [folders, byFolder, searchQuery, serversMap]
+    [folders, byFolder, visibleIds]
   )
+
+  const isFiltering = searchQuery.trim() !== "" || activeFilter !== "all"
 
   const showUngroupedSection =
     filteredUngroupedIds.length > 0 || (editMode && folders.length > 0)
@@ -88,10 +115,10 @@ function ServersTable() {
     folderSections.filter((section) => section.serverIds.length > 0).length +
     (filteredUngroupedIds.length > 0 ? 1 : 0)
   const hasEmptyFolderSections =
-    searchQuery.trim() === "" &&
+    !isFiltering &&
     folderSections.some((section) => section.serverIds.length === 0)
   const hasEmptyUngroupedSection =
-    searchQuery.trim() === "" &&
+    !isFiltering &&
     editMode &&
     folders.length > 0 &&
     filteredUngroupedIds.length === 0
@@ -143,73 +170,82 @@ function ServersTable() {
         fallbackTitle="Could not load servers"
         className="flex flex-col gap-6"
       >
-          {servers.length > 0 ? <FleetSummaryCards servers={servers} /> : null}
+        {servers.length > 0 ? (
+          <FleetSummaryCards
+            servers={servers}
+            activeFilter={activeFilter}
+            onFilterChange={setFleetFilter}
+          />
+        ) : null}
 
-          {editMode && (canOrganize || canReorderFolders) ? (
-            <p className="text-xs text-muted-foreground">
-              {canOrganize && canReorderFolders
-                ? "Drag servers into folders, or drag folder headers to reorder."
-                : canOrganize
-                  ? "Drag servers by the grip handle into a folder to organize them."
-                  : "Drag folder headers to reorder them."}
+        {servers.length > 0 && !editMode ? (
+          <ServersFilterBar
+            counts={fleetCounts}
+            filter={fleetFilter}
+            onFilterChange={setFleetFilter}
+            sort={sortKey}
+            onSortChange={setSortKey}
+          />
+        ) : null}
+
+        {editMode && (canOrganize || canReorderFolders) ? (
+          <p className="text-xs text-muted-foreground">
+            {canOrganize && canReorderFolders
+              ? "Drag servers into folders, or drag folder headers to reorder."
+              : canOrganize
+                ? "Drag servers by the grip handle into a folder to organize them."
+                : "Drag folder headers to reorder them."}
+          </p>
+        ) : null}
+
+        {serverIds.length === 0 && folders.length === 0 ? (
+          <FirstServerPrompt />
+        ) : null}
+
+        {isFiltering &&
+        visibleSectionCount === 0 &&
+        !hasEmptyFolderSections &&
+        !hasEmptyUngroupedSection ? (
+          <div className="flex flex-col items-start gap-2 rounded-lg border border-dashed border-border px-4 py-6">
+            <p className="text-muted-foreground">
+              No servers match your current filters.
             </p>
-          ) : null}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSearchQuery("")
+                setFleetFilter("all")
+              }}
+            >
+              Clear filters
+            </Button>
+          </div>
+        ) : null}
 
-          {serverIds.length === 0 && folders.length === 0 ? (
-            <p className="text-muted-foreground">No servers registered yet.</p>
-          ) : null}
-
-          {searchQuery.trim() !== "" &&
-          visibleSectionCount === 0 &&
-          !hasEmptyFolderSections &&
-          !hasEmptyUngroupedSection ? (
-            <p className="text-muted-foreground">No servers match your search.</p>
-          ) : null}
-
-          {folderSections.some(
-            ({ serverIds: sectionServerIds }) =>
-              searchQuery.trim() === "" || sectionServerIds.length > 0
-          ) ||
-          filteredUngroupedIds.length > 0 ||
-          folders.length > 0 ? (
-            <div className="flex flex-col">
-              {folderSections
-                .filter(
-                  ({ serverIds: sectionServerIds }) =>
-                    searchQuery.trim() === "" || sectionServerIds.length > 0
-                )
-                .map(({ folder, serverIds: sectionServerIds }) => (
-                  <ServersFolderTable
-                    key={folder.id}
-                    title={folder.name}
-                    folderId={folder.id}
-                    folderName={folder.name}
-                    dropTargetKey={`folder:${folder.id}`}
-                    isDropTarget={activeDropTargetKey === `folder:${folder.id}`}
-                    canAcceptServerDrop={canAcceptServerDrop(folder.name)}
-                    serverIds={sectionServerIds}
-                    editMode={editMode}
-                    columns={columns}
-                    serversMap={serversMap}
-                    draggingServerId={draggingServerId}
-                    draggingFolderId={draggingFolderId}
-                    onServerDragStart={onServerDragStart}
-                    onServerDragEnd={onServerDragEnd}
-                    onFolderDragStart={onFolderDragStart}
-                    onFolderDragEnd={onFolderDragEnd}
-                    onDropTargetChange={onDropTargetChange}
-                    onMoveServer={onMoveServer}
-                    onReorderFolder={onReorderFolder}
-                  />
-                ))}
-              {showUngroupedSection ? (
+        {folderSections.some(
+          ({ serverIds: sectionServerIds }) =>
+            !isFiltering || sectionServerIds.length > 0
+        ) ||
+        filteredUngroupedIds.length > 0 ||
+        folders.length > 0 ? (
+          <div className="flex flex-col">
+            {folderSections
+              .filter(
+                ({ serverIds: sectionServerIds }) =>
+                  !isFiltering || sectionServerIds.length > 0
+              )
+              .map(({ folder, serverIds: sectionServerIds }) => (
                 <ServersFolderTable
-                  title="Ungrouped"
-                  folderName={null}
-                  dropTargetKey="ungrouped"
-                  isDropTarget={activeDropTargetKey === "ungrouped"}
-                  canAcceptServerDrop={canAcceptServerDrop(null)}
-                  serverIds={filteredUngroupedIds}
+                  key={folder.id}
+                  title={folder.name}
+                  folderId={folder.id}
+                  folderName={folder.name}
+                  dropTargetKey={`folder:${folder.id}`}
+                  isDropTarget={activeDropTargetKey === `folder:${folder.id}`}
+                  canAcceptServerDrop={canAcceptServerDrop(folder.name)}
+                  serverIds={sectionServerIds}
                   editMode={editMode}
                   columns={columns}
                   serversMap={serversMap}
@@ -223,9 +259,31 @@ function ServersTable() {
                   onMoveServer={onMoveServer}
                   onReorderFolder={onReorderFolder}
                 />
-              ) : null}
-            </div>
-          ) : null}
+              ))}
+            {showUngroupedSection ? (
+              <ServersFolderTable
+                title="Ungrouped"
+                folderName={null}
+                dropTargetKey="ungrouped"
+                isDropTarget={activeDropTargetKey === "ungrouped"}
+                canAcceptServerDrop={canAcceptServerDrop(null)}
+                serverIds={filteredUngroupedIds}
+                editMode={editMode}
+                columns={columns}
+                serversMap={serversMap}
+                draggingServerId={draggingServerId}
+                draggingFolderId={draggingFolderId}
+                onServerDragStart={onServerDragStart}
+                onServerDragEnd={onServerDragEnd}
+                onFolderDragStart={onFolderDragStart}
+                onFolderDragEnd={onFolderDragEnd}
+                onDropTargetChange={onDropTargetChange}
+                onMoveServer={onMoveServer}
+                onReorderFolder={onReorderFolder}
+              />
+            ) : null}
+          </div>
+        ) : null}
       </QueryStatusShell>
     </div>
   )

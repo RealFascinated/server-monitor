@@ -67,7 +67,7 @@ export function formatMetricTimeWindow(window: MetricTimeWindow): {
   const toLabel = METRIC_TIME_WINDOW_FORMATTER.format(
     new Date(window.to * 1000)
   )
-  const label = `${fromLabel} – ${toLabel}`
+  const label = `${fromLabel} to ${toLabel}`
 
   return {
     label,

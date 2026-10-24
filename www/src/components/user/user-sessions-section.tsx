@@ -11,7 +11,10 @@ import {
   revokeUserSession,
 } from "@/lib/api/user/sessions"
 import type { UserSession } from "@/lib/api/user/sessions"
-import { userSessionsQueryKey, userSessionsQueryOptions } from "@/lib/api/user/sessions.queries"
+import {
+  userSessionsQueryKey,
+  userSessionsQueryOptions,
+} from "@/lib/api/user/sessions.queries"
 import { formatRelativeTime } from "@/lib/formatter"
 import { toastMutationError, toastSuccess } from "@/lib/toast"
 import { cn } from "@/lib/utils"
@@ -143,7 +146,7 @@ function UserSessionsSection() {
         fallbackTitle="Could not load sessions"
       >
         {sessions.length === 0 ? (
-          <div className="rounded-sm border border-dashed border-border bg-muted/30 px-4 py-6 text-center">
+          <div className="rounded-lg border border-dashed border-border bg-muted/30 px-4 py-6 text-center">
             <p className="text-sm text-muted-foreground">No active sessions.</p>
           </div>
         ) : (
@@ -152,7 +155,7 @@ function UserSessionsSection() {
               <li
                 key={session.id}
                 className={cn(
-                  "flex items-center gap-3 rounded-sm border border-border bg-card px-3 py-2.5",
+                  "flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5",
                   session.current && "border-primary/30 bg-primary/5"
                 )}
               >
@@ -173,7 +176,7 @@ function UserSessionsSection() {
                       {sessionDeviceLabel(session)}
                     </p>
                     {session.current ? (
-                      <span className="rounded-sm bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-primary uppercase">
+                      <span className="rounded-sm bg-primary/10 px-1.5 py-0.5 text-xs font-semibold tracking-wide text-primary uppercase">
                         Current
                       </span>
                     ) : null}

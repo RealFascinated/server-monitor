@@ -16,7 +16,7 @@ type AdminMetricsHeaderProps = {
 }
 
 const metricRangeShellClassName =
-  "inline-flex w-full shrink-0 items-stretch overflow-hidden rounded-sm border border-border bg-muted/80 p-1 sm:w-auto dark:bg-muted/60"
+  "inline-flex w-full shrink-0 items-stretch overflow-hidden rounded-md border border-border bg-muted/80 p-1 sm:w-auto dark:bg-muted/60"
 
 type AdminMetricsToolbarProps = {
   timeWindow: MetricTimeWindow

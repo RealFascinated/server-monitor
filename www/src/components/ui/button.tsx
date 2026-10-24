@@ -6,7 +6,7 @@ import { Slot } from "radix-ui"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "group/button inline-flex min-w-fit shrink-0 cursor-pointer items-center justify-center gap-2 rounded-sm border-2 border-transparent bg-clip-padding px-2 text-sm font-medium whitespace-nowrap normal-case transition-colors outline-none select-none focus-visible:ring-2 focus-visible:ring-monitor focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:border-border disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:border-border aria-disabled:bg-muted aria-disabled:text-muted-foreground aria-disabled:opacity-100 dark:focus-visible:ring-warning dark:focus-visible:ring-offset-base dark:disabled:border-border dark:disabled:bg-muted/60 dark:disabled:text-muted-foreground dark:aria-disabled:border-border dark:aria-disabled:bg-muted/60 dark:aria-disabled:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex min-w-fit shrink-0 cursor-pointer items-center justify-center gap-2 rounded-sm border border-transparent bg-clip-padding px-2 text-sm font-medium whitespace-nowrap normal-case transition-colors outline-none select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:border-border disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:border-border aria-disabled:bg-muted aria-disabled:text-muted-foreground aria-disabled:opacity-100 dark:focus-visible:ring-offset-base dark:disabled:border-border dark:disabled:bg-muted/60 dark:disabled:text-muted-foreground dark:aria-disabled:border-border dark:aria-disabled:bg-muted/60 dark:aria-disabled:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
@@ -24,7 +24,7 @@ const buttonVariants = cva(
           "border-border bg-muted text-foreground hover:bg-accent dark:hover:bg-accent",
         ghost:
           "border-transparent text-foreground hover:bg-muted dark:hover:bg-muted",
-        link: "h-auto border-transparent bg-transparent p-0 text-monitor underline-offset-4 hover:underline dark:text-warning",
+        link: "h-auto border-transparent bg-transparent p-0 text-brand underline-offset-4 hover:underline",
       },
       size: {
         default: "h-8 has-[>svg]:px-2",

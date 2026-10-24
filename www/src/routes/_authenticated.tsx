@@ -5,12 +5,13 @@ import {
   useNavigate,
   useRouterState,
 } from "@tanstack/react-router"
-import { Menu } from "lucide-react"
+import { Menu, Search } from "lucide-react"
 import { useQueryClient } from "@tanstack/react-query"
 import { useEffect, useState, useCallback } from "react"
 import type { CSSProperties } from "react"
 
 import { AppSidebar } from "@/components/app-sidebar"
+import { CommandPalette, openCommandPalette } from "@/components/command-palette"
 import { LoadingState } from "@/components/loading-state"
 import { MonitorLogo } from "@/components/monitor-logo"
 import { NotFoundView } from "@/components/not-found-view"
@@ -139,12 +140,24 @@ function AuthenticatedLayout() {
             <MonitorLogo />
             <p className="text-base font-bold text-foreground">{APP_NAME}</p>
           </Link>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            aria-label="Quick find"
+            className="ml-auto"
+            onClick={openCommandPalette}
+          >
+            <Search className="size-4" />
+          </Button>
         </header>
 
         <main className="p-4 sm:px-6 lg:px-8 lg:py-6">
           <Outlet />
         </main>
       </div>
+
+      <CommandPalette />
     </div>
   )
 }

@@ -7,8 +7,7 @@ const roleLabels: Record<UserRole, string> = {
 }
 
 const roleStyles: Record<UserRole, string> = {
-  ADMIN:
-    "bg-monitor/10 text-monitor ring-monitor/20 dark:bg-warning/10 dark:text-warning dark:ring-warning/20",
+  ADMIN: "bg-primary/10 text-brand ring-primary/20",
   USER: "bg-muted text-muted-foreground ring-border",
 }
 

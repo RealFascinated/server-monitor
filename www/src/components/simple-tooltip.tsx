@@ -38,7 +38,7 @@ function TableHeaderTooltip({
 }) {
   return (
     <SimpleTooltip content={tooltip}>
-      <span className="cursor-help">{label}</span>
+      <span className="tooltip-hint">{label}</span>
     </SimpleTooltip>
   )
 }
