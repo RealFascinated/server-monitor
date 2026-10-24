@@ -19,10 +19,7 @@ export const Route = createFileRoute("/_authenticated/admin/metrics")({
   validateSearch: adminMetricsSearchSchema,
   loaderDeps: ({ search }) => ({ timeWindow: search }),
   loader: ({ context: { queryClient }, deps: { timeWindow } }) => {
-    return loadCachedQuery(
-      queryClient,
-      adminMetricsQueryOptions(timeWindow)
-    )
+    return loadCachedQuery(queryClient, adminMetricsQueryOptions(timeWindow))
   },
   head: () => ({
     meta: [{ title: pageTitle("Admin Metrics") }],

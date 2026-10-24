@@ -21,9 +21,7 @@ export function useQueryStatus({
   fallbackMessage,
   fallbackTitle,
 }: UseQueryStatusOptions): QueryStatusState {
-  const errorMessage = error
-    ? getApiErrorMessage(error, fallbackMessage)
-    : null
+  const errorMessage = error ? getApiErrorMessage(error, fallbackMessage) : null
   const errorTitle = error ? getApiErrorTitle(error, fallbackTitle) : null
 
   return {

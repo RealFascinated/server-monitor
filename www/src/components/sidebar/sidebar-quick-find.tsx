@@ -38,7 +38,7 @@ function SidebarQuickFind({
       {!compact ? (
         <>
           <span className="flex-1 truncate text-left">Quick find</span>
-          <kbd className="rounded-md border border-border px-1.5 text-[11px] font-sans">
+          <kbd className="rounded-md border border-border px-1.5 font-sans text-[11px]">
             {shortcut}
           </kbd>
         </>
@@ -47,7 +47,11 @@ function SidebarQuickFind({
   )
 
   if (compact) {
-    return <SimpleTooltip content={`Quick find (${shortcut})`}>{button}</SimpleTooltip>
+    return (
+      <SimpleTooltip content={`Quick find (${shortcut})`}>
+        {button}
+      </SimpleTooltip>
+    )
   }
 
   return button

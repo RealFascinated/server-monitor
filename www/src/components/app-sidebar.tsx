@@ -55,7 +55,7 @@ const AppSidebarHeader = memo(function AppSidebarHeader({
       >
         <MonitorLogo />
         {!compact ? (
-          <p className="text-lg font-bold leading-tight text-foreground">
+          <p className="text-lg leading-tight font-bold text-foreground">
             {APP_NAME}
           </p>
         ) : null}
@@ -175,10 +175,7 @@ export function AppSidebar({
         <SidebarQuickFind compact={compact} onNavigate={handleNavigate} />
         <SidebarNav compact={compact} onNavigate={handleNavigate} />
         {user.role === "ADMIN" ? (
-          <SidebarAdminSection
-            compact={compact}
-            onNavigate={handleNavigate}
-          />
+          <SidebarAdminSection compact={compact} onNavigate={handleNavigate} />
         ) : null}
         <SidebarFolderTree compact={compact} onNavigate={handleNavigate} />
       </nav>

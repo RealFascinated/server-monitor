@@ -11,7 +11,10 @@ import { useEffect, useState, useCallback } from "react"
 import type { CSSProperties } from "react"
 
 import { AppSidebar } from "@/components/app-sidebar"
-import { CommandPalette, openCommandPalette } from "@/components/command-palette"
+import {
+  CommandPalette,
+  openCommandPalette,
+} from "@/components/command-palette"
 import { LoadingState } from "@/components/loading-state"
 import { MonitorLogo } from "@/components/monitor-logo"
 import { NotFoundView } from "@/components/not-found-view"
@@ -138,7 +141,7 @@ function AuthenticatedLayout() {
           </Button>
           <Link to="/" aria-label="Servers" className="flex items-center gap-3">
             <MonitorLogo />
-            <p className="text-base font-bold text-foreground">{APP_NAME}</p>
+            <p className="font-bold text-base text-foreground">{APP_NAME}</p>
           </Link>
           <Button
             type="button"

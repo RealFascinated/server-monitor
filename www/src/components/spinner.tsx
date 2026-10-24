@@ -5,10 +5,7 @@ import { cn } from "@/lib/utils"
 function Spinner({ className }: { className?: string }) {
   return (
     <Loader2
-      className={cn(
-        "size-4 animate-spin text-brand",
-        className
-      )}
+      className={cn("size-4 animate-spin text-brand", className)}
       aria-hidden
     />
   )

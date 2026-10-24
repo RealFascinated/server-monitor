@@ -82,9 +82,7 @@ function PageHeader({
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <div className="flex min-w-0 flex-wrap items-center gap-2">
-            {Icon ? (
-              <Icon className="size-4 shrink-0 text-brand" />
-            ) : null}
+            {Icon ? <Icon className="size-4 shrink-0 text-brand" /> : null}
             <h1>{title}</h1>
             {titleAddon}
           </div>

@@ -50,7 +50,9 @@ function CpuBreakdownTooltip({ cpu }: { cpu: ServerCpuSnapshot }) {
       ))}
       {cpu.percent != null && entries.length > 1 ? (
         <div className="mt-1 flex items-center justify-between border-t border-border pt-1">
-          <span className="text-muted-foreground dark:text-muted-foreground">Total</span>
+          <span className="text-muted-foreground dark:text-muted-foreground">
+            Total
+          </span>
           <span className="font-medium tabular-nums">
             {formatPercentValue(cpu.percent)}
           </span>

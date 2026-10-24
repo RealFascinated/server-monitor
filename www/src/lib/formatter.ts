@@ -103,7 +103,10 @@ export function formatCount(value: number): string {
   }).format(value)
 }
 
-export function formatCompactCount(value: number, fractionDigits?: number): string {
+export function formatCompactCount(
+  value: number,
+  fractionDigits?: number
+): string {
   const units = ["", "K", "M", "B", "T"]
   let size = Math.abs(value)
   let unitIndex = 0

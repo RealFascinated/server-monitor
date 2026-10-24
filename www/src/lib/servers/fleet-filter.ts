@@ -102,7 +102,11 @@ function attentionScore(server: ServerResponse): number {
   if (serverNeedsAttention(server)) {
     return (
       100 +
-      Math.max(server.cpu?.percent ?? 0, memoryPercent(server), diskPercent(server))
+      Math.max(
+        server.cpu?.percent ?? 0,
+        memoryPercent(server),
+        diskPercent(server)
+      )
     )
   }
 

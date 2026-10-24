@@ -265,7 +265,10 @@ function CommandPalette() {
         <DialogTitle className="sr-only">Command palette</DialogTitle>
 
         <div className="flex items-center gap-2 border-b border-border px-3">
-          <Search aria-hidden className="size-4 shrink-0 text-muted-foreground" />
+          <Search
+            aria-hidden
+            className="size-4 shrink-0 text-muted-foreground"
+          />
           <input
             autoFocus
             role="combobox"
@@ -333,7 +336,9 @@ function CommandPalette() {
                       aria-hidden
                       className={cn("size-4 shrink-0", active && "text-brand")}
                     />
-                    <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                    <span className="min-w-0 flex-1 truncate">
+                      {item.label}
+                    </span>
                     {item.detail ? (
                       <span className="shrink-0 truncate text-xs text-muted-foreground">
                         {item.detail}

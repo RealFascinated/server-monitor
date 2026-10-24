@@ -1,6 +1,10 @@
 import { MetricStatCard } from "@/components/metrics/metric-stat-card"
 import type { AdminMetricsResponse } from "@/lib/api/admin/metrics"
-import { formatCompactCount, formatCount, formatMemoryBytes } from "@/lib/formatter"
+import {
+  formatCompactCount,
+  formatCount,
+  formatMemoryBytes,
+} from "@/lib/formatter"
 import { getLatestValue, hasValues } from "@/lib/metrics/series"
 import { fleetOnlineStatusColorClass } from "@/lib/metrics/percent-level"
 

@@ -25,7 +25,7 @@ function SettingsToggle({
         "relative h-5 w-9 shrink-0 rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none disabled:cursor-not-allowed dark:focus-visible:ring-offset-base",
         checked
           ? "bg-primary disabled:bg-primary/70"
-          : "bg-muted ring-1 ring-inset ring-border disabled:bg-muted/80 dark:bg-muted-foreground/30 dark:ring-border dark:disabled:bg-muted-foreground/20"
+          : "bg-muted ring-1 ring-border ring-inset disabled:bg-muted/80 dark:bg-muted-foreground/30 dark:ring-border dark:disabled:bg-muted-foreground/20"
       )}
     >
       <span

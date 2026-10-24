@@ -90,8 +90,9 @@ function MetricChart({
   const thresholdsKey =
     thresholds?.map((entry) => `${entry.level}:${entry.value}`).join("|") ?? ""
   const rightThresholdsKey =
-    rightThresholds?.map((entry) => `${entry.level}:${entry.value}`).join("|") ??
-    ""
+    rightThresholds
+      ?.map((entry) => `${entry.level}:${entry.value}`)
+      .join("|") ?? ""
   const stacked = mode === "stack"
   const bidirectional = negated.some(Boolean)
   const hasRightAxis = seriesAxes.some((axis) => axis === "right")
@@ -191,7 +192,9 @@ function MetricChart({
 
       const drawAxesHooks: Array<(u: uPlot) => void> = []
       if (!hasRightAxis && thresholds && thresholds.length > 0) {
-        drawAxesHooks.push(createThresholdDrawHook(thresholds, resolvedTheme, "y"))
+        drawAxesHooks.push(
+          createThresholdDrawHook(thresholds, resolvedTheme, "y")
+        )
       }
       if (!hasRightAxis && rightThresholds && rightThresholds.length > 0) {
         drawAxesHooks.push(

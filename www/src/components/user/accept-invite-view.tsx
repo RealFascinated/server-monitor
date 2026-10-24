@@ -59,8 +59,8 @@ function AcceptInviteView({ token }: AcceptInviteViewProps) {
                 .
               </p>
               <p className="text-sm text-muted-foreground">
-                Sent to {preview.email}. Expires{" "}
-                {formatDate(preview.expiresAt)}.
+                Sent to {preview.email}. Expires {formatDate(preview.expiresAt)}
+                .
               </p>
             </div>
 

@@ -27,10 +27,7 @@ function AuthFormShell({
   children,
 }: AuthFormShellProps) {
   return (
-    <form
-      className={cn("flex flex-col gap-4", className)}
-      onSubmit={onSubmit}
-    >
+    <form className={cn("flex flex-col gap-4", className)} onSubmit={onSubmit}>
       {apiError ? (
         <Callout type="danger" title={apiErrorTitle ?? "Request failed"}>
           {apiError}
@@ -60,11 +57,7 @@ type AuthFormFieldProps = {
 function AuthFormField({ id, label, error, children }: AuthFormFieldProps) {
   return (
     <div className="flex flex-col gap-2">
-      {typeof label === "string" ? (
-        <Label htmlFor={id}>{label}</Label>
-      ) : (
-        label
-      )}
+      {typeof label === "string" ? <Label htmlFor={id}>{label}</Label> : label}
       {children}
       {error ? <FormFieldError error={error} /> : null}
     </div>
