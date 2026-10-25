@@ -191,10 +191,13 @@ function Install-AgentBinary([string]$Version, [string]$Destination) {
 }
 
 function Get-ConfigTemplatePath([string]$Version, [string]$Destination) {
-    $local = Join-Path $PSScriptRoot 'config-example.yml'
-    if (Test-Path $local) {
-        Copy-Item -Path $local -Destination $Destination -Force
-        return
+    # $PSScriptRoot is empty when piped through [ScriptBlock]::Create (the one-liner install).
+    if ($PSScriptRoot) {
+        $local = Join-Path $PSScriptRoot 'config-example.yml'
+        if (Test-Path $local) {
+            Copy-Item -Path $local -Destination $Destination -Force
+            return
+        }
     }
 
     $tag = "agent/v$Version"
