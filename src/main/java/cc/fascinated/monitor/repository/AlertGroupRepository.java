@@ -19,6 +19,10 @@ public interface AlertGroupRepository extends JpaRepository<AlertGroupRow, Long>
 
     List<AlertGroupRow> findByUserIdAndAutoAddServersTrue(long userId);
 
+    /** Users who lack the default group, e.g. accounts that predate alerting. */
+    @Query("SELECT u.id FROM UserRow u WHERE NOT EXISTS (SELECT 1 FROM AlertGroupRow g WHERE g.userId = u.id AND g.defaultGroup = true)")
+    List<Long> findUserIdsWithoutDefaultGroup();
+
     /** Groups of one user that contain a server. */
     @Query("SELECT g FROM AlertGroupRow g WHERE g.userId = :userId AND :serverId MEMBER OF g.serverIds")
     List<AlertGroupRow> findByUserIdAndServerId(@Param("userId") long userId, @Param("serverId") long serverId);

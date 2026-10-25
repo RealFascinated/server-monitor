@@ -39,6 +39,8 @@ class AlertIntegrationTest extends IntegrationTestBase {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private AlertStateSweeper sweeper;
+    @Autowired
+    private cc.fascinated.monitor.alert.DefaultAlertRuleService defaultAlertRuleService;
 
     private TestAuthSupport auth;
     private String token;
@@ -293,6 +295,26 @@ class AlertIntegrationTest extends IntegrationTestBase {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].firingCount").value(0))
                 .andExpect(jsonPath("$[0].lastFiredAt").exists());
+    }
+
+    @Test
+    void accountsWithoutADefaultGroupGetOneWithTheirServers() throws Exception {
+        var server = this.auth.createServer(this.token, "legacy");
+        // an account that predates alerting has no groups at all
+        this.jdbcTemplate.update("DELETE FROM alert_groups WHERE user_id = (SELECT user_id FROM server_members WHERE server_id = ? LIMIT 1)",
+                server.serverId());
+
+        this.defaultAlertRuleService.backfillMissing();
+        this.defaultAlertRuleService.backfillMissing();
+
+        this.mockMvc.perform(get("/v1/alerts/groups")
+                        .header("Authorization", TestAuthSupport.bearer(this.token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].defaultGroup").value(true))
+                .andExpect(jsonPath("$[0].enabled").value(false))
+                .andExpect(jsonPath("$[0].servers[0].id").value(server.serverId()))
+                .andExpect(jsonPath("$[0].ruleCount").value(org.hamcrest.Matchers.greaterThan(10)));
     }
 
     @Test
