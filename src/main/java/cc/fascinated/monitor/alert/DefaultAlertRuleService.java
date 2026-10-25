@@ -9,6 +9,7 @@ import cc.fascinated.monitor.repository.AlertGroupRepository;
 import cc.fascinated.monitor.repository.AlertRuleRepository;
 import cc.fascinated.monitor.repository.ServerMemberRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -71,18 +72,35 @@ public class DefaultAlertRuleService {
         AlertGroupRow row = AlertGroupRow.defaultGroup(userId, DEFAULT_GROUP_NAME, now);
         row.getServerIds().addAll(serverIds);
         AlertGroupRow group = this.groupRepository.save(row);
-        List<AlertRuleRow> rules = VmMetricCatalog.alertable().values().stream()
-                .filter(series -> series.alertInfo() != null && series.alertInfo().defaultRule() != null)
-                .sorted(Comparator.comparing(VmGaugeSeries::metricName))
-                .map(series -> toRule(userId, group.getId(), series, now))
-                .toList();
-        this.ruleRepository.saveAll(rules);
+        addTo(userId, group.getId(), null);
     }
 
-    private static AlertRuleRow toRule(long userId, long groupId, VmGaugeSeries series, Instant now) {
+    /** How many rules {@link #addTo} creates, so callers can enforce the per-user rule cap first. */
+    public int defaultRuleCount() {
+        return defaultSeries().size();
+    }
+
+    /** Adds the default rules to an existing group, notifying {@code destinationId} when given. */
+    public void addTo(long userId, long groupId, @Nullable Long destinationId) {
+        Instant now = Instant.now();
+        this.ruleRepository.saveAll(defaultSeries().stream()
+                .map(series -> toRule(userId, groupId, destinationId, series, now))
+                .toList());
+    }
+
+    private static List<VmGaugeSeries> defaultSeries() {
+        return VmMetricCatalog.alertable().values().stream()
+                .filter(series -> series.alertInfo() != null && series.alertInfo().defaultRule() != null)
+                .sorted(Comparator.comparing(VmGaugeSeries::metricName))
+                .toList();
+    }
+
+    private static AlertRuleRow toRule(long userId, long groupId, @Nullable Long destinationId, VmGaugeSeries series,
+                                       Instant now) {
         AlertInfo info = series.alertInfo();
         AlertInfo.DefaultRule defaults = info.defaultRule();
         AlertRuleRow row = new AlertRuleRow(userId, groupId, now);
+        row.setDestinationId(destinationId);
         row.setName(info.label());
         row.setMetric(series.metricName());
         row.setLabelFilter(Map.of());

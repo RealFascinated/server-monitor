@@ -11,5 +11,7 @@ public record AlertGroupRequest(
         @Size(max = 64, message = "Name must be at most 64 characters")
         String name,
         @Nullable Boolean autoAddServers,
+        /** Seeds the group with the same alerts a new account gets. Only used when creating. */
+        @Nullable Boolean addDefaultRules,
         @Nullable List<Long> serverIds
 ) {}

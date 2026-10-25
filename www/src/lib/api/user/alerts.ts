@@ -58,6 +58,8 @@ export type AlertGroup = {
 export type AlertGroupRequest = {
   name: string
   autoAddServers?: boolean
+  /** Seeds a new group with the default alerts; ignored when editing. */
+  addDefaultRules?: boolean
   serverIds?: number[]
 }
 

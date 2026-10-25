@@ -733,4 +733,38 @@ class AlertIntegrationTest extends IntegrationTestBase {
                         .header("Authorization", TestAuthSupport.bearer(this.token)))
                 .andExpect(status().isConflict());
     }
+
+    private JsonNode createGroupWithDefaults(String name, boolean addDefaults) throws Exception {
+        String body = this.mockMvc.perform(post("/v1/alerts/groups")
+                        .header("Authorization", TestAuthSupport.bearer(this.token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name":"%s","addDefaultRules":%s}
+                                """.formatted(name, addDefaults)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        return this.objectMapper.readTree(body);
+    }
+
+    @Test
+    void newGroupsCanStartWithTheDefaultAlerts() throws Exception {
+        int defaults = this.objectMapper.readTree(this.mockMvc.perform(get("/v1/alerts/groups")
+                        .header("Authorization", TestAuthSupport.bearer(this.token)))
+                .andReturn().getResponse().getContentAsString()).get(0).get("ruleCount").asInt();
+        assertThat(defaults).as("the seeded Default group holds the default rules").isGreaterThan(10);
+        long destination = createDestination();
+
+        JsonNode plain = createGroupWithDefaults("plain", false);
+        JsonNode seeded = createGroupWithDefaults("seeded", true);
+
+        assertThat(plain.get("ruleCount").asInt()).isZero();
+        assertThat(seeded.get("ruleCount").asInt()).isEqualTo(defaults);
+        assertThat(seeded.get("enabled").asBoolean()).isTrue();
+        this.mockMvc.perform(get("/v1/alerts/rules").param("groupId", seeded.get("id").asText())
+                        .header("Authorization", TestAuthSupport.bearer(this.token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(defaults))
+                .andExpect(jsonPath("$[0].destinationId").value(destination))
+                .andExpect(jsonPath("$[0].enabled").value(true));
+    }
 }

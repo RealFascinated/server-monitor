@@ -41,6 +41,7 @@ function GroupDialog({ group, trigger, onCreated }: GroupDialogProps) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState(group?.name ?? "")
   const [autoAdd, setAutoAdd] = useState(group?.autoAddServers ?? false)
+  const [addDefaults, setAddDefaults] = useState(false)
   const [serverIds, setServerIds] = useState<Set<number>>(
     () => new Set(group?.servers.map((server) => server.id))
   )
@@ -54,6 +55,7 @@ function GroupDialog({ group, trigger, onCreated }: GroupDialogProps) {
   function reset() {
     setName(group?.name ?? "")
     setAutoAdd(group?.autoAddServers ?? false)
+    setAddDefaults(false)
     setServerIds(new Set(group?.servers.map((server) => server.id)))
     setNameError(null)
   }
@@ -94,12 +96,15 @@ function GroupDialog({ group, trigger, onCreated }: GroupDialogProps) {
       return
     }
 
-    create.mutate(request, {
-      onSuccess: (created) => {
-        setOpen(false)
-        onCreated?.(created)
-      },
-    })
+    create.mutate(
+      { ...request, addDefaultRules: addDefaults },
+      {
+        onSuccess: (created) => {
+          setOpen(false)
+          onCreated?.(created)
+        },
+      }
+    )
   }
 
   return (
@@ -155,6 +160,24 @@ function GroupDialog({ group, trigger, onCreated }: GroupDialogProps) {
                 onCheckedChange={setAutoAdd}
               />
             </div>
+
+            {editing ? null : (
+              <div className="flex items-center justify-between gap-4 rounded-md border border-border p-3">
+                <div className="flex flex-col gap-0.5">
+                  <Label htmlFor="group-add-defaults">Add default alerts</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Start with the same recommended alerts as the Default group
+                    (CPU, memory, disk, temperature, drive health and more).
+                  </p>
+                </div>
+                <SettingsToggle
+                  ariaLabel="Add default alerts"
+                  checked={addDefaults}
+                  disabled={pending}
+                  onCheckedChange={setAddDefaults}
+                />
+              </div>
+            )}
 
             <fieldset className="flex flex-col gap-2">
               <legend className="mb-1 text-sm font-medium text-foreground">

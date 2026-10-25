@@ -7,10 +7,12 @@ import cc.fascinated.monitor.model.domain.server.ServerPermission;
 import cc.fascinated.monitor.model.dto.request.alert.AlertGroupRequest;
 import cc.fascinated.monitor.model.dto.request.alert.AlertGroupUpdateRequest;
 import cc.fascinated.monitor.model.dto.response.alert.AlertGroupResponse;
+import cc.fascinated.monitor.model.persistance.AlertDestinationRow;
 import cc.fascinated.monitor.model.persistance.AlertGroupRow;
 import cc.fascinated.monitor.model.persistance.AlertRuleRow;
 import cc.fascinated.monitor.model.persistance.ServerRow;
 import cc.fascinated.monitor.model.persistance.UserRow;
+import cc.fascinated.monitor.repository.AlertDestinationRepository;
 import cc.fascinated.monitor.repository.AlertGroupRepository;
 import cc.fascinated.monitor.repository.AlertRuleEventStat;
 import cc.fascinated.monitor.repository.AlertEventRepository;
@@ -41,11 +43,16 @@ public class AlertGroupService {
     private final ServerService serverService;
     private final AlertStateService stateService;
     private final MonitorAlertProperties properties;
+    private final DefaultAlertRuleService defaultRuleService;
+    private final AlertDestinationRepository destinationRepository;
 
     public AlertGroupService(AlertGroupRepository groupRepository, AlertRuleRepository ruleRepository,
                              AlertEventRepository eventRepository, ServerRepository serverRepository,
                              ServerService serverService, AlertStateService stateService,
-                             MonitorAlertProperties properties) {
+                             MonitorAlertProperties properties, DefaultAlertRuleService defaultRuleService,
+                             AlertDestinationRepository destinationRepository) {
+        this.defaultRuleService = defaultRuleService;
+        this.destinationRepository = destinationRepository;
         this.groupRepository = groupRepository;
         this.ruleRepository = ruleRepository;
         this.eventRepository = eventRepository;
@@ -70,10 +77,22 @@ public class AlertGroupService {
         if (this.groupRepository.countByUserId(user.getId()) >= this.properties.getMaxGroupsPerUser()) {
             throw new ConflictException("You can have at most %d alert groups".formatted(this.properties.getMaxGroupsPerUser()));
         }
+        boolean addDefaults = Boolean.TRUE.equals(request.addDefaultRules());
+        if (addDefaults && this.ruleRepository.countByUserId(user.getId()) + this.defaultRuleService.defaultRuleCount()
+                > this.properties.getMaxRulesPerUser()) {
+            throw new ConflictException("Adding the default alerts would exceed the limit of %d alert rules"
+                    .formatted(this.properties.getMaxRulesPerUser()));
+        }
         AlertGroupRow row = new AlertGroupRow(user.getId(), request.name().trim(),
                 Boolean.TRUE.equals(request.autoAddServers()), Instant.now());
         row.getServerIds().addAll(requireServers(user, request.serverIds()));
         AlertGroupRow saved = this.groupRepository.save(row);
+        if (addDefaults) {
+            // notify the user's first destination, as rules created before they had one do once they add it
+            Long destinationId = this.destinationRepository.findByUserIdOrderByIdAsc(user.getId()).stream()
+                    .findFirst().map(AlertDestinationRow::getId).orElse(null);
+            this.defaultRuleService.addTo(user.getId(), saved.getId(), destinationId);
+        }
         this.stateService.invalidateServers(saved.getServerIds());
         return toResponses(List.of(saved)).getFirst();
     }
