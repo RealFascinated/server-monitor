@@ -38,7 +38,7 @@ function ServerMetricsView({
   onZoomToRange,
   zoomDisabled = false,
 }: ServerMetricsViewProps) {
-  const { data: server } = useUserServer(metrics.id)
+  const { data: server, isPending: serverPending } = useUserServer(metrics.id)
   const navigate = useNavigate()
   const { temperatureUnit } = useTemperatureUnit()
   const timeGrid = useMemo(() => buildMetricsTimeGrid(metrics), [metrics])
@@ -59,10 +59,13 @@ function ServerMetricsView({
   )
 
   const hasChartData = sections.length > 0
-  const showRangeCallout = !hasChartData && server?.status !== "PENDING"
+  const showRangeCallout =
+    !hasChartData && !serverPending && server?.status !== "PENDING"
 
   const fitRange =
-    showRangeCallout && serverOverviewHasData(server) && timeWindow.kind === "preset"
+    showRangeCallout &&
+    serverOverviewHasData(server) &&
+    timeWindow.kind === "preset"
       ? fitMetricRange(
           timeWindow.range,
           server?.createdAt
