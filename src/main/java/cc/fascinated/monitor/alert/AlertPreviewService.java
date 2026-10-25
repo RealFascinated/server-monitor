@@ -3,6 +3,7 @@ package cc.fascinated.monitor.alert;
 import cc.fascinated.monitor.alert.engine.AlertRuleEngine;
 import cc.fascinated.monitor.alert.engine.RuleSpec;
 import cc.fascinated.monitor.alert.engine.SeriesState;
+import cc.fascinated.monitor.exception.impl.BadRequestException;
 import cc.fascinated.monitor.metrics.server.catalog.VmMetricCatalog;
 import cc.fascinated.monitor.metrics.vm.query.VictoriaMetricsQuery;
 import cc.fascinated.monitor.metrics.vm.query.VictoriaMetricsQueryClient;
@@ -32,6 +33,7 @@ public class AlertPreviewService {
     private static final int MAX_SERIES = 10;
     private static final int TARGET_POINTS = 480;
     private static final int MIN_STEP_SECONDS = 15;
+    private static final int MAX_RANGE_HOURS = 168;
 
     private final VictoriaMetricsQueryClient queryClient;
     private final ServerService serverService;
@@ -45,6 +47,10 @@ public class AlertPreviewService {
     }
 
     public AlertPreviewResponse preview(UserRow user, AlertPreviewRequest request) {
+        // Bean validation covers REST; MCP tools build requests directly.
+        if (request.rangeHours() < 1 || request.rangeHours() > MAX_RANGE_HOURS) {
+            throw new BadRequestException("Range must be between 1 and %d hours".formatted(MAX_RANGE_HOURS));
+        }
         this.serverService.requireServer(user, request.serverId(), ServerPermission.VIEW_METRICS);
         AlertRuleValidator.Definition definition = this.validator.validate(request.metric(), request.labelFilter(),
                 request.operator(), request.threshold(), request.recoveryThreshold(), request.windowSeconds());

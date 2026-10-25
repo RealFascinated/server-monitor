@@ -29,6 +29,26 @@ spring:
           batch_size: 200
         order_inserts: true
         order_updates: true
+  ai:
+    mcp:
+      server:
+        name: server-monitor
+        version: 1.0.0
+        protocol: STATELESS
+        instructions: >-
+          Server Monitor: servers run an agent that reports metrics; you act as the user who owns the API token.
+          Start with list_servers for server ids, status and a current CPU/memory/disk snapshot. For history, get
+          metric ids and label values (disks, interfaces, containers) from list_metrics, then call query_metrics.
+          Outages (a server stopped reporting) are in list_server_incidents.
+          Alerting is account-wide: an alert group holds rules and a set of member servers, and every member is
+          checked against every rule of the group; the group sends notifications to its one destination. Rules
+          never belong to a server; to exclude a server from an alert, remove it from the group
+          (set_alert_group_servers). Use list_alert_events with state=firing for what is firing now. Before
+          creating or changing a rule, dry-run it with preview_alert_rule. Metric values use the units shown by
+          list_metrics (percent is 0-100, temperature is Celsius, bytes are raw bytes). Dates in results are
+          ISO-8601 except metric points and previews, which use Unix epoch seconds.
+        streamable-http:
+          mcp-endpoint: /mcp
   datasource:
     url: jdbc:postgresql://localhost:5432/monitor
     username: monitor

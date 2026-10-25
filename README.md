@@ -71,6 +71,26 @@ curl -fsSL https://raw.githubusercontent.com/RealFascinated/Monitor-API/master/a
   sudo bash -s -- install YOUR_INGEST_TOKEN --api-endpoint http://your-host:8080/v1/servers/ingest
 ```
 
+## MCP server
+
+The API embeds an [MCP](https://modelcontextprotocol.io) server at `/mcp` (Streamable HTTP, stateless) so assistants can read your servers and metrics and manage alerts.
+
+Create an API token in the dashboard under **Account settings → API tokens** (or `POST /v1/user/api-tokens` with a session). The token is shown once and starts with `smk_`. API tokens only work on `/mcp`, and session tokens do not work there.
+
+| Scope | Allows |
+| --- | --- |
+| `servers:read` | List servers with their status, hardware, current usage and outages |
+| `metrics:read` | Browse the metric catalog and query metric history |
+| `alerts:read` | Read alert rules, groups, destinations and history, and preview rules against metric history |
+| `alerts:write` | Create, change, delete and silence alert rules, change which servers a group covers and send test notifications (also grants `alerts:read`) |
+
+Only grant what the client needs; write tools act as you and can send real notifications.
+
+```bash
+claude mcp add --transport http server-monitor https://your-api-host/mcp \
+  --header "Authorization: Bearer smk_YOUR_TOKEN"
+```
+
 ## Development
 
 Clone this repo if you want to build or hack on Monitor.

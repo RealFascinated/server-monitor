@@ -7,6 +7,7 @@ import { SettingsSubsectionHeader } from "@/components/settings/settings-subsect
 import { ThemeSwitcher } from "@/components/theme-switcher"
 import { Card, CardContent } from "@/components/ui/card"
 import { ChangePasswordForm } from "@/components/user/change-password-form"
+import { ApiTokensSection } from "@/components/user/api-tokens-section"
 import { UserSessionsSection } from "@/components/user/user-sessions-section"
 import { UserRoleBadge } from "@/components/user/user-role-badge"
 import { SettingsToggle } from "@/components/ui/settings-toggle"
@@ -81,7 +82,7 @@ function AccountSettingsView({ user }: AccountSettingsViewProps) {
       <section className="flex flex-col gap-4">
         <SettingsSectionHeader
           title="Security"
-          description="Update your sign-in password and manage active sessions."
+          description="Update your sign-in password and manage sessions and API tokens."
         />
 
         <div className="flex max-w-xl flex-col gap-6">
@@ -96,6 +97,8 @@ function AccountSettingsView({ user }: AccountSettingsViewProps) {
           </div>
 
           <UserSessionsSection />
+
+          <ApiTokensSection />
         </div>
       </section>
 

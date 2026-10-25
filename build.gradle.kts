@@ -23,9 +23,18 @@ repositories {
     maven { url = uri("https://repo.jenkins-ci.org/public/") }
 }
 
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.ai:spring-ai-bom:2.0.2")
+    }
+}
+
 dependencies {
     // Spring
     implementation("org.springframework.boot:spring-boot-starter-web")
+
+    // MCP server
+    implementation("org.springframework.ai:spring-ai-starter-mcp-server-webmvc")
 
     // Postgres
     implementation("org.flywaydb:flyway-database-postgresql")

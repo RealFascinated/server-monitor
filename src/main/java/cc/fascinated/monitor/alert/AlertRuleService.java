@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 public class AlertRuleService {
     private static final int MIN_REPEAT_SECONDS = 60;
     private static final int MAX_REPEAT_SECONDS = 30 * 24 * 3600;
+    private static final int MAX_NAME_LENGTH = 100;
 
     private final AlertRuleRepository ruleRepository;
     private final AlertEventRepository eventRepository;
@@ -125,6 +126,10 @@ public class AlertRuleService {
             throw new BadRequestException("Repeat interval must be between %d seconds and 30 days".formatted(MIN_REPEAT_SECONDS));
         }
         String name = request.name() == null || request.name().isBlank() ? null : request.name().trim();
+        // Bean validation covers REST; MCP tools build requests directly.
+        if (name != null && name.length() > MAX_NAME_LENGTH) {
+            throw new BadRequestException("Name must be at most %d characters".formatted(MAX_NAME_LENGTH));
+        }
         row.setName(name);
         row.setMetric(definition.metric());
         row.setLabelFilter(definition.labelFilter());
