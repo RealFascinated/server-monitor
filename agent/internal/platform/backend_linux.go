@@ -54,10 +54,31 @@ type linuxBackend struct {
 	shared      *linuxBackendShared
 
 	cgroup string
+
+	// lxc is set when running inside an LXC container, where host-wide
+	// counters (power, clock, interrupts, file handles) don't describe this container.
+	lxc bool
+}
+
+// applyContainerLimits turns off host-level collectors that only report the
+// hypervisor's hardware (or nothing useful) from inside an LXC container.
+func applyContainerLimits(opts Options) Options {
+	opts.HasZFS = false
+	opts.EnableGPU = false
+	opts.EnableBattery = false
+	opts.EnableThermal = false
+	opts.EnableSmart = false
+	opts.EnableTimesync = false
+	return opts
 }
 
 func newLinuxBackend(opts Options) *linuxBackend {
+	lxc := linux.IsLXC()
+	if lxc {
+		opts = applyContainerLimits(opts)
+	}
 	return &linuxBackend{
+		lxc:    lxc,
 		opts:   opts,
 		shared: newLinuxBackendShared(),
 		cgroup: linux.Dir(),
@@ -78,7 +99,16 @@ func (b *linuxBackend) Tick(ready bool) (TickUpdate, error) {
 	)
 
 	var wg sync.WaitGroup
-	wg.Add(4)
+	wg.Add(3)
+	if !b.lxc {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if mhz, err := cpu.GetClockSpeedMHz(); err == nil {
+				clockMHz = mhz
+			}
+		}()
+	}
 	go func() {
 		defer wg.Done()
 		procAfter = linux.ReadProcStat()
@@ -91,12 +121,6 @@ func (b *linuxBackend) Tick(ready bool) (TickUpdate, error) {
 		defer wg.Done()
 		diskstatsAfter = linux.ReadDiskstats()
 	}()
-	go func() {
-		defer wg.Done()
-		if mhz, err := cpu.GetClockSpeedMHz(); err == nil {
-			clockMHz = mhz
-		}
-	}()
 	wg.Wait()
 	profilePhase("parallel_reads", start)
 
@@ -105,7 +129,13 @@ func (b *linuxBackend) Tick(ready bool) (TickUpdate, error) {
 	}
 
 	cgroupIOAfter = linux.ReadIOStats()
-	powerAfter, powerMaxAfter, hasPowerAfter := cpu.ReadPackageEnergyMicrojoules()
+	var (
+		powerAfter, powerMaxAfter uint64
+		hasPowerAfter             bool
+	)
+	if !b.lxc {
+		powerAfter, powerMaxAfter, hasPowerAfter = cpu.ReadPackageEnergyMicrojoules()
+	}
 	if b.opts.HasZFS {
 		zfsIOAfter = zfs.ReadPoolIOSnapshots()
 	}
@@ -156,6 +186,10 @@ func (b *linuxBackend) Tick(ready bool) (TickUpdate, error) {
 		Cgroup:         b.cgroup,
 		Elapsed:        elapsed,
 	})
+	if b.lxc {
+		metrics.ContextSwitchesPerSecond = 0
+		metrics.InterruptsPerSecond = 0
+	}
 	profilePhase("tick_cpu", cpuStart)
 
 	avg := loadavg.Read()
@@ -172,7 +206,9 @@ func (b *linuxBackend) Tick(ready bool) (TickUpdate, error) {
 	if !b.opts.EnableCPUCores {
 		metrics.CPUCoreMetrics = nil
 	}
-	fd.ApplyTo(&metrics, fd.Read())
+	if !b.lxc {
+		fd.ApplyTo(&metrics, fd.Read())
+	}
 	oomAfter, hasOom := oom.Read()
 	if hasOom {
 		oom.ApplyRate(&metrics, prev.oomKillsBefore, oomAfter, prev.hasOomBefore, elapsed)
