@@ -4,6 +4,7 @@ import cc.fascinated.monitor.alert.AlertGroupService;
 import cc.fascinated.monitor.exception.impl.BadRequestException;
 import cc.fascinated.monitor.mcp.McpJson;
 import cc.fascinated.monitor.mcp.auth.McpAuth;
+import cc.fascinated.monitor.mcp.auth.RequiresScope;
 import cc.fascinated.monitor.model.domain.user.ApiTokenScope;
 import cc.fascinated.monitor.model.dto.request.alert.AlertGroupUpdateRequest;
 import cc.fascinated.monitor.model.dto.response.alert.AlertGroupResponse;
@@ -27,6 +28,7 @@ public class SetAlertGroupServersTool {
         this.groupService = groupService;
     }
 
+    @RequiresScope(ApiTokenScope.ALERTS_WRITE)
     @McpTool(name = "set_alert_group_servers", description = """
             Adds and/or removes servers from an alert group. Servers in the group are checked against all of its \
             rules; removing a server from a group is how to exclude it from those alerts, and closes its open \

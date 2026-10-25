@@ -90,6 +90,10 @@ CREATE INDEX api_tokens_user_idx ON api_tokens(user_id);
 
 `ExceptionControllerAdvice` does not apply to MCP. Verified by tests: exceptions thrown from a tool method (`NotFoundException`, `ForbiddenException`, `BadRequestException`) reach the client as `isError: true` with the original message, so no handler was needed.
 
+### Tool visibility (as built)
+
+`tools/list` is filtered per token: each tool method carries `@RequiresScope`, and `McpToolVisibility` (a `McpStatelessSyncServerCustomizer` adding an SDK tool filter) hides tools the token's scopes do not grant. Startup fails if a tool has no `@RequiresScope`. Hiding is a convenience only: `tools/call` still goes through `McpAuth.require`, and `McpToolScopeCoverageTest` checks that, for each scope, the listed tools are exactly the callable ones.
+
 ### Output format (as built)
 
 Tools return `String` produced by `McpJson.write`, a mapper with ISO dates and no null fields. Spring AI's default converter writes every null, which wastes the model's context.

@@ -2,6 +2,7 @@ package cc.fascinated.monitor.mcp.tool;
 
 import cc.fascinated.monitor.mcp.McpJson;
 import cc.fascinated.monitor.mcp.auth.McpAuth;
+import cc.fascinated.monitor.mcp.auth.RequiresScope;
 import cc.fascinated.monitor.model.domain.user.ApiTokenScope;
 import cc.fascinated.monitor.model.dto.response.server.ServerResponse;
 import cc.fascinated.monitor.model.persistance.UserRow;
@@ -23,6 +24,7 @@ public class ListServersTool {
         this.serverService = serverService;
     }
 
+    @RequiresScope(ApiTokenScope.SERVERS_READ)
     @McpTool(name = "list_servers", description = """
             Lists the servers the user can see, sorted by name. Start here: serverId is what every other server, \
             metric and alert tool takes. Each server has status (ONLINE, OFFLINE, or PENDING = never reported), \

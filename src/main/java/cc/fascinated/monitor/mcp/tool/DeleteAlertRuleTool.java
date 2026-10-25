@@ -3,6 +3,7 @@ package cc.fascinated.monitor.mcp.tool;
 import cc.fascinated.monitor.alert.AlertRuleService;
 import cc.fascinated.monitor.mcp.McpJson;
 import cc.fascinated.monitor.mcp.auth.McpAuth;
+import cc.fascinated.monitor.mcp.auth.RequiresScope;
 import cc.fascinated.monitor.mcp.dto.McpAck;
 import cc.fascinated.monitor.model.domain.user.ApiTokenScope;
 import cc.fascinated.monitor.model.persistance.UserRow;
@@ -21,6 +22,7 @@ public class DeleteAlertRuleTool {
         this.ruleService = ruleService;
     }
 
+    @RequiresScope(ApiTokenScope.ALERTS_WRITE)
     @McpTool(name = "delete_alert_rule", description = """
             Permanently deletes an alert rule together with its whole alert history (its events in \
             list_alert_events), for every server in its group. This cannot be undone. To stop a rule without losing \

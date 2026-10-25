@@ -3,6 +3,7 @@ package cc.fascinated.monitor.mcp.tool;
 import cc.fascinated.monitor.alert.AlertDestinationService;
 import cc.fascinated.monitor.mcp.McpJson;
 import cc.fascinated.monitor.mcp.auth.McpAuth;
+import cc.fascinated.monitor.mcp.auth.RequiresScope;
 import cc.fascinated.monitor.mcp.dto.McpAck;
 import cc.fascinated.monitor.model.domain.user.ApiTokenScope;
 import cc.fascinated.monitor.model.persistance.UserRow;
@@ -21,6 +22,7 @@ public class TestAlertDestinationTool {
         this.destinationService = destinationService;
     }
 
+    @RequiresScope(ApiTokenScope.ALERTS_WRITE)
     @McpTool(name = "test_alert_destination", description = """
             Sends a sample alert to an alert destination (e.g. posts it to the Discord channel) to check that \
             delivery works; the error says why when it does not. It notifies real people, so only call it when the \

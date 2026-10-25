@@ -3,6 +3,7 @@ package cc.fascinated.monitor.mcp.tool;
 import cc.fascinated.monitor.alert.AlertGroupService;
 import cc.fascinated.monitor.mcp.McpJson;
 import cc.fascinated.monitor.mcp.auth.McpAuth;
+import cc.fascinated.monitor.mcp.auth.RequiresScope;
 import cc.fascinated.monitor.model.domain.user.ApiTokenScope;
 import cc.fascinated.monitor.model.dto.response.alert.AlertGroupResponse;
 import cc.fascinated.monitor.model.persistance.UserRow;
@@ -23,6 +24,7 @@ public class ListAlertGroupsTool {
         this.groupService = groupService;
     }
 
+    @RequiresScope(ApiTokenScope.ALERTS_READ)
     @McpTool(name = "list_alert_groups", description = """
             Lists alert groups. Alert groups are account-wide and rules belong to a group, never to a server: a \
             server is covered by the rules of every group it is a member of, and a group notifies its one \

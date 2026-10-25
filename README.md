@@ -84,7 +84,7 @@ Create an API token in the dashboard under **Account settings → API tokens** (
 | `alerts:read` | Read alert rules, groups, destinations and history, and preview rules against metric history |
 | `alerts:write` | Create, change, delete and silence alert rules, change which servers a group covers and send test notifications (also grants `alerts:read`) |
 
-Only grant what the client needs; write tools act as you and can send real notifications.
+`tools/list` only shows the tools a token's scopes allow, and calling any other tool is refused. Only grant what the client needs; write tools act as you and can send real notifications.
 
 ```bash
 claude mcp add --transport http server-monitor https://your-api-host/mcp \

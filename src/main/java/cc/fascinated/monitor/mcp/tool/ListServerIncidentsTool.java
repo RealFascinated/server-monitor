@@ -2,6 +2,7 @@ package cc.fascinated.monitor.mcp.tool;
 
 import cc.fascinated.monitor.mcp.McpJson;
 import cc.fascinated.monitor.mcp.auth.McpAuth;
+import cc.fascinated.monitor.mcp.auth.RequiresScope;
 import cc.fascinated.monitor.model.domain.user.ApiTokenScope;
 import cc.fascinated.monitor.model.dto.response.server.IncidentResponse;
 import cc.fascinated.monitor.model.persistance.UserRow;
@@ -24,6 +25,7 @@ public class ListServerIncidentsTool {
         this.serverService = serverService;
     }
 
+    @RequiresScope(ApiTokenScope.SERVERS_READ)
     @McpTool(name = "list_server_incidents", description = """
             Lists a server's outages, newest first: each incident is a period when the server stopped sending \
             heartbeats long enough to be marked OFFLINE, with startedAt and resolvedAt (absent while it is still \

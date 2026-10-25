@@ -3,6 +3,7 @@ package cc.fascinated.monitor.mcp.tool;
 import cc.fascinated.monitor.mcp.McpMetricQueryService;
 import cc.fascinated.monitor.mcp.McpJson;
 import cc.fascinated.monitor.mcp.auth.McpAuth;
+import cc.fascinated.monitor.mcp.auth.RequiresScope;
 import cc.fascinated.monitor.mcp.dto.McpMetricQueryResult;
 import cc.fascinated.monitor.model.domain.user.ApiTokenScope;
 import cc.fascinated.monitor.model.persistance.UserRow;
@@ -23,6 +24,7 @@ public class QueryMetricsTool {
         this.queryService = queryService;
     }
 
+    @RequiresScope(ApiTokenScope.METRICS_READ)
     @McpTool(name = "query_metrics", description = """
             History of one metric on one server. Get the metric id, and the label values to filter on, from \
             list_metrics (with serverId). Returns unit and displayName (alertable metrics only), from/to and \

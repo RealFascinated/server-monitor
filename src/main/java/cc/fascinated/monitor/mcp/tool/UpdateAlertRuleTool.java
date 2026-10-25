@@ -4,6 +4,7 @@ import cc.fascinated.monitor.alert.AlertRuleService;
 import cc.fascinated.monitor.mcp.McpJson;
 import cc.fascinated.monitor.mcp.McpMetricCatalogService;
 import cc.fascinated.monitor.mcp.auth.McpAuth;
+import cc.fascinated.monitor.mcp.auth.RequiresScope;
 import cc.fascinated.monitor.model.domain.alert.AlertOperator;
 import cc.fascinated.monitor.model.domain.alert.AlertSeverity;
 import cc.fascinated.monitor.model.domain.user.ApiTokenScope;
@@ -27,6 +28,7 @@ public class UpdateAlertRuleTool {
         this.ruleService = ruleService;
     }
 
+    @RequiresScope(ApiTokenScope.ALERTS_WRITE)
     @McpTool(name = "update_alert_rule", description = """
             Changes an alert rule. Pass ruleId plus only the fields to change; the rest keep their current values \
             (see list_alert_rules), and the same limits as create_alert_rule apply. This is also how to disable or \

@@ -4,6 +4,7 @@ import cc.fascinated.monitor.alert.AlertRuleService;
 import cc.fascinated.monitor.mcp.McpJson;
 import cc.fascinated.monitor.mcp.McpMetricCatalogService;
 import cc.fascinated.monitor.mcp.auth.McpAuth;
+import cc.fascinated.monitor.mcp.auth.RequiresScope;
 import cc.fascinated.monitor.model.domain.alert.AlertOperator;
 import cc.fascinated.monitor.model.domain.alert.AlertSeverity;
 import cc.fascinated.monitor.model.domain.user.ApiTokenScope;
@@ -27,6 +28,7 @@ public class CreateAlertRuleTool {
         this.ruleService = ruleService;
     }
 
+    @RequiresScope(ApiTokenScope.ALERTS_WRITE)
     @McpTool(name = "create_alert_rule", description = """
             Creates an alert rule in an alert group. Rules belong to a group, never to a server: every server in the \
             group is checked against the rule, each series separately (each disk, interface, ...), and the group's \

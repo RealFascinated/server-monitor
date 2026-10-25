@@ -4,6 +4,7 @@ import cc.fascinated.monitor.alert.AlertPreviewService;
 import cc.fascinated.monitor.mcp.McpJson;
 import cc.fascinated.monitor.mcp.McpMetricCatalogService;
 import cc.fascinated.monitor.mcp.auth.McpAuth;
+import cc.fascinated.monitor.mcp.auth.RequiresScope;
 import cc.fascinated.monitor.mcp.dto.McpAlertPreview;
 import cc.fascinated.monitor.model.domain.alert.AlertOperator;
 import cc.fascinated.monitor.model.domain.user.ApiTokenScope;
@@ -28,6 +29,7 @@ public class PreviewAlertRuleTool {
         this.previewService = previewService;
     }
 
+    @RequiresScope(ApiTokenScope.ALERTS_READ)
     @McpTool(name = "preview_alert_rule", description = """
             Dry-runs a rule definition against one server's real history with the same engine live alerts use. \
             Nothing is created or sent. Use it before create_alert_rule or update_alert_rule to pick a threshold \

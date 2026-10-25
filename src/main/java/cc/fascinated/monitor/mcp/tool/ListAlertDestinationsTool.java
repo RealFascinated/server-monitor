@@ -3,6 +3,7 @@ package cc.fascinated.monitor.mcp.tool;
 import cc.fascinated.monitor.alert.AlertDestinationService;
 import cc.fascinated.monitor.mcp.McpJson;
 import cc.fascinated.monitor.mcp.auth.McpAuth;
+import cc.fascinated.monitor.mcp.auth.RequiresScope;
 import cc.fascinated.monitor.model.domain.user.ApiTokenScope;
 import cc.fascinated.monitor.model.dto.response.alert.AlertDestinationResponse;
 import cc.fascinated.monitor.model.persistance.UserRow;
@@ -22,6 +23,7 @@ public class ListAlertDestinationsTool {
         this.destinationService = destinationService;
     }
 
+    @RequiresScope(ApiTokenScope.ALERTS_READ)
     @McpTool(name = "list_alert_destinations", description = """
             Lists where alerts are delivered: id, name, type (DISCORD_WEBHOOK), maskedUrl (the secret part is \
             hidden) and groupCount, how many alert groups use it. Each group points at one destination (see \

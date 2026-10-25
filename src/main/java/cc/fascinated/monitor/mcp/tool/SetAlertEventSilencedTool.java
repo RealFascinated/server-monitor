@@ -3,6 +3,7 @@ package cc.fascinated.monitor.mcp.tool;
 import cc.fascinated.monitor.alert.AlertHistoryService;
 import cc.fascinated.monitor.mcp.McpJson;
 import cc.fascinated.monitor.mcp.auth.McpAuth;
+import cc.fascinated.monitor.mcp.auth.RequiresScope;
 import cc.fascinated.monitor.mcp.dto.McpAck;
 import cc.fascinated.monitor.model.domain.user.ApiTokenScope;
 import cc.fascinated.monitor.model.persistance.UserRow;
@@ -21,6 +22,7 @@ public class SetAlertEventSilencedTool {
         this.historyService = historyService;
     }
 
+    @RequiresScope(ApiTokenScope.ALERTS_WRITE)
     @McpTool(name = "set_alert_event_silenced", description = """
             Silences or unsilences a firing alert event, i.e. acknowledges it. A silenced alert sends no \
             notifications (nor one when it resolves) and is not counted in firingCount, until its value gets worse \

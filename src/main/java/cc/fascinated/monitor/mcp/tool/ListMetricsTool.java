@@ -3,6 +3,7 @@ package cc.fascinated.monitor.mcp.tool;
 import cc.fascinated.monitor.mcp.McpMetricCatalogService;
 import cc.fascinated.monitor.mcp.McpJson;
 import cc.fascinated.monitor.mcp.auth.McpAuth;
+import cc.fascinated.monitor.mcp.auth.RequiresScope;
 import cc.fascinated.monitor.mcp.dto.McpMetricInfo;
 import cc.fascinated.monitor.model.domain.user.ApiTokenScope;
 import cc.fascinated.monitor.model.persistance.UserRow;
@@ -23,6 +24,7 @@ public class ListMetricsTool {
         this.catalog = catalog;
     }
 
+    @RequiresScope(ApiTokenScope.METRICS_READ)
     @McpTool(name = "list_metrics", description = """
             The only metric discovery tool: lists the metric ids that query_metrics accepts and the alert tools use. \
             Each entry has its group, labelKeys (the labels that tell its series apart, e.g. disk, interface, \

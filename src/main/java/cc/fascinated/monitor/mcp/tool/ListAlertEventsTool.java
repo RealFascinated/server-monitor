@@ -3,6 +3,7 @@ package cc.fascinated.monitor.mcp.tool;
 import cc.fascinated.monitor.alert.AlertHistoryService;
 import cc.fascinated.monitor.mcp.McpJson;
 import cc.fascinated.monitor.mcp.auth.McpAuth;
+import cc.fascinated.monitor.mcp.auth.RequiresScope;
 import cc.fascinated.monitor.model.domain.user.ApiTokenScope;
 import cc.fascinated.monitor.model.dto.response.alert.AlertEventResponse;
 import cc.fascinated.monitor.model.persistance.UserRow;
@@ -24,6 +25,7 @@ public class ListAlertEventsTool {
         this.historyService = historyService;
     }
 
+    @RequiresScope(ApiTokenScope.ALERTS_READ)
     @McpTool(name = "list_alert_events", description = """
             Alert history, newest first. Each event is one firing of one rule on one server and series (labels, \
             e.g. which disk), with the rule's metric, metricLabel, unit, operator and threshold, startedAt, \

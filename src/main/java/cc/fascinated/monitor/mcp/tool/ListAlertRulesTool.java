@@ -3,6 +3,7 @@ package cc.fascinated.monitor.mcp.tool;
 import cc.fascinated.monitor.alert.AlertRuleService;
 import cc.fascinated.monitor.mcp.McpJson;
 import cc.fascinated.monitor.mcp.auth.McpAuth;
+import cc.fascinated.monitor.mcp.auth.RequiresScope;
 import cc.fascinated.monitor.model.domain.user.ApiTokenScope;
 import cc.fascinated.monitor.model.dto.response.alert.AlertRuleResponse;
 import cc.fascinated.monitor.model.persistance.UserRow;
@@ -23,6 +24,7 @@ public class ListAlertRulesTool {
         this.ruleService = ruleService;
     }
 
+    @RequiresScope(ApiTokenScope.ALERTS_READ)
     @McpTool(name = "list_alert_rules", description = """
             Lists the user's alert rules, newest first. Every rule belongs to one alert group and applies to every \
             server in that group. Each rule has groupId/groupName, name (absent when unnamed), metric with \
