@@ -100,3 +100,39 @@ export function parseMetricRange(value: unknown): MetricTimeRange {
 
   return DEFAULT_METRIC_TIME_RANGE
 }
+
+const AUTO_FIT_RANGES: readonly MetricTimeRange[] = [
+  "1h",
+  "3h",
+  "6h",
+  "12h",
+  "24h",
+]
+
+/**
+ * Picks a shorter preset (24h or less) for a range the server has not been
+ * monitored long enough to fill. With a known age it picks the smallest preset
+ * covering that age, otherwise it steps down one preset. Returns null when no
+ * shorter preset exists.
+ */
+export function fitMetricRange(
+  current: MetricTimeRange,
+  ageSeconds?: number
+): MetricTimeRange | null {
+  const currentSeconds = METRIC_RANGE_LOOKBACK_SECONDS[current]
+  const shorter = AUTO_FIT_RANGES.filter(
+    (range) => METRIC_RANGE_LOOKBACK_SECONDS[range] < currentSeconds
+  )
+  if (shorter.length === 0) {
+    return null
+  }
+
+  if (ageSeconds != null && Number.isFinite(ageSeconds)) {
+    const covering = shorter.find(
+      (range) => METRIC_RANGE_LOOKBACK_SECONDS[range] >= ageSeconds
+    )
+    return covering ?? shorter[shorter.length - 1]
+  }
+
+  return shorter[shorter.length - 1]
+}

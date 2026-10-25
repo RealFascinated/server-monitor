@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
-import { useMemo } from "react"
+import { useNavigate } from "@tanstack/react-router"
+import { useEffect, useMemo } from "react"
 
 import { Callout } from "@/components/callout"
 import { MetricsView } from "@/components/metrics/metrics-view"
@@ -15,6 +16,7 @@ import {
 } from "@/lib/metrics/chart-annotations"
 import type { ServerMetricsResponse } from "@/lib/api/user/metrics"
 import type { MetricsDataWindow } from "@/lib/metrics/chart-zoom"
+import { fitMetricRange } from "@/lib/metrics/range"
 import { formatMetricTimeWindowDescription } from "@/lib/metrics/time-window"
 import type { MetricTimeWindow } from "@/lib/metrics/time-window"
 import { useTemperatureUnit } from "@/hooks/use-temperature-unit"
@@ -37,6 +39,7 @@ function ServerMetricsView({
   zoomDisabled = false,
 }: ServerMetricsViewProps) {
   const { data: server } = useUserServer(metrics.id)
+  const navigate = useNavigate()
   const { temperatureUnit } = useTemperatureUnit()
   const timeGrid = useMemo(() => buildMetricsTimeGrid(metrics), [metrics])
   const { data: incidentPage } = useQuery(
@@ -57,6 +60,28 @@ function ServerMetricsView({
 
   const hasChartData = sections.length > 0
   const showRangeCallout = !hasChartData && server?.status !== "PENDING"
+
+  const fitRange =
+    showRangeCallout && serverOverviewHasData(server) && timeWindow.kind === "preset"
+      ? fitMetricRange(
+          timeWindow.range,
+          server?.createdAt
+            ? (Date.now() - new Date(server.createdAt).getTime()) / 1000
+            : undefined
+        )
+      : null
+
+  useEffect(() => {
+    if (fitRange) {
+      void navigate({
+        to: "/servers/$serverId",
+        params: { serverId: String(metrics.id) },
+        search: { range: fitRange },
+        replace: true,
+        resetScroll: false,
+      })
+    }
+  }, [fitRange, metrics.id, navigate])
 
   if (sections.length === 0 && !showRangeCallout) {
     return null

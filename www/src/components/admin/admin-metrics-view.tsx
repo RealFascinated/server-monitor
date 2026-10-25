@@ -1,4 +1,5 @@
-import { useMemo } from "react"
+import { useNavigate } from "@tanstack/react-router"
+import { useEffect, useMemo } from "react"
 
 import { Callout } from "@/components/callout"
 import {
@@ -11,6 +12,7 @@ import { chartsHaveData } from "@/lib/metrics/chart-config"
 import type { MetricsDataWindow } from "@/lib/metrics/chart-zoom"
 import { buildAdminMetricSections } from "@/lib/metrics/sections/admin/build"
 import { overviewCharts } from "@/lib/metrics/sections/admin/charts"
+import { fitMetricRange } from "@/lib/metrics/range"
 import { formatMetricTimeWindowDescription } from "@/lib/metrics/time-window"
 import type { MetricTimeWindow } from "@/lib/metrics/time-window"
 import { buildMetricsTimeGrid } from "@/lib/metrics/timestamps"
@@ -30,6 +32,7 @@ function AdminMetricsView({
   onZoomToRange,
   zoomDisabled = false,
 }: AdminMetricsViewProps) {
+  const navigate = useNavigate()
   const timeGrid = useMemo(() => buildMetricsTimeGrid(metrics), [metrics])
   const sections = useMemo(
     () => buildAdminMetricSections(metrics, timeGrid),
@@ -39,14 +42,30 @@ function AdminMetricsView({
   const hasChartData = sections.length > 0
   const showRangeCallout = !hasChartData
 
+  const hasCurrentMetrics = chartsHaveData(
+    overviewCharts(metrics.overview ?? {})
+  )
+  const fitRange =
+    showRangeCallout && hasCurrentMetrics && timeWindow.kind === "preset"
+      ? fitMetricRange(timeWindow.range)
+      : null
+
+  useEffect(() => {
+    if (fitRange) {
+      void navigate({
+        to: "/admin/metrics",
+        search: { range: fitRange },
+        replace: true,
+        resetScroll: false,
+      })
+    }
+  }, [fitRange, navigate])
+
   if (sections.length === 0 && !showRangeCallout) {
     return null
   }
 
   const rangeLabel = formatMetricTimeWindowDescription(timeWindow)
-  const hasCurrentMetrics = chartsHaveData(
-    overviewCharts(metrics.overview ?? {})
-  )
 
   return (
     <div className="flex flex-col gap-6">
