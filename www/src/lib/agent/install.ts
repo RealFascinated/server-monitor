@@ -1,10 +1,10 @@
 import { env } from "@/env"
 
 export const AGENT_INSTALL_SH_URL =
-  "https://raw.githubusercontent.com/RealFascinated/Monitor-API/master/agent/install.sh"
+  "https://raw.githubusercontent.com/RealFascinated/server-monitor/master/agent/install.sh"
 
 export const AGENT_INSTALL_PS1_URL =
-  "https://raw.githubusercontent.com/RealFascinated/Monitor-API/master/agent/install.ps1"
+  "https://raw.githubusercontent.com/RealFascinated/server-monitor/master/agent/install.ps1"
 
 export const AGENT_DOCKER_IMAGE = "ghcr.io/realfascinated/monitor-agent:latest"
 

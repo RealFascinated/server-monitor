@@ -4,7 +4,7 @@
   Install or remove the Monitor agent on Windows.
 
 .EXAMPLE
-  Set-ExecutionPolicy Bypass -Scope Process -Force; & ([ScriptBlock]::Create((iwr https://raw.githubusercontent.com/RealFascinated/Monitor-API/master/agent/install.ps1 -UseBasicParsing).Content)) install YOUR_INGEST_TOKEN
+  Set-ExecutionPolicy Bypass -Scope Process -Force; & ([ScriptBlock]::Create((iwr https://raw.githubusercontent.com/RealFascinated/server-monitor/master/agent/install.ps1 -UseBasicParsing).Content)) install YOUR_INGEST_TOKEN
 
 .EXAMPLE
   .\install.ps1 install YOUR_INGEST_TOKEN
@@ -35,7 +35,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$GitHubRepo = 'RealFascinated/Monitor-API'
+$GitHubRepo = 'RealFascinated/server-monitor'
 $AgentPath = 'agent'
 $NssmZipUrl = 'https://nssm.cc/release/nssm-2.24.zip'
 
@@ -56,7 +56,7 @@ Options (install):
   -ServiceName NAME      Windows service name (default: monitor-agent)
 
 Examples:
-  Set-ExecutionPolicy Bypass -Scope Process -Force; & ([ScriptBlock]::Create((iwr https://raw.githubusercontent.com/RealFascinated/Monitor-API/master/agent/install.ps1 -UseBasicParsing).Content)) install YOUR_INGEST_TOKEN
+  Set-ExecutionPolicy Bypass -Scope Process -Force; & ([ScriptBlock]::Create((iwr https://raw.githubusercontent.com/RealFascinated/server-monitor/master/agent/install.ps1 -UseBasicParsing).Content)) install YOUR_INGEST_TOKEN
   .\install.ps1 install YOUR_INGEST_TOKEN
   .\install.ps1 install YOUR_INGEST_TOKEN -BinaryPath .\monitor-agent.exe
   .\install.ps1 uninstall

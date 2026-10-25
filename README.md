@@ -11,7 +11,7 @@ You need [Docker Engine](https://docs.docker.com/engine/install/) and the [Compo
 **1. Clone and configure**
 
 ```bash
-git clone https://github.com/RealFascinated/Monitor-API.git monitor
+git clone https://github.com/RealFascinated/server-monitor.git monitor
 cd monitor
 cp .env.example .env
 ```
@@ -67,7 +67,7 @@ See [agent/README.md](agent/README.md) for Linux, Windows, Docker, and Unraid in
 The dashboard **Agent** tab copies install commands with the correct API endpoint for your instance. For a manual Linux install against a self-hosted stack:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/RealFascinated/Monitor-API/master/agent/install.sh | \
+curl -fsSL https://raw.githubusercontent.com/RealFascinated/server-monitor/master/agent/install.sh | \
   sudo bash -s -- install YOUR_INGEST_TOKEN --api-endpoint http://your-host:8080/v1/servers/ingest
 ```
 

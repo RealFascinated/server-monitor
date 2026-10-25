@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-GITHUB_REPO="RealFascinated/Monitor-API"
+GITHUB_REPO="RealFascinated/server-monitor"
 AGENT_PATH="agent"
 DEFAULT_VERSION="2.0.1"
 DEFAULT_API_ENDPOINT="https://monitor.fascinated.cc/api/v1/servers/ingest"

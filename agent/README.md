@@ -13,19 +13,19 @@ If you self-host, set the API URL to your instance (see [Configuration](#configu
 **Linux**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/RealFascinated/Monitor-API/master/agent/install.sh | sudo bash -s -- install YOUR_INGEST_TOKEN
+curl -fsSL https://raw.githubusercontent.com/RealFascinated/server-monitor/master/agent/install.sh | sudo bash -s -- install YOUR_INGEST_TOKEN
 ```
 
 **Windows** (Administrator PowerShell)
 
 ```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; & ([ScriptBlock]::Create((iwr https://raw.githubusercontent.com/RealFascinated/Monitor-API/master/agent/install.ps1 -UseBasicParsing).Content)) install YOUR_INGEST_TOKEN
+Set-ExecutionPolicy Bypass -Scope Process -Force; & ([ScriptBlock]::Create((iwr https://raw.githubusercontent.com/RealFascinated/server-monitor/master/agent/install.ps1 -UseBasicParsing).Content)) install YOUR_INGEST_TOKEN
 ```
 
 Uninstall:
 
 ```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; & ([ScriptBlock]::Create((iwr https://raw.githubusercontent.com/RealFascinated/Monitor-API/master/agent/install.ps1 -UseBasicParsing).Content)) uninstall
+Set-ExecutionPolicy Bypass -Scope Process -Force; & ([ScriptBlock]::Create((iwr https://raw.githubusercontent.com/RealFascinated/server-monitor/master/agent/install.ps1 -UseBasicParsing).Content)) uninstall
 ```
 
 Windows installs as a service. It must run as Administrator for hardware sensors (including GPU).
