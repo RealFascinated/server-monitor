@@ -1,5 +1,6 @@
 import { useId, useMemo } from "react"
 
+import { SimpleTooltip } from "@/components/simple-tooltip"
 import { formatPercent } from "@/lib/formatter"
 import { sparklineStats } from "@/lib/metrics/sparkline"
 import type { SparklineValues } from "@/lib/metrics/sparkline"
@@ -105,33 +106,36 @@ function Sparkline({
   const description = `${label}: now ${formatPercent(stats.latest)}, average ${formatPercent(stats.avg)}, peak ${formatPercent(stats.max)}`
 
   return (
-    <svg
-      role="img"
-      aria-label={description}
-      viewBox={`0 0 ${width} ${height}`}
-      width={width}
-      height={height}
-      preserveAspectRatio="none"
-      className={cn("shrink-0 overflow-visible", className)}
-    >
-      <title>{description}</title>
-      <defs>
-        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="currentColor" stopOpacity="0.28" />
-          <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      {paths.area ? <path d={paths.area} fill={`url(#${gradientId})`} /> : null}
-      <path
-        d={paths.line}
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        vectorEffect="non-scaling-stroke"
-      />
-    </svg>
+    <SimpleTooltip content={description}>
+      <svg
+        role="img"
+        aria-label={description}
+        viewBox={`0 0 ${width} ${height}`}
+        width={width}
+        height={height}
+        preserveAspectRatio="none"
+        className={cn("shrink-0 cursor-help overflow-visible", className)}
+      >
+        <defs>
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="currentColor" stopOpacity="0.28" />
+            <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {paths.area ? (
+          <path d={paths.area} fill={`url(#${gradientId})`} />
+        ) : null}
+        <path
+          d={paths.line}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+    </SimpleTooltip>
   )
 }
 

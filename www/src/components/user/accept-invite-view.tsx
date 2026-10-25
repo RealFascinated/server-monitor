@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 
 import { Callout } from "@/components/callout"
 import { QueryStatusShell } from "@/components/query-status-shell"
+import { SimpleTooltip } from "@/components/simple-tooltip"
 import { Spinner } from "@/components/spinner"
 import { Button } from "@/components/ui/button"
 import { useAcceptServerInvite } from "@/hooks/use-accept-server-invite"
@@ -53,9 +54,11 @@ function AcceptInviteView({ token }: AcceptInviteViewProps) {
                   {preview.invitedByEmail}
                 </span>{" "}
                 invited you to join as a{" "}
-                <span title={SERVER_ROLE_TOOLTIPS[preview.role]}>
-                  {formatServerRole(preview.role)}
-                </span>
+                <SimpleTooltip content={SERVER_ROLE_TOOLTIPS[preview.role]}>
+                  <span className="tooltip-hint">
+                    {formatServerRole(preview.role)}
+                  </span>
+                </SimpleTooltip>
                 .
               </p>
               <p className="text-sm text-muted-foreground">
