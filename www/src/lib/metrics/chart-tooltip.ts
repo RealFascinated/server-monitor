@@ -7,8 +7,6 @@ import type { TooltipSortEntry } from "@/lib/metrics/chart-config"
 const TOOLTIP_PADDING = 8
 const TOOLTIP_OFFSET_X = 20
 const VIEWPORT_PADDING = 8
-const TOOLTIP_MAX_WIDTH = 320
-const TOOLTIP_COLUMN_WIDTH = 132
 const MOBILE_BREAKPOINT = 768
 const HIDDEN_CURSOR_POS = -10
 
@@ -25,7 +23,7 @@ function getViewportBounds() {
     right: offsetLeft + width - VIEWPORT_PADDING,
     bottom: offsetTop + height - VIEWPORT_PADDING,
     width,
-    maxWidth: Math.min(TOOLTIP_MAX_WIDTH, width - VIEWPORT_PADDING * 2),
+    maxWidth: width - VIEWPORT_PADDING * 2,
   }
 }
 
@@ -174,8 +172,8 @@ function renderTooltipRow(
   return (
     `<div class="flex items-center gap-2 py-0.5">` +
     `<span class="size-2 shrink-0 rounded-full" style="background:${entry.color}"></span>` +
-    `<span class="truncate text-muted-foreground dark:text-muted-foreground">${entry.label}</span>` +
-    `<span class="ml-auto pl-3 font-medium whitespace-nowrap tabular-nums">${formatted}</span>` +
+    `<span class="whitespace-nowrap text-muted-foreground dark:text-muted-foreground">${entry.label}</span>` +
+    `<span class="ml-auto shrink-0 pl-3 font-medium whitespace-nowrap tabular-nums">${formatted}</span>` +
     `</div>`
   )
 }
@@ -216,30 +214,13 @@ function renderTooltipBody(
     columns
       .map(
         (column) =>
-          `<div class="min-w-0 shrink-0" style="width:${TOOLTIP_COLUMN_WIDTH}px">` +
+          `<div class="shrink-0">` +
           column.map((entry) => renderTooltipRow(entry, formatValue)).join("") +
           `</div>`
       )
       .join("") +
     `</div>`
   )
-}
-
-function getTooltipMaxWidth(
-  viewport: ReturnType<typeof getViewportBounds>,
-  tooltipColumnSize?: number,
-  entryCount = 0
-): number {
-  if (tooltipColumnSize == null || entryCount <= tooltipColumnSize) {
-    return viewport.maxWidth
-  }
-
-  const columnCount = Math.ceil(entryCount / tooltipColumnSize)
-  const desiredWidth =
-    columnCount * TOOLTIP_COLUMN_WIDTH + Math.max(0, columnCount - 1) * 16 + 20
-  const availableWidth = viewport.width - VIEWPORT_PADDING * 2
-
-  return Math.min(availableWidth, desiredWidth)
 }
 
 type CreateCursorTooltipHandlerParams = {
@@ -266,11 +247,8 @@ export function createCursorTooltipHandler({
   tooltipSort,
 }: CreateCursorTooltipHandlerParams) {
   const isDark = theme === "dark"
-  const useColumnLayout =
-    tooltipColumnSize != null && labels.length > tooltipColumnSize
   tooltip.className = [
     "pointer-events-none fixed z-50 rounded-sm border px-2.5 py-2 text-xs shadow-md",
-    useColumnLayout ? "" : "max-w-xs",
     isDark
       ? "border-border bg-popover text-popover-foreground"
       : "border-border bg-card text-foreground",
@@ -365,7 +343,7 @@ export function createCursorTooltipHandler({
     tooltip.style.display = "block"
     tooltip.style.transform = "none"
     tooltip.style.maxHeight = ""
-    tooltip.style.maxWidth = `${getTooltipMaxWidth(viewport, tooltipColumnSize, labels.length)}px`
+    tooltip.style.maxWidth = `${viewport.maxWidth}px`
 
     tooltip.style.left = "0"
     tooltip.style.top = "0"
@@ -391,7 +369,7 @@ export function createChartTooltipElement(
   const tooltip = document.createElement("div")
   const isDark = theme === "dark"
   tooltip.className = [
-    "pointer-events-none fixed z-50 max-w-xs rounded-sm border px-2.5 py-2 text-xs shadow-md",
+    "pointer-events-none fixed z-50 rounded-sm border px-2.5 py-2 text-xs shadow-md",
     isDark
       ? "border-border bg-popover text-popover-foreground"
       : "border-border bg-card text-foreground",
