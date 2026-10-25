@@ -34,10 +34,6 @@ public class AlertRuleRow {
     private Long groupId;
 
     @Nullable
-    @Column(name = "destination_id")
-    private Long destinationId;
-
-    @Nullable
     @Column(name = "name")
     private String name;
 

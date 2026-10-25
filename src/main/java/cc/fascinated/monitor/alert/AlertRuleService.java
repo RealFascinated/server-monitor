@@ -6,11 +6,9 @@ import cc.fascinated.monitor.exception.impl.ConflictException;
 import cc.fascinated.monitor.exception.impl.NotFoundException;
 import cc.fascinated.monitor.model.dto.request.alert.AlertRuleRequest;
 import cc.fascinated.monitor.model.dto.response.alert.AlertRuleResponse;
-import cc.fascinated.monitor.model.persistance.AlertDestinationRow;
 import cc.fascinated.monitor.model.persistance.AlertRuleRow;
 import cc.fascinated.monitor.model.persistance.AlertGroupRow;
 import cc.fascinated.monitor.model.persistance.UserRow;
-import cc.fascinated.monitor.repository.AlertDestinationRepository;
 import cc.fascinated.monitor.repository.AlertRuleEventStat;
 import cc.fascinated.monitor.repository.AlertEventRepository;
 import cc.fascinated.monitor.repository.AlertRuleRepository;
@@ -34,19 +32,17 @@ public class AlertRuleService {
     private static final int MAX_REPEAT_SECONDS = 30 * 24 * 3600;
 
     private final AlertRuleRepository ruleRepository;
-    private final AlertDestinationRepository destinationRepository;
     private final AlertEventRepository eventRepository;
     private final AlertGroupRepository groupRepository;
     private final AlertRuleValidator validator;
     private final AlertStateService stateService;
     private final MonitorAlertProperties properties;
 
-    public AlertRuleService(AlertRuleRepository ruleRepository, AlertDestinationRepository destinationRepository,
+    public AlertRuleService(AlertRuleRepository ruleRepository,
                             AlertEventRepository eventRepository, AlertGroupRepository groupRepository,
                             AlertRuleValidator validator, AlertStateService stateService,
                             MonitorAlertProperties properties) {
         this.ruleRepository = ruleRepository;
-        this.destinationRepository = destinationRepository;
         this.eventRepository = eventRepository;
         this.groupRepository = groupRepository;
         this.validator = validator;
@@ -124,15 +120,11 @@ public class AlertRuleService {
     private void apply(UserRow user, AlertRuleRow row, AlertRuleRequest request) {
         AlertRuleValidator.Definition definition = this.validator.validate(request.metric(), request.labelFilter(),
                 request.operator(), request.threshold(), request.recoveryThreshold(), request.windowSeconds());
-        Long destinationId = request.destinationId() == null ? null : this.destinationRepository
-                .findByIdAndUserId(request.destinationId(), user.getId())
-                .orElseThrow(() -> new BadRequestException("Choose one of your own alert destinations")).getId();
         Integer repeat = request.repeatIntervalSeconds();
         if (repeat != null && (repeat < MIN_REPEAT_SECONDS || repeat > MAX_REPEAT_SECONDS)) {
             throw new BadRequestException("Repeat interval must be between %d seconds and 30 days".formatted(MIN_REPEAT_SECONDS));
         }
         String name = request.name() == null || request.name().isBlank() ? null : request.name().trim();
-        row.setDestinationId(destinationId);
         row.setName(name);
         row.setMetric(definition.metric());
         row.setLabelFilter(definition.labelFilter());
@@ -176,17 +168,11 @@ public class AlertRuleService {
         for (AlertGroupRow group : this.groupRepository.findAllById(groupIds)) {
             groupNames.put(group.getId(), group.getName());
         }
-        Set<Long> destinationIds = rows.stream().map(AlertRuleRow::getDestinationId).filter(Objects::nonNull).collect(Collectors.toSet());
-        Map<Long, String> destinationNames = new HashMap<>();
-        for (AlertDestinationRow destination : this.destinationRepository.findAllById(destinationIds)) {
-            destinationNames.put(destination.getId(), destination.getName());
-        }
         Map<Long, AlertRuleEventStat> stats = new HashMap<>();
         for (AlertRuleEventStat stat : this.eventRepository.statsByRuleIds(rows.stream().map(AlertRuleRow::getId).toList())) {
             stats.put(stat.ruleId(), stat);
         }
         return rows.stream().map(row -> AlertRuleResponse.from(row, groupNames.get(row.getGroupId()),
-                row.getDestinationId() == null ? null : destinationNames.get(row.getDestinationId()),
                 stats.get(row.getId()))).toList();
     }
 }

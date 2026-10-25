@@ -16,9 +16,10 @@ import cc.fascinated.monitor.model.dto.request.alert.AlertDestinationRequest;
 import cc.fascinated.monitor.model.dto.request.alert.AlertDestinationUpdateRequest;
 import cc.fascinated.monitor.model.dto.response.alert.AlertDestinationResponse;
 import cc.fascinated.monitor.model.persistance.AlertDestinationRow;
+import cc.fascinated.monitor.model.persistance.AlertGroupRow;
 import cc.fascinated.monitor.model.persistance.UserRow;
 import cc.fascinated.monitor.repository.AlertDestinationRepository;
-import cc.fascinated.monitor.repository.AlertRuleRepository;
+import cc.fascinated.monitor.repository.AlertGroupRepository;
 import cc.fascinated.monitor.service.EncryptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,19 +31,19 @@ import java.util.Map;
 @Service
 public class AlertDestinationService {
     private final AlertDestinationRepository destinationRepository;
-    private final AlertRuleRepository ruleRepository;
+    private final AlertGroupRepository groupRepository;
     private final EncryptionService encryptionService;
     private final MonitorAlertProperties properties;
     private final MonitorProperties monitorProperties;
     private final AlertDispatcher dispatcher;
     private final AlertStateService stateService;
 
-    public AlertDestinationService(AlertDestinationRepository destinationRepository, AlertRuleRepository ruleRepository,
+    public AlertDestinationService(AlertDestinationRepository destinationRepository, AlertGroupRepository groupRepository,
                                    EncryptionService encryptionService, MonitorAlertProperties properties,
                                    MonitorProperties monitorProperties, AlertDispatcher dispatcher,
                                    AlertStateService stateService) {
         this.destinationRepository = destinationRepository;
-        this.ruleRepository = ruleRepository;
+        this.groupRepository = groupRepository;
         this.encryptionService = encryptionService;
         this.properties = properties;
         this.monitorProperties = monitorProperties;
@@ -65,7 +66,7 @@ public class AlertDestinationService {
                 this.encryptionService.encrypt(config), Instant.now());
         boolean first = this.destinationRepository.countByUserId(user.getId()) == 0;
         AlertDestinationRow saved = this.destinationRepository.save(row);
-        if (first && this.ruleRepository.attachDestination(user.getId(), saved.getId()) > 0) {
+        if (first && this.groupRepository.attachDestination(user.getId(), saved.getId()) > 0) {
             this.stateService.invalidateAll();
         }
         return toResponse(saved);
@@ -89,12 +90,12 @@ public class AlertDestinationService {
     @Transactional
     public void delete(UserRow user, long id, boolean force) {
         AlertDestinationRow row = require(user, id);
-        List<Long> ruleIds = this.ruleRepository.findIdsByDestinationId(id);
-        if (!ruleIds.isEmpty() && !force) {
-            throw new ConflictException("This destination is used by %d alert rule(s). Deleting it deletes them too."
-                    .formatted(ruleIds.size()));
+        List<AlertGroupRow> groups = this.groupRepository.findByDestinationId(id);
+        if (!groups.isEmpty() && !force) {
+            throw new ConflictException("This destination is used by %d alert group(s). Deleting it stops them notifying anyone."
+                    .formatted(groups.size()));
         }
-        this.stateService.retire(ruleIds);
+        groups.forEach(group -> group.setDestinationId(null));
         this.destinationRepository.delete(row);
         this.stateService.invalidateAll();
     }
@@ -127,6 +128,6 @@ public class AlertDestinationService {
 
     private AlertDestinationResponse toResponse(AlertDestinationRow row) {
         String masked = row.getType().mask(this.encryptionService.decrypt(row.getConfigEncrypted()));
-        return AlertDestinationResponse.from(row, masked, this.ruleRepository.countByDestinationId(row.getId()));
+        return AlertDestinationResponse.from(row, masked, this.groupRepository.countByDestinationId(row.getId()));
     }
 }

@@ -12,7 +12,6 @@ import java.util.Map;
 public record AlertRuleRequest(
         @NotNull(message = "Group is required")
         Long groupId,
-        @Nullable Long destinationId,
         @Nullable
         @Size(max = 100, message = "Name must be at most 100 characters")
         String name,

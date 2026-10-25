@@ -12,5 +12,8 @@ public record AlertGroupUpdateRequest(
         String name,
         @Nullable Boolean autoAddServers,
         @Nullable Boolean enabled,
+        @Nullable Long destinationId,
+        /** Stops the group notifying anyone; {@code destinationId} cannot express "none" because null means unchanged. */
+        @Nullable Boolean clearDestination,
         @Nullable List<Long> serverIds
 ) {}

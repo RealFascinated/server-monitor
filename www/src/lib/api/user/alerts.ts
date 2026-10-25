@@ -23,7 +23,8 @@ export type AlertDestination = {
   name: string
   type: AlertDestinationType
   maskedUrl: string
-  ruleCount: number
+  /** How many alert groups notify this destination. */
+  groupCount: number
 }
 
 export type AlertDestinationRequest = {
@@ -49,6 +50,9 @@ export type AlertGroup = {
   enabled: boolean
   /** The group every account starts with; it can't be deleted. */
   defaultGroup: boolean
+  /** Where every alert in this group is sent; none means nobody is notified. */
+  destinationId?: number | null
+  destinationName?: string | null
   servers: AlertGroupServer[]
   ruleCount: number
   firingCount: number
@@ -60,6 +64,7 @@ export type AlertGroupRequest = {
   autoAddServers?: boolean
   /** Seeds a new group with the default alerts; ignored when editing. */
   addDefaultRules?: boolean
+  destinationId?: number | null
   serverIds?: number[]
 }
 
@@ -67,6 +72,9 @@ export type AlertGroupUpdateRequest = {
   name?: string
   autoAddServers?: boolean
   enabled?: boolean
+  destinationId?: number | null
+  /** A null destinationId means "unchanged", so removing it needs this. */
+  clearDestination?: boolean
   /** Replaces the whole server list. */
   serverIds?: number[]
 }
@@ -75,8 +83,6 @@ export type AlertRule = {
   id: number
   groupId: number
   groupName: string
-  destinationId?: number | null
-  destinationName?: string | null
   name?: string | null
   metric: string
   metricLabel: string
@@ -97,7 +103,6 @@ export type AlertRule = {
 
 export type AlertRuleRequest = {
   groupId: number
-  destinationId?: number | null
   name?: string | null
   metric: string
   labelFilter?: Record<string, string>

@@ -9,6 +9,7 @@ import { FolderKanban, Pencil, Trash2 } from "lucide-react"
 import { useMemo } from "react"
 
 import { AlertOverviewCards } from "@/components/alerts/alert-overview-cards"
+import { GroupDestination } from "@/components/alerts/group-destination"
 import { GroupDialog } from "@/components/alerts/group-dialog"
 import { GroupEnabledToggle } from "@/components/alerts/group-enabled-toggle"
 import { Callout } from "@/components/callout"
@@ -144,6 +145,11 @@ function GroupsTable({ groups }: { groups: AlertGroup[] }) {
         id: "servers",
         header: "Servers",
         cell: ({ row }) => <ServerChips group={row.original} />,
+      },
+      {
+        id: "notifies",
+        header: "Notifies",
+        cell: ({ row }) => <GroupDestination group={row.original} />,
       },
       {
         id: "alerts",

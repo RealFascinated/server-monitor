@@ -16,8 +16,6 @@ public record AlertRuleResponse(
         long id,
         long groupId,
         String groupName,
-        @Nullable Long destinationId,
-        @Nullable String destinationName,
         @Nullable String name,
         String metric,
         String metricLabel,
@@ -36,10 +34,9 @@ public record AlertRuleResponse(
         @Nullable Instant lastFiredAt
 ) {
 
-    public static AlertRuleResponse from(AlertRuleRow row, String groupName, @Nullable String destinationName,
-                                         @Nullable AlertRuleEventStat stat) {
+    public static AlertRuleResponse from(AlertRuleRow row, String groupName, @Nullable AlertRuleEventStat stat) {
         AlertInfo info = VmMetricCatalog.alertInfoOf(row.getMetric());
-        return new AlertRuleResponse(row.getId(), row.getGroupId(), groupName, row.getDestinationId(), destinationName,
+        return new AlertRuleResponse(row.getId(), row.getGroupId(), groupName,
                 row.getName(), row.getMetric(), info.label(), info.unit(), row.getLabelFilter(), row.getOperator(),
                 row.getThreshold(), row.getRecoveryThreshold(), row.getWindowSeconds(), row.getSeverity(),
                 row.getRepeatIntervalSeconds(), row.isEnabled(), row.getCreatedAt(),

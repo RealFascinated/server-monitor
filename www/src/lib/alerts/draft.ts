@@ -26,7 +26,6 @@ export type AlertDraft = {
   windowSeconds: number
   severity: AlertSeverity
   repeatIntervalSeconds: number
-  destinationId: number | null
   enabled: boolean
 }
 
@@ -44,7 +43,6 @@ export const EMPTY_DRAFT: AlertDraft = {
   windowSeconds: 0,
   severity: "WARNING",
   repeatIntervalSeconds: 0,
-  destinationId: null,
   enabled: true,
 }
 
@@ -92,7 +90,6 @@ export function ruleToDraft(
     windowSeconds: rule.windowSeconds,
     severity: rule.severity,
     repeatIntervalSeconds: rule.repeatIntervalSeconds ?? 0,
-    destinationId: rule.destinationId ?? null,
     enabled: rule.enabled,
   }
 }
@@ -157,7 +154,6 @@ export function draftToRequest(
 
   return {
     groupId,
-    destinationId: draft.destinationId,
     name: draft.name.trim() === "" ? null : draft.name.trim(),
     metric: draft.metric,
     labelFilter: draft.labelFilter,
@@ -179,7 +175,6 @@ export function draftToRequest(
 export function ruleToCopyRequest(rule: AlertRule): AlertRuleRequest {
   return {
     groupId: rule.groupId,
-    destinationId: rule.destinationId ?? null,
     name: `${rule.name || rule.metricLabel} (copy)`.slice(0, 64),
     metric: rule.metric,
     labelFilter: rule.labelFilter,

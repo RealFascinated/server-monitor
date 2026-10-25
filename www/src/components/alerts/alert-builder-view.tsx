@@ -4,10 +4,7 @@ import { AlertBuilder } from "@/components/alerts/alert-builder"
 import { QueryStatusShell } from "@/components/query-status-shell"
 import { useAlertGroup } from "@/hooks/use-alert-groups"
 import { useAlertRule } from "@/hooks/use-alert-rules"
-import {
-  alertDestinationsQueryOptions,
-  alertMetricsQueryOptions,
-} from "@/lib/api/user/alerts.queries"
+import { alertMetricsQueryOptions } from "@/lib/api/user/alerts.queries"
 
 /** Loads everything the form starts from, so its initial state is complete when it mounts. */
 function AlertBuilderView({
@@ -22,22 +19,13 @@ function AlertBuilderView({
   const group = useAlertGroup(groupId)
   const rule = useAlertRule(ruleId ?? 0)
   const metrics = useQuery(alertMetricsQueryOptions())
-  const destinations = useQuery(alertDestinationsQueryOptions())
   const editing = ruleId != null
 
   return (
     <QueryStatusShell
-      error={
-        group.error ??
-        metrics.error ??
-        destinations.error ??
-        (editing ? rule.error : null)
-      }
+      error={group.error ?? metrics.error ?? (editing ? rule.error : null)}
       isPending={
-        group.isPending ||
-        metrics.isPending ||
-        destinations.isPending ||
-        (editing && rule.isPending)
+        group.isPending || metrics.isPending || (editing && rule.isPending)
       }
       loadingMessage="Loading…"
       fallbackMessage="Could not load this alert."
@@ -49,7 +37,6 @@ function AlertBuilderView({
           metrics={metrics.data}
           rule={editing ? rule.data : undefined}
           initialMetric={initialMetric}
-          defaultDestinationId={destinations.data?.[0]?.id}
         />
       ) : null}
     </QueryStatusShell>

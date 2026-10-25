@@ -20,7 +20,8 @@ public record RuleSnapshot(
         @Nullable Long destinationId
 ) {
 
-    public static RuleSnapshot from(AlertRuleRow row) {
+    /** {@code destinationId} is the destination of the rule's group. */
+    public static RuleSnapshot from(AlertRuleRow row, @Nullable Long destinationId) {
         return new RuleSnapshot(
                 row.getId(),
                 row.getUserId(),
@@ -30,7 +31,7 @@ public record RuleSnapshot(
                 new RuleSpec(row.getOperator(), row.getThreshold(), row.getRecoveryThreshold(), row.getWindowSeconds()),
                 row.getSeverity(),
                 row.getRepeatIntervalSeconds(),
-                row.getDestinationId()
+                destinationId
         );
     }
 

@@ -1,11 +1,10 @@
 import { useQuery } from "@tanstack/react-query"
 import { Link, useNavigate } from "@tanstack/react-router"
-import { ChevronDown, Send } from "lucide-react"
+import { ChevronDown } from "lucide-react"
 import { useMemo, useState } from "react"
 
 import { AlertPreviewChart } from "@/components/alerts/alert-preview-chart"
 import { ChoiceChips } from "@/components/alerts/choice-chips"
-import { DestinationDialog } from "@/components/alerts/destination-dialog"
 import { MetricPicker } from "@/components/alerts/metric-picker"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { CollapsiblePanel } from "@/components/collapsible-panel"
@@ -22,10 +21,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { SettingsToggle } from "@/components/ui/settings-toggle"
-import {
-  useAlertDestinations,
-  useTestAlertDestination,
-} from "@/hooks/use-alert-destinations"
 import { useCreateAlertRule, useUpdateAlertRule } from "@/hooks/use-alert-rules"
 import { useTemperatureUnit } from "@/hooks/use-temperature-unit"
 import {
@@ -57,7 +52,6 @@ import type {
 import { alertSeriesQueryOptions } from "@/lib/api/user/alerts.queries"
 
 const ANY = "__any__"
-const NO_DESTINATION = "__none__"
 
 const OPERATOR_OPTIONS = (Object.keys(OPERATOR_LABELS) as AlertOperator[]).map(
   (operator) => ({ value: operator, label: `Is ${OPERATOR_LABELS[operator]}` })
@@ -224,8 +218,6 @@ type AlertBuilderProps = {
   rule?: AlertRule
   /** Preselects a metric when creating, e.g. from a template. */
   initialMetric?: string
-  /** Destination a new alert notifies until the user picks another. */
-  defaultDestinationId?: number
 }
 
 function AlertBuilder({
@@ -233,20 +225,18 @@ function AlertBuilder({
   metrics,
   rule,
   initialMetric,
-  defaultDestinationId,
 }: AlertBuilderProps) {
   const navigate = useNavigate()
   const { temperatureUnit } = useTemperatureUnit()
-  const destinations = useAlertDestinations()
   const create = useCreateAlertRule()
   const update = useUpdateAlertRule()
-  const testDestination = useTestAlertDestination()
 
   const [draft, setDraft] = useState<AlertDraft>(() => {
     if (rule) return ruleToDraft(rule, temperatureUnit)
     const preset = metrics.find((metric) => metric.metric === initialMetric)
-    const base = { ...EMPTY_DRAFT, destinationId: defaultDestinationId ?? null }
-    return preset ? draftForMetric(base, preset, temperatureUnit) : base
+    return preset
+      ? draftForMetric(EMPTY_DRAFT, preset, temperatureUnit)
+      : EMPTY_DRAFT
   })
   const [showErrors, setShowErrors] = useState(false)
   const [advancedOpen, setAdvancedOpen] = useState(
@@ -265,7 +255,6 @@ function AlertBuilder({
   const isState = isStateMetric(unit)
   const errors = validateDraft(draft, unit, temperatureUnit)
   const pending = create.isPending || update.isPending
-  const hasDestinations = (destinations.data?.length ?? 0) > 0
 
   function patch(next: Partial<AlertDraft>) {
     setDraft((current) => ({ ...current, ...next }))
@@ -307,9 +296,6 @@ function AlertBuilder({
       : null
 
   const suffix = unit ? alertInputSuffix(unit, temperatureUnit) : ""
-  const selectedDestination = destinations.data?.find(
-    (destination) => destination.id === draft.destinationId
-  )
   const condition =
     metric && storedThreshold != null && unit
       ? describeCondition(
@@ -504,66 +490,9 @@ function AlertBuilder({
 
           <Step
             number={3}
-            title="Who to tell"
-            description="Where this alert is sent when it fires and when it recovers."
+            title="Name it"
+            description="Alerts are sent to the destination chosen on the group."
           >
-            <div className="flex flex-wrap items-end gap-2">
-              <div className="flex min-w-48 flex-1 flex-col gap-2">
-                <Label>Destination</Label>
-                <Select
-                  value={
-                    draft.destinationId == null
-                      ? NO_DESTINATION
-                      : String(draft.destinationId)
-                  }
-                  onValueChange={(value) =>
-                    patch({
-                      destinationId:
-                        value === NO_DESTINATION ? null : Number(value),
-                    })
-                  }
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={NO_DESTINATION}>
-                      Nobody, record history only
-                    </SelectItem>
-                    {destinations.data?.map((destination) => (
-                      <SelectItem
-                        key={destination.id}
-                        value={String(destination.id)}
-                      >
-                        {destination.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={!selectedDestination || testDestination.isPending}
-                onClick={() =>
-                  selectedDestination &&
-                  testDestination.mutate(selectedDestination.id)
-                }
-              >
-                {testDestination.isPending ? <Spinner /> : <Send />}
-                Send test
-              </Button>
-              <DestinationDialog
-                onCreated={(created) => patch({ destinationId: created.id })}
-                trigger={
-                  <Button type="button" variant="outline" size="sm">
-                    {hasDestinations ? "New destination" : "Add a destination"}
-                  </Button>
-                }
-              />
-            </div>
-
             <Field
               label="Name (optional)"
               htmlFor="alert-name"
@@ -620,9 +549,9 @@ function AlertBuilder({
             )}
             <ul className="flex flex-col gap-1 text-xs text-muted-foreground">
               <li>
-                {selectedDestination
-                  ? `Notifies ${selectedDestination.name}.`
-                  : "Notifies nobody. It still shows in history."}
+                {group.destinationName
+                  ? `Notifies ${group.destinationName}, set on the group.`
+                  : `${group.name} has no destination, so this only shows in history.`}
               </li>
               {!isState && draft.windowSeconds > 0 ? (
                 <li>

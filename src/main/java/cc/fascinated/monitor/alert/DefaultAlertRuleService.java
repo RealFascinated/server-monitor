@@ -9,7 +9,6 @@ import cc.fascinated.monitor.repository.AlertGroupRepository;
 import cc.fascinated.monitor.repository.AlertRuleRepository;
 import cc.fascinated.monitor.repository.ServerMemberRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -72,7 +71,7 @@ public class DefaultAlertRuleService {
         AlertGroupRow row = AlertGroupRow.defaultGroup(userId, DEFAULT_GROUP_NAME, now);
         row.getServerIds().addAll(serverIds);
         AlertGroupRow group = this.groupRepository.save(row);
-        addTo(userId, group.getId(), null);
+        addTo(userId, group.getId());
     }
 
     /** How many rules {@link #addTo} creates, so callers can enforce the per-user rule cap first. */
@@ -80,11 +79,11 @@ public class DefaultAlertRuleService {
         return defaultSeries().size();
     }
 
-    /** Adds the default rules to an existing group, notifying {@code destinationId} when given. */
-    public void addTo(long userId, long groupId, @Nullable Long destinationId) {
+    /** Adds the default rules to an existing group. */
+    public void addTo(long userId, long groupId) {
         Instant now = Instant.now();
         this.ruleRepository.saveAll(defaultSeries().stream()
-                .map(series -> toRule(userId, groupId, destinationId, series, now))
+                .map(series -> toRule(userId, groupId, series, now))
                 .toList());
     }
 
@@ -95,12 +94,10 @@ public class DefaultAlertRuleService {
                 .toList();
     }
 
-    private static AlertRuleRow toRule(long userId, long groupId, @Nullable Long destinationId, VmGaugeSeries series,
-                                       Instant now) {
+    private static AlertRuleRow toRule(long userId, long groupId, VmGaugeSeries series, Instant now) {
         AlertInfo info = series.alertInfo();
         AlertInfo.DefaultRule defaults = info.defaultRule();
         AlertRuleRow row = new AlertRuleRow(userId, groupId, now);
-        row.setDestinationId(destinationId);
         row.setName(info.label());
         row.setMetric(series.metricName());
         row.setLabelFilter(Map.of());

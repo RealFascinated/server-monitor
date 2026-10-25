@@ -121,7 +121,6 @@ describe("ruleToDraft", () => {
       id: 1,
       groupId: 7,
       groupName: "Prod",
-      destinationId: 3,
       name: "High CPU",
       metric: cpu.metric,
       metricLabel: cpu.label,
@@ -148,7 +147,6 @@ describe("ruleToDraft", () => {
 
     expect(request).toMatchObject({
       groupId: 7,
-      destinationId: 3,
       name: "High CPU",
       threshold: 90,
       recoveryThreshold: 80,
@@ -165,7 +163,6 @@ describe("ruleToCopyRequest", () => {
       id: 1,
       groupId: 7,
       groupName: "Prod",
-      destinationId: 3,
       name: "High CPU",
       metric: cpu.metric,
       metricLabel: cpu.label,
@@ -185,7 +182,6 @@ describe("ruleToCopyRequest", () => {
 
     expect(copy).toMatchObject({
       groupId: 7,
-      destinationId: 3,
       name: "High CPU (copy)",
       labelFilter: { disk: "/" },
       threshold: 90,

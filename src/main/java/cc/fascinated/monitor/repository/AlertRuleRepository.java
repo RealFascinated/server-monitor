@@ -2,7 +2,6 @@ package cc.fascinated.monitor.repository;
 
 import cc.fascinated.monitor.model.persistance.AlertRuleRow;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -24,10 +23,6 @@ public interface AlertRuleRepository extends JpaRepository<AlertRuleRow, Long> {
 
     long countByUserId(long userId);
 
-    long countByDestinationId(long destinationId);
-
-    List<AlertRuleRow> findByDestinationId(long destinationId);
-
     /** Rules a server inherits from the enabled groups it is in, for owners who still have access to it. */
     @Query("""
             SELECT r FROM AlertRuleRow r
@@ -38,13 +33,6 @@ public interface AlertRuleRepository extends JpaRepository<AlertRuleRow, Long> {
 
     @Query("SELECT r.id FROM AlertRuleRow r WHERE r.groupId IN :groupIds")
     List<Long> findIdsByGroupIds(@Param("groupIds") Collection<Long> groupIds);
-
-    @Query("SELECT r.id FROM AlertRuleRow r WHERE r.destinationId = :destinationId")
-    List<Long> findIdsByDestinationId(@Param("destinationId") long destinationId);
-
-    @Modifying(flushAutomatically = true, clearAutomatically = true)
-    @Query("UPDATE AlertRuleRow r SET r.destinationId = :destinationId WHERE r.userId = :userId AND r.destinationId IS NULL")
-    int attachDestination(@Param("userId") long userId, @Param("destinationId") long destinationId);
 
     @Query("SELECT r FROM AlertRuleRow r WHERE r.id IN :ids")
     List<AlertRuleRow> findAllByIds(@Param("ids") Collection<Long> ids);

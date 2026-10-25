@@ -70,8 +70,12 @@ class AlertIntegrationTest extends IntegrationTestBase {
     }
 
     private long createDestination() throws Exception {
+        return createDestinationFor(this.token);
+    }
+
+    private long createDestinationFor(String bearer) throws Exception {
         String body = this.mockMvc.perform(post("/v1/alerts/destinations")
-                        .header("Authorization", TestAuthSupport.bearer(this.token))
+                        .header("Authorization", TestAuthSupport.bearer(bearer))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"name":"ops","type":"DISCORD_WEBHOOK","config":"%s"}
@@ -129,15 +133,24 @@ class AlertIntegrationTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.enabled").value(enabled));
     }
 
-    private long createRule(String bearer, long groupId, Long destinationId, String metric, String filter,
+    private void setGroupDestination(long groupId, long destinationId) throws Exception {
+        this.mockMvc.perform(patch("/v1/alerts/groups/{id}", groupId)
+                        .header("Authorization", TestAuthSupport.bearer(this.token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"destinationId\":%d}".formatted(destinationId)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.destinationId").value(destinationId));
+    }
+
+    private long createRule(String bearer, long groupId, String metric, String filter,
                             String operator, double threshold, boolean enabled) throws Exception {
         String body = this.mockMvc.perform(post("/v1/alerts/rules")
                         .header("Authorization", TestAuthSupport.bearer(bearer))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"groupId":%d,"destinationId":%s,"name":"rule","metric":"%s","labelFilter":%s,
+                                {"groupId":%d,"name":"rule","metric":"%s","labelFilter":%s,
                                  "operator":"%s","threshold":%s,"windowSeconds":0,"severity":"WARNING","enabled":%s}
-                                """.formatted(groupId, destinationId, metric, filter, operator, threshold, enabled)))
+                                """.formatted(groupId, metric, filter, operator, threshold, enabled)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         return this.objectMapper.readTree(body).get("id").asLong();
@@ -181,7 +194,6 @@ class AlertIntegrationTest extends IntegrationTestBase {
         java.util.Set<String> metrics = new java.util.HashSet<>();
         for (JsonNode rule : this.objectMapper.readTree(body)) {
             metrics.add(rule.get("metric").asString());
-            assertThat(rule.get("destinationId") == null || rule.get("destinationId").isNull()).isTrue();
             assertThat(rule.get("groupId").asLong()).isEqualTo(groupId);
         }
         assertThat(metrics).contains(CPU, "monitor_host_mem_usage_pct", "monitor_disk_usage_percent",
@@ -214,16 +226,48 @@ class AlertIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    void firstDestinationIsAttachedToRulesWithoutOne() throws Exception {
+    void firstDestinationIsAttachedToGroupsWithoutOne() throws Exception {
         long destinationId = createDestination();
+        long later = createGroup(this.token, "later", false);
 
-        String body = this.mockMvc.perform(get("/v1/alerts/rules")
+        String body = this.mockMvc.perform(get("/v1/alerts/groups")
                         .header("Authorization", TestAuthSupport.bearer(this.token)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        for (JsonNode rule : this.objectMapper.readTree(body)) {
-            assertThat(rule.get("destinationId").asLong()).isEqualTo(destinationId);
+        for (JsonNode group : this.objectMapper.readTree(body)) {
+            if (group.get("id").asLong() == later) {
+                assertThat(group.has("destinationId")).as("groups created afterwards start without one").isFalse();
+            } else {
+                assertThat(group.get("destinationId").asLong()).isEqualTo(destinationId);
+                assertThat(group.get("destinationName").asString()).isEqualTo("ops");
+            }
         }
+    }
+
+    @Test
+    void groupDestinationCanBeChangedAndCleared() throws Exception {
+        long destination = createDestination();
+        long group = createGroup(this.token, "g", false);
+        setGroupDestination(group, destination);
+
+        this.mockMvc.perform(patch("/v1/alerts/groups/{id}", group)
+                        .header("Authorization", TestAuthSupport.bearer(this.token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"renamed\"}"))
+                .andExpect(jsonPath("$.destinationId").value(destination));
+        this.mockMvc.perform(patch("/v1/alerts/groups/{id}", group)
+                        .header("Authorization", TestAuthSupport.bearer(this.token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"clearDestination\":true}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.destinationId").doesNotExist());
+
+        String other = this.auth.register(TestAuthSupport.uniqueEmail(), PASSWORD).token();
+        this.mockMvc.perform(patch("/v1/alerts/groups/{id}", group)
+                        .header("Authorization", TestAuthSupport.bearer(this.token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"destinationId\":%d}".formatted(createDestinationFor(other))))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -236,7 +280,6 @@ class AlertIntegrationTest extends IntegrationTestBase {
                                 {"groupId":%d,"metric":"%s","operator":"MORE_THAN","threshold":95,"severity":"WARNING"}
                                 """.formatted(group, CPU)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.destinationId").doesNotExist())
                 .andExpect(jsonPath("$.groupName").value("g"));
     }
 
@@ -272,7 +315,8 @@ class AlertIntegrationTest extends IntegrationTestBase {
         var server = this.auth.createServer(this.token, "web-01");
         long destination = createDestination();
         long group = createGroup(this.token, "prod", false, server.serverId());
-        long rule = createRule(this.token, group, destination, CPU, "{}", "MORE_THAN", 90, true);
+        setGroupDestination(group, destination);
+        long rule = createRule(this.token, group, CPU, "{}", "MORE_THAN", 90, true);
 
         ingestCpu(server.ingestToken().toString(), 50);
         assertThat(nextMessage()).isNull();
@@ -338,7 +382,8 @@ class AlertIntegrationTest extends IntegrationTestBase {
         var server = this.auth.createServer(this.token, "toggled");
         long destination = createDestination();
         long group = createGroup(this.token, "switchable", false, server.serverId());
-        long rule = createRule(this.token, group, destination, CPU, "{}", "MORE_THAN", 90, true);
+        setGroupDestination(group, destination);
+        long rule = createRule(this.token, group, CPU, "{}", "MORE_THAN", 90, true);
 
         ingestCpu(server.ingestToken().toString(), 99);
         assertThat(nextMessage()).contains("toggled");
@@ -363,7 +408,8 @@ class AlertIntegrationTest extends IntegrationTestBase {
         var outside = this.auth.createServer(this.token, "gamma");
         long destination = createDestination();
         long group = createGroup(this.token, "pair", false, first.serverId(), second.serverId());
-        createRule(this.token, group, destination, CPU, "{}", "MORE_THAN", 90, true);
+        setGroupDestination(group, destination);
+        createRule(this.token, group, CPU, "{}", "MORE_THAN", 90, true);
 
         ingestCpu(outside.ingestToken().toString(), 99);
         assertThat(this.received.poll(1, TimeUnit.SECONDS)).as("gamma is not in the group").isNull();
@@ -380,7 +426,8 @@ class AlertIntegrationTest extends IntegrationTestBase {
         var server = this.auth.createServer(this.token, "roamer");
         long destination = createDestination();
         long group = createGroup(this.token, "g", false);
-        long rule = createRule(this.token, group, destination, CPU, "{}", "MORE_THAN", 90, true);
+        setGroupDestination(group, destination);
+        long rule = createRule(this.token, group, CPU, "{}", "MORE_THAN", 90, true);
 
         ingestCpu(server.ingestToken().toString(), 99);
         assertThat(this.received.poll(1, TimeUnit.SECONDS)).as("not a member yet").isNull();
@@ -407,7 +454,7 @@ class AlertIntegrationTest extends IntegrationTestBase {
     void deletingAGroupDeletesItsRules() throws Exception {
         var server = this.auth.createServer(this.token, "web");
         long group = createGroup(this.token, "temp", false, server.serverId());
-        long rule = createRule(this.token, group, null, CPU, "{}", "MORE_THAN", 90, true);
+        long rule = createRule(this.token, group, CPU, "{}", "MORE_THAN", 90, true);
 
         this.mockMvc.perform(delete("/v1/alerts/groups/{id}", group)
                         .header("Authorization", TestAuthSupport.bearer(this.token)))
@@ -423,7 +470,8 @@ class AlertIntegrationTest extends IntegrationTestBase {
         var server = this.auth.createServer(this.token, "batch-host");
         long destination = createDestination();
         long group = createGroup(this.token, "g", false, server.serverId());
-        createRule(this.token, group, destination, CPU, "{}", "LESS_THAN", 99, true);
+        setGroupDestination(group, destination);
+        createRule(this.token, group, CPU, "{}", "LESS_THAN", 99, true);
         long now = Instant.now().getEpochSecond();
 
         this.mockMvc.perform(post("/v1/servers/ingest/batch")
@@ -442,7 +490,8 @@ class AlertIntegrationTest extends IntegrationTestBase {
         var server = this.auth.createServer(this.token, "disk-host");
         long destination = createDestination();
         long group = createGroup(this.token, "g", false, server.serverId());
-        createRule(this.token, group, destination, "monitor_disk_usage_percent", "{\"disk\":\"/data\"}",
+        setGroupDestination(group, destination);
+        createRule(this.token, group, "monitor_disk_usage_percent", "{\"disk\":\"/data\"}",
                 "MORE_THAN", 80, true);
 
         String payload = TestFixtures.minimalIngestPayload().replace("\"diskMetrics\": []",
@@ -515,7 +564,8 @@ class AlertIntegrationTest extends IntegrationTestBase {
     void foreignUsersCannotTouchRulesGroupsOrDestinations() throws Exception {
         long destination = createDestination();
         long group = createGroup(this.token, "mine", false);
-        long rule = createRule(this.token, group, destination, CPU, "{}", "MORE_THAN", 90, true);
+        setGroupDestination(group, destination);
+        long rule = createRule(this.token, group, CPU, "{}", "MORE_THAN", 90, true);
         String other = this.auth.register(TestAuthSupport.uniqueEmail(), PASSWORD).token();
 
         this.mockMvc.perform(get("/v1/alerts/rules/{id}", rule)
@@ -531,17 +581,18 @@ class AlertIntegrationTest extends IntegrationTestBase {
                         .header("Authorization", TestAuthSupport.bearer(other))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"groupId":%d,"destinationId":%d,"metric":"%s","operator":"MORE_THAN","threshold":1,"severity":"WARNING"}
-                                """.formatted(group, destination, CPU)))
+                                {"groupId":%d,"metric":"%s","operator":"MORE_THAN","threshold":1,"severity":"WARNING"}
+                                """.formatted(group, CPU)))
                 .andExpect(status().is4xxClientError());
     }
 
     @Test
-    void deletingADestinationInUseNeedsForce() throws Exception {
+    void deletingADestinationInUseNeedsForceAndKeepsTheGroupsAlerts() throws Exception {
         clearDefaultGroup(this.token);
         long destination = createDestination();
         long group = createGroup(this.token, "g", false);
-        createRule(this.token, group, destination, CPU, "{}", "MORE_THAN", 90, true);
+        setGroupDestination(group, destination);
+        createRule(this.token, group, CPU, "{}", "MORE_THAN", 90, true);
 
         this.mockMvc.perform(delete("/v1/alerts/destinations/{id}", destination)
                         .header("Authorization", TestAuthSupport.bearer(this.token)))
@@ -551,21 +602,23 @@ class AlertIntegrationTest extends IntegrationTestBase {
                 .andExpect(status().isOk());
         this.mockMvc.perform(get("/v1/alerts/rules")
                         .header("Authorization", TestAuthSupport.bearer(this.token)))
-                .andExpect(jsonPath("$.length()").value(0));
+                .andExpect(jsonPath("$.length()").value(1));
+        this.mockMvc.perform(get("/v1/alerts/groups/{id}", group)
+                        .header("Authorization", TestAuthSupport.bearer(this.token)))
+                .andExpect(jsonPath("$.destinationId").doesNotExist());
     }
 
     @Test
     void invalidRulesAreRejected() throws Exception {
-        long destination = createDestination();
         long group = createGroup(this.token, "g", false);
         String base = """
-                {"groupId":%d,"destinationId":%d,"metric":"%s","labelFilter":%s,"operator":"MORE_THAN","threshold":%s,
+                {"groupId":%d,"metric":"%s","labelFilter":%s,"operator":"MORE_THAN","threshold":%s,
                  "recoveryThreshold":%s,"windowSeconds":%d,"severity":"WARNING"}
                 """;
-        assertRejected(base.formatted(group, destination, "not_a_metric", "{}", 1, "null", 0));
-        assertRejected(base.formatted(group, destination, CPU, "{\"nope\":\"x\"}", 1, "null", 0));
-        assertRejected(base.formatted(group, destination, CPU, "{}", 90, "95", 0));
-        assertRejected(base.formatted(group, destination, CPU, "{}", 90, "null", 5));
+        assertRejected(base.formatted(group, "not_a_metric", "{}", 1, "null", 0));
+        assertRejected(base.formatted(group, CPU, "{\"nope\":\"x\"}", 1, "null", 0));
+        assertRejected(base.formatted(group, CPU, "{}", 90, "95", 0));
+        assertRejected(base.formatted(group, CPU, "{}", 90, "null", 5));
     }
 
     private void assertRejected(String body) throws Exception {
@@ -582,7 +635,8 @@ class AlertIntegrationTest extends IntegrationTestBase {
         var server = this.auth.createServer(this.token, "flaky");
         long destination = createDestination();
         long group = createGroup(this.token, "g", false, server.serverId());
-        createRule(this.token, group, destination, "monitor_server_up", "{}", "LESS_THAN", 1, true);
+        setGroupDestination(group, destination);
+        createRule(this.token, group, "monitor_server_up", "{}", "LESS_THAN", 1, true);
         ingestCpu(server.ingestToken().toString(), 10);
         assertThat(this.received.poll(1, TimeUnit.SECONDS)).isNull();
 
@@ -594,24 +648,23 @@ class AlertIntegrationTest extends IntegrationTestBase {
 
     @Test
     void rulePatchKeepsItsGroupImmutable() throws Exception {
-        long destination = createDestination();
         long group = createGroup(this.token, "g", false);
         long otherGroup = createGroup(this.token, "other", false);
-        long rule = createRule(this.token, group, destination, CPU, "{}", "MORE_THAN", 90, true);
+        long rule = createRule(this.token, group, CPU, "{}", "MORE_THAN", 90, true);
 
         this.mockMvc.perform(patch("/v1/alerts/rules/{id}", rule)
                         .header("Authorization", TestAuthSupport.bearer(this.token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"groupId":%d,"destinationId":%d,"metric":"%s","operator":"MORE_THAN","threshold":80,"severity":"CRITICAL"}
-                                """.formatted(otherGroup, destination, CPU)))
+                                {"groupId":%d,"metric":"%s","operator":"MORE_THAN","threshold":80,"severity":"CRITICAL"}
+                                """.formatted(otherGroup, CPU)))
                 .andExpect(status().isBadRequest());
         this.mockMvc.perform(patch("/v1/alerts/rules/{id}", rule)
                         .header("Authorization", TestAuthSupport.bearer(this.token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"groupId":%d,"destinationId":%d,"metric":"%s","operator":"MORE_THAN","threshold":80,"severity":"CRITICAL"}
-                                """.formatted(group, destination, CPU)))
+                                {"groupId":%d,"metric":"%s","operator":"MORE_THAN","threshold":80,"severity":"CRITICAL"}
+                                """.formatted(group, CPU)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.threshold").value(80.0))
                 .andExpect(jsonPath("$.severity").value("CRITICAL"));
@@ -635,7 +688,8 @@ class AlertIntegrationTest extends IntegrationTestBase {
         clearDefaultGroup(this.token);
         var server = this.auth.createServer(this.token, "web-01");
         long group = createGroup(this.token, "prod", false, server.serverId());
-        long rule = createRule(this.token, group, createDestination(), CPU, "{}", "MORE_THAN", 90, true);
+        setGroupDestination(group, createDestination());
+        long rule = createRule(this.token, group, CPU, "{}", "MORE_THAN", 90, true);
         String ingest = server.ingestToken().toString();
 
         ingestCpu(ingest, 95);
@@ -672,7 +726,8 @@ class AlertIntegrationTest extends IntegrationTestBase {
         clearDefaultGroup(this.token);
         var server = this.auth.createServer(this.token, "web-01");
         long group = createGroup(this.token, "prod", false, server.serverId());
-        long rule = createRule(this.token, group, createDestination(), CPU, "{}", "MORE_THAN", 90, true);
+        setGroupDestination(group, createDestination());
+        long rule = createRule(this.token, group, CPU, "{}", "MORE_THAN", 90, true);
         String ingest = server.ingestToken().toString();
 
         ingestCpu(ingest, 95);
@@ -692,7 +747,8 @@ class AlertIntegrationTest extends IntegrationTestBase {
         clearDefaultGroup(this.token);
         var server = this.auth.createServer(this.token, "web-01");
         long group = createGroup(this.token, "prod", false, server.serverId());
-        long rule = createRule(this.token, group, createDestination(), CPU, "{}", "MORE_THAN", 90, true);
+        setGroupDestination(group, createDestination());
+        long rule = createRule(this.token, group, CPU, "{}", "MORE_THAN", 90, true);
         String ingest = server.ingestToken().toString();
 
         ingestCpu(ingest, 95);
@@ -713,7 +769,8 @@ class AlertIntegrationTest extends IntegrationTestBase {
         clearDefaultGroup(this.token);
         var server = this.auth.createServer(this.token, "web-01");
         long group = createGroup(this.token, "prod", false, server.serverId());
-        long rule = createRule(this.token, group, createDestination(), CPU, "{}", "MORE_THAN", 90, true);
+        setGroupDestination(group, createDestination());
+        long rule = createRule(this.token, group, CPU, "{}", "MORE_THAN", 90, true);
         String ingest = server.ingestToken().toString();
         String other = this.auth.register(TestAuthSupport.uniqueEmail(), PASSWORD).token();
 
@@ -734,13 +791,13 @@ class AlertIntegrationTest extends IntegrationTestBase {
                 .andExpect(status().isConflict());
     }
 
-    private JsonNode createGroupWithDefaults(String name, boolean addDefaults) throws Exception {
+    private JsonNode createGroupWithDefaults(String name, boolean addDefaults, long destination) throws Exception {
         String body = this.mockMvc.perform(post("/v1/alerts/groups")
                         .header("Authorization", TestAuthSupport.bearer(this.token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"name":"%s","addDefaultRules":%s}
-                                """.formatted(name, addDefaults)))
+                                {"name":"%s","addDefaultRules":%s,"destinationId":%d}
+                                """.formatted(name, addDefaults, destination)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         return this.objectMapper.readTree(body);
@@ -754,17 +811,17 @@ class AlertIntegrationTest extends IntegrationTestBase {
         assertThat(defaults).as("the seeded Default group holds the default rules").isGreaterThan(10);
         long destination = createDestination();
 
-        JsonNode plain = createGroupWithDefaults("plain", false);
-        JsonNode seeded = createGroupWithDefaults("seeded", true);
+        JsonNode plain = createGroupWithDefaults("plain", false, destination);
+        JsonNode seeded = createGroupWithDefaults("seeded", true, destination);
 
         assertThat(plain.get("ruleCount").asInt()).isZero();
         assertThat(seeded.get("ruleCount").asInt()).isEqualTo(defaults);
         assertThat(seeded.get("enabled").asBoolean()).isTrue();
+        assertThat(seeded.get("destinationId").asLong()).isEqualTo(destination);
         this.mockMvc.perform(get("/v1/alerts/rules").param("groupId", seeded.get("id").asText())
                         .header("Authorization", TestAuthSupport.bearer(this.token)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(defaults))
-                .andExpect(jsonPath("$[0].destinationId").value(destination))
                 .andExpect(jsonPath("$[0].enabled").value(true));
     }
 }

@@ -19,6 +19,15 @@ public interface AlertGroupRepository extends JpaRepository<AlertGroupRow, Long>
 
     List<AlertGroupRow> findByUserIdAndAutoAddServersTrue(long userId);
 
+    long countByDestinationId(long destinationId);
+
+    List<AlertGroupRow> findByDestinationId(long destinationId);
+
+    /** Points every group of the user that notifies nobody at the destination. */
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("UPDATE AlertGroupRow g SET g.destinationId = :destinationId WHERE g.userId = :userId AND g.destinationId IS NULL")
+    int attachDestination(@Param("userId") long userId, @Param("destinationId") long destinationId);
+
     /** Users who lack the default group, e.g. accounts that predate alerting. */
     @Query("SELECT u.id FROM UserRow u WHERE NOT EXISTS (SELECT 1 FROM AlertGroupRow g WHERE g.userId = u.id AND g.defaultGroup = true)")
     List<Long> findUserIdsWithoutDefaultGroup();

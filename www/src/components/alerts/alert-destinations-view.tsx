@@ -13,9 +13,9 @@ import {
 } from "@/hooks/use-alert-destinations"
 import type { AlertDestination } from "@/lib/api/user/alerts"
 
-function ruleCountLabel(count: number): string {
-  if (count === 0) return "Not used by any rule"
-  return count === 1 ? "Used by 1 rule" : `Used by ${count} rules`
+function groupCountLabel(count: number): string {
+  if (count === 0) return "Not used by any group"
+  return count === 1 ? "Used by 1 group" : `Used by ${count} groups`
 }
 
 function DestinationRow({ destination }: { destination: AlertDestination }) {
@@ -40,7 +40,7 @@ function DestinationRow({ destination }: { destination: AlertDestination }) {
           {destination.maskedUrl}
         </p>
         <p className="text-xs text-muted-foreground">
-          Discord · {ruleCountLabel(destination.ruleCount)}
+          Discord · {groupCountLabel(destination.groupCount)}
         </p>
       </div>
 
@@ -73,10 +73,10 @@ function DestinationRow({ destination }: { destination: AlertDestination }) {
           }
           title={`Delete ${destination.name}?`}
           description={
-            destination.ruleCount > 0
-              ? `${ruleCountLabel(destination.ruleCount)}. Deleting this destination also deletes ${
-                  destination.ruleCount === 1 ? "that rule" : "those rules"
-                }.`
+            destination.groupCount > 0
+              ? `${groupCountLabel(destination.groupCount)}. Deleting this destination stops ${
+                  destination.groupCount === 1 ? "that group" : "those groups"
+                } notifying anyone. Their alerts are kept.`
               : "Alerts will no longer be sent to this channel."
           }
           confirmLabel="Delete"
@@ -84,7 +84,7 @@ function DestinationRow({ destination }: { destination: AlertDestination }) {
           onConfirm={() =>
             remove.mutateAsync({
               id: destination.id,
-              force: destination.ruleCount > 0,
+              force: destination.groupCount > 0,
             })
           }
         />
@@ -107,8 +107,9 @@ function AlertDestinationsView() {
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground">
-            Where alerts are delivered. Rules without a destination still record
-            history but notify no one.
+            Where alerts are delivered. Each alert group sends all of its alerts
+            to one destination; groups without one still record history but
+            notify no one.
           </p>
           <DestinationDialog />
         </div>
@@ -123,7 +124,7 @@ function AlertDestinationsView() {
           <EmptyState
             icon={Webhook}
             title="No destinations yet"
-            description="Add a Discord webhook to get notified when an alert fires or recovers. The first one you add is attached to your existing rules."
+            description="Add a Discord webhook to get notified when an alert fires or recovers. The first one you add is attached to your existing groups."
             action={<DestinationDialog />}
           />
         )}

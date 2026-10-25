@@ -4,12 +4,11 @@ import {
 } from "@tanstack/react-table/legacy"
 import type { LegacyColumnDef as ColumnDef } from "@tanstack/react-table/legacy"
 import { Link } from "@tanstack/react-router"
-import { Copy, Pencil, Trash2, Webhook } from "lucide-react"
+import { Copy, Pencil, Trash2 } from "lucide-react"
 import { useMemo } from "react"
 
 import { AlertSeverityBadge } from "@/components/alerts/alert-severity-badge"
 import { ConfirmDialog } from "@/components/confirm-dialog"
-import { SimpleTooltip } from "@/components/simple-tooltip"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/data-table"
 import { SettingsToggle } from "@/components/ui/settings-toggle"
@@ -73,23 +72,6 @@ function RuleCondition({ rule }: { rule: AlertRule }) {
         },
         temperatureUnit
       )}
-    </span>
-  )
-}
-
-function RuleDestination({ rule }: { rule: AlertRule }) {
-  if (!rule.destinationName) {
-    return (
-      <SimpleTooltip content="This alert is recorded in history but notifies no one.">
-        <span className="tooltip-hint text-warning">Nobody</span>
-      </SimpleTooltip>
-    )
-  }
-
-  return (
-    <span className="flex items-center gap-1.5">
-      <Webhook aria-hidden className="size-3.5 text-muted-foreground" />
-      <span className="truncate">{rule.destinationName}</span>
     </span>
   )
 }
@@ -198,11 +180,6 @@ function AlertRulesTable({ rules, readOnly = false }: AlertRulesTableProps) {
         id: "condition",
         header: "Condition",
         cell: ({ row }) => <RuleCondition rule={row.original} />,
-      },
-      {
-        id: "notifies",
-        header: "Notifies",
-        cell: ({ row }) => <RuleDestination rule={row.original} />,
       },
       {
         id: "state",

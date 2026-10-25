@@ -5,6 +5,7 @@ import { History, Pencil, Server, Trash2, Zap } from "lucide-react"
 import { AddAlertDialog } from "@/components/alerts/add-alert-dialog"
 import { AlertEventsTable } from "@/components/alerts/alert-events-table"
 import { AlertRulesTable } from "@/components/alerts/alert-rules-table"
+import { GroupDestination } from "@/components/alerts/group-destination"
 import { GroupDialog } from "@/components/alerts/group-dialog"
 import { GroupEnabledToggle } from "@/components/alerts/group-enabled-toggle"
 import { Breadcrumb } from "@/components/breadcrumb"
@@ -99,8 +100,12 @@ function AlertGroupView({ groupId }: { groupId: number }) {
                 <h2 className="flex items-center gap-2 truncate text-xl font-semibold text-foreground">
                   {group.data.name}
                 </h2>
-                <p className="text-sm text-muted-foreground">
+                <p className="flex flex-wrap items-center gap-x-1.5 text-sm text-muted-foreground">
                   Every server in this group inherits every alert below.
+                  <span aria-hidden>·</span>
+                  <span className="inline-flex items-center gap-1.5">
+                    Notifies <GroupDestination group={group.data} />
+                  </span>
                 </p>
               </div>
               <div className="flex items-center gap-2">

@@ -15,7 +15,15 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { SettingsToggle } from "@/components/ui/settings-toggle"
+import { useAlertDestinations } from "@/hooks/use-alert-destinations"
 import {
   useCreateAlertGroup,
   useUpdateAlertGroup,
@@ -30,6 +38,8 @@ type GroupDialogProps = {
   onCreated?: (group: AlertGroup) => void
 }
 
+const NO_DESTINATION = "__none__"
+
 function validateName(name: string): string | null {
   if (name.trim().length === 0) return "Enter a name"
   if (name.trim().length > 64) return "Name must be at most 64 characters"
@@ -42,20 +52,29 @@ function GroupDialog({ group, trigger, onCreated }: GroupDialogProps) {
   const [name, setName] = useState(group?.name ?? "")
   const [autoAdd, setAutoAdd] = useState(group?.autoAddServers ?? false)
   const [addDefaults, setAddDefaults] = useState(false)
+  const [destination, setDestination] = useState(NO_DESTINATION)
   const [serverIds, setServerIds] = useState<Set<number>>(
     () => new Set(group?.servers.map((server) => server.id))
   )
   const [nameError, setNameError] = useState<string | null>(null)
 
   const { data: servers } = useUserServers()
+  const { data: destinations } = useAlertDestinations()
   const create = useCreateAlertGroup()
   const update = useUpdateAlertGroup()
   const pending = create.isPending || update.isPending
+
+  /** New groups start on the first destination, since a group with none notifies nobody. */
+  function initialDestination(): string {
+    const id = group ? group.destinationId : destinations?.[0]?.id
+    return id == null ? NO_DESTINATION : String(id)
+  }
 
   function reset() {
     setName(group?.name ?? "")
     setAutoAdd(group?.autoAddServers ?? false)
     setAddDefaults(false)
+    setDestination(initialDestination())
     setServerIds(new Set(group?.servers.map((server) => server.id)))
     setNameError(null)
   }
@@ -82,6 +101,8 @@ function GroupDialog({ group, trigger, onCreated }: GroupDialogProps) {
     setNameError(error)
     if (error) return
 
+    const destinationId =
+      destination === NO_DESTINATION ? null : Number(destination)
     const request = {
       name: name.trim(),
       autoAddServers: autoAdd,
@@ -90,14 +111,21 @@ function GroupDialog({ group, trigger, onCreated }: GroupDialogProps) {
 
     if (group) {
       update.mutate(
-        { id: group.id, request },
+        {
+          id: group.id,
+          request: {
+            ...request,
+            destinationId,
+            clearDestination: destinationId == null,
+          },
+        },
         { onSuccess: () => setOpen(false) }
       )
       return
     }
 
     create.mutate(
-      { ...request, addDefaultRules: addDefaults },
+      { ...request, destinationId, addDefaultRules: addDefaults },
       {
         onSuccess: (created) => {
           setOpen(false)
@@ -142,6 +170,34 @@ function GroupDialog({ group, trigger, onCreated }: GroupDialogProps) {
                 placeholder="Production"
               />
               <FormFieldError error={nameError ?? undefined} />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="group-destination">Notify</Label>
+              <Select
+                value={destination}
+                onValueChange={setDestination}
+                disabled={pending}
+              >
+                <SelectTrigger id="group-destination" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={NO_DESTINATION}>
+                    Nobody, record history only
+                  </SelectItem>
+                  {destinations?.map((item) => (
+                    <SelectItem key={item.id} value={String(item.id)}>
+                      {item.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                {destinations && destinations.length === 0
+                  ? "Add a destination on the Destinations tab to get notified."
+                  : "Every alert in this group is sent here when it fires and when it recovers."}
+              </p>
             </div>
 
             <div className="flex items-center justify-between gap-4 rounded-md border border-border p-3">
