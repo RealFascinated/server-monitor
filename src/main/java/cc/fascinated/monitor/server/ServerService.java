@@ -60,6 +60,7 @@ public class ServerService {
     private final ServerFolderService serverFolderService;
     private final IncidentService incidentService;
     private final ServerIngestService serverIngestService;
+    private final Instant startedAt = Instant.now();
 
     public ServerService(ServerRepository serverRepository,
                          VictoriaMetricsWriteClient victoriaMetricsWriteClient,
@@ -84,6 +85,11 @@ public class ServerService {
     @Scheduled(fixedDelayString = "#{@monitorMetricsProperties.refreshIntervalMs}")
     @Transactional
     public void markStaleServersOffline() {
+        // Heartbeats can't have been recorded while the backend was down, so right after a start every server looks
+        // stale. Give agents a full offline threshold to check back in before judging them.
+        if (Instant.now().isBefore(this.startedAt.plus(this.serverProperties.getOfflineThreshold()))) {
+            return;
+        }
         if (!this.internetConnectivityService.isAvailable()) {
             log.info("Skipping stale-server offline check, internet connectivity probe failed");
             return;
