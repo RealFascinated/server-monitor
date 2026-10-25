@@ -29,13 +29,30 @@ const INSTALL_METHODS: {
 
 const METHOD_NOTES: Partial<Record<AgentInstallMethod, string>> = {
   windows:
-    "Run from an Administrator PowerShell. The agent must run as Administrator so hardware sensors (including GPU power) can be read.",
+    "Run from an **Administrator PowerShell**. The agent must run as **Administrator** so hardware sensors (including GPU power) can be read.",
   docker:
-    "Save as docker-compose.yml on the host, then run docker compose up -d. Requires Docker on the host.",
+    "Save as **docker-compose.yml** on the host, then run **docker compose up -d**. Requires **Docker** on the host.",
   "docker-nvidia":
-    "Use on NVIDIA GPU hosts with the NVIDIA Container Toolkit. Same setup as Docker, but with gpus: all and the NVIDIA image.",
+    "Use on NVIDIA GPU hosts with the **NVIDIA Container Toolkit**. Same setup as Docker, but with **gpus: all** and the NVIDIA image.",
   "unraid-nvidia":
-    "Requires the Unraid NVIDIA Driver plugin. Install monitor-agent-nvidia from Community Applications.",
+    "Requires the **Unraid NVIDIA Driver** plugin. Install **monitor-agent-nvidia** from Community Applications.",
+}
+
+// Wraps **keyword** spans in the primary color; the markers never reach the DOM.
+function Highlighted({ text }: { text: string }) {
+  return text.split(/\*\*(.+?)\*\*/g).map((part, index) =>
+    index % 2 === 1 ? (
+      <span key={index} className="font-medium text-primary">
+        {part}
+      </span>
+    ) : (
+      part
+    )
+  )
+}
+
+function stripHighlights(text: string): string {
+  return text.replace(/\*\*(.+?)\*\*/g, "$1")
 }
 
 type AgentInstallPanelProps = {
@@ -147,7 +164,7 @@ function AgentInstallPanel({ ingestToken }: AgentInstallPanelProps) {
         >
           {INSTALL_METHODS.map((option) => {
             const note =
-              METHOD_NOTES[option.value] ??
+              stripHighlights(METHOD_NOTES[option.value] ?? "") ||
               `Install the Monitor Agent on ${option.label}.`
 
             return (
@@ -172,7 +189,9 @@ function AgentInstallPanel({ ingestToken }: AgentInstallPanelProps) {
         </div>
 
         {methodNote ? (
-          <p className="text-xs text-muted-foreground">{methodNote}</p>
+          <p className="text-xs text-muted-foreground">
+            <Highlighted text={methodNote} />
+          </p>
         ) : null}
       </div>
 
@@ -181,7 +200,9 @@ function AgentInstallPanel({ ingestToken }: AgentInstallPanelProps) {
           <Label>Install steps</Label>
           <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
             {unraidSteps.map((step) => (
-              <li key={step}>{step}</li>
+              <li key={step}>
+                <Highlighted text={step} />
+              </li>
             ))}
           </ol>
         </div>

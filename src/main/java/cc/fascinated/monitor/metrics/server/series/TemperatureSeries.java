@@ -6,7 +6,6 @@ import cc.fascinated.monitor.metrics.server.catalog.VmMetricFamily;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.TemperatureMetric;
 import cc.fascinated.monitor.model.domain.alert.AlertInfo;
 import cc.fascinated.monitor.model.domain.alert.AlertOperator;
-import cc.fascinated.monitor.model.domain.alert.AlertSeverity;
 import cc.fascinated.monitor.model.domain.alert.AlertUnit;
 import org.jetbrains.annotations.Nullable;
 import lombok.Getter;
@@ -16,7 +15,7 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 public enum TemperatureSeries implements VmMetricFamily {
     CELSIUS("monitor_host_temperature_celsius",
-            AlertInfo.of("Temperature", AlertUnit.TEMPERATURE, AlertOperator.MORE_THAN, 85).asDefault(300, AlertSeverity.WARNING));
+            AlertInfo.of("Temperature", AlertUnit.TEMPERATURE, AlertOperator.MORE_THAN, 85));
 
     private final String metricName;
     @Nullable

@@ -72,10 +72,10 @@ export function getUnraidInstallSteps(nvidia: boolean): string[] {
   const appName = nvidia ? "monitor-agent-nvidia" : "monitor-agent"
 
   return [
-    `Open Apps and search for "${appName}".`,
-    "Install the container from Community Applications.",
-    "Paste your ingest token into the Ingest Token field.",
-    "Apply to start the container.",
+    `Open **Apps** and search for "**${appName}**".`,
+    "Install the container from **Community Applications**.",
+    "Paste your ingest token into the **Ingest Token** field.",
+    "Click **Apply** to start the container.",
   ]
 }
 

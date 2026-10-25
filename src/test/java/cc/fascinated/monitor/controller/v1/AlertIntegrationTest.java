@@ -197,14 +197,14 @@ class AlertIntegrationTest extends IntegrationTestBase {
             assertThat(rule.get("groupId").asLong()).isEqualTo(groupId);
         }
         assertThat(metrics).contains(CPU, "monitor_host_mem_usage_pct", "monitor_disk_usage_percent",
-                "monitor_host_temperature_celsius", "monitor_server_up", "monitor_smart_health_passed",
+                "monitor_server_up", "monitor_smart_health_passed",
                 "monitor_host_oom_kills_per_second", "monitor_smart_temperature_celsius",
                 "monitor_smart_reallocated_sectors", "monitor_smart_pending_sectors",
                 "monitor_smart_reported_uncorrect", "monitor_smart_offline_uncorrectable",
                 "monitor_smart_udma_crc_errors", "monitor_smart_endurance_used_percent",
                 "monitor_smart_percentage_used", "monitor_smart_available_spare", "monitor_smart_media_errors");
         // NVMe logs benign entries all the time, so this one stays opt-in
-        assertThat(metrics).doesNotContain("monitor_smart_error_log_entries");
+        assertThat(metrics).doesNotContain("monitor_smart_error_log_entries", "monitor_host_temperature_celsius");
     }
 
     @Test
