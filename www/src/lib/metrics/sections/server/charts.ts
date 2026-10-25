@@ -331,6 +331,14 @@ function gpuCharts(
 ): MetricChartConfig[] {
   return [
     {
+      title: "Utilization",
+      description: "Overall GPU core busy percentage.",
+      series: [chartSeries("Usage", gpu.usagePercent)],
+      valueFormatter: formatPercentValue,
+      yRange: PERCENT_Y_RANGE,
+      thresholds: PERCENT_THRESHOLDS,
+    },
+    {
       title: "Encode/decode",
       description:
         "Video encoder and decoder utilization on supported GPUs (for example NVENC/NVDEC on NVIDIA).",
@@ -344,20 +352,12 @@ function gpuCharts(
     },
     {
       title: "Memory",
-      description:
-        "GPU memory used vs total. Core utilization is on the right axis.",
+      description: "GPU memory used vs total.",
       series: [
         chartSeries("Used", gpu.memoryUsedBytes),
         chartSeries("Total", gpu.memoryTotalBytes),
-        percentSeries("Usage", gpu.usagePercent),
       ],
       valueFormatter: formatMemoryBytes,
-      seriesFormatters: [
-        formatMemoryBytes,
-        formatMemoryBytes,
-        formatPercentValue,
-      ],
-      ...PERCENT_RIGHT_AXIS,
     },
     {
       title: "Temperature",
