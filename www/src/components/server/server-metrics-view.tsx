@@ -92,7 +92,7 @@ function ServerMetricsView({
 
   return (
     <div className="flex flex-col gap-6">
-      {showRangeCallout ? (
+      {showRangeCallout && !fitRange ? (
         <Callout
           type={hasCurrentMetrics ? "info" : "warning"}
           title={
