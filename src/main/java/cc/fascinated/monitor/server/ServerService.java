@@ -85,7 +85,7 @@ public class ServerService {
     @Transactional
     public void markStaleServersOffline() {
         if (!this.internetConnectivityService.isAvailable()) {
-            log.info("Skipping stale-server offline check — internet connectivity probe failed");
+            log.info("Skipping stale-server offline check, internet connectivity probe failed");
             return;
         }
         Instant cutoff = Instant.now().minus(this.serverProperties.getOfflineThreshold());

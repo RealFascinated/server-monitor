@@ -136,6 +136,7 @@ describe("ruleToDraft", () => {
       enabled: true,
       createdAt: "2026-01-01T00:00:00Z",
       firingCount: 0,
+      silencedCount: 0,
     }
 
     const request = draftToRequest(
@@ -179,6 +180,7 @@ describe("ruleToCopyRequest", () => {
       enabled: true,
       createdAt: "2026-01-01T00:00:00Z",
       firingCount: 2,
+      silencedCount: 0,
     })
 
     expect(copy).toMatchObject({

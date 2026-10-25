@@ -47,7 +47,7 @@ package disk
 
 ## Logging
 
-Use `log/slog` only — no third-party loggers.
+Use `log/slog` only, no third-party loggers.
 
 ```go
 slog.Info("agent started", "schedule", schedule)
@@ -72,7 +72,7 @@ Structured key-value pairs; no printf-style logging in new code.
 
 ## Concurrency
 
-- `Agent` uses `sync.RWMutex` for config and cron lifecycle — follow that pattern for shared mutable agent state.
+- `Agent` uses `sync.RWMutex` for config and cron lifecycle; follow that pattern for shared mutable agent state.
 - Pass `context.Context` for shutdown/cancellation in long-running loops (`Run`, cron tied to ctx).
 - Don't spawn goroutines without a clear exit path tied to context or agent stop.
 

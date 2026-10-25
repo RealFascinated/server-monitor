@@ -90,7 +90,7 @@ public class AlertPreviewService {
             switch (evaluation.change()) {
                 case FIRED -> startedAt = ts;
                 case RESOLVED -> firing.add(new AlertPreviewResponse.Interval(startedAt, ts, false, state.worstValue()));
-                case NONE -> {
+                case NONE, ESCALATED -> {
                 }
             }
             peak = state.worstValue();

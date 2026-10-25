@@ -97,7 +97,7 @@ public class AlertEvaluator {
                 }
                 continue;
             }
-            if (tracked.state.isFiring()) {
+            if (tracked.state.isFiring() && !tracked.state.isSilenced()) {
                 remind(key, tracked, nowMillis, now);
             }
         }
@@ -124,12 +124,33 @@ public class AlertEvaluator {
         this.states.clear();
     }
 
+    /**
+     * Mutes a firing series until it gets worse than it is now. Returns that baseline, or null when nothing
+     * in memory is firing for the key (the caller then falls back to the event's recorded peak).
+     */
+    @Nullable
+    public Double silence(long ruleId, long serverId, String seriesKey) {
+        TrackedSeries tracked = this.states.get(new StateKey(ruleId, serverId, seriesKey));
+        if (tracked == null) {
+            return null;
+        }
+        double baseline = tracked.state.worstValue();
+        return tracked.state.silence(baseline) ? baseline : null;
+    }
+
+    public void unsilence(long ruleId, long serverId, String seriesKey) {
+        TrackedSeries tracked = this.states.get(new StateKey(ruleId, serverId, seriesKey));
+        if (tracked != null) {
+            tracked.state.unsilence();
+        }
+    }
+
     /** Restores a firing series after a restart so it does not notify again. */
     void restore(long ruleId, long serverId, String seriesKey, String metric, int windowSeconds, Instant startedAt,
-                 double peak, @Nullable Instant lastNotifiedAt) {
+                 double peak, @Nullable Instant lastNotifiedAt, @Nullable Double silencedValue) {
         TrackedSeries tracked = new TrackedSeries(windowSeconds, metric, SeriesKeys.labelsOf(seriesKey));
         long nowSeconds = Instant.now().getEpochSecond();
-        tracked.state.restoreFiring(startedAt.getEpochSecond(), peak, nowSeconds);
+        tracked.state.restoreFiring(startedAt.getEpochSecond(), peak, nowSeconds, silencedValue);
         tracked.lastNotifiedMillis = lastNotifiedAt != null ? lastNotifiedAt.toEpochMilli() : startedAt.toEpochMilli();
         this.states.put(new StateKey(ruleId, serverId, seriesKey), tracked);
     }
@@ -168,9 +189,22 @@ public class AlertEvaluator {
                     emit(serverRules, rule, key, tracked, AlertTransition.FIRING, evaluation.effectiveValue(),
                             tracked.state.worstValue(), null, Instant.ofEpochSecond(ts));
                 }
-                case RESOLVED -> emit(serverRules, rule, key, tracked, AlertTransition.RESOLVED,
-                        evaluation.effectiveValue(), tracked.state.worstValue(), AlertEventRow.REASON_RECOVERED,
-                        Instant.ofEpochSecond(ts));
+                case ESCALATED -> {
+                    tracked.lastNotifiedMillis = System.currentTimeMillis();
+                    emit(serverRules, rule, key, tracked, AlertTransition.ESCALATED, evaluation.effectiveValue(),
+                            tracked.state.worstValue(), null, Instant.ofEpochSecond(ts));
+                }
+                case RESOLVED -> {
+                    if (evaluation.wasSilenced()) {
+                        // a muted alert ends quietly: close the event without telling anyone
+                        this.dispatcher.submit(new AlertSignal(AlertTransition.RESOLVED, rule.id(), key.serverId(),
+                                key.seriesKey(), rule.destinationId(), tracked.state.worstValue(),
+                                Instant.ofEpochSecond(ts), AlertEventRow.REASON_RECOVERED, null));
+                    } else {
+                        emit(serverRules, rule, key, tracked, AlertTransition.RESOLVED, evaluation.effectiveValue(),
+                                tracked.state.worstValue(), AlertEventRow.REASON_RECOVERED, Instant.ofEpochSecond(ts));
+                    }
+                }
                 case NONE -> {
                 }
             }

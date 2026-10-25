@@ -32,6 +32,7 @@ public record AlertRuleResponse(
         boolean enabled,
         Instant createdAt,
         long firingCount,
+        long silencedCount,
         @Nullable Instant lastFiredAt
 ) {
 
@@ -42,6 +43,7 @@ public record AlertRuleResponse(
                 row.getName(), row.getMetric(), info.label(), info.unit(), row.getLabelFilter(), row.getOperator(),
                 row.getThreshold(), row.getRecoveryThreshold(), row.getWindowSeconds(), row.getSeverity(),
                 row.getRepeatIntervalSeconds(), row.isEnabled(), row.getCreatedAt(),
-                stat == null ? 0 : stat.firingCount(), stat == null ? null : stat.lastFiredAt());
+                stat == null ? 0 : stat.firingCount(),
+                stat == null ? 0 : stat.silencedCount(), stat == null ? null : stat.lastFiredAt());
     }
 }

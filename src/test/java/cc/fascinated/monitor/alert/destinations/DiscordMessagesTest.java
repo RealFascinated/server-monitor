@@ -40,7 +40,7 @@ class DiscordMessagesTest {
                 Duration.ofMinutes(12), Instant.EPOCH);
 
         assertThat(DiscordMessages.describe(resolved))
-                .isEqualTo("**web-01**'s CPU usage is back below 90% — now 42.1%, was firing for 12m");
+                .isEqualTo("**web-01**'s CPU usage is back below 90%, now 42.1%, was firing for 12m");
     }
 
     @Test

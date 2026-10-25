@@ -64,11 +64,11 @@ Don't use `@NonNull`, `@NotNull`, or any other non-null annotation in our own co
 
 ## No Useless Variables or Methods
 
-Don't assign a value to a variable if it's only used once immediately after. Don't extract a method if it's only called from one place and adds no clarity — inline it.
+Don't assign a value to a variable if it's only used once immediately after. Don't extract a method if it's only called from one place and adds no clarity; inline it.
 
 ## Static Methods and Constants
 
-Move general-purpose static methods to a `@UtilityClass` in `util`. Access `public static` fields directly — no getters.
+Move general-purpose static methods to a `@UtilityClass` in `util`. Access `public static` fields directly; no getters.
 
 ```java
 // bad
@@ -84,7 +84,7 @@ AuthUtils.hash(value)
 - DTOs are Java `record`s with Jakarta validation annotations where needed.
 - Services throw typed exceptions from `exception.impl`; `ExceptionControllerAdvice` maps them to HTTP responses.
 - Use `@Transactional` on service methods that perform multiple writes.
-- Controllers stay thin — delegate to services, no business logic.
+- Controllers stay thin; delegate to services, no business logic.
 
 ## JPA and Migrations
 

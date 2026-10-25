@@ -47,16 +47,20 @@ public class DiscordMessages {
         }
         if (alert.transition() == AlertTransition.RESOLVED) {
             String duration = alert.firedFor() == null ? "" : ", was firing for " + DurationUtils.format(alert.firedFor());
-            return "%s is %s %s%s — now %s%s".formatted(
+            return "%s is %s %s%s, now %s%s".formatted(
                     name, alert.operator().recoveryPhrase(), threshold, labels.isEmpty() ? "" : " (" + labels + ")",
                     value, duration);
         }
         String window = alert.windowSeconds() > 0 ? " (avg " + DurationUtils.format(Duration.ofSeconds(alert.windowSeconds())) + ")" : "";
-        String still = alert.transition() == AlertTransition.REPEAT ? "still " : "";
+        String lead = switch (alert.transition()) {
+            case REPEAT -> "is still ";
+            case ESCALATED -> "has got worse, now ";
+            default -> "is ";
+        };
         String since = alert.transition() == AlertTransition.REPEAT && alert.firedFor() != null
                 ? " · firing for " + DurationUtils.format(alert.firedFor()) : "";
-        return "%s is %s%s %s\n%s: %s%s%s%s".formatted(
-                name, still, alert.operator().phrase(), threshold,
+        return "%s %s%s %s\n%s: %s%s%s%s".formatted(
+                name, lead, alert.operator().phrase(), threshold,
                 alert.metricLabel(), value, window, labels.isEmpty() ? "" : " · " + labels, since);
     }
 
@@ -69,6 +73,7 @@ public class DiscordMessages {
                     duration.isEmpty() ? "" : ", was unhealthy for " + duration);
             case REPEAT -> "%s is still unhealthy%s%s".formatted(name, suffix,
                     duration.isEmpty() ? "" : " · for " + duration);
+            case ESCALATED -> "%s has got worse%s".formatted(name, suffix);
             default -> "%s is unhealthy%s".formatted(name, suffix);
         };
     }
@@ -136,6 +141,7 @@ public class DiscordMessages {
         String prefix = switch (alert.transition()) {
             case FIRING -> alert.severity().label() + " · Firing";
             case REPEAT -> alert.severity().label() + " · Still firing";
+            case ESCALATED -> alert.severity().label() + " · Got worse";
             case RESOLVED -> "Resolved";
         };
         return alert.ruleName() == null || alert.ruleName().isBlank() ? prefix : prefix + " · " + alert.ruleName();

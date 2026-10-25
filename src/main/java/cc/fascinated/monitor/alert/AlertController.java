@@ -144,6 +144,16 @@ public class AlertController {
         return this.historyService.list(user, page, count, ruleId, groupId, serverId, state);
     }
 
+    @PostMapping("/events/{id}/silence")
+    public void silenceEvent(@AuthenticatedUser UserRow user, @PathVariable long id) {
+        this.historyService.silence(user, id);
+    }
+
+    @DeleteMapping("/events/{id}/silence")
+    public void unsilenceEvent(@AuthenticatedUser UserRow user, @PathVariable long id) {
+        this.historyService.unsilence(user, id);
+    }
+
     @GetMapping("/firing-count")
     public long firingCount(@AuthenticatedUser UserRow user) {
         return this.historyService.firingCount(user);

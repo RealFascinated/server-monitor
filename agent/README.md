@@ -79,8 +79,8 @@ Or pass `--api-endpoint` when using `install.sh` / `-ApiEndpoint` with `install.
 
 Image: `ghcr.io/realfascinated/monitor-agent`
 
-- Default image — AMD/Intel GPU via sysfs
-- `:nvidia` tag — NVIDIA hosts with the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html)
+- Default image: AMD/Intel GPU via sysfs
+- `:nvidia` tag: NVIDIA hosts with the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html)
 
 The root `docker-compose.yml` has a commented **agent** service. Copy the env vars from there, or run with the agent profile after setting `MONITOR_INGEST_TOKEN` in `.env`:
 

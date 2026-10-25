@@ -71,8 +71,8 @@ public enum AlertDestination {
   **web-01**'s CPU usage is above 90%
   CPU usage: 96.55% (avg 5m) · disk: /      <- labels only if present
   ```
-  Resolved: `**web-01**'s CPU usage is back below 90% — now 42.10%, was firing for 12m`. Title links to the server page. Always `allowed_mentions: {"parse": []}`; escape markdown in server names so a name can't ping `@everyone`.
-- Verify `cpu_usage`/`mem_usage` units against the agent (assumed 0–100 %).
+  Resolved: `**web-01**'s CPU usage is back below 90%, now 42.10%, was firing for 12m`. Title links to the server page. Always `allowed_mentions: {"parse": []}`; escape markdown in server names so a name can't ping `@everyone`.
+- Verify `cpu_usage`/`mem_usage` units against the agent (assumed 0-100 %).
 
 ## Schema: `V8__alerting.sql`
 

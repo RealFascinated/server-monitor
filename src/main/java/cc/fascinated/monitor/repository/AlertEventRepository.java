@@ -21,7 +21,10 @@ public interface AlertEventRepository extends JpaRepository<AlertEventRow, Long>
 
     @Query("""
             SELECT new cc.fascinated.monitor.repository.AlertRuleEventStat(
-                e.ruleId, COUNT(CASE WHEN e.resolvedAt IS NULL THEN 1 END), MAX(e.startedAt))
+                e.ruleId,
+                COUNT(CASE WHEN e.resolvedAt IS NULL AND e.silencedAt IS NULL THEN 1 END),
+                COUNT(CASE WHEN e.resolvedAt IS NULL AND e.silencedAt IS NOT NULL THEN 1 END),
+                MAX(e.startedAt))
             FROM AlertEventRow e
             WHERE e.ruleId IN :ruleIds
             GROUP BY e.ruleId
@@ -53,4 +56,19 @@ public interface AlertEventRepository extends JpaRepository<AlertEventRow, Long>
 
     @Query("SELECT COUNT(e) FROM AlertEventRow e WHERE e.ruleId IN :ruleIds AND e.resolvedAt IS NULL")
     long countOpenByRuleIds(@Param("ruleIds") Collection<Long> ruleIds);
+
+    /** Targeted updates so a concurrent resolve by the dispatcher is never overwritten with a stale row. */
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("""
+            UPDATE AlertEventRow e SET e.silencedAt = :at, e.silencedValue = :value
+            WHERE e.id = :id AND e.resolvedAt IS NULL
+            """)
+    int silenceOpenEvent(@Param("id") long id, @Param("at") Instant at, @Param("value") double value);
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("""
+            UPDATE AlertEventRow e SET e.silencedAt = NULL, e.silencedValue = NULL
+            WHERE e.id = :id AND e.resolvedAt IS NULL
+            """)
+    int unsilenceOpenEvent(@Param("id") long id);
 }

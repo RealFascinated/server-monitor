@@ -1,5 +1,7 @@
 package cc.fascinated.monitor.alert.engine;
 
+import cc.fascinated.monitor.model.domain.alert.AlertOperator;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * State of one rule against one series: whether it is firing and, for windowed rules, a small ring of
@@ -15,6 +17,8 @@ public final class SeriesState {
     private final long[] ids;
 
     private boolean firing;
+    private boolean silenced;
+    private double silencedBaseline;
     private long firingSince;
     private double worstValue;
     private long lastSeen = Long.MIN_VALUE;
@@ -38,11 +42,34 @@ public final class SeriesState {
     }
 
     /** Seeds a firing state, used to restore open events after a restart. */
-    public synchronized void restoreFiring(long since, double worst, long seenAt) {
+    public synchronized void restoreFiring(long since, double worst, long seenAt, @Nullable Double silencedBaseline) {
+        this.silenced = silencedBaseline != null;
+        this.silencedBaseline = silencedBaseline == null ? 0 : silencedBaseline;
         this.firing = true;
         this.firingSince = since;
         this.worstValue = worst;
         this.lastSeen = seenAt;
+    }
+
+    /**
+     * Mutes a firing series until its value gets worse than {@code baseline}.
+     * Returns false when the series is not firing, so there is nothing to silence.
+     */
+    public synchronized boolean silence(double baseline) {
+        if (!this.firing) {
+            return false;
+        }
+        this.silenced = true;
+        this.silencedBaseline = baseline;
+        return true;
+    }
+
+    public synchronized void unsilence() {
+        this.silenced = false;
+    }
+
+    public synchronized boolean isSilenced() {
+        return this.silenced;
     }
 
     synchronized boolean isFiringInternal() {
@@ -122,6 +149,12 @@ public final class SeriesState {
 
     void resolve() {
         this.firing = false;
+        this.silenced = false;
+    }
+
+    /** True when the series is silenced and {@code value} is further past the threshold than it was when silenced. */
+    boolean escalates(AlertOperator operator, double value) {
+        return this.silenced && operator.isWorse(value, this.silencedBaseline);
     }
 
     void updateWorst(double value) {

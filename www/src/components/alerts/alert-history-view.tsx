@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { History } from "lucide-react"
 
-import { AlertEventRow } from "@/components/alerts/alert-event-row"
+import { AlertEventsTable } from "@/components/alerts/alert-events-table"
 import { EmptyState } from "@/components/empty-state"
 import { Pagination } from "@/components/pagination"
 import { QueryStatusShell } from "@/components/query-status-shell"
@@ -143,11 +143,7 @@ function AlertHistoryView({
 
         {data && data.items.length > 0 ? (
           <>
-            <ul className="flex flex-col gap-3">
-              {data.items.map((event) => (
-                <AlertEventRow key={event.id} event={event} />
-              ))}
-            </ul>
+            <AlertEventsTable events={data.items} />
             <Pagination
               page={data}
               currentPage={pagination.page}

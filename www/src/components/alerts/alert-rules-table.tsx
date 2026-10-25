@@ -99,6 +99,7 @@ function RuleState({ rule }: { rule: AlertRule }) {
     return <span className="text-muted-foreground">Disabled</span>
   }
   const firing = rule.firingCount > 0
+  const silenced = rule.silencedCount > 0
 
   return (
     <span
@@ -109,7 +110,11 @@ function RuleState({ rule }: { rule: AlertRule }) {
           : "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300"
       )}
     >
-      {firing ? `${rule.firingCount} firing` : "OK"}
+      {firing
+        ? `${rule.firingCount} firing${silenced ? `, ${rule.silencedCount} silenced` : ""}`
+        : silenced
+          ? `OK, ${rule.silencedCount} silenced`
+          : "OK"}
     </span>
   )
 }

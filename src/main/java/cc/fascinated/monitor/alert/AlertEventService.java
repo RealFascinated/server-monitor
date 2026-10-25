@@ -43,6 +43,14 @@ public class AlertEventService {
                 open.ifPresent(event -> event.setPeakValue(Math.max(event.getPeakValue(), signal.peakValue())));
                 return open;
             }
+            case ESCALATED -> {
+                open.ifPresent(event -> {
+                    event.setPeakValue(Math.max(event.getPeakValue(), signal.peakValue()));
+                    event.setSilencedAt(null);
+                    event.setSilencedValue(null);
+                });
+                return open;
+            }
             case RESOLVED -> {
                 open.ifPresent(event -> {
                     event.setResolvedAt(signal.at());

@@ -49,7 +49,8 @@ public class AlertStateRehydrator {
                     continue;
                 }
                 this.evaluator.restore(rule.getId(), event.getServerId(), event.getSeriesKey(), rule.getMetric(),
-                        rule.getWindowSeconds(), event.getStartedAt(), event.getPeakValue(), event.getLastNotifiedAt());
+                        rule.getWindowSeconds(), event.getStartedAt(), event.getPeakValue(), event.getLastNotifiedAt(),
+                        event.getSilencedValue());
                 restored++;
             }
             log.info("Restored {} firing alert(s) from open events", restored);

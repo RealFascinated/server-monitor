@@ -3,7 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router"
 import { History, Pencil, Server, Trash2, Zap } from "lucide-react"
 
 import { AddAlertDialog } from "@/components/alerts/add-alert-dialog"
-import { AlertEventRow } from "@/components/alerts/alert-event-row"
+import { AlertEventsTable } from "@/components/alerts/alert-events-table"
 import { AlertRulesTable } from "@/components/alerts/alert-rules-table"
 import { GroupDialog } from "@/components/alerts/group-dialog"
 import { GroupEnabledToggle } from "@/components/alerts/group-enabled-toggle"
@@ -61,11 +61,7 @@ function RecentActivity({ groupId }: { groupId: number }) {
         }
       />
       {data && data.items.length > 0 ? (
-        <ul className="flex flex-col gap-2">
-          {data.items.map((event) => (
-            <AlertEventRow key={event.id} event={event} />
-          ))}
-        </ul>
+        <AlertEventsTable events={data.items} />
       ) : (
         <p className="text-sm text-muted-foreground">
           Nothing has fired for this group yet.

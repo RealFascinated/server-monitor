@@ -1,6 +1,8 @@
 package cc.fascinated.monitor.alert;
 
 import cc.fascinated.monitor.exception.impl.BadRequestException;
+import cc.fascinated.monitor.exception.impl.ConflictException;
+import cc.fascinated.monitor.exception.impl.NotFoundException;
 import cc.fascinated.monitor.model.dto.response.alert.AlertEventResponse;
 import cc.fascinated.monitor.model.persistance.AlertEventRow;
 import cc.fascinated.monitor.model.persistance.AlertRuleRow;
@@ -18,6 +20,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,9 +35,11 @@ public class AlertHistoryService {
     private final AlertEventRepository eventRepository;
     private final AlertRuleRepository ruleRepository;
     private final ServerRepository serverRepository;
+    private final AlertEvaluator evaluator;
 
     public AlertHistoryService(AlertEventRepository eventRepository, AlertRuleRepository ruleRepository,
-                               ServerRepository serverRepository) {
+                               ServerRepository serverRepository, AlertEvaluator evaluator) {
+        this.evaluator = evaluator;
         this.eventRepository = eventRepository;
         this.ruleRepository = ruleRepository;
         this.serverRepository = serverRepository;
@@ -79,10 +84,41 @@ public class AlertHistoryService {
                                 Sort.by(Sort.Direction.DESC, "startedAt", "id"))).getContent()));
     }
 
-    /** How many of the caller's alerts are firing right now, for the sidebar badge. */
+    /** How many of the caller's alerts are firing right now (silenced ones excluded), for the sidebar badge. */
     @Transactional(readOnly = true)
     public long firingCount(UserRow user) {
-        return this.eventRepository.count(ownedBy(user.getId()).and((root, query, cb) -> cb.isNull(root.get("resolvedAt"))));
+        return this.eventRepository.count(ownedBy(user.getId()).and((root, query, cb) -> cb.and(
+                cb.isNull(root.get("resolvedAt")), cb.isNull(root.get("silencedAt")))));
+    }
+
+    /** Mutes a firing alert until its value gets worse than it is now. */
+    @Transactional
+    public void silence(UserRow user, long eventId) {
+        AlertEventRow event = requireOwnedOpenEvent(user, eventId);
+        Double baseline = this.evaluator.silence(event.getRuleId(), event.getServerId(), event.getSeriesKey());
+        double value = baseline != null ? baseline : event.getPeakValue();
+        if (this.eventRepository.silenceOpenEvent(eventId, Instant.now(), value) == 0) {
+            throw new ConflictException("That alert is no longer firing");
+        }
+    }
+
+    @Transactional
+    public void unsilence(UserRow user, long eventId) {
+        AlertEventRow event = requireOwnedOpenEvent(user, eventId);
+        this.evaluator.unsilence(event.getRuleId(), event.getServerId(), event.getSeriesKey());
+        this.eventRepository.unsilenceOpenEvent(eventId);
+    }
+
+    private AlertEventRow requireOwnedOpenEvent(UserRow user, long eventId) {
+        AlertEventRow event = this.eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Alert event not found"));
+        this.ruleRepository.findById(event.getRuleId())
+                .filter(rule -> rule.getUserId().equals(user.getId()))
+                .orElseThrow(() -> new NotFoundException("Alert event not found"));
+        if (event.getResolvedAt() != null) {
+            throw new ConflictException("That alert is no longer firing");
+        }
+        return event;
     }
 
     private static Specification<AlertEventRow> ownedBy(long userId) {

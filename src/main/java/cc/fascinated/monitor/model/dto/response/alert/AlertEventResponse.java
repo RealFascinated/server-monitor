@@ -29,7 +29,9 @@ public record AlertEventResponse(
         @Nullable String resolveReason,
         double peakValue,
         @Nullable Instant lastNotifiedAt,
-        @Nullable String notifyError
+        @Nullable String notifyError,
+        @Nullable Instant silencedAt,
+        @Nullable Double silencedValue
 ) {
 
     public static AlertEventResponse from(AlertEventRow event, AlertRuleRow rule, @Nullable String serverName) {
@@ -37,6 +39,7 @@ public record AlertEventResponse(
         return new AlertEventResponse(event.getId(), event.getRuleId(), rule.getName(), rule.getMetric(), info.label(),
                 info.unit(), rule.getOperator(), rule.getThreshold(), event.getServerId(), serverName,
                 SeriesKeys.labelsOf(event.getSeriesKey()), event.getStartedAt(), event.getResolvedAt(),
-                event.getResolveReason(), event.getPeakValue(), event.getLastNotifiedAt(), event.getNotifyError());
+                event.getResolveReason(), event.getPeakValue(), event.getLastNotifiedAt(), event.getNotifyError(),
+                event.getSilencedAt(), event.getSilencedValue());
     }
 }

@@ -103,10 +103,68 @@ class AlertRuleEngineTest {
     void restoredFiringStateResolvesWithoutRefiring() {
         RuleSpec spec = new RuleSpec(AlertOperator.MORE_THAN, 90, null, 0);
         SeriesState state = new SeriesState(0);
-        state.restoreFiring(100, 97, 100);
+        state.restoreFiring(100, 97, 100, null);
 
         assertThat(step(spec, state, 200, 95)).isEqualTo(Change.NONE);
         assertThat(step(spec, state, 201, 10)).isEqualTo(Change.RESOLVED);
         assertThat(state.firingSince()).isEqualTo(100);
+    }
+
+    @Test
+    void silencedSeriesStaysQuietUntilItGetsWorse() {
+        RuleSpec spec = new RuleSpec(AlertOperator.MORE_THAN, 0, null, 0);
+        SeriesState state = new SeriesState(0);
+
+        assertThat(step(spec, state, 0, 5)).isEqualTo(Change.FIRED);
+        assertThat(state.silence(5)).isTrue();
+        assertThat(step(spec, state, 1, 5)).as("same value stays silent").isEqualTo(Change.NONE);
+        assertThat(step(spec, state, 2, 4)).as("a better value stays silent").isEqualTo(Change.NONE);
+        assertThat(step(spec, state, 3, 6)).as("worse than when silenced").isEqualTo(Change.ESCALATED);
+        assertThat(state.isSilenced()).isFalse();
+        assertThat(step(spec, state, 4, 7)).as("no longer silenced, no repeat escalation").isEqualTo(Change.NONE);
+    }
+
+    @Test
+    void silencedLessThanSeriesEscalatesWhenItDrops() {
+        RuleSpec spec = new RuleSpec(AlertOperator.LESS_THAN, 10, null, 0);
+        SeriesState state = new SeriesState(0);
+
+        assertThat(step(spec, state, 0, 8)).isEqualTo(Change.FIRED);
+        state.silence(8);
+        assertThat(step(spec, state, 1, 9)).isEqualTo(Change.NONE);
+        assertThat(step(spec, state, 2, 7)).isEqualTo(Change.ESCALATED);
+    }
+
+    @Test
+    void resolvingWhileSilencedIsFlaggedAndClearsTheSilence() {
+        RuleSpec spec = new RuleSpec(AlertOperator.MORE_THAN, 90, null, 0);
+        SeriesState state = new SeriesState(0);
+
+        step(spec, state, 0, 95);
+        state.silence(95);
+        AlertRuleEngine.Evaluation resolved = AlertRuleEngine.evaluate(spec, state, 1, 50);
+        assertThat(resolved.change()).isEqualTo(Change.RESOLVED);
+        assertThat(resolved.wasSilenced()).isTrue();
+        assertThat(state.isSilenced()).isFalse();
+        assertThat(step(spec, state, 2, 95)).as("fires normally afterwards").isEqualTo(Change.FIRED);
+        assertThat(state.isSilenced()).isFalse();
+    }
+
+    @Test
+    void cannotSilenceASeriesThatIsNotFiring() {
+        SeriesState state = new SeriesState(0);
+        assertThat(state.silence(1)).isFalse();
+        assertThat(state.isSilenced()).isFalse();
+    }
+
+    @Test
+    void restoredSilencedSeriesKeepsItsBaseline() {
+        RuleSpec spec = new RuleSpec(AlertOperator.MORE_THAN, 0, null, 0);
+        SeriesState state = new SeriesState(0);
+
+        state.restoreFiring(100, 5, 100, 5.0);
+        assertThat(state.isSilenced()).isTrue();
+        assertThat(step(spec, state, 101, 5)).isEqualTo(Change.NONE);
+        assertThat(step(spec, state, 102, 6)).isEqualTo(Change.ESCALATED);
     }
 }

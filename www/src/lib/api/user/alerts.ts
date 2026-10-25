@@ -89,6 +89,7 @@ export type AlertRule = {
   enabled: boolean
   createdAt: string
   firingCount: number
+  silencedCount: number
   lastFiredAt?: string | null
 }
 
@@ -125,6 +126,8 @@ export type AlertEvent = {
   peakValue: number
   lastNotifiedAt?: string | null
   notifyError?: string | null
+  silencedAt?: string | null
+  silencedValue?: number | null
 }
 
 export type AlertEventState = "firing" | "resolved"
@@ -309,6 +312,17 @@ export function getAlertEvents(
   if (filters.state) params.set("state", filters.state)
 
   return apiFetch<Page<AlertEvent>>(`/v1/alerts/events?${params}`)
+}
+
+/** Mutes a firing alert until its value gets worse than it is now. */
+export function silenceAlertEvent(id: number): Promise<void> {
+  return apiFetch<void>(`/v1/alerts/events/${id}/silence`, { method: "POST" })
+}
+
+export function unsilenceAlertEvent(id: number): Promise<void> {
+  return apiFetch<void>(`/v1/alerts/events/${id}/silence`, {
+    method: "DELETE",
+  })
 }
 
 export function getAlertFiringCount(): Promise<number> {

@@ -616,4 +616,121 @@ class AlertIntegrationTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.threshold").value(80.0))
                 .andExpect(jsonPath("$.severity").value("CRITICAL"));
     }
+
+    private long openEventId(long rule) {
+        Long id = this.jdbcTemplate.queryForObject(
+                "SELECT id FROM alert_events WHERE rule_id = ? AND resolved_at IS NULL", Long.class, rule);
+        assertThat(id).isNotNull();
+        return id;
+    }
+
+    private void silence(String bearer, long eventId) throws Exception {
+        this.mockMvc.perform(post("/v1/alerts/events/{id}/silence", eventId)
+                .header("Authorization", TestAuthSupport.bearer(bearer)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void silencedAlertStaysQuietUntilItGetsWorse() throws Exception {
+        clearDefaultGroup(this.token);
+        var server = this.auth.createServer(this.token, "web-01");
+        long group = createGroup(this.token, "prod", false, server.serverId());
+        long rule = createRule(this.token, group, createDestination(), CPU, "{}", "MORE_THAN", 90, true);
+        String ingest = server.ingestToken().toString();
+
+        ingestCpu(ingest, 95);
+        assertThat(nextMessage()).contains("above");
+        long event = openEventId(rule);
+
+        this.mockMvc.perform(post("/v1/alerts/events/{id}/silence", event)
+                        .header("Authorization", TestAuthSupport.bearer(this.token)))
+                .andExpect(status().isOk());
+        assertThat(eventCount("id = " + event + " AND silenced_at IS NOT NULL AND silenced_value = 95")).isEqualTo(1);
+        this.mockMvc.perform(get("/v1/alerts/rules")
+                        .header("Authorization", TestAuthSupport.bearer(this.token)))
+                .andExpect(jsonPath("$[0].firingCount").value(0))
+                .andExpect(jsonPath("$[0].silencedCount").value(1));
+        this.mockMvc.perform(get("/v1/alerts/firing-count")
+                        .header("Authorization", TestAuthSupport.bearer(this.token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(0));
+
+        ingestCpu(ingest, 95);
+        ingestCpu(ingest, 93);
+        assertThat(this.received.poll(1, TimeUnit.SECONDS)).as("same or better value stays silent").isNull();
+
+        ingestCpu(ingest, 99);
+        assertThat(nextMessage()).contains("got worse").contains("99");
+        assertThat(eventCount("id = " + event + " AND silenced_at IS NULL AND peak_value = 99")).isEqualTo(1);
+        this.mockMvc.perform(get("/v1/alerts/firing-count")
+                        .header("Authorization", TestAuthSupport.bearer(this.token)))
+                .andExpect(jsonPath("$").value(1));
+    }
+
+    @Test
+    void silencedAlertResolvesQuietlyAndFiresNormallyAgain() throws Exception {
+        clearDefaultGroup(this.token);
+        var server = this.auth.createServer(this.token, "web-01");
+        long group = createGroup(this.token, "prod", false, server.serverId());
+        long rule = createRule(this.token, group, createDestination(), CPU, "{}", "MORE_THAN", 90, true);
+        String ingest = server.ingestToken().toString();
+
+        ingestCpu(ingest, 95);
+        assertThat(nextMessage()).isNotNull();
+        silence(this.token, openEventId(rule));
+
+        ingestCpu(ingest, 40);
+        assertThat(this.received.poll(1, TimeUnit.SECONDS)).as("a muted alert ends quietly").isNull();
+        assertThat(eventCount("rule_id = " + rule + " AND resolved_at IS NOT NULL AND resolve_reason = 'RECOVERED'")).isEqualTo(1);
+
+        ingestCpu(ingest, 96);
+        assertThat(nextMessage()).as("the next firing is announced").contains("above");
+    }
+
+    @Test
+    void unsilencingRestoresNotifications() throws Exception {
+        clearDefaultGroup(this.token);
+        var server = this.auth.createServer(this.token, "web-01");
+        long group = createGroup(this.token, "prod", false, server.serverId());
+        long rule = createRule(this.token, group, createDestination(), CPU, "{}", "MORE_THAN", 90, true);
+        String ingest = server.ingestToken().toString();
+
+        ingestCpu(ingest, 95);
+        assertThat(nextMessage()).isNotNull();
+        long event = openEventId(rule);
+        silence(this.token, event);
+        this.mockMvc.perform(delete("/v1/alerts/events/{id}/silence", event)
+                        .header("Authorization", TestAuthSupport.bearer(this.token)))
+                .andExpect(status().isOk());
+        assertThat(eventCount("id = " + event + " AND silenced_at IS NULL AND silenced_value IS NULL")).isEqualTo(1);
+
+        ingestCpu(ingest, 40);
+        assertThat(nextMessage()).as("resolves loudly again").contains("back below");
+    }
+
+    @Test
+    void onlyTheOwnerCanSilenceAndOnlyOpenAlerts() throws Exception {
+        clearDefaultGroup(this.token);
+        var server = this.auth.createServer(this.token, "web-01");
+        long group = createGroup(this.token, "prod", false, server.serverId());
+        long rule = createRule(this.token, group, createDestination(), CPU, "{}", "MORE_THAN", 90, true);
+        String ingest = server.ingestToken().toString();
+        String other = this.auth.register(TestAuthSupport.uniqueEmail(), PASSWORD).token();
+
+        ingestCpu(ingest, 95);
+        assertThat(nextMessage()).isNotNull();
+        long event = openEventId(rule);
+        this.mockMvc.perform(post("/v1/alerts/events/{id}/silence", event)
+                        .header("Authorization", TestAuthSupport.bearer(other)))
+                .andExpect(status().isNotFound());
+        this.mockMvc.perform(post("/v1/alerts/events/{id}/silence", 999_999_999L)
+                        .header("Authorization", TestAuthSupport.bearer(this.token)))
+                .andExpect(status().isNotFound());
+
+        ingestCpu(ingest, 40);
+        assertThat(nextMessage()).isNotNull();
+        this.mockMvc.perform(post("/v1/alerts/events/{id}/silence", event)
+                        .header("Authorization", TestAuthSupport.bearer(this.token)))
+                .andExpect(status().isConflict());
+    }
 }

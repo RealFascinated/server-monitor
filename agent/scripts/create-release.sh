@@ -98,7 +98,7 @@ if [[ -z "$message" ]]; then
 fi
 
 if [[ "$dry_run" == true ]]; then
-  printf '\nDry run — no tag created.\n'
+  printf '\nDry run: no tag created.\n'
   exit 0
 fi
 

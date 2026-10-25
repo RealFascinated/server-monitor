@@ -9,7 +9,7 @@ alwaysApply: true
 
 **Think before coding, but don't over-plan. Just do the task.**
 
-- State assumptions explicitly. If uncertain about something critical, ask — don't guess silently.
+- State assumptions explicitly. If uncertain about something critical, ask, don't guess silently.
 - If multiple valid approaches exist, pick the simplest and say why.
 - Don't produce step-by-step plans or loop structures unless the task is genuinely complex and multi-phase.
 
@@ -22,20 +22,20 @@ alwaysApply: true
 
 **No backward compatibility unless asked.**
 
-- Do not add migration paths, dual-format loaders, deprecated-key fallbacks, or legacy shims when changing configs, persisted data (localStorage, cookies), serialized fields, or API contracts — unless the user explicitly requests it.
+- Do not add migration paths, dual-format loaders, deprecated-key fallbacks, or legacy shims when changing configs, persisted data (localStorage, cookies), serialized fields, or API contracts, unless the user explicitly requests it.
 - Default to the new shape only. This project is early-stage; there is usually no production data to preserve.
 - If a change could break something already live, **ask the user** before adding compatibility or migrations.
 
 **Never commit automatically. Let the user commit their own changes.**
 
-After completing changes, suggest a short commit message the user can use — but don't run `git commit`. No conventional commit prefixes. Just the message itself.
+After completing changes, suggest a short commit message the user can use, but don't run `git commit`. No conventional commit prefixes. Just the message itself.
 
 **Touch only what you must.**
 
 - Don't "improve" adjacent code, formatting, or comments.
 - Don't refactor things that aren't broken.
 - Match existing style, even if you'd do it differently.
-- Remove imports/variables/methods that *your* changes made unused — leave pre-existing dead code alone unless asked.
+- Remove imports/variables/methods that *your* changes made unused; leave pre-existing dead code alone unless asked.
 
 ## Project Overview
 
@@ -58,7 +58,7 @@ Spring Boot REST API (`cc.fascinated.monitor`) for server monitoring: user auth,
 | Utilities | `util` | `@UtilityClass` |
 | Migrations | `src/main/resources/db/migration` | `V{n}__description.sql` |
 
-Auth uses Bearer tokens parsed via `AuthUtils`. User sessions and ingest tokens are stored as SHA-256 hashes — never persist raw tokens.
+Auth uses Bearer tokens parsed via `AuthUtils`. User sessions and ingest tokens are stored as SHA-256 hashes; never persist raw tokens.
 
 ### www (frontend)
 
@@ -70,7 +70,7 @@ Go metrics agent (`fascinated.cc/monitor/agent`) for Linux and Windows. Collects
 
 | Package | Role |
 |---------|------|
-| `cmd` | `main` — config load, signal handling, update subcommand |
+| `cmd` | `main`: config load, signal handling, update subcommand |
 | `internal/agent` | Cron scheduling, sample/slow loops, push loop, config reload |
 | `internal/platform` | Platform backends (linux/windows tick and slow orchestration) |
 | `internal/collector` | Stateful `Sampler` (fast tick + slow refresh) → `ingest` types |
@@ -85,7 +85,7 @@ Go metrics agent (`fascinated.cc/monitor/agent`) for Linux and Windows. Collects
 
 Supported OS: `linux`, `windows` only (`cmd/main.go` exits on other platforms). Platform code uses `//go:build` tags; unsupported platforms get stub files (`*_unsupported.go`, `other.go`).
 
-Config: `config.yml` (see `config-example.yml`) with `MONITOR_` + uppercase key env overrides. Ingest token is required — never log or persist it beyond in-memory config.
+Config: `config.yml` (see `config-example.yml`) with `MONITOR_` + uppercase key env overrides. Ingest token is required; never log or persist it beyond in-memory config.
 
 JSON field names on `ingest` types must stay compatible with the Monitor API ingest contract (camelCase `json` tags).
 

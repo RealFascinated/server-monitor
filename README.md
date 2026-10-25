@@ -28,7 +28,7 @@ docker compose up -d
 **3. Set up**
 
 1. Open [http://localhost:3000](http://localhost:3000) (web UI)
-2. Register — the first account is admin
+2. Register: the first account is admin
 3. Create a server in the UI and copy the **ingest token**
 4. Install the [agent](agent/README.md) on each host you want to monitor
 
@@ -47,7 +47,7 @@ Set these in `.env` or `docker/application.yml` as needed:
 | Feature | Config |
 | --- | --- |
 | Email (password reset, server invites) | `monitor.mail.enabled: true` plus SMTP host/port/credentials in `docker/application.yml` |
-| Session location labels | `MAXMIND_LICENSE` — free [GeoLite2](https://dev.maxmind.com/geoip/geolite2-free-geolocation-data) license key |
+| Session location labels | `MAXMIND_LICENSE`: free [GeoLite2](https://dev.maxmind.com/geoip/geolite2-free-geolocation-data) license key |
 | Agent updates from your fork | `monitor.agent.github-owner` / `github-repo` in `docker/application.yml` |
 
 When mail is disabled, password-reset and invite links are written to the **API container logs** instead of being emailed.
@@ -56,7 +56,7 @@ When mail is disabled, password-reset and invite links are written to the **API 
 
 - Put TLS in front of both the web UI and API (or terminate at your reverse proxy)
 - Set `MONITOR_WEBSITE_URL` and build/configure `VITE_API_URL` for the www image to your public HTTPS URLs
-- Do not expose VictoriaMetrics (`8428`) publicly — remove that port mapping or firewall it
+- Do not expose VictoriaMetrics (`8428`) publicly; remove that port mapping or firewall it
 - Back up the `postgres_data` and `victoriametrics_data` Docker volumes regularly
 - Use the install commands from the dashboard (they include your ingest API URL) or pass `--api-endpoint` / `MONITOR_API_ENDPOINT` manually
 

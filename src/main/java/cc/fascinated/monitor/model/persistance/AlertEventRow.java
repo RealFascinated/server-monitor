@@ -59,6 +59,14 @@ public class AlertEventRow {
     @Column(name = "notify_error")
     private String notifyError;
 
+    @Nullable
+    @Column(name = "silenced_at")
+    private Instant silencedAt;
+
+    @Nullable
+    @Column(name = "silenced_value")
+    private Double silencedValue;
+
     public AlertEventRow(long ruleId, long serverId, String seriesKey, Instant startedAt, double peakValue) {
         this.ruleId = ruleId;
         this.serverId = serverId;

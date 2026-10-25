@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 import { Bell, History, Users } from "lucide-react"
 
-import { AlertEventRow } from "@/components/alerts/alert-event-row"
+import { AlertEventsTable } from "@/components/alerts/alert-events-table"
 import { AlertRulesTable } from "@/components/alerts/alert-rules-table"
 import { EmptyState } from "@/components/empty-state"
 import { QueryStatusShell } from "@/components/query-status-shell"
@@ -58,11 +58,7 @@ function ServerRecentActivity({ serverId }: { serverId: number }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <ul className="flex flex-col gap-2">
-        {data.items.map((event) => (
-          <AlertEventRow key={event.id} event={event} />
-        ))}
-      </ul>
+      <AlertEventsTable events={data.items} />
       <Button asChild variant="ghost" size="sm" className="w-fit">
         <Link to="/alerts/history" search={{ serverId }}>
           View all
