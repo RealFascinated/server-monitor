@@ -158,7 +158,7 @@ export function AppSidebar({
         onMobileClose={onMobileClose}
       />
 
-      <nav className="relative flex min-h-0 flex-1 flex-col gap-1 overflow-hidden px-2">
+      <nav className="relative flex min-h-0 flex-1 flex-col px-2">
         <button
           type="button"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -172,12 +172,17 @@ export function AppSidebar({
             )}
           />
         </button>
-        <SidebarQuickFind compact={compact} onNavigate={handleNavigate} />
-        <SidebarNav compact={compact} onNavigate={handleNavigate} />
-        {user.role === "ADMIN" ? (
-          <SidebarAdminSection compact={compact} onNavigate={handleNavigate} />
-        ) : null}
-        <SidebarFolderTree compact={compact} onNavigate={handleNavigate} />
+        <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
+          <SidebarQuickFind compact={compact} onNavigate={handleNavigate} />
+          <SidebarNav compact={compact} onNavigate={handleNavigate} />
+          {user.role === "ADMIN" ? (
+            <SidebarAdminSection
+              compact={compact}
+              onNavigate={handleNavigate}
+            />
+          ) : null}
+          <SidebarFolderTree compact={compact} onNavigate={handleNavigate} />
+        </div>
       </nav>
 
       <SidebarResizeHandle onResizeStart={onResizeStart} />

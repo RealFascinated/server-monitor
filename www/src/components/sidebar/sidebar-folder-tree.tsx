@@ -18,7 +18,7 @@ export const SidebarFolderTree = memo(function SidebarFolderTree({
   const showSearchInput = servers.length > SIDEBAR_SEARCH_MIN_SERVERS
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex shrink-0 flex-col">
       {!compact ? (
         <SidebarSearch
           value={searchQuery}

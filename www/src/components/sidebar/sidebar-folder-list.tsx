@@ -233,7 +233,7 @@ export const SidebarFolderList = memo(function SidebarFolderList({
       : filteredServerIds.length > 0)
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto">
+    <div className="flex shrink-0 flex-col gap-0.5">
       {!hasSearchResults ? (
         <p className="px-2 py-1 text-xs text-muted-foreground">
           No servers match your search.
