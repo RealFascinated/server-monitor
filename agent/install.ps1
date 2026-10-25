@@ -37,7 +37,12 @@ param(
 $ErrorActionPreference = 'Stop'
 $GitHubRepo = 'RealFascinated/server-monitor'
 $AgentPath = 'agent'
-$NssmZipUrl = 'https://nssm.cc/release/nssm-2.24.zip'
+# nssm.cc is frequently down (503), so fall back to an archived copy. The hash pins the exact release.
+$NssmZipUrls = @(
+    'https://nssm.cc/release/nssm-2.24.zip',
+    'https://web.archive.org/web/2023id_/https://nssm.cc/release/nssm-2.24.zip'
+)
+$NssmZipSha256 = '727d1e42275c605e0f04aba98095c38a8e1e46def453cdffce42869428aa6743'
 
 function Show-Usage {
     @"
@@ -256,13 +261,31 @@ function Show-ServiceDiagnostics([string]$Nssm, [string]$Exe, [string]$Log) {
     $ErrorActionPreference = $prev
 }
 
+function Save-NssmZip([string]$Destination) {
+    foreach ($url in $NssmZipUrls) {
+        for ($attempt = 1; $attempt -le 3; $attempt++) {
+            try {
+                Invoke-WebRequest -Uri $url -OutFile $Destination -UseBasicParsing
+                $actual = (Get-FileHash -Path $Destination -Algorithm SHA256).Hash.ToLower()
+                if ($actual -eq $NssmZipSha256) { return }
+                Write-Log "NSSM archive from $url failed checksum verification"
+                break
+            } catch {
+                Write-Log "NSSM download failed ($url, attempt $attempt/3): $($_.Exception.Message)"
+                if ($attempt -lt 3) { Start-Sleep -Seconds (2 * $attempt) }
+            }
+        }
+    }
+    throw 'Could not download NSSM. Download nssm.exe manually into the tools directory (<InstallDir>\tools\nssm.exe) and re-run.'
+}
+
 function Get-NssmExe([string]$ToolsDir) {
     $nssm = Join-Path $ToolsDir 'nssm.exe'
     if (Test-Path $nssm) { return $nssm }
 
     Write-Log 'Downloading NSSM'
     $zipPath = Join-Path $env:TEMP 'nssm-2.24.zip'
-    Invoke-WebRequest -Uri $NssmZipUrl -OutFile $zipPath
+    Save-NssmZip -Destination $zipPath
     $extract = Join-Path $env:TEMP 'nssm-extract'
     if (Test-Path $extract) { Remove-Item -Recurse -Force $extract }
     Expand-Archive -Path $zipPath -DestinationPath $extract -Force
