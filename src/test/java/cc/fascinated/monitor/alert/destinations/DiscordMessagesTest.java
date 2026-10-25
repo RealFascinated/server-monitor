@@ -7,10 +7,13 @@ import cc.fascinated.monitor.model.domain.alert.AlertSeverity;
 import cc.fascinated.monitor.model.domain.alert.AlertTransition;
 import cc.fascinated.monitor.model.domain.alert.AlertUnit;
 import cc.fascinated.monitor.model.domain.metric.TemperatureUnit;
+import cc.fascinated.monitor.util.Constants;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
@@ -26,25 +29,68 @@ class DiscordMessagesTest {
                 window, transition == AlertTransition.RESOLVED ? Duration.ofMinutes(12) : null, Instant.EPOCH);
     }
 
-    @Test
-    void describesAFiringAlert() {
-        String text = DiscordMessages.describe(notification("web-01", AlertTransition.FIRING, 300));
+    private static JsonNode embedOf(AlertNotification alert) throws Exception {
+        return Constants.OBJECT_MAPPER.readTree(DiscordMessages.payloads(List.of(alert)).getFirst()).get("embeds").get(0);
+    }
 
-        assertThat(text).isEqualTo("**web-01**'s CPU usage is above 90%\nCPU usage: 96.55% (avg 5m) · disk: /");
+    private static Map<String, String> fieldsOf(JsonNode embed) {
+        Map<String, String> fields = new LinkedHashMap<>();
+        embed.get("fields").forEach(field -> fields.put(field.get("name").asString(), field.get("value").asString()));
+        return fields;
     }
 
     @Test
-    void describesARecoveryWithDuration() {
+    void firingEmbedHasAHeadlineAndDetailFields() throws Exception {
+        JsonNode embed = embedOf(notification("web-01", AlertTransition.FIRING, 300));
+
+        assertThat(embed.get("author").get("name").asString()).isEqualTo("Critical · Firing");
+        assertThat(embed.get("title").asString()).isEqualTo("CPU usage is above 90%");
+        assertThat(embed.get("footer").get("text").asString()).isEqualTo("High CPU");
+        assertThat(fieldsOf(embed)).containsExactly(
+                Map.entry("Server", "web-01"),
+                Map.entry("Disk", "/"),
+                Map.entry("Value (avg 5m)", "96.55%"),
+                Map.entry("Threshold", "above 90%"));
+    }
+
+    @Test
+    void recoveryEmbedShowsHowLongItFired() throws Exception {
         AlertNotification resolved = new AlertNotification(1, null, 7, "web-01", "u", "cpu", "CPU usage", Map.of(),
                 AlertOperator.MORE_THAN, 90, 42.1, AlertUnit.PERCENT, TemperatureUnit.CELSIUS, AlertSeverity.WARNING, AlertTransition.RESOLVED, 0,
                 Duration.ofMinutes(12), Instant.EPOCH);
+        JsonNode embed = embedOf(resolved);
 
-        assertThat(DiscordMessages.describe(resolved))
-                .isEqualTo("**web-01**'s CPU usage is back below 90%, now 42.1%, was firing for 12m");
+        assertThat(embed.get("author").get("name").asString()).isEqualTo("Resolved");
+        assertThat(embed.get("title").asString()).isEqualTo("CPU usage is back below 90%");
+        assertThat(embed.has("footer")).as("no footer without a rule name").isFalse();
+        assertThat(fieldsOf(embed)).containsExactly(
+                Map.entry("Server", "web-01"),
+                Map.entry("Now", "42.1%"),
+                Map.entry("Threshold", "above 90%"),
+                Map.entry("Was firing for", "12m"));
     }
 
     @Test
-    void onOffMetricsReadAsHealthyOrUnhealthy() {
+    void escalationHeadlineDoesNotRepeatTheThreshold() throws Exception {
+        JsonNode embed = embedOf(notification("web-01", AlertTransition.ESCALATED, 0));
+
+        assertThat(embed.get("author").get("name").asString()).isEqualTo("Critical · Got worse");
+        assertThat(embed.get("title").asString()).isEqualTo("CPU usage got worse");
+        assertThat(fieldsOf(embed)).containsEntry("Value", "96.55%");
+    }
+
+    @Test
+    void severalLabelsAreJoinedUnderSeries() throws Exception {
+        AlertNotification drive = new AlertNotification(1, null, 7, "web-01", "u", "crc", "UDMA CRC errors",
+                new java.util.LinkedHashMap<>(Map.of("device", "sda")) {{ put("model", "WDC WD40EFRX"); }},
+                AlertOperator.MORE_THAN, 0, 12, AlertUnit.COUNT, TemperatureUnit.CELSIUS, AlertSeverity.WARNING,
+                AlertTransition.FIRING, 0, null, Instant.EPOCH);
+
+        assertThat(fieldsOf(embedOf(drive))).containsEntry("Series", "sda · WDC WD40EFRX");
+    }
+
+    @Test
+    void onOffMetricsReadAsHealthyOrUnhealthy() throws Exception {
         AlertNotification firing = new AlertNotification(1, null, 7, "web-01", "u", "monitor_server_up", "Server status",
                 Map.of(), AlertOperator.LESS_THAN, 1, 0, AlertUnit.STATE, TemperatureUnit.CELSIUS, AlertSeverity.CRITICAL,
                 AlertTransition.FIRING, 0, null, Instant.EPOCH);
@@ -52,9 +98,10 @@ class DiscordMessagesTest {
                 Map.of(), AlertOperator.LESS_THAN, 1, 1, AlertUnit.STATE, TemperatureUnit.CELSIUS, AlertSeverity.CRITICAL,
                 AlertTransition.RESOLVED, 0, Duration.ofMinutes(12), Instant.EPOCH);
 
-        assertThat(DiscordMessages.describe(firing)).isEqualTo("**web-01**'s Server status is unhealthy");
-        assertThat(DiscordMessages.describe(resolved))
-                .isEqualTo("**web-01**'s Server status is healthy again, was unhealthy for 12m");
+        assertThat(embedOf(firing).get("title").asString()).isEqualTo("Server status is unhealthy");
+        assertThat(fieldsOf(embedOf(firing))).containsOnlyKeys("Server");
+        assertThat(embedOf(resolved).get("title").asString()).isEqualTo("Server status is healthy again");
+        assertThat(fieldsOf(embedOf(resolved))).containsEntry("Was firing for", "12m");
     }
 
     @Test
@@ -98,11 +145,12 @@ class DiscordMessagesTest {
     }
 
     @Test
-    void temperaturesUseTheOwnersUnit() {
+    void temperaturesUseTheOwnersUnit() throws Exception {
         AlertNotification hot = new AlertNotification(1, null, 7, "web-01", "u", "temp", "Temperature", Map.of(),
                 AlertOperator.MORE_THAN, 85, 90, AlertUnit.TEMPERATURE, TemperatureUnit.FAHRENHEIT, AlertSeverity.WARNING,
                 AlertTransition.FIRING, 0, null, Instant.EPOCH);
 
-        assertThat(DiscordMessages.describe(hot)).isEqualTo("**web-01**'s Temperature is above 185°F\nTemperature: 194°F");
+        assertThat(embedOf(hot).get("title").asString()).isEqualTo("Temperature is above 185°F");
+        assertThat(fieldsOf(embedOf(hot))).containsEntry("Value", "194°F");
     }
 }

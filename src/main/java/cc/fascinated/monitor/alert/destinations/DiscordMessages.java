@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @UtilityClass
 public class DiscordMessages {
@@ -37,44 +39,23 @@ public class DiscordMessages {
         return payloads;
     }
 
-    public static String describe(AlertNotification alert) {
-        String name = "**" + escape(alert.serverName()) + "**'s " + alert.metricLabel();
-        String threshold = alert.unit().format(alert.threshold(), alert.temperatureUnit());
-        String value = alert.unit().format(alert.value(), alert.temperatureUnit());
-        String labels = labelSuffix(alert.labels());
+    /** The embed title: what happened, in a few words. Details live in the embed fields. */
+    public static String headline(AlertNotification alert) {
+        String metric = alert.metricLabel();
         if (alert.unit() == AlertUnit.STATE) {
-            return describeState(alert, name, labels);
+            return switch (alert.transition()) {
+                case FIRING -> metric + " is unhealthy";
+                case REPEAT -> metric + " is still unhealthy";
+                case ESCALATED -> metric + " got worse";
+                case RESOLVED -> metric + " is healthy again";
+            };
         }
-        if (alert.transition() == AlertTransition.RESOLVED) {
-            String duration = alert.firedFor() == null ? "" : ", was firing for " + DurationUtils.format(alert.firedFor());
-            return "%s is %s %s%s, now %s%s".formatted(
-                    name, alert.operator().recoveryPhrase(), threshold, labels.isEmpty() ? "" : " (" + labels + ")",
-                    value, duration);
-        }
-        String window = alert.windowSeconds() > 0 ? " (avg " + DurationUtils.format(Duration.ofSeconds(alert.windowSeconds())) + ")" : "";
-        String lead = switch (alert.transition()) {
-            case REPEAT -> "is still ";
-            case ESCALATED -> "has got worse, now ";
-            default -> "is ";
-        };
-        String since = alert.transition() == AlertTransition.REPEAT && alert.firedFor() != null
-                ? " · firing for " + DurationUtils.format(alert.firedFor()) : "";
-        return "%s %s%s %s\n%s: %s%s%s%s".formatted(
-                name, lead, alert.operator().phrase(), threshold,
-                alert.metricLabel(), value, window, labels.isEmpty() ? "" : " · " + labels, since);
-    }
-
-    /** On/off metrics read "X is unhealthy" rather than "X is below 1". */
-    private static String describeState(AlertNotification alert, String name, String labels) {
-        String suffix = labels.isEmpty() ? "" : " (" + labels + ")";
-        String duration = alert.firedFor() == null ? "" : DurationUtils.format(alert.firedFor());
+        String threshold = alert.unit().format(alert.threshold(), alert.temperatureUnit());
         return switch (alert.transition()) {
-            case RESOLVED -> "%s is healthy again%s%s".formatted(name, suffix,
-                    duration.isEmpty() ? "" : ", was unhealthy for " + duration);
-            case REPEAT -> "%s is still unhealthy%s%s".formatted(name, suffix,
-                    duration.isEmpty() ? "" : " · for " + duration);
-            case ESCALATED -> "%s has got worse%s".formatted(name, suffix);
-            default -> "%s is unhealthy%s".formatted(name, suffix);
+            case FIRING -> "%s is %s %s".formatted(metric, alert.operator().phrase(), threshold);
+            case REPEAT -> "%s is still %s %s".formatted(metric, alert.operator().phrase(), threshold);
+            case ESCALATED -> metric + " got worse";
+            case RESOLVED -> "%s is %s %s".formatted(metric, alert.operator().recoveryPhrase(), threshold);
         };
     }
 
@@ -128,31 +109,70 @@ public class DiscordMessages {
     }
 
     private static Map<String, Object> embed(AlertNotification alert) {
+        boolean resolved = alert.transition() == AlertTransition.RESOLVED;
         Map<String, Object> embed = new LinkedHashMap<>();
-        embed.put("title", title(alert));
+        embed.put("author", Map.of("name", status(alert)));
+        embed.put("title", headline(alert));
         embed.put("url", alert.serverUrl());
-        embed.put("description", describe(alert));
-        embed.put("color", alert.transition() == AlertTransition.RESOLVED ? RESOLVED_COLOR : alert.severity().color());
+        embed.put("color", resolved ? RESOLVED_COLOR : alert.severity().color());
+        embed.put("fields", fields(alert));
+        if (alert.ruleName() != null && !alert.ruleName().isBlank()) {
+            embed.put("footer", Map.of("text", alert.ruleName()));
+        }
         embed.put("timestamp", alert.occurredAt().toString());
         return embed;
     }
 
-    private static String title(AlertNotification alert) {
-        String prefix = switch (alert.transition()) {
+    private static String status(AlertNotification alert) {
+        return switch (alert.transition()) {
             case FIRING -> alert.severity().label() + " · Firing";
             case REPEAT -> alert.severity().label() + " · Still firing";
             case ESCALATED -> alert.severity().label() + " · Got worse";
             case RESOLVED -> "Resolved";
         };
-        return alert.ruleName() == null || alert.ruleName().isBlank() ? prefix : prefix + " · " + alert.ruleName();
     }
 
-    private static String labelSuffix(Map<String, String> labels) {
-        if (labels.isEmpty()) {
-            return "";
+    private static List<Map<String, Object>> fields(AlertNotification alert) {
+        List<Map<String, Object>> fields = new ArrayList<>();
+        fields.add(field("Server", escape(alert.serverName())));
+        series(alert.labels()).ifPresent(series -> fields.add(field(series.name(), series.value())));
+        if (alert.unit() != AlertUnit.STATE) {
+            boolean resolved = alert.transition() == AlertTransition.RESOLVED;
+            String window = alert.windowSeconds() > 0
+                    ? " (avg " + DurationUtils.format(Duration.ofSeconds(alert.windowSeconds())) + ")" : "";
+            fields.add(field((resolved ? "Now" : "Value") + window,
+                    alert.unit().format(alert.value(), alert.temperatureUnit())));
+            fields.add(field("Threshold", alert.operator().phrase() + " "
+                    + alert.unit().format(alert.threshold(), alert.temperatureUnit())));
         }
-        List<String> parts = new ArrayList<>(labels.size());
-        labels.forEach((key, value) -> parts.add(key + ": " + escape(value)));
-        return String.join(", ", parts);
+        if (alert.firedFor() != null) {
+            String name = alert.transition() == AlertTransition.RESOLVED ? "Was firing for" : "Firing for";
+            fields.add(field(name, DurationUtils.format(alert.firedFor())));
+        }
+        return fields;
+    }
+
+    private static Map<String, Object> field(String name, String value) {
+        Map<String, Object> field = new LinkedHashMap<>();
+        field.put("name", name);
+        field.put("value", value);
+        field.put("inline", true);
+        return field;
+    }
+
+    private record Series(String name, String value) {}
+
+    /** A single label reads as "Disk: /home"; several are joined under "Series", as the web UI does. */
+    private static Optional<Series> series(Map<String, String> labels) {
+        if (labels.isEmpty()) {
+            return Optional.empty();
+        }
+        if (labels.size() == 1) {
+            Map.Entry<String, String> only = labels.entrySet().iterator().next();
+            String key = only.getKey();
+            return Optional.of(new Series(Character.toUpperCase(key.charAt(0)) + key.substring(1), escape(only.getValue())));
+        }
+        return Optional.of(new Series("Series", labels.values().stream().map(DiscordMessages::escape)
+                .collect(Collectors.joining(" · "))));
     }
 }
