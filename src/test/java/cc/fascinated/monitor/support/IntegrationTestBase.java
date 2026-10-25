@@ -1,5 +1,7 @@
 package cc.fascinated.monitor.support;
 
+import cc.fascinated.monitor.alert.AlertEvaluator;
+import cc.fascinated.monitor.alert.AlertRuleCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,6 +48,12 @@ public abstract class IntegrationTestBase {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private AlertRuleCache alertRuleCache;
+
+    @Autowired
+    private AlertEvaluator alertEvaluator;
+
     @BeforeEach
     void resetIntegrationState() throws Exception {
         this.jdbcTemplate.execute("""
@@ -60,11 +68,16 @@ public abstract class IntegrationTestBase {
                     server_ingest_tokens,
                     server_inventory,
                     incidents,
+                    alert_events,
+                    alert_rules,
+                    alert_destinations,
                     servers,
                     settings,
                     users
                 RESTART IDENTITY CASCADE
                 """);
+        this.alertRuleCache.invalidateAll();
+        this.alertEvaluator.purgeAll();
         clearStaticMap("cc.fascinated.monitor.service.SettingsService$Settings", "CACHE");
         clearStaticMap("cc.fascinated.monitor.service.UserPreferencesService$Preferences", "CACHE");
     }

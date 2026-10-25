@@ -17,16 +17,25 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedInvitesRouteRouteImport } from './routes/_authenticated/invites/route'
+import { Route as AuthenticatedAlertsRouteRouteImport } from './routes/_authenticated/alerts/route'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedInvitesIndexRouteImport } from './routes/_authenticated/invites/index'
+import { Route as AuthenticatedAlertsIndexRouteImport } from './routes/_authenticated/alerts/index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedInvitesAcceptRouteImport } from './routes/_authenticated/invites/accept'
+import { Route as AuthenticatedAlertsHistoryRouteImport } from './routes/_authenticated/alerts/history'
+import { Route as AuthenticatedAlertsDestinationsRouteImport } from './routes/_authenticated/alerts/destinations'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 import { Route as AuthenticatedAdminMetricsRouteImport } from './routes/_authenticated/admin/metrics'
 import { Route as AuthenticatedServersServerIdRouteRouteImport } from './routes/_authenticated/servers/$serverId/route'
 import { Route as AuthenticatedServersServerIdIndexRouteImport } from './routes/_authenticated/servers/$serverId/index'
+import { Route as AuthenticatedAlertsGroupsIndexRouteImport } from './routes/_authenticated/alerts/groups.index'
 import { Route as AuthenticatedServersServerIdSettingsRouteImport } from './routes/_authenticated/servers/$serverId/settings'
 import { Route as AuthenticatedServersServerIdIncidentsRouteImport } from './routes/_authenticated/servers/$serverId/incidents'
+import { Route as AuthenticatedServersServerIdAlertsRouteImport } from './routes/_authenticated/servers/$serverId/alerts'
+import { Route as AuthenticatedAlertsGroupsGroupIdIndexRouteImport } from './routes/_authenticated/alerts/groups.$groupId.index'
+import { Route as AuthenticatedAlertsGroupsGroupIdRulesNewRouteImport } from './routes/_authenticated/alerts/groups.$groupId.rules.new'
+import { Route as AuthenticatedAlertsGroupsGroupIdRulesRuleIdRouteImport } from './routes/_authenticated/alerts/groups.$groupId.rules.$ruleId'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -68,6 +77,12 @@ const AuthenticatedInvitesRouteRoute =
     path: '/invites',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAlertsRouteRoute =
+  AuthenticatedAlertsRouteRouteImport.update({
+    id: '/alerts',
+    path: '/alerts',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -79,6 +94,12 @@ const AuthenticatedInvitesIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedInvitesRouteRoute,
   } as any)
+const AuthenticatedAlertsIndexRoute =
+  AuthenticatedAlertsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAlertsRouteRoute,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -89,6 +110,18 @@ const AuthenticatedInvitesAcceptRoute =
     id: '/accept',
     path: '/accept',
     getParentRoute: () => AuthenticatedInvitesRouteRoute,
+  } as any)
+const AuthenticatedAlertsHistoryRoute =
+  AuthenticatedAlertsHistoryRouteImport.update({
+    id: '/history',
+    path: '/history',
+    getParentRoute: () => AuthenticatedAlertsRouteRoute,
+  } as any)
+const AuthenticatedAlertsDestinationsRoute =
+  AuthenticatedAlertsDestinationsRouteImport.update({
+    id: '/destinations',
+    path: '/destinations',
+    getParentRoute: () => AuthenticatedAlertsRouteRoute,
   } as any)
 const AuthenticatedAdminSettingsRoute =
   AuthenticatedAdminSettingsRouteImport.update({
@@ -114,6 +147,12 @@ const AuthenticatedServersServerIdIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedServersServerIdRouteRoute,
   } as any)
+const AuthenticatedAlertsGroupsIndexRoute =
+  AuthenticatedAlertsGroupsIndexRouteImport.update({
+    id: '/groups/',
+    path: '/groups/',
+    getParentRoute: () => AuthenticatedAlertsRouteRoute,
+  } as any)
 const AuthenticatedServersServerIdSettingsRoute =
   AuthenticatedServersServerIdSettingsRouteImport.update({
     id: '/settings',
@@ -126,6 +165,30 @@ const AuthenticatedServersServerIdIncidentsRoute =
     path: '/incidents',
     getParentRoute: () => AuthenticatedServersServerIdRouteRoute,
   } as any)
+const AuthenticatedServersServerIdAlertsRoute =
+  AuthenticatedServersServerIdAlertsRouteImport.update({
+    id: '/alerts',
+    path: '/alerts',
+    getParentRoute: () => AuthenticatedServersServerIdRouteRoute,
+  } as any)
+const AuthenticatedAlertsGroupsGroupIdIndexRoute =
+  AuthenticatedAlertsGroupsGroupIdIndexRouteImport.update({
+    id: '/groups/$groupId/',
+    path: '/groups/$groupId/',
+    getParentRoute: () => AuthenticatedAlertsRouteRoute,
+  } as any)
+const AuthenticatedAlertsGroupsGroupIdRulesNewRoute =
+  AuthenticatedAlertsGroupsGroupIdRulesNewRouteImport.update({
+    id: '/groups/$groupId/rules/new',
+    path: '/groups/$groupId/rules/new',
+    getParentRoute: () => AuthenticatedAlertsRouteRoute,
+  } as any)
+const AuthenticatedAlertsGroupsGroupIdRulesRuleIdRoute =
+  AuthenticatedAlertsGroupsGroupIdRulesRuleIdRouteImport.update({
+    id: '/groups/$groupId/rules/$ruleId',
+    path: '/groups/$groupId/rules/$ruleId',
+    getParentRoute: () => AuthenticatedAlertsRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -134,17 +197,26 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/alerts': typeof AuthenticatedAlertsRouteRouteWithChildren
   '/invites': typeof AuthenticatedInvitesRouteRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
   '/servers/$serverId': typeof AuthenticatedServersServerIdRouteRouteWithChildren
   '/admin/metrics': typeof AuthenticatedAdminMetricsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/alerts/destinations': typeof AuthenticatedAlertsDestinationsRoute
+  '/alerts/history': typeof AuthenticatedAlertsHistoryRoute
   '/invites/accept': typeof AuthenticatedInvitesAcceptRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/alerts/': typeof AuthenticatedAlertsIndexRoute
   '/invites/': typeof AuthenticatedInvitesIndexRoute
+  '/servers/$serverId/alerts': typeof AuthenticatedServersServerIdAlertsRoute
   '/servers/$serverId/incidents': typeof AuthenticatedServersServerIdIncidentsRoute
   '/servers/$serverId/settings': typeof AuthenticatedServersServerIdSettingsRoute
+  '/alerts/groups/': typeof AuthenticatedAlertsGroupsIndexRoute
   '/servers/$serverId/': typeof AuthenticatedServersServerIdIndexRoute
+  '/alerts/groups/$groupId/': typeof AuthenticatedAlertsGroupsGroupIdIndexRoute
+  '/alerts/groups/$groupId/rules/$ruleId': typeof AuthenticatedAlertsGroupsGroupIdRulesRuleIdRoute
+  '/alerts/groups/$groupId/rules/new': typeof AuthenticatedAlertsGroupsGroupIdRulesNewRoute
 }
 export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
@@ -155,12 +227,20 @@ export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
   '/admin/metrics': typeof AuthenticatedAdminMetricsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/alerts/destinations': typeof AuthenticatedAlertsDestinationsRoute
+  '/alerts/history': typeof AuthenticatedAlertsHistoryRoute
   '/invites/accept': typeof AuthenticatedInvitesAcceptRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/alerts': typeof AuthenticatedAlertsIndexRoute
   '/invites': typeof AuthenticatedInvitesIndexRoute
+  '/servers/$serverId/alerts': typeof AuthenticatedServersServerIdAlertsRoute
   '/servers/$serverId/incidents': typeof AuthenticatedServersServerIdIncidentsRoute
   '/servers/$serverId/settings': typeof AuthenticatedServersServerIdSettingsRoute
+  '/alerts/groups': typeof AuthenticatedAlertsGroupsIndexRoute
   '/servers/$serverId': typeof AuthenticatedServersServerIdIndexRoute
+  '/alerts/groups/$groupId': typeof AuthenticatedAlertsGroupsGroupIdIndexRoute
+  '/alerts/groups/$groupId/rules/$ruleId': typeof AuthenticatedAlertsGroupsGroupIdRulesRuleIdRoute
+  '/alerts/groups/$groupId/rules/new': typeof AuthenticatedAlertsGroupsGroupIdRulesNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -170,18 +250,27 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/_authenticated/alerts': typeof AuthenticatedAlertsRouteRouteWithChildren
   '/_authenticated/invites': typeof AuthenticatedInvitesRouteRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/servers/$serverId': typeof AuthenticatedServersServerIdRouteRouteWithChildren
   '/_authenticated/admin/metrics': typeof AuthenticatedAdminMetricsRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/_authenticated/alerts/destinations': typeof AuthenticatedAlertsDestinationsRoute
+  '/_authenticated/alerts/history': typeof AuthenticatedAlertsHistoryRoute
   '/_authenticated/invites/accept': typeof AuthenticatedInvitesAcceptRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/alerts/': typeof AuthenticatedAlertsIndexRoute
   '/_authenticated/invites/': typeof AuthenticatedInvitesIndexRoute
+  '/_authenticated/servers/$serverId/alerts': typeof AuthenticatedServersServerIdAlertsRoute
   '/_authenticated/servers/$serverId/incidents': typeof AuthenticatedServersServerIdIncidentsRoute
   '/_authenticated/servers/$serverId/settings': typeof AuthenticatedServersServerIdSettingsRoute
+  '/_authenticated/alerts/groups/': typeof AuthenticatedAlertsGroupsIndexRoute
   '/_authenticated/servers/$serverId/': typeof AuthenticatedServersServerIdIndexRoute
+  '/_authenticated/alerts/groups/$groupId/': typeof AuthenticatedAlertsGroupsGroupIdIndexRoute
+  '/_authenticated/alerts/groups/$groupId/rules/$ruleId': typeof AuthenticatedAlertsGroupsGroupIdRulesRuleIdRoute
+  '/_authenticated/alerts/groups/$groupId/rules/new': typeof AuthenticatedAlertsGroupsGroupIdRulesNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -192,17 +281,26 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/admin'
+    | '/alerts'
     | '/invites'
     | '/settings'
     | '/servers/$serverId'
     | '/admin/metrics'
     | '/admin/settings'
+    | '/alerts/destinations'
+    | '/alerts/history'
     | '/invites/accept'
     | '/admin/'
+    | '/alerts/'
     | '/invites/'
+    | '/servers/$serverId/alerts'
     | '/servers/$serverId/incidents'
     | '/servers/$serverId/settings'
+    | '/alerts/groups/'
     | '/servers/$serverId/'
+    | '/alerts/groups/$groupId/'
+    | '/alerts/groups/$groupId/rules/$ruleId'
+    | '/alerts/groups/$groupId/rules/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/forgot-password'
@@ -213,12 +311,20 @@ export interface FileRouteTypes {
     | '/'
     | '/admin/metrics'
     | '/admin/settings'
+    | '/alerts/destinations'
+    | '/alerts/history'
     | '/invites/accept'
     | '/admin'
+    | '/alerts'
     | '/invites'
+    | '/servers/$serverId/alerts'
     | '/servers/$serverId/incidents'
     | '/servers/$serverId/settings'
+    | '/alerts/groups'
     | '/servers/$serverId'
+    | '/alerts/groups/$groupId'
+    | '/alerts/groups/$groupId/rules/$ruleId'
+    | '/alerts/groups/$groupId/rules/new'
   id:
     | '__root__'
     | '/_authenticated'
@@ -227,18 +333,27 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/_authenticated/admin'
+    | '/_authenticated/alerts'
     | '/_authenticated/invites'
     | '/_authenticated/settings'
     | '/_authenticated/'
     | '/_authenticated/servers/$serverId'
     | '/_authenticated/admin/metrics'
     | '/_authenticated/admin/settings'
+    | '/_authenticated/alerts/destinations'
+    | '/_authenticated/alerts/history'
     | '/_authenticated/invites/accept'
     | '/_authenticated/admin/'
+    | '/_authenticated/alerts/'
     | '/_authenticated/invites/'
+    | '/_authenticated/servers/$serverId/alerts'
     | '/_authenticated/servers/$serverId/incidents'
     | '/_authenticated/servers/$serverId/settings'
+    | '/_authenticated/alerts/groups/'
     | '/_authenticated/servers/$serverId/'
+    | '/_authenticated/alerts/groups/$groupId/'
+    | '/_authenticated/alerts/groups/$groupId/rules/$ruleId'
+    | '/_authenticated/alerts/groups/$groupId/rules/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -307,6 +422,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInvitesRouteRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/alerts': {
+      id: '/_authenticated/alerts'
+      path: '/alerts'
+      fullPath: '/alerts'
+      preLoaderRoute: typeof AuthenticatedAlertsRouteRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -321,6 +443,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInvitesIndexRouteImport
       parentRoute: typeof AuthenticatedInvitesRouteRoute
     }
+    '/_authenticated/alerts/': {
+      id: '/_authenticated/alerts/'
+      path: '/'
+      fullPath: '/alerts/'
+      preLoaderRoute: typeof AuthenticatedAlertsIndexRouteImport
+      parentRoute: typeof AuthenticatedAlertsRouteRoute
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
@@ -334,6 +463,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/invites/accept'
       preLoaderRoute: typeof AuthenticatedInvitesAcceptRouteImport
       parentRoute: typeof AuthenticatedInvitesRouteRoute
+    }
+    '/_authenticated/alerts/history': {
+      id: '/_authenticated/alerts/history'
+      path: '/history'
+      fullPath: '/alerts/history'
+      preLoaderRoute: typeof AuthenticatedAlertsHistoryRouteImport
+      parentRoute: typeof AuthenticatedAlertsRouteRoute
+    }
+    '/_authenticated/alerts/destinations': {
+      id: '/_authenticated/alerts/destinations'
+      path: '/destinations'
+      fullPath: '/alerts/destinations'
+      preLoaderRoute: typeof AuthenticatedAlertsDestinationsRouteImport
+      parentRoute: typeof AuthenticatedAlertsRouteRoute
     }
     '/_authenticated/admin/settings': {
       id: '/_authenticated/admin/settings'
@@ -363,6 +506,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedServersServerIdIndexRouteImport
       parentRoute: typeof AuthenticatedServersServerIdRouteRoute
     }
+    '/_authenticated/alerts/groups/': {
+      id: '/_authenticated/alerts/groups/'
+      path: '/groups'
+      fullPath: '/alerts/groups/'
+      preLoaderRoute: typeof AuthenticatedAlertsGroupsIndexRouteImport
+      parentRoute: typeof AuthenticatedAlertsRouteRoute
+    }
     '/_authenticated/servers/$serverId/settings': {
       id: '/_authenticated/servers/$serverId/settings'
       path: '/settings'
@@ -376,6 +526,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/servers/$serverId/incidents'
       preLoaderRoute: typeof AuthenticatedServersServerIdIncidentsRouteImport
       parentRoute: typeof AuthenticatedServersServerIdRouteRoute
+    }
+    '/_authenticated/servers/$serverId/alerts': {
+      id: '/_authenticated/servers/$serverId/alerts'
+      path: '/alerts'
+      fullPath: '/servers/$serverId/alerts'
+      preLoaderRoute: typeof AuthenticatedServersServerIdAlertsRouteImport
+      parentRoute: typeof AuthenticatedServersServerIdRouteRoute
+    }
+    '/_authenticated/alerts/groups/$groupId/': {
+      id: '/_authenticated/alerts/groups/$groupId/'
+      path: '/groups/$groupId'
+      fullPath: '/alerts/groups/$groupId/'
+      preLoaderRoute: typeof AuthenticatedAlertsGroupsGroupIdIndexRouteImport
+      parentRoute: typeof AuthenticatedAlertsRouteRoute
+    }
+    '/_authenticated/alerts/groups/$groupId/rules/new': {
+      id: '/_authenticated/alerts/groups/$groupId/rules/new'
+      path: '/groups/$groupId/rules/new'
+      fullPath: '/alerts/groups/$groupId/rules/new'
+      preLoaderRoute: typeof AuthenticatedAlertsGroupsGroupIdRulesNewRouteImport
+      parentRoute: typeof AuthenticatedAlertsRouteRoute
+    }
+    '/_authenticated/alerts/groups/$groupId/rules/$ruleId': {
+      id: '/_authenticated/alerts/groups/$groupId/rules/$ruleId'
+      path: '/groups/$groupId/rules/$ruleId'
+      fullPath: '/alerts/groups/$groupId/rules/$ruleId'
+      preLoaderRoute: typeof AuthenticatedAlertsGroupsGroupIdRulesRuleIdRouteImport
+      parentRoute: typeof AuthenticatedAlertsRouteRoute
     }
   }
 }
@@ -398,6 +576,35 @@ const AuthenticatedAdminRouteRouteWithChildren =
     AuthenticatedAdminRouteRouteChildren,
   )
 
+interface AuthenticatedAlertsRouteRouteChildren {
+  AuthenticatedAlertsDestinationsRoute: typeof AuthenticatedAlertsDestinationsRoute
+  AuthenticatedAlertsHistoryRoute: typeof AuthenticatedAlertsHistoryRoute
+  AuthenticatedAlertsIndexRoute: typeof AuthenticatedAlertsIndexRoute
+  AuthenticatedAlertsGroupsIndexRoute: typeof AuthenticatedAlertsGroupsIndexRoute
+  AuthenticatedAlertsGroupsGroupIdIndexRoute: typeof AuthenticatedAlertsGroupsGroupIdIndexRoute
+  AuthenticatedAlertsGroupsGroupIdRulesRuleIdRoute: typeof AuthenticatedAlertsGroupsGroupIdRulesRuleIdRoute
+  AuthenticatedAlertsGroupsGroupIdRulesNewRoute: typeof AuthenticatedAlertsGroupsGroupIdRulesNewRoute
+}
+
+const AuthenticatedAlertsRouteRouteChildren: AuthenticatedAlertsRouteRouteChildren =
+  {
+    AuthenticatedAlertsDestinationsRoute: AuthenticatedAlertsDestinationsRoute,
+    AuthenticatedAlertsHistoryRoute: AuthenticatedAlertsHistoryRoute,
+    AuthenticatedAlertsIndexRoute: AuthenticatedAlertsIndexRoute,
+    AuthenticatedAlertsGroupsIndexRoute: AuthenticatedAlertsGroupsIndexRoute,
+    AuthenticatedAlertsGroupsGroupIdIndexRoute:
+      AuthenticatedAlertsGroupsGroupIdIndexRoute,
+    AuthenticatedAlertsGroupsGroupIdRulesRuleIdRoute:
+      AuthenticatedAlertsGroupsGroupIdRulesRuleIdRoute,
+    AuthenticatedAlertsGroupsGroupIdRulesNewRoute:
+      AuthenticatedAlertsGroupsGroupIdRulesNewRoute,
+  }
+
+const AuthenticatedAlertsRouteRouteWithChildren =
+  AuthenticatedAlertsRouteRoute._addFileChildren(
+    AuthenticatedAlertsRouteRouteChildren,
+  )
+
 interface AuthenticatedInvitesRouteRouteChildren {
   AuthenticatedInvitesAcceptRoute: typeof AuthenticatedInvitesAcceptRoute
   AuthenticatedInvitesIndexRoute: typeof AuthenticatedInvitesIndexRoute
@@ -415,6 +622,7 @@ const AuthenticatedInvitesRouteRouteWithChildren =
   )
 
 interface AuthenticatedServersServerIdRouteRouteChildren {
+  AuthenticatedServersServerIdAlertsRoute: typeof AuthenticatedServersServerIdAlertsRoute
   AuthenticatedServersServerIdIncidentsRoute: typeof AuthenticatedServersServerIdIncidentsRoute
   AuthenticatedServersServerIdSettingsRoute: typeof AuthenticatedServersServerIdSettingsRoute
   AuthenticatedServersServerIdIndexRoute: typeof AuthenticatedServersServerIdIndexRoute
@@ -422,6 +630,8 @@ interface AuthenticatedServersServerIdRouteRouteChildren {
 
 const AuthenticatedServersServerIdRouteRouteChildren: AuthenticatedServersServerIdRouteRouteChildren =
   {
+    AuthenticatedServersServerIdAlertsRoute:
+      AuthenticatedServersServerIdAlertsRoute,
     AuthenticatedServersServerIdIncidentsRoute:
       AuthenticatedServersServerIdIncidentsRoute,
     AuthenticatedServersServerIdSettingsRoute:
@@ -437,6 +647,7 @@ const AuthenticatedServersServerIdRouteRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
+  AuthenticatedAlertsRouteRoute: typeof AuthenticatedAlertsRouteRouteWithChildren
   AuthenticatedInvitesRouteRoute: typeof AuthenticatedInvitesRouteRouteWithChildren
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
@@ -445,6 +656,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
+  AuthenticatedAlertsRouteRoute: AuthenticatedAlertsRouteRouteWithChildren,
   AuthenticatedInvitesRouteRoute: AuthenticatedInvitesRouteRouteWithChildren,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,

@@ -1,9 +1,17 @@
 package cc.fascinated.monitor.metrics.server.series;
 
 import cc.fascinated.monitor.metrics.vm.MetricWriteContext;
+import cc.fascinated.monitor.model.domain.alert.AlertInfo;
+import org.jetbrains.annotations.Nullable;
 
 public interface VmGaugeSeries {
     String metricName();
+
+    /** Alerting metadata, or null when users cannot alert on this series. */
+    @Nullable
+    default AlertInfo alertInfo() {
+        return null;
+    }
 
     default void write(MetricWriteContext ctx, double value) {
         ctx.gauge(this.metricName(), value);

@@ -4,30 +4,47 @@ import cc.fascinated.monitor.metrics.vm.MetricWriteContext;
 import cc.fascinated.monitor.metrics.server.catalog.MetricFamily;
 import cc.fascinated.monitor.metrics.server.catalog.VmMetricFamily;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.DiskMetric;
+import cc.fascinated.monitor.model.domain.alert.AlertInfo;
+import cc.fascinated.monitor.model.domain.alert.AlertOperator;
+import cc.fascinated.monitor.model.domain.alert.AlertSeverity;
+import cc.fascinated.monitor.model.domain.alert.AlertUnit;
+import org.jetbrains.annotations.Nullable;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
 @Getter
 @Accessors(fluent = true)
 public enum DiskSeries implements VmMetricFamily {
-    USAGE_PERCENT("monitor_disk_usage_percent"),
+    USAGE_PERCENT("monitor_disk_usage_percent",
+            AlertInfo.of("Disk usage", AlertUnit.PERCENT, AlertOperator.MORE_THAN, 90).asDefault(300, AlertSeverity.WARNING)),
     USED_BYTES("monitor_disk_used_bytes"),
     TOTAL_BYTES("monitor_disk_total_bytes"),
     IO_READ_BPS("monitor_disk_io_read_bps"),
     IO_WRITE_BPS("monitor_disk_io_write_bps"),
-    IO_USAGE_PCT("monitor_disk_io_usage_pct"),
-    IO_WAIT_MS("monitor_disk_io_wait_ms"),
+    IO_USAGE_PCT("monitor_disk_io_usage_pct",
+            AlertInfo.of("Disk I/O utilisation", AlertUnit.PERCENT, AlertOperator.MORE_THAN, 90)),
+    IO_WAIT_MS("monitor_disk_io_wait_ms",
+            AlertInfo.of("Disk I/O wait", AlertUnit.MILLISECONDS, AlertOperator.MORE_THAN, 100)),
     INODE_USED("monitor_disk_inode_used"),
     INODE_TOTAL("monitor_disk_inode_total"),
     READ_IOPS("monitor_disk_read_iops"),
     WRITE_IOPS("monitor_disk_write_iops"),
-    READ_LATENCY_MS("monitor_disk_read_latency_ms"),
-    WRITE_LATENCY_MS("monitor_disk_write_latency_ms");
+    READ_LATENCY_MS("monitor_disk_read_latency_ms",
+            AlertInfo.of("Disk read latency", AlertUnit.MILLISECONDS, AlertOperator.MORE_THAN, 100)),
+    WRITE_LATENCY_MS("monitor_disk_write_latency_ms",
+            AlertInfo.of("Disk write latency", AlertUnit.MILLISECONDS, AlertOperator.MORE_THAN, 100));
 
     private final String metricName;
+    @Nullable
+    private final AlertInfo alertInfo;
 
     DiskSeries(String metricName) {
+        this(metricName, null);
+    }
+
+    DiskSeries(String metricName, @Nullable AlertInfo alertInfo) {
         this.metricName = metricName;
+        this.alertInfo = alertInfo;
     }
 
     @Override

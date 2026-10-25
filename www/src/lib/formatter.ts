@@ -144,10 +144,6 @@ export function formatMilliseconds(value: number): string {
   return `${formatNumber(value)} ms`
 }
 
-export function formatCelsius(value: number): string {
-  return `${formatNumber(value)} °C`
-}
-
 export function memoryUsagePercent(
   usage: number | null,
   max: number | null

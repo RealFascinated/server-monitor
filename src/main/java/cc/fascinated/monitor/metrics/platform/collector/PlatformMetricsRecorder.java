@@ -34,6 +34,39 @@ public class PlatformMetricsRecorder {
     private final LabeledCounterAccumulator httpRequests = new LabeledCounterAccumulator();
     private final LabeledHistogramAccumulator httpRequestDuration = new LabeledHistogramAccumulator(HistogramAccumulator.DURATION_BUCKETS);
 
+    private final CounterAccumulator alertEvaluations = new CounterAccumulator();
+    private final LabeledCounterAccumulator alertTransitions = new LabeledCounterAccumulator();
+    private final LabeledCounterAccumulator alertNotifications = new LabeledCounterAccumulator();
+    private final CounterAccumulator alertDropped = new CounterAccumulator();
+
+    public void recordAlertEvaluation() {
+        if (!this.monitorMetricsProperties.isEnabled()) {
+            return;
+        }
+        this.alertEvaluations.increment();
+    }
+
+    public void recordAlertTransition(String type) {
+        if (!this.monitorMetricsProperties.isEnabled()) {
+            return;
+        }
+        this.alertTransitions.increment(type);
+    }
+
+    public void recordAlertNotification(String status) {
+        if (!this.monitorMetricsProperties.isEnabled()) {
+            return;
+        }
+        this.alertNotifications.increment(status);
+    }
+
+    public void recordAlertDropped() {
+        if (!this.monitorMetricsProperties.isEnabled()) {
+            return;
+        }
+        this.alertDropped.increment();
+    }
+
     public void recordIngest(double durationSeconds, long payloadBytes) {
         if (!this.monitorMetricsProperties.isEnabled()) {
             return;
@@ -101,6 +134,20 @@ public class PlatformMetricsRecorder {
         writeIngest(ctx);
         writeVm(ctx);
         writeHttp(ctx);
+        writeAlerts(ctx);
+    }
+
+    private void writeAlerts(PrometheusWriteContext ctx) {
+        ctx.counter(PlatformMetricFamily.ALERT_EVALUATIONS_TOTAL.metricName(), this.alertEvaluations.get());
+        ctx.counter(PlatformMetricFamily.ALERT_DROPPED_TOTAL.metricName(), this.alertDropped.get());
+        for (Map.Entry<String, Long> entry : this.alertTransitions.snapshot().entrySet()) {
+            ctx.counter(PlatformMetricFamily.ALERT_TRANSITIONS_TOTAL.metricName(), entry.getValue(),
+                    Map.of("type", entry.getKey()));
+        }
+        for (Map.Entry<String, Long> entry : this.alertNotifications.snapshot().entrySet()) {
+            ctx.counter(PlatformMetricFamily.ALERT_NOTIFICATIONS_TOTAL.metricName(), entry.getValue(),
+                    Map.of("status", entry.getKey()));
+        }
     }
 
     private void writeIngest(PrometheusWriteContext ctx) {

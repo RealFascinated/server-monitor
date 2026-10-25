@@ -4,24 +4,41 @@ import cc.fascinated.monitor.metrics.vm.MetricWriteContext;
 import cc.fascinated.monitor.metrics.server.catalog.MetricFamily;
 import cc.fascinated.monitor.metrics.server.catalog.VmMetricFamily;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.GpuMetric;
+import cc.fascinated.monitor.model.domain.alert.AlertInfo;
+import cc.fascinated.monitor.model.domain.alert.AlertOperator;
+import cc.fascinated.monitor.model.domain.alert.AlertSeverity;
+import cc.fascinated.monitor.model.domain.alert.AlertUnit;
+import org.jetbrains.annotations.Nullable;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
 @Getter
 @Accessors(fluent = true)
 public enum GpuSeries implements VmMetricFamily {
-    USAGE_PERCENT("monitor_gpu_usage_percent"),
-    ENCODER_USAGE_PERCENT("monitor_gpu_encoder_usage_percent"),
-    DECODER_USAGE_PERCENT("monitor_gpu_decoder_usage_percent"),
+    USAGE_PERCENT("monitor_gpu_usage_percent",
+            AlertInfo.of("GPU usage", AlertUnit.PERCENT, AlertOperator.MORE_THAN, 95)),
+    ENCODER_USAGE_PERCENT("monitor_gpu_encoder_usage_percent",
+            AlertInfo.of("GPU encoder usage", AlertUnit.PERCENT, AlertOperator.MORE_THAN, 95)),
+    DECODER_USAGE_PERCENT("monitor_gpu_decoder_usage_percent",
+            AlertInfo.of("GPU decoder usage", AlertUnit.PERCENT, AlertOperator.MORE_THAN, 95)),
     MEMORY_USED_BYTES("monitor_gpu_memory_used_bytes"),
     MEMORY_TOTAL_BYTES("monitor_gpu_memory_total_bytes"),
-    TEMPERATURE_CELSIUS("monitor_gpu_temperature_celsius"),
-    POWER_WATTS("monitor_gpu_power_watts");
+    TEMPERATURE_CELSIUS("monitor_gpu_temperature_celsius",
+            AlertInfo.of("GPU temperature", AlertUnit.TEMPERATURE, AlertOperator.MORE_THAN, 85)),
+    POWER_WATTS("monitor_gpu_power_watts",
+            AlertInfo.of("GPU power", AlertUnit.WATTS, AlertOperator.MORE_THAN, 300));
 
     private final String metricName;
+    @Nullable
+    private final AlertInfo alertInfo;
 
     GpuSeries(String metricName) {
+        this(metricName, null);
+    }
+
+    GpuSeries(String metricName, @Nullable AlertInfo alertInfo) {
         this.metricName = metricName;
+        this.alertInfo = alertInfo;
     }
 
     @Override

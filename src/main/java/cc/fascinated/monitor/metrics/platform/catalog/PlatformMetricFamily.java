@@ -62,7 +62,12 @@ public enum PlatformMetricFamily {
     JVM_PROCESS_RSS_BYTES("monitor_platform_jvm_process_rss_bytes", PlatformSection.JVM, false),
 
     HTTP_REQUESTS_TOTAL("monitor_platform_http_requests_total", PlatformSection.HTTP, true, "method", "path", "status"),
-    HTTP_REQUEST_DURATION_SECONDS("monitor_platform_http_request_duration_seconds", PlatformSection.HTTP, true, true, "method", "path");
+    HTTP_REQUEST_DURATION_SECONDS("monitor_platform_http_request_duration_seconds", PlatformSection.HTTP, true, true, "method", "path"),
+
+    ALERT_EVALUATIONS_TOTAL("monitor_platform_alert_evaluations_total", PlatformSection.ALERTS, false),
+    ALERT_TRANSITIONS_TOTAL("monitor_platform_alert_transitions_total", PlatformSection.ALERTS, true, "type"),
+    ALERT_NOTIFICATIONS_TOTAL("monitor_platform_alert_notifications_total", PlatformSection.ALERTS, true, "status"),
+    ALERT_DROPPED_TOTAL("monitor_platform_alert_dropped_total", PlatformSection.ALERTS, false);
 
     private final String metricName;
     private final PlatformSection section;
@@ -125,7 +130,8 @@ public enum PlatformMetricFamily {
         return switch (this) {
             case INGESTS_TOTAL, INGEST_AUTH_FAILURES_TOTAL, INGEST_BACKFILLED_SAMPLES_TOTAL, INGEST_REJECTED_SAMPLES_TOTAL,
                  VM_QUERIES_TOTAL, VM_QUERY_ERRORS_TOTAL, VM_WRITES_TOTAL, VM_WRITE_ERRORS_TOTAL,
-                 HTTP_REQUESTS_TOTAL -> true;
+                 HTTP_REQUESTS_TOTAL, ALERT_EVALUATIONS_TOTAL, ALERT_TRANSITIONS_TOTAL, ALERT_NOTIFICATIONS_TOTAL,
+                 ALERT_DROPPED_TOTAL -> true;
             default -> false;
         };
     }

@@ -4,28 +4,43 @@ import cc.fascinated.monitor.metrics.vm.MetricWriteContext;
 import cc.fascinated.monitor.metrics.server.catalog.MetricFamily;
 import cc.fascinated.monitor.metrics.server.catalog.VmMetricFamily;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.ZfsPoolMetric;
+import cc.fascinated.monitor.model.domain.alert.AlertInfo;
+import cc.fascinated.monitor.model.domain.alert.AlertOperator;
+import cc.fascinated.monitor.model.domain.alert.AlertSeverity;
+import cc.fascinated.monitor.model.domain.alert.AlertUnit;
+import org.jetbrains.annotations.Nullable;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
 @Getter
 @Accessors(fluent = true)
 public enum ZfsPoolSeries implements VmMetricFamily {
-    CAPACITY_PERCENT("monitor_zfs_pool_capacity_percent"),
+    CAPACITY_PERCENT("monitor_zfs_pool_capacity_percent",
+            AlertInfo.of("ZFS pool capacity", AlertUnit.PERCENT, AlertOperator.MORE_THAN, 85)),
     ALLOCATED_BYTES("monitor_zfs_pool_allocated_bytes"),
     FREE_BYTES("monitor_zfs_pool_free_bytes"),
     TOTAL_BYTES("monitor_zfs_pool_total_bytes"),
-    FRAGMENTATION_PERCENT("monitor_zfs_pool_fragmentation_percent"),
+    FRAGMENTATION_PERCENT("monitor_zfs_pool_fragmentation_percent",
+            AlertInfo.of("ZFS pool fragmentation", AlertUnit.PERCENT, AlertOperator.MORE_THAN, 80)),
     SCAN_PERCENT("monitor_zfs_pool_scan_percent"),
     READ_BPS("monitor_zfs_pool_read_bps"),
     WRITE_BPS("monitor_zfs_pool_write_bps"),
     READ_IOPS("monitor_zfs_pool_read_iops"),
     WRITE_IOPS("monitor_zfs_pool_write_iops"),
-    CHECKSUM_ERRORS("monitor_zfs_pool_checksum_errors");
+    CHECKSUM_ERRORS("monitor_zfs_pool_checksum_errors",
+            AlertInfo.of("ZFS checksum errors", AlertUnit.COUNT, AlertOperator.MORE_THAN, 0));
 
     private final String metricName;
+    @Nullable
+    private final AlertInfo alertInfo;
 
     ZfsPoolSeries(String metricName) {
+        this(metricName, null);
+    }
+
+    ZfsPoolSeries(String metricName, @Nullable AlertInfo alertInfo) {
         this.metricName = metricName;
+        this.alertInfo = alertInfo;
     }
 
     @Override

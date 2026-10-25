@@ -1,4 +1,5 @@
 import type { MetricRefreshInterval } from "@/lib/metrics/refresh-interval"
+import type { TemperatureUnit } from "@/lib/metrics/temperature"
 import type { MetricTimeRange } from "@/lib/metrics/range"
 import { DEFAULT_METRIC_TIME_RANGE } from "@/lib/metrics/range"
 
@@ -32,6 +33,11 @@ export const Preferences = {
     key: "sidebar_columns_ram",
     defaultValue: true as boolean,
   } satisfies PreferenceDefinition<boolean>,
+
+  TEMPERATURE_UNIT: {
+    key: "temperature_unit",
+    defaultValue: "celsius" as TemperatureUnit,
+  } satisfies PreferenceDefinition<TemperatureUnit>,
 
   SIDEBAR_WIDTH: {
     key: "sidebar_width",

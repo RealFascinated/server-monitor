@@ -17,6 +17,7 @@ import cc.fascinated.monitor.metrics.server.series.TcpConnectionSeries;
 import cc.fascinated.monitor.metrics.server.series.TemperatureSeries;
 import cc.fascinated.monitor.metrics.server.series.ZfsArcSeries;
 import cc.fascinated.monitor.metrics.server.series.ZfsPoolSeries;
+import cc.fascinated.monitor.alert.AlertEvaluator;
 import cc.fascinated.monitor.metrics.vm.MetricWriteContext;
 import cc.fascinated.monitor.metrics.vm.VictoriaMetricsWriteClient;
 import cc.fascinated.monitor.model.domain.server.ServerStatus;
@@ -57,6 +58,7 @@ public class ServerIngestService {
     private final IngestSampleChecker sampleChecker;
     private final IngestBatchValidator batchValidator;
     private final BackfillLimiter backfillLimiter;
+    private final AlertEvaluator alertEvaluator;
 
     public ServerIngestService(ServerRepository serverRepository,
                                ServerIngestTokenRepository serverIngestTokenRepository,
@@ -65,7 +67,8 @@ public class ServerIngestService {
                                IncidentService incidentService,
                                IngestSampleChecker sampleChecker,
                                IngestBatchValidator batchValidator,
-                               BackfillLimiter backfillLimiter) {
+                               BackfillLimiter backfillLimiter,
+                               AlertEvaluator alertEvaluator) {
         this.serverRepository = serverRepository;
         this.serverIngestTokenRepository = serverIngestTokenRepository;
         this.platformMetricsRecorder = platformMetricsRecorder;
@@ -74,6 +77,7 @@ public class ServerIngestService {
         this.sampleChecker = sampleChecker;
         this.batchValidator = batchValidator;
         this.backfillLimiter = backfillLimiter;
+        this.alertEvaluator = alertEvaluator;
     }
 
     public ServerRow authenticateIngestRequest(String authorizationHeader) {
@@ -120,7 +124,8 @@ public class ServerIngestService {
         server.setStatus(ServerStatus.ONLINE);
 
         StringBuilder buffer = new StringBuilder();
-        MetricWriteContext ctx = new MetricWriteContext(buffer, server.getId(), now.getEpochSecond());
+        MetricWriteContext ctx = new MetricWriteContext(buffer, server.getId(), now.getEpochSecond(),
+                this.alertEvaluator.sinkFor(server.getId(), now.getEpochSecond()));
         writeSeries(ctx, metrics);
         ServerStatusSeries.writeOnline(ctx);
         this.victoriaMetricsWriteClient.flush(buffer.toString());

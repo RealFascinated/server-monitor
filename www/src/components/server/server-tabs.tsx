@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router"
-import { History, LineChart, Settings } from "lucide-react"
+import { Bell, History, LineChart, Settings } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
 import { useMetricDefaultRange } from "@/hooks/use-metric-default-range"
@@ -23,7 +23,7 @@ function ServerTabs({ serverId }: ServerTabsProps) {
   return (
     <nav
       aria-label="Server sections"
-      className="-mx-1 -mb-3 flex overflow-x-auto px-1"
+      className="-mx-1 -mb-3 flex overflow-x-auto overflow-y-hidden px-1"
     >
       <Link
         to="/servers/$serverId"
@@ -42,6 +42,14 @@ function ServerTabs({ serverId }: ServerTabsProps) {
       >
         <TabIcon icon={History} />
         Incidents
+      </Link>
+      <Link
+        to="/servers/$serverId/alerts"
+        params={params}
+        className={tabClassName}
+      >
+        <TabIcon icon={Bell} />
+        Alerts
       </Link>
       <Link
         to="/servers/$serverId/settings"

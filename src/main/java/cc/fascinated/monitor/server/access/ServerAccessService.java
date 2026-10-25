@@ -3,6 +3,7 @@ package cc.fascinated.monitor.server.access;
 import cc.fascinated.monitor.exception.impl.ConflictException;
 import cc.fascinated.monitor.exception.impl.NotFoundException;
 import cc.fascinated.monitor.exception.impl.UnauthorizedException;
+import cc.fascinated.monitor.alert.AlertStateService;
 import cc.fascinated.monitor.model.domain.server.ServerPermission;
 import cc.fascinated.monitor.model.domain.server.ServerRole;
 import cc.fascinated.monitor.model.dto.request.server.ServerMemberInviteRequest;
@@ -41,18 +42,21 @@ public class ServerAccessService {
     private final ServerRepository serverRepository;
     private final UserRepository userRepository;
     private final MailService mailService;
+    private final AlertStateService alertStateService;
     private final SecureRandom secureRandom = new SecureRandom();
 
     public ServerAccessService(ServerMemberRepository serverMemberRepository,
                                ServerInviteRepository serverInviteRepository,
                                ServerRepository serverRepository,
                                UserRepository userRepository,
-                               MailService mailService) {
+                               MailService mailService,
+                               AlertStateService alertStateService) {
         this.serverMemberRepository = serverMemberRepository;
         this.serverInviteRepository = serverInviteRepository;
         this.serverRepository = serverRepository;
         this.userRepository = userRepository;
         this.mailService = mailService;
+        this.alertStateService = alertStateService;
     }
 
     public Optional<ServerRole> findRole(long serverId, long userId) {
@@ -93,6 +97,7 @@ public class ServerAccessService {
     @Transactional
     public void addOwner(long serverId, long userId, Instant joinedAt) {
         this.serverMemberRepository.save(new ServerMemberRow(serverId, userId, ServerRole.OWNER, joinedAt));
+        this.alertStateService.onMemberAdded(serverId, userId);
     }
 
     public ServerAccessListResponse listAccess(UserRow user, ServerRow server) {
@@ -178,12 +183,14 @@ public class ServerAccessService {
         }
 
         this.serverMemberRepository.deleteByServerIdAndUserId(server.getId(), memberUserId);
+        this.alertStateService.onMemberRemoved(server.getId(), memberUserId);
     }
 
     @Transactional
     public void leaveServer(UserRow user, ServerRow server) {
         requirePermission(user, server, ServerPermission.LEAVE_SERVER);
         this.serverMemberRepository.deleteByServerIdAndUserId(server.getId(), user.getId());
+        this.alertStateService.onMemberRemoved(server.getId(), user.getId());
     }
 
     @Transactional
@@ -282,6 +289,7 @@ public class ServerAccessService {
                 now
         ));
         this.serverInviteRepository.delete(invite);
+        this.alertStateService.onMemberAdded(serverId, user.getId());
 
         ServerRow server = this.serverRepository.findById(serverId)
                 .orElseThrow(() -> new NotFoundException("Server \"%s\" not found".formatted(serverId)));

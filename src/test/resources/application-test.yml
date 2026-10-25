@@ -11,3 +11,10 @@ monitor:
     enabled: false
   victoriametrics:
     delete-token: test
+  alerts:
+    allowed-webhook-hosts: localhost,127.0.0.1
+    require-https: false
+    coalesce-window: 200ms
+    max-delivery-attempts: 2
+    state-ttl: 10m
+    cache-ttl: 5m

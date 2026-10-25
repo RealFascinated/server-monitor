@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select"
 import { useMetricDefaultRange } from "@/hooks/use-metric-default-range"
 import { useMetricRefreshInterval } from "@/hooks/use-metric-refresh-interval"
+import { useTemperatureUnit } from "@/hooks/use-temperature-unit"
 import {
   SIDEBAR_COLUMNS,
   useSidebarColumnVisibility,
@@ -28,6 +29,8 @@ import { useSidebarDetailedMode } from "@/hooks/use-sidebar-detailed-mode"
 import type { User } from "@/lib/auth/types"
 import type { MetricRefreshInterval } from "@/lib/metrics/refresh-interval"
 import { METRIC_REFRESH_INTERVAL_OPTIONS } from "@/lib/metrics/refresh-interval"
+import type { TemperatureUnit } from "@/lib/metrics/temperature"
+import { TEMPERATURE_UNIT_OPTIONS } from "@/lib/metrics/temperature"
 import type { MetricTimeRange } from "@/lib/metrics/range"
 import { METRIC_RANGE_OPTIONS } from "@/lib/metrics/range"
 import { cn } from "@/lib/utils"
@@ -44,6 +47,7 @@ type AccountSettingsViewProps = {
 function AccountSettingsView({ user }: AccountSettingsViewProps) {
   const { refreshInterval, setRefreshInterval } = useMetricRefreshInterval()
   const { defaultRange, setDefaultRange } = useMetricDefaultRange()
+  const { temperatureUnit, setTemperatureUnit } = useTemperatureUnit()
   const { detailed, setDetailed } = useSidebarDetailedMode()
   const { visibility, setColumnVisible } = useSidebarColumnVisibility()
 
@@ -130,6 +134,29 @@ function AccountSettingsView({ user }: AccountSettingsViewProps) {
                 </SelectTrigger>
                 <SelectContent>
                   {METRIC_RANGE_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            }
+          />
+          <SettingsPreferenceRow
+            label="Temperature unit"
+            description="How temperatures appear in charts and alerts."
+            control={
+              <Select
+                value={temperatureUnit}
+                onValueChange={(value) =>
+                  setTemperatureUnit(value as TemperatureUnit)
+                }
+              >
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {TEMPERATURE_UNIT_OPTIONS.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>

@@ -4,39 +4,63 @@ import cc.fascinated.monitor.metrics.server.catalog.MetricFamily;
 import cc.fascinated.monitor.metrics.server.catalog.VmMetricFamily;
 import cc.fascinated.monitor.metrics.vm.MetricWriteContext;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.SmartMetric;
+import cc.fascinated.monitor.model.domain.alert.AlertInfo;
+import cc.fascinated.monitor.model.domain.alert.AlertOperator;
+import cc.fascinated.monitor.model.domain.alert.AlertSeverity;
+import cc.fascinated.monitor.model.domain.alert.AlertUnit;
+import org.jetbrains.annotations.Nullable;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
 @Getter
 @Accessors(fluent = true)
 public enum SmartSeries implements VmMetricFamily {
-    HEALTH_PASSED("monitor_smart_health_passed"),
-    TEMPERATURE_CELSIUS("monitor_smart_temperature_celsius"),
+    HEALTH_PASSED("monitor_smart_health_passed",
+            AlertInfo.of("Drive health", AlertUnit.STATE, AlertOperator.LESS_THAN, 1).asDefault(0, AlertSeverity.CRITICAL)),
+    TEMPERATURE_CELSIUS("monitor_smart_temperature_celsius",
+            AlertInfo.of("Drive temperature", AlertUnit.TEMPERATURE, AlertOperator.MORE_THAN, 60).asDefault(300, AlertSeverity.WARNING)),
     POWER_ON_HOURS("monitor_smart_power_on_hours"),
     POWER_CYCLE_COUNT("monitor_smart_power_cycle_count"),
-    REALLOCATED_SECTORS("monitor_smart_reallocated_sectors"),
+    REALLOCATED_SECTORS("monitor_smart_reallocated_sectors",
+            AlertInfo.of("Reallocated sectors", AlertUnit.COUNT, AlertOperator.MORE_THAN, 0).asDefault(0, AlertSeverity.WARNING)),
     REALLOCATED_EVENTS("monitor_smart_reallocated_events"),
-    PENDING_SECTORS("monitor_smart_pending_sectors"),
-    REPORTED_UNCORRECT("monitor_smart_reported_uncorrect"),
-    OFFLINE_UNCORRECTABLE("monitor_smart_offline_uncorrectable"),
-    UDMA_CRC_ERRORS("monitor_smart_udma_crc_errors"),
+    PENDING_SECTORS("monitor_smart_pending_sectors",
+            AlertInfo.of("Pending sectors", AlertUnit.COUNT, AlertOperator.MORE_THAN, 0).asDefault(0, AlertSeverity.WARNING)),
+    REPORTED_UNCORRECT("monitor_smart_reported_uncorrect",
+            AlertInfo.of("Reported uncorrectable errors", AlertUnit.COUNT, AlertOperator.MORE_THAN, 0).asDefault(0, AlertSeverity.WARNING)),
+    OFFLINE_UNCORRECTABLE("monitor_smart_offline_uncorrectable",
+            AlertInfo.of("Offline uncorrectable sectors", AlertUnit.COUNT, AlertOperator.MORE_THAN, 0).asDefault(0, AlertSeverity.WARNING)),
+    UDMA_CRC_ERRORS("monitor_smart_udma_crc_errors",
+            AlertInfo.of("UDMA CRC errors", AlertUnit.COUNT, AlertOperator.MORE_THAN, 0).asDefault(0, AlertSeverity.WARNING)),
     LOAD_CYCLE_COUNT("monitor_smart_load_cycle_count"),
     START_STOP_COUNTS("monitor_smart_start_stop_counts"),
     POWER_OFF_RETRACTS("monitor_smart_power_off_retracts"),
     HELIUM_PERCENT("monitor_smart_helium_percent"),
-    ERROR_LOG_ENTRIES("monitor_smart_error_log_entries"),
-    ENDURANCE_USED_PERCENT("monitor_smart_endurance_used_percent"),
-    PERCENTAGE_USED("monitor_smart_percentage_used"),
-    AVAILABLE_SPARE("monitor_smart_available_spare"),
-    MEDIA_ERRORS("monitor_smart_media_errors"),
+    ERROR_LOG_ENTRIES("monitor_smart_error_log_entries",
+            AlertInfo.of("Drive error log entries", AlertUnit.COUNT, AlertOperator.MORE_THAN, 0)),
+    ENDURANCE_USED_PERCENT("monitor_smart_endurance_used_percent",
+            AlertInfo.of("Drive endurance used", AlertUnit.PERCENT, AlertOperator.MORE_THAN, 90).asDefault(0, AlertSeverity.WARNING)),
+    PERCENTAGE_USED("monitor_smart_percentage_used",
+            AlertInfo.of("NVMe life used", AlertUnit.PERCENT, AlertOperator.MORE_THAN, 90).asDefault(0, AlertSeverity.WARNING)),
+    AVAILABLE_SPARE("monitor_smart_available_spare",
+            AlertInfo.of("NVMe available spare", AlertUnit.PERCENT, AlertOperator.LESS_THAN, 10).asDefault(0, AlertSeverity.WARNING)),
+    MEDIA_ERRORS("monitor_smart_media_errors",
+            AlertInfo.of("NVMe media errors", AlertUnit.COUNT, AlertOperator.MORE_THAN, 0).asDefault(0, AlertSeverity.WARNING)),
     UNSAFE_SHUTDOWNS("monitor_smart_unsafe_shutdowns"),
     DATA_WRITTEN_BYTES("monitor_smart_data_written_bytes"),
     DATA_READ_BYTES("monitor_smart_data_read_bytes");
 
     private final String metricName;
+    @Nullable
+    private final AlertInfo alertInfo;
 
     SmartSeries(String metricName) {
+        this(metricName, null);
+    }
+
+    SmartSeries(String metricName, @Nullable AlertInfo alertInfo) {
         this.metricName = metricName;
+        this.alertInfo = alertInfo;
     }
 
     @Override

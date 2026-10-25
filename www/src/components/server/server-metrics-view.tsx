@@ -17,6 +17,7 @@ import type { ServerMetricsResponse } from "@/lib/api/user/metrics"
 import type { MetricsDataWindow } from "@/lib/metrics/chart-zoom"
 import { formatMetricTimeWindowDescription } from "@/lib/metrics/time-window"
 import type { MetricTimeWindow } from "@/lib/metrics/time-window"
+import { useTemperatureUnit } from "@/hooks/use-temperature-unit"
 import { buildServerMetricSections } from "@/lib/metrics/sections/server/build"
 import { buildServerSparklines } from "@/lib/metrics/sparkline"
 import { buildMetricsTimeGrid } from "@/lib/metrics/timestamps"
@@ -37,6 +38,7 @@ function ServerMetricsView({
   zoomDisabled = false,
 }: ServerMetricsViewProps) {
   const { data: server } = useUserServer(metrics.id)
+  const { temperatureUnit } = useTemperatureUnit()
   const timeGrid = useMemo(() => buildMetricsTimeGrid(metrics), [metrics])
   const { data: incidentPage } = useQuery(
     serverIncidentsQueryOptions(metrics.id, { page: 1, count: 50 })
@@ -51,8 +53,8 @@ function ServerMetricsView({
   )
   const trends = useMemo(() => buildServerSparklines(metrics), [metrics])
   const sections = useMemo(
-    () => buildServerMetricSections(metrics, timeGrid),
-    [metrics, timeGrid]
+    () => buildServerMetricSections(metrics, timeGrid, temperatureUnit),
+    [metrics, timeGrid, temperatureUnit]
   )
 
   const hasChartData = sections.length > 0

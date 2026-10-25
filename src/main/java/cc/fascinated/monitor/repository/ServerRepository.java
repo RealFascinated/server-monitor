@@ -12,6 +12,8 @@ import java.util.List;
 
 public interface ServerRepository extends JpaRepository<ServerRow, Long> {
 
+    List<ServerRow> findByStatus(ServerStatus status);
+
     @Query("""
             SELECT s FROM ServerRow s
             WHERE (s.status IS NULL OR s.status = :onlineStatus)

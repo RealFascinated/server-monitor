@@ -1,10 +1,12 @@
 import { Link } from "@tanstack/react-router"
-import { Mail, Server, User as UserIcon } from "lucide-react"
+import { Bell, Mail, Server, User as UserIcon } from "lucide-react"
+import { useQuery } from "@tanstack/react-query"
 import { memo } from "react"
 
 import { CountBadge } from "@/components/count-badge"
 import { SimpleTooltip } from "@/components/simple-tooltip"
 import { useUserInvites } from "@/hooks/use-user-invites"
+import { alertFiringCountQueryOptions } from "@/lib/api/user/alerts.queries"
 import { cn } from "@/lib/utils"
 
 const navItems = [
@@ -13,6 +15,12 @@ const navItems = [
     label: "Servers",
     icon: Server,
     exact: true,
+  },
+  {
+    to: "/alerts" as const,
+    label: "Alerts",
+    icon: Bell,
+    exact: false,
   },
   {
     to: "/invites" as const,
@@ -39,7 +47,7 @@ function SidebarNavLink({
 }: {
   compact: boolean
   onNavigate?: () => void
-  to: "/" | "/invites" | "/settings"
+  to: "/" | "/alerts" | "/invites" | "/settings"
   icon: typeof Server
   label: string
   exact: boolean
@@ -90,6 +98,9 @@ export const SidebarNav = memo(function SidebarNav({
 }) {
   const { data: invites = [] } = useUserInvites()
   const pendingInviteCount = invites.length
+  const { data: firingAlertCount = 0 } = useQuery(
+    alertFiringCountQueryOptions()
+  )
 
   return (
     <>
@@ -102,7 +113,13 @@ export const SidebarNav = memo(function SidebarNav({
           icon={icon}
           label={label}
           exact={exact}
-          badgeCount={to === "/invites" ? pendingInviteCount : 0}
+          badgeCount={
+            to === "/invites"
+              ? pendingInviteCount
+              : to === "/alerts"
+                ? firingAlertCount
+                : 0
+          }
         />
       ))}
     </>

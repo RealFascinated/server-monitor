@@ -14,6 +14,9 @@ import cc.fascinated.monitor.metrics.server.series.TemperatureSeries;
 import cc.fascinated.monitor.metrics.server.series.TcpConnectionSeries;
 import cc.fascinated.monitor.metrics.server.series.ZfsArcSeries;
 import cc.fascinated.monitor.metrics.server.series.ZfsPoolSeries;
+import cc.fascinated.monitor.model.domain.alert.AlertInfo;
+import cc.fascinated.monitor.model.domain.alert.AlertOperator;
+import cc.fascinated.monitor.model.domain.alert.AlertUnit;
 import lombok.experimental.UtilityClass;
 
 import java.util.ArrayList;
@@ -28,9 +31,27 @@ public class VmMetricCatalog {
     private static final Map<String, MetricFamily> FAMILY_BY_METRIC = buildFamilyByMetric();
     private static final Map<String, String> FIELD_BY_METRIC = buildFieldByMetric();
     private static final List<String> ALL_GAUGE_NAMES = buildAllGaugeNames();
+    private static final Map<String, VmGaugeSeries> ALERTABLE_BY_METRIC = buildAlertable();
 
     public static MetricFamily familyOf(String metricName) {
         return FAMILY_BY_METRIC.get(metricName);
+    }
+
+    /** Series users can alert on, keyed by metric name. */
+    public static Map<String, VmGaugeSeries> alertable() {
+        return ALERTABLE_BY_METRIC;
+    }
+
+    /** Alert metadata for a metric name; falls back to the raw name for a series that is no longer alertable. */
+    public static AlertInfo alertInfoOf(String metricName) {
+        VmGaugeSeries series = ALERTABLE_BY_METRIC.get(metricName);
+        AlertInfo info = series == null ? null : series.alertInfo();
+        return info != null ? info : AlertInfo.of(metricName, AlertUnit.NONE, AlertOperator.MORE_THAN, 0);
+    }
+
+    public static List<String> identityLabelsOf(String metricName) {
+        MetricFamily family = FAMILY_BY_METRIC.get(metricName);
+        return family == null ? List.of() : List.of(family.identityLabels());
     }
 
     public static String fieldName(VmGaugeSeries metric) {
@@ -104,6 +125,21 @@ public class VmMetricCatalog {
                 continue;
             }
             map.put(metricName, Promql.toCamelCase(metricName.substring(prefix.length())));
+        }
+        return Map.copyOf(map);
+    }
+
+    private static Map<String, VmGaugeSeries> buildAlertable() {
+        Map<String, VmGaugeSeries> map = new HashMap<>();
+        for (VmGaugeSeries series : ALL_FAMILIES) {
+            if (series.alertInfo() != null) {
+                map.put(series.metricName(), series);
+            }
+        }
+        for (VmGaugeSeries series : ServerStatusSeries.values()) {
+            if (series.alertInfo() != null) {
+                map.put(series.metricName(), series);
+            }
         }
         return Map.copyOf(map);
     }

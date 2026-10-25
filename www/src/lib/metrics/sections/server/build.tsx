@@ -32,6 +32,7 @@ import {
   tcpCharts,
   zfsPoolCharts,
 } from "@/lib/metrics/sections/server/charts"
+import type { TemperatureUnit } from "@/lib/metrics/temperature"
 import type { MetricsTimeGrid } from "@/lib/metrics/timestamps"
 import {
   formatCount,
@@ -41,7 +42,8 @@ import {
 
 function buildServerMetricSections(
   metrics: ServerMetricsResponse,
-  timeGrid: MetricsTimeGrid
+  timeGrid: MetricsTimeGrid,
+  temperatureUnit: TemperatureUnit
 ): MetricsSectionNode[] {
   const host = metrics.host ?? {}
   const builder = createMetricsSectionBuilder()
@@ -70,7 +72,7 @@ function buildServerMetricSections(
   addChartSection(builder, {
     title: "Hardware",
     icon: Thermometer,
-    charts: hostHardwareCharts(host, metrics.temperatures),
+    charts: hostHardwareCharts(host, metrics.temperatures, temperatureUnit),
     timeGrid,
   })
 
@@ -137,7 +139,7 @@ function buildServerMetricSections(
         navLabel: gpu.gpu,
         icon: Gpu,
         description: `${gpu.vendor} · ${gpu.deviceId}`,
-        charts: gpuCharts(gpu),
+        charts: gpuCharts(gpu, temperatureUnit),
         timeGrid,
       })
     }
@@ -154,7 +156,7 @@ function buildServerMetricSections(
           navLabel: disk.device,
           icon: HeartPulse,
           description: disk.model || undefined,
-          charts: smartCharts(disk),
+          charts: smartCharts(disk, temperatureUnit),
           timeGrid,
         })
       }

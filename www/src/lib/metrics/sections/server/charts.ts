@@ -21,7 +21,12 @@ import type {
 } from "@/lib/metrics/chart-config"
 import { chartSeries, hasSeriesData } from "@/lib/metrics/series"
 import {
-  formatCelsius,
+  convertedTemperatureFormatter,
+  convertTemperatureThresholds,
+  convertTemperatureValues,
+} from "@/lib/metrics/temperature"
+import type { TemperatureUnit } from "@/lib/metrics/temperature"
+import {
   formatCount,
   formatDurationSeconds,
   formatMegahertz,
@@ -193,7 +198,10 @@ function formatHealthStatus(value: number): string {
  * A disk only reports the counters its own interface has, so a chart it can never fill is noise.
  * A disk reporting nothing at all keeps them, which is a fresh agent rather than a wrong one.
  */
-function smartCharts(disk: SmartDeviceMetrics): MetricChartConfig[] {
+function smartCharts(
+  disk: SmartDeviceMetrics,
+  temperatureUnit: TemperatureUnit
+): MetricChartConfig[] {
   const charts: MetricChartConfig[] = [
     {
       title: "Health",
@@ -206,9 +214,17 @@ function smartCharts(disk: SmartDeviceMetrics): MetricChartConfig[] {
     {
       title: "Temperature",
       description: "Drive temperature as reported by the drive itself.",
-      series: [chartSeries("Temperature", disk.temperatureCelsius)],
-      valueFormatter: formatCelsius,
-      thresholds: TEMPERATURE_THRESHOLDS,
+      series: [
+        chartSeries(
+          "Temperature",
+          convertTemperatureValues(disk.temperatureCelsius, temperatureUnit)
+        ),
+      ],
+      valueFormatter: convertedTemperatureFormatter(temperatureUnit),
+      thresholds: convertTemperatureThresholds(
+        TEMPERATURE_THRESHOLDS,
+        temperatureUnit
+      ),
     },
     {
       title: "Wear",
@@ -309,7 +325,10 @@ function smartCharts(disk: SmartDeviceMetrics): MetricChartConfig[] {
   return filled.length > 0 ? filled : charts
 }
 
-function gpuCharts(gpu: GpuMetrics): MetricChartConfig[] {
+function gpuCharts(
+  gpu: GpuMetrics,
+  temperatureUnit: TemperatureUnit
+): MetricChartConfig[] {
   return [
     {
       title: "Encode/decode",
@@ -343,9 +362,17 @@ function gpuCharts(gpu: GpuMetrics): MetricChartConfig[] {
     {
       title: "Temperature",
       description: "GPU die temperature.",
-      series: [chartSeries("°C", gpu.temperatureCelsius)],
-      valueFormatter: formatCelsius,
-      thresholds: TEMPERATURE_THRESHOLDS,
+      series: [
+        chartSeries(
+          "Temperature",
+          convertTemperatureValues(gpu.temperatureCelsius, temperatureUnit)
+        ),
+      ],
+      valueFormatter: convertedTemperatureFormatter(temperatureUnit),
+      thresholds: convertTemperatureThresholds(
+        TEMPERATURE_THRESHOLDS,
+        temperatureUnit
+      ),
     },
     {
       title: "Power",
@@ -645,17 +672,24 @@ function hostSystemCharts(
 
 function hostHardwareCharts(
   host: NonNullable<ServerMetricsResponse["host"]>,
-  temperatures: TemperatureMetrics[] | null | undefined
+  temperatures: TemperatureMetrics[] | null | undefined,
+  temperatureUnit: TemperatureUnit
 ): MetricChartConfig[] {
   return [
     {
       title: "Temperature",
       description: "Hardware temperature readings from system sensors.",
       series: (temperatures ?? []).map((sensor) =>
-        chartSeries(sensor.sensor, sensor.temperatureCelsius)
+        chartSeries(
+          sensor.sensor,
+          convertTemperatureValues(sensor.temperatureCelsius, temperatureUnit)
+        )
       ),
-      valueFormatter: formatCelsius,
-      thresholds: TEMPERATURE_THRESHOLDS,
+      valueFormatter: convertedTemperatureFormatter(temperatureUnit),
+      thresholds: convertTemperatureThresholds(
+        TEMPERATURE_THRESHOLDS,
+        temperatureUnit
+      ),
       showCurrentValues: false,
     },
     {

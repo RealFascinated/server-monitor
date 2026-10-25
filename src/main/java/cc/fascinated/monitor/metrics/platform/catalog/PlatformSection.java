@@ -12,7 +12,8 @@ public enum PlatformSection {
     AGENTS("agents"),
     VM("vm"),
     JVM("jvm"),
-    HTTP("http");
+    HTTP("http"),
+    ALERTS("alerts");
 
     private final String jsonKey;
 

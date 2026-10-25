@@ -1,5 +1,6 @@
 package cc.fascinated.monitor.service;
 
+import cc.fascinated.monitor.alert.DefaultAlertRuleService;
 import cc.fascinated.monitor.exception.impl.ConflictException;
 import cc.fascinated.monitor.exception.impl.ForbiddenException;
 import cc.fascinated.monitor.exception.impl.UnauthorizedException;
@@ -24,17 +25,20 @@ public class AuthService {
     private final SessionService sessionService;
     private final ClientInfoService clientInfoService;
     private final PasswordEncoder passwordEncoder;
+    private final DefaultAlertRuleService defaultAlertRuleService;
 
     public AuthService(
             UserRepository userRepository,
             SessionService sessionService,
             ClientInfoService clientInfoService,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            DefaultAlertRuleService defaultAlertRuleService
     ) {
         this.userRepository = userRepository;
         this.sessionService = sessionService;
         this.clientInfoService = clientInfoService;
         this.passwordEncoder = passwordEncoder;
+        this.defaultAlertRuleService = defaultAlertRuleService;
     }
 
     @Transactional
@@ -55,6 +59,7 @@ public class AuthService {
                 encodePassword(request.password()),
                 now
         ));
+        this.defaultAlertRuleService.createFor(user.getId());
         return this.sessionService.createSession(user, this.clientInfoService.capture(httpRequest));
     }
 

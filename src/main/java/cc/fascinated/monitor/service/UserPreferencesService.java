@@ -3,6 +3,7 @@ package cc.fascinated.monitor.service;
 import cc.fascinated.monitor.exception.impl.NotFoundException;
 import cc.fascinated.monitor.model.domain.metric.MetricRefreshInterval;
 import cc.fascinated.monitor.model.domain.metric.MetricTimeRange;
+import cc.fascinated.monitor.model.domain.metric.TemperatureUnit;
 import cc.fascinated.monitor.model.domain.settings.SettingType;
 import cc.fascinated.monitor.model.dto.response.user.UserPreferenceResponse;
 import cc.fascinated.monitor.model.persistance.UserPreferenceRow;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Getter
@@ -58,13 +60,14 @@ public class UserPreferencesService {
         SIDEBAR_DETAILED_MODE("sidebar_detailed_mode", SettingType.BOOLEAN, false),
         SIDEBAR_COLUMNS_CPU("sidebar_columns_cpu", SettingType.BOOLEAN, true),
         SIDEBAR_COLUMNS_RAM("sidebar_columns_ram", SettingType.BOOLEAN, true),
-        SIDEBAR_WIDTH("sidebar_width", SettingType.INTEGER, 224L);
+        SIDEBAR_WIDTH("sidebar_width", SettingType.INTEGER, 224L),
+        TEMPERATURE_UNIT("temperature_unit", SettingType.ENUM.from(TemperatureUnit.class), "celsius");
 
         private final String key;
         private final SettingType type;
         private final Object defaultValue;
 
-        private static final Map<Long, Map<String, Object>> CACHE = new HashMap<>();
+        private static final Map<Long, Map<String, Object>> CACHE = new ConcurrentHashMap<>();
 
         public static Preferences fromKey(String key) {
             for (Preferences pref : values()) {
@@ -79,7 +82,7 @@ public class UserPreferencesService {
             return (boolean) getValue(userId);
         }
 
-        Object getValue(Long userId) {
+        public Object getValue(Long userId) {
             Map<String, Object> userCache = CACHE.get(userId);
             if (userCache != null) {
                 Object cached = userCache.get(this.key);
@@ -91,13 +94,13 @@ public class UserPreferencesService {
                     .findById(new UserPreferenceRow.Id(userId, this.key))
                     .map(UserPreferenceRow::getValue)
                     .orElse(this.defaultValue);
-            CACHE.computeIfAbsent(userId, k -> new HashMap<>()).put(this.key, value);
+            CACHE.computeIfAbsent(userId, k -> new ConcurrentHashMap<>()).put(this.key, value);
             return value;
         }
 
         void setValue(Long userId, Object value) {
             INSTANCE.getUserPreferenceRepository().save(new UserPreferenceRow(userId, this.key, value));
-            CACHE.computeIfAbsent(userId, k -> new HashMap<>()).put(this.key, value);
+            CACHE.computeIfAbsent(userId, k -> new ConcurrentHashMap<>()).put(this.key, value);
         }
     }
 }
