@@ -1,5 +1,8 @@
+import { useQuery } from "@tanstack/react-query"
+
 import { MetricStatCard } from "@/components/metrics/metric-stat-card"
 import { useUserServer } from "@/hooks/use-user-server"
+import { userServerSparklineQueryOptions } from "@/lib/api/user/sparklines.queries"
 import type { ServerResponse } from "@/lib/api/user/servers"
 import {
   formatCpuInventoryTooltip,
@@ -8,7 +11,6 @@ import {
   memoryUsagePercent,
 } from "@/lib/formatter"
 import { percentLevelColorClass } from "@/lib/metrics/percent-level"
-import type { ServerSparklines } from "@/lib/metrics/sparkline"
 
 function serverOverviewHasData(
   server: Pick<ServerResponse, "cpu" | "memory" | "disk"> | undefined
@@ -22,17 +24,15 @@ function serverOverviewHasData(
 
 type ServerOverviewStatsProps = {
   serverId: number
-  /** History for the selected range, drawn beside CPU and memory. */
-  trends?: ServerSparklines
-  rangeLabel?: string
 }
 
-function ServerOverviewStats({
-  serverId,
-  trends,
-  rangeLabel,
-}: ServerOverviewStatsProps) {
+function ServerOverviewStats({ serverId }: ServerOverviewStatsProps) {
   const { data: server } = useUserServer(serverId)
+  const { data: sparklines } = useQuery({
+    ...userServerSparklineQueryOptions(serverId),
+    enabled: server != null,
+  })
+
   if (!server) {
     return null
   }
@@ -59,8 +59,8 @@ function ServerOverviewStats({
         detailTooltip={cpuInventoryTooltip ?? undefined}
         valueClassName={percentLevelColorClass(cpuUsage)}
         progress={cpuUsage}
-        trend={trends?.cpu}
-        trendLabel={rangeLabel ? `CPU, ${rangeLabel}` : "CPU trend"}
+        trend={sparklines?.cpu}
+        trendLabel="CPU, last hour"
       />
     ) : null,
     memUsage != null ? (
@@ -78,8 +78,8 @@ function ServerOverviewStats({
         }
         valueClassName={percentLevelColorClass(memPercent)}
         progress={memPercent}
-        trend={trends?.memory}
-        trendLabel={rangeLabel ? `Memory, ${rangeLabel}` : "Memory trend"}
+        trend={sparklines?.memory}
+        trendLabel="Memory, last hour"
       />
     ) : null,
     diskUsage != null ? (

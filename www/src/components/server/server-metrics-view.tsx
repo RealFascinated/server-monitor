@@ -19,7 +19,6 @@ import { formatMetricTimeWindowDescription } from "@/lib/metrics/time-window"
 import type { MetricTimeWindow } from "@/lib/metrics/time-window"
 import { useTemperatureUnit } from "@/hooks/use-temperature-unit"
 import { buildServerMetricSections } from "@/lib/metrics/sections/server/build"
-import { buildServerSparklines } from "@/lib/metrics/sparkline"
 import { buildMetricsTimeGrid } from "@/lib/metrics/timestamps"
 
 type ServerMetricsViewProps = {
@@ -51,7 +50,6 @@ function ServerMetricsView({
       }),
     [incidentPage, metrics.from, metrics.to]
   )
-  const trends = useMemo(() => buildServerSparklines(metrics), [metrics])
   const sections = useMemo(
     () => buildServerMetricSections(metrics, timeGrid, temperatureUnit),
     [metrics, timeGrid, temperatureUnit]
@@ -86,11 +84,7 @@ function ServerMetricsView({
         </Callout>
       ) : null}
       {serverOverviewHasData(server) ? (
-        <ServerOverviewStats
-          serverId={metrics.id}
-          trends={trends}
-          rangeLabel={rangeLabel}
-        />
+        <ServerOverviewStats serverId={metrics.id} />
       ) : null}
       {sections.length > 0 ? (
         <MetricsChartAnnotationsProvider spans={incidentSpans}>
