@@ -90,6 +90,34 @@ public class Promql {
         return builder.toString();
     }
 
+    /** The metrics and labels one branch of an {@link #vectorSelectorAnyOf} selector matches. */
+    public record SelectorFilter(
+            Collection<String> metricNames,
+            Map<String, String> exactLabels,
+            Map<String, String> regexLabels
+    ) {
+    }
+
+    /**
+     * One selector that matches any of the filters, e.g. {@code {__name__=~"a",x="1" or __name__=~"b",y="2"}}.
+     * Unlike {@code selector1 or selector2}, this does not drop a series just because another branch
+     * returned one with the same labels under a different metric name.
+     */
+    public static String vectorSelectorAnyOf(List<SelectorFilter> filters) {
+        StringBuilder builder = new StringBuilder("{");
+        boolean first = true;
+        for (SelectorFilter filter : filters) {
+            if (!first) {
+                builder.append(" or ");
+            }
+            builder.append("__name__=~\"").append(String.join("|", filter.metricNames())).append('"');
+            appendExactLabels(builder, filter.exactLabels());
+            appendRegexLabels(builder, filter.regexLabels());
+            first = false;
+        }
+        return builder.append('}').toString();
+    }
+
     private static void appendExactLabels(StringBuilder builder, Map<String, String> labels) {
         for (Map.Entry<String, String> entry : labels.entrySet()) {
             builder.append(',');

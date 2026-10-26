@@ -2,6 +2,7 @@ package cc.fascinated.monitor.metrics.vm;
 
 import cc.fascinated.monitor.metrics.server.catalog.ComputedMetric;
 import cc.fascinated.monitor.metrics.server.catalog.VmMetricCatalog;
+import cc.fascinated.monitor.metrics.vm.query.Promql;
 import cc.fascinated.monitor.metrics.vm.query.VictoriaMetricsQuery;
 import cc.fascinated.monitor.metrics.vm.query.VictoriaMetricsQueryClient;
 import cc.fascinated.monitor.metrics.vm.query.VmQueryResponse;
@@ -11,9 +12,11 @@ import cc.fascinated.monitor.model.domain.metric.MetricQueryWindow;
 import cc.fascinated.monitor.model.dto.response.metrics.ServerMetricsResponse;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -80,10 +83,7 @@ public class VmMetricsReader {
             return Map.of();
         }
         VmQueryResponse response = this.victoriaMetricsQueryClient.execute(
-                VictoriaMetricsQuery.builder()
-                        .metrics(metrics)
-                        .serverIds(serverIds)
-                        .build()
+                VictoriaMetricsQuery.builder().query(latestMetricsPromql(metrics, serverIds, labelFiltersByMetric)).build()
         );
         Map<String, VmGaugeSeries> byName = new HashMap<>();
         for (VmGaugeSeries metric : metrics) {
@@ -94,10 +94,6 @@ public class VmMetricsReader {
             String metricName = series.labels().get("__name__");
             VmGaugeSeries metric = byName.get(metricName);
             if (metric == null || series.samples().isEmpty()) {
-                continue;
-            }
-            Map<String, String> labelFilter = labelFiltersByMetric.getOrDefault(metric, Map.of());
-            if (!matchesLabelFilter(series.labels(), labelFilter)) {
                 continue;
             }
             String serverIdLabel = series.labels().get("server_id");
@@ -115,12 +111,24 @@ public class VmMetricsReader {
         return response.timeSeries();
     }
 
-    private static boolean matchesLabelFilter(Map<String, String> labels, Map<String, String> filter) {
-        for (Map.Entry<String, String> entry : filter.entrySet()) {
-            if (!entry.getValue().equals(labels.get(entry.getKey()))) {
-                return false;
-            }
+    /**
+     * Metrics are grouped by the label filter they need, and each group becomes one branch of a single
+     * selector, so a filter like {@code disk="/"} is applied by VictoriaMetrics rather than after every
+     * mount's series has been sent back.
+     */
+    static String latestMetricsPromql(
+            Collection<? extends VmGaugeSeries> metrics,
+            List<Long> serverIds,
+            Map<? extends VmGaugeSeries, Map<String, String>> labelFiltersByMetric
+    ) {
+        Map<Map<String, String>, List<String>> namesByFilter = new LinkedHashMap<>();
+        for (VmGaugeSeries metric : metrics) {
+            namesByFilter.computeIfAbsent(labelFiltersByMetric.getOrDefault(metric, Map.of()), ignored -> new ArrayList<>())
+                    .add(metric.metricName());
         }
-        return true;
+        Map<String, String> serverFilter = Map.of("server_id", Promql.serverIdsRegex(serverIds));
+        List<Promql.SelectorFilter> filters = new ArrayList<>(namesByFilter.size());
+        namesByFilter.forEach((labels, names) -> filters.add(new Promql.SelectorFilter(names, labels, serverFilter)));
+        return Promql.vectorSelectorAnyOf(filters);
     }
 }
