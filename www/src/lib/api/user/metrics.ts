@@ -140,6 +140,7 @@ export type SmartDeviceMetrics = {
   errorLogEntries?: MetricValues
   enduranceUsedPercent?: MetricValues
   percentageUsed?: MetricValues
+  etaUntilWornOut?: MetricValues
   availableSpare?: MetricValues
   mediaErrors?: MetricValues
   unsafeShutdowns?: MetricValues

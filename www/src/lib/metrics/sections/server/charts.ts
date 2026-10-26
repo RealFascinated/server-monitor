@@ -98,7 +98,7 @@ function diskCharts(disk: DiskMetrics): MetricChartConfig[] {
     {
       title: "ETA until full",
       description:
-        "Estimated time until the disk fills, based on recent growth.",
+        "Estimated time until the disk fills, based on the last 24 hours of growth. Hidden while usage is flat or shrinking.",
       series: [chartSeries("ETA", disk.etaUntilFull)],
       valueFormatter: formatDurationSeconds,
     },
@@ -238,6 +238,13 @@ function smartCharts(
       ],
       valueFormatter: formatPercentValue,
       ...PERCENT_RIGHT_AXIS,
+    },
+    {
+      title: "Estimated life remaining",
+      description:
+        "Estimated time until the drive reaches its rated endurance, at its average wear rate so far. Rough for drives with little wear.",
+      series: [chartSeries("Life remaining", disk.etaUntilWornOut)],
+      valueFormatter: formatDurationSeconds,
     },
     {
       title: "Bad sectors",
