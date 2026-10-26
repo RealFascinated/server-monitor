@@ -25,6 +25,8 @@ public enum AgentSeries implements VmGaugeSeries {
     BUFFER_OLDEST_AGE_SECONDS("monitor_agent_buffer_oldest_age_seconds"),
     BUFFER_DROPPED_TOTAL("monitor_agent_buffer_dropped_total");
 
+    public static final String METRIC_NAME_PREFIX = "monitor_agent_";
+
     private final String metricName;
 
     AgentSeries(String metricName) {

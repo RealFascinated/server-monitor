@@ -10,6 +10,7 @@ import cc.fascinated.monitor.metrics.server.series.GpuSeries;
 import cc.fascinated.monitor.metrics.server.series.HostSeries;
 import cc.fascinated.monitor.metrics.server.series.NetworkSeries;
 import cc.fascinated.monitor.metrics.server.series.PsiSeries;
+import cc.fascinated.monitor.metrics.server.series.AgentSeries;
 import cc.fascinated.monitor.metrics.server.series.ServerStatusSeries;
 import cc.fascinated.monitor.metrics.server.series.TemperatureSeries;
 import cc.fascinated.monitor.metrics.server.series.TcpConnectionSeries;
@@ -67,8 +68,15 @@ public class VmMetricCatalog {
         return ALL_GAUGE_NAMES;
     }
 
+    /**
+     * Everything a server reported except what the per-server dashboard never serves: the agent's own
+     * metrics (admin fleet view only) and the status flag. Selecting by server and excluding by name
+     * keeps this one index lookup and a short query, where listing every catalog name makes the query
+     * grow with each metric added. Series outside the catalog are dropped when the response is assembled.
+     */
     public static String selectorForServer(long serverId) {
-        return Promql.vectorSelectorRegex(ALL_GAUGE_NAMES, Map.of("server_id", Long.toString(serverId)));
+        return "{server_id=\"" + serverId + "\",__name__!~\"" + AgentSeries.METRIC_NAME_PREFIX + ".*|"
+                + ServerStatusSeries.UP.metricName() + "\"}";
     }
 
     public static String selectorForServers(Collection<Long> serverIds, Collection<? extends VmGaugeSeries> metrics) {

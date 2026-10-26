@@ -1,6 +1,7 @@
 package cc.fascinated.monitor.metrics.server.catalog;
 
 import cc.fascinated.monitor.metrics.server.series.AgentSeries;
+import cc.fascinated.monitor.metrics.server.series.ServerStatusSeries;
 import cc.fascinated.monitor.metrics.server.series.DockerSeries;
 import cc.fascinated.monitor.metrics.server.series.DiskSeries;
 import cc.fascinated.monitor.metrics.server.series.HostSeries;
@@ -81,11 +82,25 @@ class VmMetricCatalogTest {
     }
 
     @Test
-    void selectorForServer_includesServerIdAndAllGaugeNames() {
-        String selector = VmMetricCatalog.selectorForServer(42L);
-        assertTrue(selector.contains("server_id=\"42\""));
-        assertTrue(selector.contains(HostSeries.CPU_USAGE.metricName()));
-        assertTrue(selector.contains(DiskSeries.USED_BYTES.metricName()));
+    void selectorForServer_selectsByServerAndExcludesAgentAndStatusSeries() {
+        assertEquals(
+                "{server_id=\"42\",__name__!~\"monitor_agent_.*|monitor_server_up\"}",
+                VmMetricCatalog.selectorForServer(42L)
+        );
+    }
+
+    @Test
+    void selectorForServer_doesNotGrowWithTheCatalog() {
+        assertTrue(VmMetricCatalog.selectorForServer(42L).length() < 100);
+    }
+
+    @Test
+    void selectorForServer_excludedNamesAreNotServedPerServer() {
+        assertTrue(AgentSeries.RSS_BYTES.metricName().startsWith(AgentSeries.METRIC_NAME_PREFIX));
+        for (AgentSeries series : AgentSeries.values()) {
+            assertTrue(series.metricName().startsWith(AgentSeries.METRIC_NAME_PREFIX), series.metricName());
+        }
+        assertNull(VmMetricCatalog.familyOf(ServerStatusSeries.UP.metricName()));
     }
 
     @Test
