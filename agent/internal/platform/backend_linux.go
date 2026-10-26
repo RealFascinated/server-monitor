@@ -19,6 +19,7 @@ import (
 	"fascinated.cc/monitor/agent/internal/memory"
 	"fascinated.cc/monitor/agent/internal/oom"
 	"fascinated.cc/monitor/agent/internal/network"
+	"fascinated.cc/monitor/agent/internal/psi"
 	"fascinated.cc/monitor/agent/internal/smart"
 	"fascinated.cc/monitor/agent/internal/thermal"
 	"fascinated.cc/monitor/agent/internal/timesync"
@@ -212,6 +213,9 @@ func (b *linuxBackend) Tick(ready bool) (TickUpdate, error) {
 	oomAfter, hasOom := oom.Read()
 	if hasOom {
 		oom.ApplyRate(&metrics, prev.oomKillsBefore, oomAfter, prev.hasOomBefore, elapsed)
+	}
+	if !b.lxc {
+		update.PsiMetrics = psi.Read()
 	}
 
 	update.InterfaceMetrics = network.ComputeMetrics(prev.netBefore, netAfter, elapsed)

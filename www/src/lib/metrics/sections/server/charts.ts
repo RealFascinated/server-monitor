@@ -3,6 +3,7 @@ import type {
   GpuMetrics,
   MetricValues,
   NetworkMetrics,
+  PsiMetrics,
   ServerMetricsResponse,
   SmartDeviceMetrics,
   TemperatureMetrics,
@@ -615,6 +616,78 @@ function hostMemoryCharts(
   ]
 }
 
+function stallSeries(
+  some10: MetricValues,
+  some60: MetricValues,
+  some300: MetricValues,
+  full10: MetricValues,
+  full60: MetricValues,
+  full300: MetricValues
+) {
+  return [
+    chartSeries("Some 10s", some10),
+    chartSeries("Some 1 min", some60),
+    chartSeries("Some 5 min", some300),
+    chartSeries("Full 10s", full10),
+    chartSeries("Full 1 min", full60),
+    chartSeries("Full 5 min", full300),
+  ]
+}
+
+function psiCharts(psi: PsiMetrics | null | undefined): MetricChartConfig[] {
+  if (!psi) {
+    return []
+  }
+
+  return [
+    {
+      title: "CPU stall",
+      description:
+        "Share of time tasks were stalled waiting for CPU time. Some counts periods when at least one task was waiting, full when every non-idle task was. Unlike load average, time spent running does not count.",
+      series: stallSeries(
+        psi.cpuSomeAvg10Pct,
+        psi.cpuSomeAvg60Pct,
+        psi.cpuSomeAvg300Pct,
+        psi.cpuFullAvg10Pct,
+        psi.cpuFullAvg60Pct,
+        psi.cpuFullAvg300Pct
+      ),
+      valueFormatter: formatPercentValue,
+      showCurrentValues: false,
+    },
+    {
+      title: "Memory stall",
+      description:
+        "Share of time tasks were stalled on memory, waiting for pages to be reclaimed or read back from swap. Sustained full pressure means the host is thrashing.",
+      series: stallSeries(
+        psi.memorySomeAvg10Pct,
+        psi.memorySomeAvg60Pct,
+        psi.memorySomeAvg300Pct,
+        psi.memoryFullAvg10Pct,
+        psi.memoryFullAvg60Pct,
+        psi.memoryFullAvg300Pct
+      ),
+      valueFormatter: formatPercentValue,
+      showCurrentValues: false,
+    },
+    {
+      title: "I/O stall",
+      description:
+        "Share of time tasks were stalled waiting for disk I/O. Full pressure is the stronger signal: nothing else could make progress while it lasted.",
+      series: stallSeries(
+        psi.ioSomeAvg10Pct,
+        psi.ioSomeAvg60Pct,
+        psi.ioSomeAvg300Pct,
+        psi.ioFullAvg10Pct,
+        psi.ioFullAvg60Pct,
+        psi.ioFullAvg300Pct
+      ),
+      valueFormatter: formatPercentValue,
+      showCurrentValues: false,
+    },
+  ]
+}
+
 function hostSystemCharts(
   host: NonNullable<ServerMetricsResponse["host"]>
 ): MetricChartConfig[] {
@@ -730,6 +803,7 @@ export {
   hostMemoryCharts,
   hostSystemCharts,
   networkCharts,
+  psiCharts,
   smartCharts,
   tcpCharts,
   zfsPoolCharts,

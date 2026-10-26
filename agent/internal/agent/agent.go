@@ -315,6 +315,7 @@ func buildIngestData(version string, details ingest.ServerDetails, sample collec
 		ServerDetails:        details,
 		ServerMetrics:        sample.ServerMetrics,
 		ZfsArcMetrics:        sample.ZfsArcMetrics,
+		PsiMetrics:           sample.PsiMetrics,
 		InterfaceMetrics:     sample.InterfaceMetrics,
 		DiskMetrics:          sample.DiskMetrics,
 		ZfsPoolMetrics:       sample.ZfsPoolMetrics,

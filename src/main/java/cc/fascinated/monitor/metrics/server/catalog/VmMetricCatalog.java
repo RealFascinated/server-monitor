@@ -9,6 +9,7 @@ import cc.fascinated.monitor.metrics.server.series.DockerSeries;
 import cc.fascinated.monitor.metrics.server.series.GpuSeries;
 import cc.fascinated.monitor.metrics.server.series.HostSeries;
 import cc.fascinated.monitor.metrics.server.series.NetworkSeries;
+import cc.fascinated.monitor.metrics.server.series.PsiSeries;
 import cc.fascinated.monitor.metrics.server.series.ServerStatusSeries;
 import cc.fascinated.monitor.metrics.server.series.TemperatureSeries;
 import cc.fascinated.monitor.metrics.server.series.TcpConnectionSeries;
@@ -89,6 +90,7 @@ public class VmMetricCatalog {
     private static VmMetricFamily[] concatFamilies() {
         List<VmMetricFamily> metrics = new ArrayList<>();
         addFamily(metrics, HostSeries.values());
+        addFamily(metrics, PsiSeries.values());
         addFamily(metrics, CpuCoreSeries.values());
         addFamily(metrics, DiskSeries.values());
         addFamily(metrics, NetworkSeries.values());

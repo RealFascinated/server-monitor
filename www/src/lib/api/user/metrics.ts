@@ -40,6 +40,40 @@ export type HostMetrics = {
   clockOffsetMs?: MetricValues
 }
 
+/**
+ * Linux Pressure Stall Information. Avg* are the share of time tasks were stalled on a resource
+ * over 10 seconds, 1 minute and 5 minutes; "some" means at least one task was stalled, "full"
+ * means every non-idle task was. TotalMs is cumulative stall time since boot. Absent when PSI is
+ * unavailable (no CONFIG_PSI, or PSI disabled on the kernel command line); the Full fields are
+ * absent for CPU on kernels that export only a some line for it.
+ */
+export type PsiMetrics = {
+  cpuSomeAvg10Pct?: MetricValues
+  cpuSomeAvg60Pct?: MetricValues
+  cpuSomeAvg300Pct?: MetricValues
+  cpuSomeTotalMs?: MetricValues
+  cpuFullAvg10Pct?: MetricValues
+  cpuFullAvg60Pct?: MetricValues
+  cpuFullAvg300Pct?: MetricValues
+  cpuFullTotalMs?: MetricValues
+  memorySomeAvg10Pct?: MetricValues
+  memorySomeAvg60Pct?: MetricValues
+  memorySomeAvg300Pct?: MetricValues
+  memorySomeTotalMs?: MetricValues
+  memoryFullAvg10Pct?: MetricValues
+  memoryFullAvg60Pct?: MetricValues
+  memoryFullAvg300Pct?: MetricValues
+  memoryFullTotalMs?: MetricValues
+  ioSomeAvg10Pct?: MetricValues
+  ioSomeAvg60Pct?: MetricValues
+  ioSomeAvg300Pct?: MetricValues
+  ioSomeTotalMs?: MetricValues
+  ioFullAvg10Pct?: MetricValues
+  ioFullAvg60Pct?: MetricValues
+  ioFullAvg300Pct?: MetricValues
+  ioFullTotalMs?: MetricValues
+}
+
 export type CpuCoreMetrics = {
   cpu: string
   cpuCorePct?: MetricValues
@@ -169,6 +203,7 @@ export type ServerMetricsResponse = {
   step: number | null
   timestamps: number[] | null
   host?: HostMetrics | null
+  psi?: PsiMetrics | null
   cpuCores?: CpuCoreMetrics[] | null
   disks?: DiskMetrics[] | null
   networks?: NetworkMetrics[] | null

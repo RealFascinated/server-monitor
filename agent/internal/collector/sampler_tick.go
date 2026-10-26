@@ -34,6 +34,7 @@ func (s *Sampler) storeFast(update platform.TickUpdate) {
 	s.fast.InterfaceMetrics = update.InterfaceMetrics
 	s.fast.DiskMetrics = update.DiskMetrics
 	s.fast.ZfsArcMetrics = update.ZfsArcMetrics
+	s.fast.PsiMetrics = update.PsiMetrics
 }
 
 func (s *Sampler) storeSlow(update platform.SlowUpdate) {

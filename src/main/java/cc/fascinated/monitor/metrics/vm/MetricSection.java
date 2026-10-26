@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 public enum MetricSection {
     HOST("host", true),
+    PSI("psi", true),
     CPU_CORES("cpuCores", false),
     DISKS("disks", false),
     NETWORKS("networks", false),

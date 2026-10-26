@@ -1,4 +1,5 @@
 import {
+  Activity,
   Cable,
   Container,
   Cpu,
@@ -28,6 +29,7 @@ import {
   hostMemoryCharts,
   hostSystemCharts,
   networkCharts,
+  psiCharts,
   smartCharts,
   tcpCharts,
   zfsPoolCharts,
@@ -59,6 +61,14 @@ function buildServerMetricSections(
     title: "Memory",
     icon: MemoryStick,
     charts: hostMemoryCharts(host),
+    timeGrid,
+  })
+
+  addChartSection(builder, {
+    title: "Stall pressure",
+    description: "Linux Pressure Stall Information",
+    icon: Activity,
+    charts: psiCharts(metrics.psi),
     timeGrid,
   })
 

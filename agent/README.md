@@ -60,6 +60,10 @@ Optional `config.yml` (see `config-example.yml`). Environment variables override
 - **Clock sync:** whether the kernel considers the clock synchronised and its own error estimate on Linux, plus the measured offset when `chronyc` is available (an agent in a container only sees it if `chronyc` is in the image); `w32tm` on Windows. No network requests are made.
 - **Container network and disk I/O:** disk throughput is read from each container's cgroup. Network traffic is read through the container's first process, so a containerised agent needs `pid: host`; containers on host networking are skipped because their counters are the host's.
 
+### Stall pressure
+
+CPU, memory and I/O stall pressure (Linux Pressure Stall Information) is read from `/proc/pressure`, so it needs a kernel with PSI available: `CONFIG_PSI=y`, and on distributions that compile it in but leave it off, `psi=1` on the kernel command line. Nothing is reported when the files are missing. Inside an LXC container the family is skipped, because those files describe the host rather than the container.
+
 ### Compression and buffering
 
 Both depend on the API advertising support (`X-Monitor-Features`), so a self-hosted API that predates them keeps receiving exactly what it always did.

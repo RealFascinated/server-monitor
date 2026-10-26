@@ -39,7 +39,7 @@ public class ListMetricsTool {
     public String listMetrics(
             McpTransportContext context,
             @McpToolParam(description = "Server id from list_servers: only metrics it reports", required = false) Long serverId,
-            @McpToolParam(description = "Only one group: host, cpuCores, disks, networks, gpus, containers, temperatures, zfsArc, zfsPools, tcpConnections or smartDevices", required = false) String group,
+            @McpToolParam(description = "Only one group: host, psi, cpuCores, disks, networks, gpus, containers, temperatures, zfsArc, zfsPools, tcpConnections or smartDevices", required = false) String group,
             @McpToolParam(description = "Only these metric ids, e.g. [\"monitor_host_cpu_usage\", \"monitor_disk_usage_percent\"]", required = false) List<String> metrics,
             @McpToolParam(description = "With serverId: include each metric's label values as series (default false; large unless narrowed by group or metrics)", required = false) Boolean includeSeries
     ) {

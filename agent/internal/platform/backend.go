@@ -27,6 +27,7 @@ type TickUpdate struct {
 	InterfaceMetrics []ingest.InterfaceMetrics
 	DiskMetrics      []ingest.DiskMetric
 	ZfsArcMetrics    *ingest.ZFSArcMetrics
+	PsiMetrics       *ingest.PsiMetrics
 }
 
 type SlowUpdate struct {

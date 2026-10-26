@@ -11,6 +11,7 @@ import cc.fascinated.monitor.metrics.server.series.DockerSeries;
 import cc.fascinated.monitor.metrics.server.series.GpuSeries;
 import cc.fascinated.monitor.metrics.server.series.HostSeries;
 import cc.fascinated.monitor.metrics.server.series.NetworkSeries;
+import cc.fascinated.monitor.metrics.server.series.PsiSeries;
 import cc.fascinated.monitor.metrics.server.series.ServerStatusSeries;
 import cc.fascinated.monitor.metrics.server.series.SmartSeries;
 import cc.fascinated.monitor.metrics.server.series.TcpConnectionSeries;
@@ -205,6 +206,9 @@ public class ServerIngestService {
         Utils.forEach(metrics.gpuMetrics(), gpu -> GpuSeries.write(ctx, gpu));
         if (metrics.zfsArcMetrics() != null) {
             ZfsArcSeries.write(ctx, metrics.zfsArcMetrics());
+        }
+        if (metrics.psiMetrics() != null) {
+            PsiSeries.write(ctx, metrics.psiMetrics());
         }
         Utils.forEach(metrics.zfsPoolMetrics(), pool -> ZfsPoolSeries.write(ctx, pool));
         Utils.forEach(metrics.dockerContainers(), container -> DockerSeries.write(ctx, container));

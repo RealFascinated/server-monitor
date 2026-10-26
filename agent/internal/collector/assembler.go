@@ -13,6 +13,7 @@ type FastSnapshot struct {
 	InterfaceMetrics []ingest.InterfaceMetrics
 	DiskMetrics      []ingest.DiskMetric
 	ZfsArcMetrics    *ingest.ZFSArcMetrics
+	PsiMetrics       *ingest.PsiMetrics
 }
 
 // SlowSnapshot holds metrics updated on each slow refresh.
@@ -84,6 +85,7 @@ func Assemble(fast FastSnapshot, slow SlowSnapshot) Result {
 		InterfaceMetrics:     fast.InterfaceMetrics,
 		DiskMetrics:          fast.DiskMetrics,
 		ZfsArcMetrics:        fast.ZfsArcMetrics,
+		PsiMetrics:           fast.PsiMetrics,
 		ZfsPoolMetrics:       slow.ZfsPoolMetrics,
 		DockerContainers:     slow.DockerContainers,
 		GPUMetrics:           slow.GPUMetrics,

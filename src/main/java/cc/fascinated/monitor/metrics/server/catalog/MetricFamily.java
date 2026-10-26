@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 public enum MetricFamily {
     HOST(MetricSection.HOST, new String[0]),
+    PSI(MetricSection.PSI, new String[0]),
     CPU_CORE(MetricSection.CPU_CORES, new String[]{"cpu"}),
     DISK(MetricSection.DISKS, new String[]{"disk"}),
     NETWORK(MetricSection.NETWORKS, new String[]{"interface"}),

@@ -4,6 +4,7 @@ import cc.fascinated.monitor.metrics.server.series.AgentSeries;
 import cc.fascinated.monitor.metrics.server.series.DockerSeries;
 import cc.fascinated.monitor.metrics.server.series.DiskSeries;
 import cc.fascinated.monitor.metrics.server.series.HostSeries;
+import cc.fascinated.monitor.metrics.server.series.PsiSeries;
 import cc.fascinated.monitor.metrics.server.series.SmartSeries;
 import cc.fascinated.monitor.metrics.server.series.TemperatureSeries;
 import org.junit.jupiter.api.Test;
@@ -59,6 +60,17 @@ class VmMetricCatalogTest {
         assertEquals("enduranceUsedPercent", VmMetricCatalog.fieldName(SmartSeries.ENDURANCE_USED_PERCENT));
         assertEquals("smartDevices", MetricFamily.SMART.section().jsonKey());
         assertEquals(List.of("device"), List.of(MetricFamily.SMART.groupingLabels()));
+    }
+
+    @Test
+    void psiSeries_mapToPsiSectionFields() {
+        assertEquals(MetricFamily.PSI, VmMetricCatalog.familyOf(PsiSeries.CPU_SOME_AVG10_PCT.metricName()));
+        assertEquals("cpuSomeAvg10Pct", VmMetricCatalog.fieldName(PsiSeries.CPU_SOME_AVG10_PCT));
+        assertEquals("memoryFullAvg300Pct", VmMetricCatalog.fieldName(PsiSeries.MEMORY_FULL_AVG300_PCT));
+        assertEquals("ioSomeTotalMs", VmMetricCatalog.fieldName(PsiSeries.IO_SOME_TOTAL_MS));
+        assertEquals("psi", MetricFamily.PSI.section().jsonKey());
+        assertTrue(VmMetricCatalog.alertable().containsKey(PsiSeries.IO_SOME_AVG300_PCT.metricName()));
+        assertFalse(VmMetricCatalog.alertable().containsKey(PsiSeries.IO_SOME_AVG10_PCT.metricName()));
     }
 
     @Test

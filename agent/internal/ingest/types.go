@@ -9,6 +9,7 @@ type Data struct {
 	InterfaceMetrics []InterfaceMetrics      `json:"interfaceMetrics"`
 	DiskMetrics      []DiskMetric            `json:"diskMetrics"`
 	ZfsArcMetrics    *ZFSArcMetrics          `json:"zfsArcMetrics,omitempty"`
+	PsiMetrics           *PsiMetrics             `json:"psiMetrics,omitempty"`
 	ZfsPoolMetrics   []ZfsPoolMetric         `json:"zfsPoolMetrics,omitempty"`
 	DockerContainers     []DockerContainerMetric `json:"dockerContainers,omitempty"`
 	GPUMetrics           []GPUMetric             `json:"gpuMetrics,omitempty"`
@@ -156,6 +157,39 @@ type ZFSArcMetrics struct {
 	L2ArcSizeBytes     int64   `json:"l2arcSizeBytes"`
 	ArcHitRatio        float64 `json:"arcHitRatio"`
 	ArcMissesPerSecond int64   `json:"arcMissesPerSecond"`
+}
+
+// PsiMetrics is Linux Pressure Stall Information: how much wall-clock time tasks spent stalled
+// waiting on a resource. Avg* are kernel moving averages of the share of time the resource was
+// stalled, over 10 seconds, 1 minute and 5 minutes; "some" means at least one task was stalled
+// and "full" means every non-idle task was. TotalMs is cumulative stall time since boot.
+// Unset when PSI is unavailable (no CONFIG_PSI, or PSI disabled on the kernel command line), and
+// full is unset for CPU on kernels that export only a some line for it.
+type PsiMetrics struct {
+	CPUSomeAvg10Pct   *float64 `json:"cpuSomeAvg10Pct,omitempty"`
+	CPUSomeAvg60Pct   *float64 `json:"cpuSomeAvg60Pct,omitempty"`
+	CPUSomeAvg300Pct  *float64 `json:"cpuSomeAvg300Pct,omitempty"`
+	CPUSomeTotalMs    *float64 `json:"cpuSomeTotalMs,omitempty"`
+	CPUFullAvg10Pct   *float64 `json:"cpuFullAvg10Pct,omitempty"`
+	CPUFullAvg60Pct   *float64 `json:"cpuFullAvg60Pct,omitempty"`
+	CPUFullAvg300Pct  *float64 `json:"cpuFullAvg300Pct,omitempty"`
+	CPUFullTotalMs    *float64 `json:"cpuFullTotalMs,omitempty"`
+	MemorySomeAvg10Pct  *float64 `json:"memorySomeAvg10Pct,omitempty"`
+	MemorySomeAvg60Pct  *float64 `json:"memorySomeAvg60Pct,omitempty"`
+	MemorySomeAvg300Pct *float64 `json:"memorySomeAvg300Pct,omitempty"`
+	MemorySomeTotalMs   *float64 `json:"memorySomeTotalMs,omitempty"`
+	MemoryFullAvg10Pct  *float64 `json:"memoryFullAvg10Pct,omitempty"`
+	MemoryFullAvg60Pct  *float64 `json:"memoryFullAvg60Pct,omitempty"`
+	MemoryFullAvg300Pct *float64 `json:"memoryFullAvg300Pct,omitempty"`
+	MemoryFullTotalMs   *float64 `json:"memoryFullTotalMs,omitempty"`
+	IOSomeAvg10Pct      *float64 `json:"ioSomeAvg10Pct,omitempty"`
+	IOSomeAvg60Pct      *float64 `json:"ioSomeAvg60Pct,omitempty"`
+	IOSomeAvg300Pct     *float64 `json:"ioSomeAvg300Pct,omitempty"`
+	IOSomeTotalMs       *float64 `json:"ioSomeTotalMs,omitempty"`
+	IOFullAvg10Pct      *float64 `json:"ioFullAvg10Pct,omitempty"`
+	IOFullAvg60Pct      *float64 `json:"ioFullAvg60Pct,omitempty"`
+	IOFullAvg300Pct     *float64 `json:"ioFullAvg300Pct,omitempty"`
+	IOFullTotalMs       *float64 `json:"ioFullTotalMs,omitempty"`
 }
 
 type InterfaceMetrics struct {
