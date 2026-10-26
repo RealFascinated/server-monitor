@@ -126,6 +126,17 @@ class McpToolsIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
+    void listServersCanBeCompactAndFilteredByName() throws Exception {
+        JsonNode compact = json(ok(this.all, "list_servers", args("compact", true, "nameContains", "ALP")));
+        assertThat(compact.size()).isEqualTo(1);
+        assertThat(compact.get(0).get("serverName").asString()).isEqualTo("alpha");
+        assertThat(compact.get(0).has("inventory")).isFalse();
+        assertThat(compact.get(0).has("serverId")).isTrue();
+
+        assertThat(json(ok(this.all, "list_servers", args("nameContains", "nope"))).size()).isZero();
+    }
+
+    @Test
     void listIncidentsReturnsAPageAndDeniesOtherUsers() throws Exception {
         JsonNode page = json(ok(this.all, "list_server_incidents", args("serverId", this.server.serverId())));
         assertThat(page.get("totalItems").asLong()).isZero();
@@ -165,13 +176,21 @@ class McpToolsIntegrationTest extends IntegrationTestBase {
     void listMetricsForAServerOnlyListsWhatItReportsWithItsLabelValues() throws Exception {
         backfill(true);
 
-        McpTestSupport.ToolResult result = awaitResult("list_metrics", args("serverId", this.server.serverId()),
+        McpTestSupport.ToolResult unnarrowed = awaitResult("list_metrics", args("serverId", this.server.serverId()),
                 r -> r.text().contains("monitor_smart_data_written_bytes"));
+        Map<String, JsonNode> unnarrowedById = new HashMap<>();
+        this.objectMapper.readTree(unnarrowed.text())
+                .forEach(metric -> unnarrowedById.put(metric.get("metric").asString(), metric));
+        assertThat(unnarrowedById).containsKey(CPU).doesNotContainKey("monitor_container_cpu_usage");
+        assertThat(unnarrowedById.get("monitor_smart_data_written_bytes").has("series")).isFalse();
+
+        McpTestSupport.ToolResult result = ok(this.all, "list_metrics", args("serverId", this.server.serverId(),
+                "metrics", List.of(CPU, "monitor_smart_data_written_bytes"), "includeSeries", true));
         JsonNode metrics = this.objectMapper.readTree(result.text());
 
         Map<String, JsonNode> byId = new HashMap<>();
         metrics.forEach(metric -> byId.put(metric.get("metric").asString(), metric));
-        assertThat(byId).containsKey(CPU).doesNotContainKey("monitor_container_cpu_usage");
+        assertThat(byId).containsOnlyKeys(CPU, "monitor_smart_data_written_bytes");
         List<String> devices = new ArrayList<>();
         byId.get("monitor_smart_data_written_bytes").get("series")
                 .forEach(labels -> devices.add(labels.get("device").asString()));
@@ -194,9 +213,25 @@ class McpToolsIntegrationTest extends IntegrationTestBase {
         JsonNode series = query.get("series").get(0);
         assertThat(series.get("last").asDouble()).isEqualTo(12.5);
         assertThat(series.get("min").asDouble()).isEqualTo(12.5);
-        assertThat(series.get("points").get(0).size()).isEqualTo(2);
+        assertThat(series.get("maxAt").asLong()).isBetween(query.get("from").asLong(), query.get("to").asLong());
+        assertThat(series.get("minAt").asLong()).isBetween(query.get("from").asLong(), query.get("to").asLong());
+        assertThat(series.has("points")).isFalse();
+        assertThat(series.get("labels").has("__name__")).isFalse();
         assertThat(query.get("stepSeconds").asInt()).isGreaterThanOrEqualTo(15);
         assertThat(query.get("truncated").asBoolean()).isFalse();
+    }
+
+    @Test
+    void queryMetricsReturnsPointsAsWholeSecondsWhenAsked() throws Exception {
+        backfill(false);
+
+        McpTestSupport.ToolResult result = awaitResult("query_metrics",
+                args("serverId", this.server.serverId(), "metric", CPU, "includePoints", true),
+                r -> r.text().contains("\"points\""));
+        JsonNode point = this.objectMapper.readTree(result.text()).get("series").get(0).get("points").get(0);
+
+        assertThat(point.size()).isEqualTo(2);
+        assertThat(point.get(0).isIntegralNumber()).isTrue();
     }
 
     @Test
@@ -205,7 +240,7 @@ class McpToolsIntegrationTest extends IntegrationTestBase {
 
         McpTestSupport.ToolResult result = ok(this.all, "query_metrics", args(
                 "serverId", this.server.serverId(), "metric", CPU,
-                "from", java.time.Instant.now().minus(java.time.Duration.ofDays(30)).toString(), "stepSeconds", 15));
+                "from", java.time.Instant.now().minus(java.time.Duration.ofDays(30)).toString(), "stepSeconds", 15, "includePoints", true));
         JsonNode query = this.objectMapper.readTree(result.text());
 
         assertThat(query.get("stepSeconds").asInt()).isGreaterThanOrEqualTo(30 * 86_400 / 200);

@@ -81,12 +81,25 @@ public class McpMetricCatalogService {
 
     /**
      * @param group    only metrics of this group (e.g. {@code containers}), or all
-     * @param serverId only metrics this server reports now, with the label sets it has; needs VIEW_METRICS
+     * @param metrics  only these metric ids, or all
+     * @param serverId only metrics this server reports now; needs VIEW_METRICS
+     * @param includeSeries with a {@code serverId}, also the label sets it has for each metric. Off by default
+     *                      because every label value of every group is a lot of output
      */
-    public List<McpMetricInfo> list(UserRow user, @Nullable String group, @Nullable Long serverId) {
+    public List<McpMetricInfo> list(UserRow user, @Nullable String group, @Nullable List<String> metrics,
+                                    @Nullable Long serverId, boolean includeSeries) {
         if (group != null && !groups().contains(group)) {
             throw new BadRequestException("Unknown group \"%s\". Valid groups: %s"
                     .formatted(group, String.join(", ", groups())));
+        }
+        Set<String> wanted = metrics == null || metrics.isEmpty() ? null : Set.copyOf(metrics);
+        if (wanted != null) {
+            for (String metric : wanted) {
+                if (!isQueryable(metric)) {
+                    throw new BadRequestException("Unknown metric \"%s\". Use list_metrics to see valid metric ids"
+                            .formatted(metric));
+                }
+            }
         }
         Map<String, Set<Map<String, String>>> reported = null;
         if (serverId != null) {
@@ -98,10 +111,13 @@ public class McpMetricCatalogService {
             if (group != null && !group.equals(groupOf(metric))) {
                 continue;
             }
+            if (wanted != null && !wanted.contains(metric)) {
+                continue;
+            }
             if (reported != null && !reported.containsKey(metric)) {
                 continue;
             }
-            result.add(toInfo(metric, reported == null ? null : reported.get(metric)));
+            result.add(toInfo(metric, reported == null || !includeSeries ? null : reported.get(metric)));
         }
         result.sort(Comparator.comparing(McpMetricInfo::group).thenComparing(McpMetricInfo::metric));
         return result;

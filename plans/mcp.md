@@ -100,7 +100,7 @@ Tools return `String` produced by `McpJson.write`, a mapper with ISO dates and n
 
 ### Metric ids (as built)
 
-`list_metrics` is the single discovery tool. The queryable set is `VmMetricCatalog.allGaugeNames()` plus the `ServerStatusSeries` names (so `monitor_server_up` is included); `alertable` flags the subset usable in alert rules. With a `serverId` it returns only what that server reports, with label values for labelled metrics (one instant query). `query_metrics` validates the metric and label keys against the same set.
+`list_metrics` is the single discovery tool. The queryable set is `VmMetricCatalog.allGaugeNames()` plus the `ServerStatusSeries` names (so `monitor_server_up` is included); `alertable` flags the subset usable in alert rules. With a `serverId` it returns only what that server reports, with label values for labelled metrics when `includeSeries` is set (one instant query). `query_metrics` validates the metric and label keys against the same set.
 
 ### Other deviations
 
@@ -148,7 +148,7 @@ Package `cc.fascinated.monitor.mcp.tool`, class names end in `Tool`. Each is a `
 1. checks `VIEW_METRICS` on the server via `ServerAccessService.requirePermission`;
 2. validates the metric against `VmMetricCatalog.allGaugeNames()` (the full queryable set, **not** `alertable()`, which is a subset) and label keys against its `identityLabels`;
 3. builds the query through `PromqlQueryBuilder` / `VictoriaMetricsQueryClient`, reusing what `AlertPreviewService` already does;
-4. picks a step so each series returns at most ~200 points, and returns a compact `{labels, unit, points:[[epochSec, value]...]}` plus min/max/avg per series.
+4. picks a step so each series covers at most ~200 samples, and returns `{labels, min, max, avg, last, maxAt, minAt}` per series. The `[epochSec, value]` points are opt-in (`includePoints`): the statistics answer most questions and the points were most of the bytes.
 
 The point cap is only output shaping so a day of 1s data doesn't flood the model's context. It is not rate limiting.
 

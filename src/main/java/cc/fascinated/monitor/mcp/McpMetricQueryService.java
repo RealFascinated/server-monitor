@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Range queries for MCP clients. Output is shaped for a model's context: a bounded number of points and series, with
@@ -49,10 +50,11 @@ public class McpMetricQueryService {
      * @param from        ISO-8601 instant, default one hour before {@code to}
      * @param to          ISO-8601 instant, default now
      * @param stepSeconds requested resolution; raised when it would return more than {@value #MAX_POINTS} points
+     * @param includePoints whether to return the samples themselves; the statistics are always returned
      */
     public McpMetricQueryResult query(UserRow user, long serverId, String metric,
                                       @Nullable Map<String, String> labels, @Nullable String from, @Nullable String to,
-                                      @Nullable Integer stepSeconds) {
+                                      @Nullable Integer stepSeconds, boolean includePoints) {
         this.serverService.requireServer(user, serverId, ServerPermission.VIEW_METRICS);
         if (!McpMetricCatalogService.isQueryable(metric)) {
             throw new BadRequestException("Unknown metric \"%s\". Use list_metrics to see valid metric ids".formatted(metric));
@@ -92,7 +94,7 @@ public class McpMetricQueryService {
         List<McpMetricSeries> result = new ArrayList<>();
         for (VmTimeSeries series : all.subList(0, Math.min(MAX_SERIES, all.size()))) {
             if (!series.samples().isEmpty()) {
-                result.add(summarise(series));
+                result.add(summarise(series, includePoints));
             }
         }
         VmGaugeSeries alertable = VmMetricCatalog.alertable().get(metric);
@@ -101,21 +103,35 @@ public class McpMetricQueryService {
                 start.getEpochSecond(), end.getEpochSecond(), step, result, all.size() > MAX_SERIES);
     }
 
-    private static McpMetricSeries summarise(VmTimeSeries series) {
+    private static McpMetricSeries summarise(VmTimeSeries series, boolean includePoints) {
         double min = Double.POSITIVE_INFINITY;
         double max = Double.NEGATIVE_INFINITY;
+        long minAt = 0;
+        long maxAt = 0;
         double sum = 0;
-        List<double[]> points = new ArrayList<>(series.samples().size());
+        List<Object[]> points = includePoints ? new ArrayList<>(series.samples().size()) : null;
         for (VmSample sample : series.samples()) {
             double value = sample.value();
-            min = Math.min(min, value);
-            max = Math.max(max, value);
+            long at = sample.timestamp().getEpochSecond();
+            if (value < min) {
+                min = value;
+                minAt = at;
+            }
+            if (value > max) {
+                max = value;
+                maxAt = at;
+            }
             sum += value;
-            points.add(new double[]{sample.timestamp().getEpochSecond(), round(value)});
+            if (points != null) {
+                points.add(new Object[]{at, round(value)});
+            }
         }
         double last = series.samples().getLast().value();
-        return new McpMetricSeries(SeriesKeys.seriesLabels(series.labels()), round(min), round(max),
-                round(sum / series.samples().size()), round(last), points);
+        // __name__ repeats the top-level metric field.
+        Map<String, String> labels = new TreeMap<>(SeriesKeys.seriesLabels(series.labels()));
+        labels.remove("__name__");
+        return new McpMetricSeries(labels, round(min), round(max), round(sum / series.samples().size()),
+                round(last), maxAt, minAt, points);
     }
 
     private static Instant parse(String field, @Nullable String value, Instant fallback) {

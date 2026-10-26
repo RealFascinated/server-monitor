@@ -29,10 +29,11 @@ public class QueryMetricsTool {
             History of one metric on one server. Get the metric id, and the label values to filter on, from \
             list_metrics (with serverId). Returns unit and displayName (alertable metrics only), from/to and \
             stepSeconds, then one entry per series (per disk, interface, container, ...; at most 20, with \
-            truncated=true when more matched, so filter with labels) holding min, max, avg, last and up to 200 \
-            [epochSeconds, value] points one step apart. The statistics are taken over those points, so a spike \
-            shorter than the step can be missed: narrow the range to find it. Read the statistics first and the \
-            points only to see when something happened. Defaults to the last hour; the range can be at most 31 days \
+            truncated=true when more matched, so filter with labels) holding min, max, avg, last, and maxAt/minAt \
+            (epoch seconds of the highest and lowest sample). The statistics are taken over up to 200 samples one \
+            step apart, so a spike shorter than the step can be missed: narrow the range to find it. The samples \
+            themselves are left out unless includePoints=true, which adds [epochSeconds, value] pairs to each \
+            series; the statistics and maxAt/minAt answer most questions without them. Defaults to the last hour; the range can be at most 31 days \
             and the newest ~30 seconds may not be queryable yet. A series with no data in the range is left out.""")
     public String queryMetrics(
             McpTransportContext context,
@@ -42,9 +43,11 @@ public class QueryMetricsTool {
             Map<String, String> labels,
             @McpToolParam(description = "Start, ISO-8601 instant like 2026-01-31T14:00:00Z, before 'to' (default: an hour before 'to')", required = false) String from,
             @McpToolParam(description = "End, ISO-8601 instant (default: now)", required = false) String to,
-            @McpToolParam(description = "Seconds between points, at least 15; raised automatically so the range fits in 200 points (default: the smallest that fits)", required = false) Integer stepSeconds
+            @McpToolParam(description = "Seconds between points, at least 15; raised automatically so the range fits in 200 points (default: the smallest that fits)", required = false) Integer stepSeconds,
+            @McpToolParam(description = "Also return every sample as [epochSeconds, value] (default false; large)", required = false) Boolean includePoints
     ) {
         UserRow user = this.auth.require(context, ApiTokenScope.METRICS_READ);
-        return McpJson.write(this.queryService.query(user, serverId, metric, labels, from, to, stepSeconds));
+        return McpJson.write(this.queryService.query(user, serverId, metric, labels, from, to, stepSeconds,
+                Boolean.TRUE.equals(includePoints)));
     }
 }

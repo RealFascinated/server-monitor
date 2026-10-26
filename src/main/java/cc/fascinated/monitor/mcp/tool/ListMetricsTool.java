@@ -33,15 +33,17 @@ public class ListMetricsTool {
             where 1 = healthy and 0 = unhealthy) and the suggestedOperator/suggestedThreshold the dashboard \
             proposes. Other metrics have no unit; read it from the id suffix (_bytes, _bps = bytes/s, _pct or \
             _percent = 0-100, _ms, _celsius, _watts, _per_second, _total = counter). Without serverId this is the \
-            whole catalog. With serverId it lists only what that server reported in the last few minutes, with \
-            series: the label values that exist (which disks, interfaces, containers, GPUs), to use as labels in \
-            query_metrics and alert rules. Pass group to keep the result short.""")
+            whole catalog. With serverId it lists only what that server reported in the last few minutes. Add includeSeries=true for series: the label values that exist (which disks, \
+            interfaces, containers, GPUs), to use as labels in query_metrics and alert rules. That is a lot of \
+            output for a whole server, so pair it with group or metrics.""")
     public String listMetrics(
             McpTransportContext context,
-            @McpToolParam(description = "Server id from list_servers: only metrics it reports, with their label values", required = false) Long serverId,
-            @McpToolParam(description = "Only one group: host, cpuCores, disks, networks, gpus, containers, temperatures, zfsArc, zfsPools, tcpConnections or smartDevices", required = false) String group
+            @McpToolParam(description = "Server id from list_servers: only metrics it reports", required = false) Long serverId,
+            @McpToolParam(description = "Only one group: host, cpuCores, disks, networks, gpus, containers, temperatures, zfsArc, zfsPools, tcpConnections or smartDevices", required = false) String group,
+            @McpToolParam(description = "Only these metric ids, e.g. [\"monitor_host_cpu_usage\", \"monitor_disk_usage_percent\"]", required = false) List<String> metrics,
+            @McpToolParam(description = "With serverId: include each metric's label values as series (default false; large unless narrowed by group or metrics)", required = false) Boolean includeSeries
     ) {
         UserRow user = this.auth.require(context, ApiTokenScope.METRICS_READ);
-        return McpJson.write(this.catalog.list(user, group, serverId));
+        return McpJson.write(this.catalog.list(user, group, metrics, serverId, Boolean.TRUE.equals(includeSeries)));
     }
 }
