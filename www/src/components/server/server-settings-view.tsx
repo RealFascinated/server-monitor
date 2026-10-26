@@ -64,6 +64,7 @@ function ServerSettingsView({
           <ServerIngestTokenSection
             serverId={serverId}
             status={server.status}
+            lastHeartbeat={server.lastHeartbeat}
             agentVersion={server.agentVersion}
           />
         </section>

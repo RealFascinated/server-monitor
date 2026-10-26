@@ -94,7 +94,10 @@ const ServerCard = memo(
         >
           <div className="flex min-w-0 flex-1 flex-col gap-2">
             <div className="flex min-w-0 items-center gap-2">
-              <ServerStatusDot status={server.status} />
+              <ServerStatusDot
+                status={server.status}
+                lastHeartbeat={server.lastHeartbeat}
+              />
               <span className="min-w-0 flex-1 truncate font-medium text-foreground">
                 {server.serverName}
               </span>

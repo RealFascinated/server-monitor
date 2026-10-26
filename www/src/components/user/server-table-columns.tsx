@@ -102,7 +102,12 @@ export function getServerTableColumns(
         />
       ),
       meta: {
-        renderServer: (server) => <ServerStatusBadge status={server.status} />,
+        renderServer: (server) => (
+          <ServerStatusBadge
+            status={server.status}
+            lastHeartbeat={server.lastHeartbeat}
+          />
+        ),
       },
     },
     {

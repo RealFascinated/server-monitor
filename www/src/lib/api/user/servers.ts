@@ -41,6 +41,7 @@ export type ServerResponse = {
   uptimePercent30d: number | null
   agentVersion: string | null
   createdAt: string
+  lastHeartbeat: string | null
   role: ServerRole
   permissions: number
   folderName: string | null

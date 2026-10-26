@@ -189,9 +189,12 @@ export function formatDate(iso: string): string {
   return formatAbsoluteDate(iso)
 }
 
-export function formatRelativeTime(iso: string): string {
+export function formatRelativeTime(
+  iso: string,
+  nowMs: number = Date.now()
+): string {
   const date = new Date(iso)
-  const diffMs = date.getTime() - Date.now()
+  const diffMs = date.getTime() - nowMs
 
   if (Math.abs(diffMs) < 60_000) {
     return "just now"
@@ -215,14 +218,16 @@ export function formatRelativeTime(iso: string): string {
   return rtf.format(0, "second")
 }
 
-export function formatDateWithRelative(iso: string): string {
-  const absolute = formatAbsoluteDate(iso)
+export function formatTimestampWithRelative(iso: string): string {
+  return `${formatAbsoluteDate(iso)} (${formatRelativeTime(iso)})`
+}
 
+export function formatDateWithRelative(iso: string): string {
   if (isWithinRelativeTimeThreshold(iso)) {
-    return absolute
+    return formatAbsoluteDate(iso)
   }
 
-  return `${absolute} (${formatRelativeTime(iso)})`
+  return formatTimestampWithRelative(iso)
 }
 
 export function formatUptimeDetailed(seconds: number | null): string | null {

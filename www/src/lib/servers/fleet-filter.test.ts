@@ -20,6 +20,7 @@ function makeServer(
     uptimePercent30d: null,
     agentVersion: null,
     createdAt: "2026-01-01T00:00:00Z",
+    lastHeartbeat: null,
     role: "OWNER",
     permissions: 0,
     folderName: null,

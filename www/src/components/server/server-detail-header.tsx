@@ -41,7 +41,14 @@ function ServerDetailHeader({
         breadcrumbTail
       )}
       title={server?.serverName ?? `Server ${serverId}`}
-      titleAddon={server ? <ServerStatusBadge status={server.status} /> : null}
+      titleAddon={
+        server ? (
+          <ServerStatusBadge
+            status={server.status}
+            lastHeartbeat={server.lastHeartbeat}
+          />
+        ) : null
+      }
       subtitle={server ? <ServerMetaSubtitle server={server} /> : null}
       actions={actions}
       footer={

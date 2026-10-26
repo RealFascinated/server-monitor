@@ -1,9 +1,19 @@
 import { CircleDashed, CircleX } from "lucide-react"
 
 import { SimpleTooltip } from "@/components/simple-tooltip"
+import { useLiveNow } from "@/hooks/use-live-now"
 import type { ServerStatus } from "@/lib/api/user/servers"
+import {
+  formatRelativeTime,
+  formatTimestampWithRelative,
+} from "@/lib/formatter"
 import { SERVER_STATUS_TOOLTIPS } from "@/lib/tooltips/copy"
 import { cn } from "@/lib/utils"
+
+type ServerStatusIndicatorProps = {
+  status: ServerStatus
+  lastHeartbeat?: string | null
+}
 
 const statusDotStyles: Record<ServerStatus, string> = {
   ONLINE: "bg-green-500",
@@ -19,15 +29,29 @@ const statusStyles: Record<ServerStatus, string> = {
     "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
 }
 
+function statusTooltip(
+  status: ServerStatus,
+  lastHeartbeat: string | null
+): string {
+  if (status === "OFFLINE" && lastHeartbeat) {
+    return `Last heartbeat ${formatTimestampWithRelative(lastHeartbeat)}.`
+  }
+
+  return SERVER_STATUS_TOOLTIPS[status]
+}
+
 /**
  * Status marker that differs by shape as well as colour: a filled pulsing dot
  * (online), a crossed circle (offline) and a dashed circle (pending).
  */
-function ServerStatusDot({ status }: { status: ServerStatus }) {
+function ServerStatusDot({
+  status,
+  lastHeartbeat = null,
+}: ServerStatusIndicatorProps) {
   const className = "shrink-0 cursor-help"
 
   return (
-    <SimpleTooltip content={SERVER_STATUS_TOOLTIPS[status]}>
+    <SimpleTooltip content={statusTooltip(status, lastHeartbeat)}>
       {status === "ONLINE" ? (
         <span
           role="img"
@@ -56,22 +80,39 @@ function ServerStatusDot({ status }: { status: ServerStatus }) {
   )
 }
 
-function ServerStatusBadge({ status }: { status: ServerStatus }) {
+function ServerStatusBadge({
+  status,
+  lastHeartbeat = null,
+}: ServerStatusIndicatorProps) {
+  const showLastHeartbeat = status === "OFFLINE" && lastHeartbeat != null
+  const now = useLiveNow({ enabled: showLastHeartbeat })
+  const relativeHeartbeat =
+    showLastHeartbeat && lastHeartbeat
+      ? formatRelativeTime(lastHeartbeat, now)
+      : null
+
   return (
-    <SimpleTooltip content={SERVER_STATUS_TOOLTIPS[status]}>
-      <span
-        className={cn(
-          "inline-flex cursor-help items-center gap-1.5 rounded-sm px-2 py-0.5 text-xs font-medium",
-          statusStyles[status]
-        )}
-      >
-        {status === "ONLINE" ? (
-          <span
-            aria-hidden
-            className="status-pulse-dot size-1.5 shrink-0 rounded-full bg-current"
-          />
+    <SimpleTooltip content={statusTooltip(status, lastHeartbeat)}>
+      <span className="inline-flex cursor-help items-center gap-1.5">
+        <span
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-sm px-2 py-0.5 text-xs font-medium",
+            statusStyles[status]
+          )}
+        >
+          {status === "ONLINE" ? (
+            <span
+              aria-hidden
+              className="status-pulse-dot size-1.5 shrink-0 rounded-full bg-current"
+            />
+          ) : null}
+          {status}
+        </span>
+        {relativeHeartbeat ? (
+          <span className="text-xs whitespace-nowrap text-muted-foreground tabular-nums">
+            {relativeHeartbeat}
+          </span>
         ) : null}
-        {status}
       </span>
     </SimpleTooltip>
   )

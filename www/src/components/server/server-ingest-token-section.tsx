@@ -16,12 +16,14 @@ import {
 type ServerIngestTokenSectionProps = {
   serverId: number
   status: ServerStatus
+  lastHeartbeat: string | null
   agentVersion: string | null
 }
 
 function ServerIngestTokenSection({
   serverId,
   status,
+  lastHeartbeat,
   agentVersion,
 }: ServerIngestTokenSectionProps) {
   const { ingestToken, mutation } = useRotateIngestToken({
@@ -33,7 +35,7 @@ function ServerIngestTokenSection({
   return (
     <div className="overflow-hidden rounded-lg border border-border">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-border bg-muted/80 px-4 py-2.5">
-        <ServerStatusBadge status={status} />
+        <ServerStatusBadge status={status} lastHeartbeat={lastHeartbeat} />
         <SimpleTooltip content={SERVER_TABLE_COLUMN_TOOLTIPS.agent}>
           <span className="cursor-help text-xs text-muted-foreground">
             <AgentVersionLabel version={agentVersion} layout="settings" />
