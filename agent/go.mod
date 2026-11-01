@@ -5,7 +5,7 @@ go 1.26.0
 require (
 	github.com/blang/semver/v4 v4.0.0
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/shirou/gopsutil/v4 v4.26.9
+	github.com/shirou/gopsutil/v4 v4.26.10
 	github.com/yusufpapurcu/wmi v1.2.4
 	go.uber.org/goleak v1.3.0
 	golang.org/x/sys v0.49.0
