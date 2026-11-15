@@ -8,7 +8,7 @@ require (
 	github.com/shirou/gopsutil/v4 v4.26.9
 	github.com/yusufpapurcu/wmi v1.2.4
 	go.uber.org/goleak v1.3.0
-	golang.org/x/sys v0.49.0
+	golang.org/x/sys v0.50.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
