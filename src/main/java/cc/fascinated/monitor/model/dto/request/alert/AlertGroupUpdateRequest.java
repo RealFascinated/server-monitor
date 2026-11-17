@@ -5,15 +5,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-/** Only the fields that are present change; {@code serverIds} replaces the group's whole server list. */
+/** Only the fields that are present change; {@code serverIds} and {@code destinationIds} replace the whole list. */
 public record AlertGroupUpdateRequest(
         @Nullable
         @Size(min = 1, max = 64, message = "Name must be between 1 and 64 characters")
         String name,
         @Nullable Boolean autoAddServers,
         @Nullable Boolean enabled,
-        @Nullable Long destinationId,
-        /** Stops the group notifying anyone; {@code destinationId} cannot express "none" because null means unchanged. */
-        @Nullable Boolean clearDestination,
+        /** Replaces the group's destinations; an empty list stops it notifying anyone. */
+        @Nullable List<Long> destinationIds,
         @Nullable List<Long> serverIds
 ) {}

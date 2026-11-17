@@ -2,8 +2,6 @@ package cc.fascinated.monitor.model.dto.response.alert;
 
 import cc.fascinated.monitor.model.persistance.AlertGroupRow;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.time.Instant;
 import java.util.List;
 
@@ -13,8 +11,7 @@ public record AlertGroupResponse(
         boolean autoAddServers,
         boolean enabled,
         boolean defaultGroup,
-        @Nullable Long destinationId,
-        @Nullable String destinationName,
+        List<GroupDestination> destinations,
         List<GroupServer> servers,
         long ruleCount,
         long firingCount,
@@ -23,10 +20,12 @@ public record AlertGroupResponse(
 
     public record GroupServer(long id, String name) {}
 
-    public static AlertGroupResponse from(AlertGroupRow row, @Nullable String destinationName, List<GroupServer> servers,
+    public record GroupDestination(long id, String name) {}
+
+    public static AlertGroupResponse from(AlertGroupRow row, List<GroupDestination> destinations, List<GroupServer> servers,
                                           long ruleCount, long firingCount) {
         return new AlertGroupResponse(row.getId(), row.getName(), row.isAutoAddServers(), row.isEnabled(),
-                row.isDefaultGroup(), row.getDestinationId(), destinationName, servers, ruleCount, firingCount,
+                row.isDefaultGroup(), destinations, servers, ruleCount, firingCount,
                 row.getCreatedAt());
     }
 }

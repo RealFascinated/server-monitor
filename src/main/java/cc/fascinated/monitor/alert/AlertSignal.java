@@ -5,6 +5,7 @@ import cc.fascinated.monitor.model.domain.alert.AlertTransition;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
+import java.util.Set;
 
 /**
  * A state change handed from the evaluator to the dispatcher. A signal without a notification closes the
@@ -15,7 +16,7 @@ public record AlertSignal(
         long ruleId,
         long serverId,
         String seriesKey,
-        @Nullable Long destinationId,
+        Set<Long> destinationIds,
         double peakValue,
         Instant at,
         @Nullable String resolveReason,

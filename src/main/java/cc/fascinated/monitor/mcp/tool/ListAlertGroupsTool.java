@@ -27,8 +27,8 @@ public class ListAlertGroupsTool {
     @RequiresScope(ApiTokenScope.ALERTS_READ)
     @McpTool(name = "list_alert_groups", description = """
             Lists alert groups. Alert groups are account-wide and rules belong to a group, never to a server: a \
-            server is covered by the rules of every group it is a member of, and a group notifies its one \
-            destination. Each group has servers (its members, id and name), destinationId/destinationName (absent = \
+            server is covered by the rules of every group it is a member of, and a group notifies all of its \
+            destinations. Each group has servers (its members, id and name), destinations (id and name; empty = \
             notifies nobody), enabled (a disabled group evaluates none of its rules), autoAddServers (new servers \
             join it automatically), defaultGroup (the account's built-in group, which cannot be deleted), \
             ruleCount, and firingCount (its alerts open right now, silenced ones excluded). To exclude a server \

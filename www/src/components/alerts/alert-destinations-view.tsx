@@ -40,7 +40,8 @@ function DestinationRow({ destination }: { destination: AlertDestination }) {
           {destination.maskedUrl}
         </p>
         <p className="text-xs text-muted-foreground">
-          Discord · {groupCountLabel(destination.groupCount)}
+          {destination.type === "WEBHOOK" ? "Webhook" : "Discord"} ·{" "}
+          {groupCountLabel(destination.groupCount)}
         </p>
       </div>
 

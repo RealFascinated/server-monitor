@@ -137,9 +137,9 @@ class AlertIntegrationTest extends IntegrationTestBase {
         this.mockMvc.perform(patch("/v1/alerts/groups/{id}", groupId)
                         .header("Authorization", TestAuthSupport.bearer(this.token))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"destinationId\":%d}".formatted(destinationId)))
+                        .content("{\"destinationIds\":[%d]}".formatted(destinationId)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.destinationId").value(destinationId));
+                .andExpect(jsonPath("$.destinations[0].id").value(destinationId));
     }
 
     private long createRule(String bearer, long groupId, String metric, String filter,
@@ -236,12 +236,31 @@ class AlertIntegrationTest extends IntegrationTestBase {
                 .andReturn().getResponse().getContentAsString();
         for (JsonNode group : this.objectMapper.readTree(body)) {
             if (group.get("id").asLong() == later) {
-                assertThat(group.has("destinationId")).as("groups created afterwards start without one").isFalse();
+                assertThat(group.get("destinations")).as("groups created afterwards start without one").isEmpty();
             } else {
-                assertThat(group.get("destinationId").asLong()).isEqualTo(destinationId);
-                assertThat(group.get("destinationName").asString()).isEqualTo("ops");
+                assertThat(group.get("destinations").get(0).get("id").asLong()).isEqualTo(destinationId);
+                assertThat(group.get("destinations").get(0).get("name").asString()).isEqualTo("ops");
             }
         }
+    }
+
+    @Test
+    void groupCanNotifyMultipleDestinations() throws Exception {
+        long first = createDestination();
+        long second = createDestination();
+        long group = createGroup(this.token, "multi", false);
+        this.mockMvc.perform(patch("/v1/alerts/groups/{id}", group)
+                        .header("Authorization", TestAuthSupport.bearer(this.token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"destinationIds\":[%d,%d]}".formatted(first, second)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.destinations.length()").value(2));
+        this.mockMvc.perform(patch("/v1/alerts/groups/{id}", group)
+                        .header("Authorization", TestAuthSupport.bearer(this.token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"destinationIds\":[%d]}".formatted(second)))
+                .andExpect(jsonPath("$.destinations.length()").value(1))
+                .andExpect(jsonPath("$.destinations[0].id").value(second));
     }
 
     @Test
@@ -254,19 +273,19 @@ class AlertIntegrationTest extends IntegrationTestBase {
                         .header("Authorization", TestAuthSupport.bearer(this.token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"renamed\"}"))
-                .andExpect(jsonPath("$.destinationId").value(destination));
+                .andExpect(jsonPath("$.destinations[0].id").value(destination));
         this.mockMvc.perform(patch("/v1/alerts/groups/{id}", group)
                         .header("Authorization", TestAuthSupport.bearer(this.token))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"clearDestination\":true}"))
+                        .content("{\"destinationIds\":[]}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.destinationId").doesNotExist());
+                .andExpect(jsonPath("$.destinations").isEmpty());
 
         String other = this.auth.register(TestAuthSupport.uniqueEmail(), PASSWORD).token();
         this.mockMvc.perform(patch("/v1/alerts/groups/{id}", group)
                         .header("Authorization", TestAuthSupport.bearer(this.token))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"destinationId\":%d}".formatted(createDestinationFor(other))))
+                        .content("{\"destinationIds\":[%d]}".formatted(createDestinationFor(other))))
                 .andExpect(status().isBadRequest());
     }
 
@@ -605,7 +624,7 @@ class AlertIntegrationTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.length()").value(1));
         this.mockMvc.perform(get("/v1/alerts/groups/{id}", group)
                         .header("Authorization", TestAuthSupport.bearer(this.token)))
-                .andExpect(jsonPath("$.destinationId").doesNotExist());
+                .andExpect(jsonPath("$.destinations").isEmpty());
     }
 
     @Test
@@ -796,7 +815,7 @@ class AlertIntegrationTest extends IntegrationTestBase {
                         .header("Authorization", TestAuthSupport.bearer(this.token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"name":"%s","addDefaultRules":%s,"destinationId":%d}
+                                {"name":"%s","addDefaultRules":%s,"destinationIds":[%d]}
                                 """.formatted(name, addDefaults, destination)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
@@ -817,7 +836,7 @@ class AlertIntegrationTest extends IntegrationTestBase {
         assertThat(plain.get("ruleCount").asInt()).isZero();
         assertThat(seeded.get("ruleCount").asInt()).isEqualTo(defaults);
         assertThat(seeded.get("enabled").asBoolean()).isTrue();
-        assertThat(seeded.get("destinationId").asLong()).isEqualTo(destination);
+        assertThat(seeded.get("destinations").get(0).get("id").asLong()).isEqualTo(destination);
         this.mockMvc.perform(get("/v1/alerts/rules").param("groupId", seeded.get("id").asText())
                         .header("Authorization", TestAuthSupport.bearer(this.token)))
                 .andExpect(status().isOk())

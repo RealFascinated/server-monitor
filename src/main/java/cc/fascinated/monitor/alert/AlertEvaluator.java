@@ -198,7 +198,7 @@ public class AlertEvaluator {
                     if (evaluation.wasSilenced()) {
                         // a muted alert ends quietly: close the event without telling anyone
                         this.dispatcher.submit(new AlertSignal(AlertTransition.RESOLVED, rule.id(), key.serverId(),
-                                key.seriesKey(), rule.destinationId(), tracked.state.worstValue(),
+                                key.seriesKey(), rule.destinationIds(), tracked.state.worstValue(),
                                 Instant.ofEpochSecond(ts), AlertEventRow.REASON_RECOVERED, null));
                     } else {
                         emit(serverRules, rule, key, tracked, AlertTransition.RESOLVED, evaluation.effectiveValue(),
@@ -219,7 +219,7 @@ public class AlertEvaluator {
                 : null;
         this.recorder.recordAlertTransition(transition.name());
         this.dispatcher.submit(new AlertSignal(transition, rule.id(), key.serverId(), key.seriesKey(),
-                rule.destinationId(), peak, at, resolveReason,
+                rule.destinationIds(), peak, at, resolveReason,
                 notification(serverRules, rule, tracked, transition, value, firedFor, at)));
     }
 
@@ -257,7 +257,7 @@ public class AlertEvaluator {
             Duration firedFor = Duration.between(Instant.ofEpochSecond(tracked.state.firingSince()), now);
             this.recorder.recordAlertTransition(AlertTransition.REPEAT.name());
             this.dispatcher.submit(new AlertSignal(AlertTransition.REPEAT, rule.id(), key.serverId(), key.seriesKey(),
-                    rule.destinationId(), tracked.state.worstValue(), now, null,
+                    rule.destinationIds(), tracked.state.worstValue(), now, null,
                     notification(serverRules, rule, tracked, AlertTransition.REPEAT, tracked.state.worstValue(),
                             firedFor, now)));
             return;

@@ -95,7 +95,7 @@ public class AlertDestinationService {
             throw new ConflictException("This destination is used by %d alert group(s). Deleting it stops them notifying anyone."
                     .formatted(groups.size()));
         }
-        groups.forEach(group -> group.setDestinationId(null));
+        groups.forEach(group -> group.getDestinationIds().remove(id));
         this.destinationRepository.delete(row);
         this.stateService.invalidateAll();
     }

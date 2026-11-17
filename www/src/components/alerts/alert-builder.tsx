@@ -549,8 +549,8 @@ function AlertBuilder({
             )}
             <ul className="flex flex-col gap-1 text-xs text-muted-foreground">
               <li>
-                {group.destinationName
-                  ? `Notifies ${group.destinationName}, set on the group.`
+                {group.destinations.length > 0
+                  ? `Notifies ${group.destinations.map((item) => item.name).join(", ")}, set on the group.`
                   : `${group.name} has no destination, so this only shows in history.`}
               </li>
               {!isState && draft.windowSeconds > 0 ? (

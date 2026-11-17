@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.HashSet;
@@ -44,9 +43,10 @@ public class AlertGroupRow {
     private boolean defaultGroup;
 
     /** Where every alert of the group notifies; none means alerts are recorded in history only. */
-    @Nullable
-    @Column(name = "destination_id")
-    private Long destinationId;
+    @ElementCollection
+    @CollectionTable(name = "alert_group_destinations", joinColumns = @JoinColumn(name = "group_id"))
+    @Column(name = "destination_id", nullable = false)
+    private Set<Long> destinationIds = new HashSet<>();
 
     @ElementCollection
     @CollectionTable(name = "alert_group_servers", joinColumns = @JoinColumn(name = "group_id"))

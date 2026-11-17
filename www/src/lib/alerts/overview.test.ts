@@ -17,6 +17,7 @@ function group(
     autoAddServers: false,
     enabled,
     defaultGroup: false,
+    destinations: [],
     servers: serverIds.map((serverId) => ({
       id: serverId,
       name: `s${serverId}`,

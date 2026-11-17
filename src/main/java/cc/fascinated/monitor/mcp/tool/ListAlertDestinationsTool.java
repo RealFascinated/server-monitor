@@ -26,8 +26,8 @@ public class ListAlertDestinationsTool {
     @RequiresScope(ApiTokenScope.ALERTS_READ)
     @McpTool(name = "list_alert_destinations", description = """
             Lists where alerts are delivered: id, name, type (DISCORD_WEBHOOK), maskedUrl (the secret part is \
-            hidden) and groupCount, how many alert groups use it. Each group points at one destination (see \
-            destinationId in list_alert_groups); a group without one notifies nobody. Destinations are created and \
+            hidden) and groupCount, how many alert groups use it. Each group notifies all of its destinations (see \
+            destinations in list_alert_groups); a group without any notifies nobody. Destinations are created and \
             changed in the dashboard only.""")
     public String listAlertDestinations(McpTransportContext context) {
         UserRow user = this.auth.require(context, ApiTokenScope.ALERTS_READ);

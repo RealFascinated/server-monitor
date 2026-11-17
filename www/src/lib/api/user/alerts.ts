@@ -16,7 +16,7 @@ export type AlertOperator = "LESS_THAN" | "MORE_THAN"
 
 export type AlertSeverity = "WARNING" | "CRITICAL"
 
-export type AlertDestinationType = "DISCORD_WEBHOOK"
+export type AlertDestinationType = "DISCORD_WEBHOOK" | "WEBHOOK"
 
 export type AlertDestination = {
   id: number
@@ -43,6 +43,11 @@ export type AlertGroupServer = {
   name: string
 }
 
+export type AlertGroupDestination = {
+  id: number
+  name: string
+}
+
 export type AlertGroup = {
   id: number
   name: string
@@ -51,8 +56,7 @@ export type AlertGroup = {
   /** The group every account starts with; it can't be deleted. */
   defaultGroup: boolean
   /** Where every alert in this group is sent; none means nobody is notified. */
-  destinationId?: number | null
-  destinationName?: string | null
+  destinations: AlertGroupDestination[]
   servers: AlertGroupServer[]
   ruleCount: number
   firingCount: number
@@ -64,7 +68,7 @@ export type AlertGroupRequest = {
   autoAddServers?: boolean
   /** Seeds a new group with the default alerts; ignored when editing. */
   addDefaultRules?: boolean
-  destinationId?: number | null
+  destinationIds?: number[]
   serverIds?: number[]
 }
 
@@ -72,9 +76,8 @@ export type AlertGroupUpdateRequest = {
   name?: string
   autoAddServers?: boolean
   enabled?: boolean
-  destinationId?: number | null
-  /** A null destinationId means "unchanged", so removing it needs this. */
-  clearDestination?: boolean
+  /** Replaces the whole destination list; an empty list notifies nobody. */
+  destinationIds?: number[]
   /** Replaces the whole server list. */
   serverIds?: number[]
 }

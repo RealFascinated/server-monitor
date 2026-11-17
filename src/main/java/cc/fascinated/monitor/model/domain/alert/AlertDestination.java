@@ -1,6 +1,7 @@
 package cc.fascinated.monitor.model.domain.alert;
 
 import cc.fascinated.monitor.alert.destinations.DiscordMessages;
+import cc.fascinated.monitor.alert.destinations.WebhookMessages;
 import cc.fascinated.monitor.alert.destinations.AlertDestinationTarget;
 import cc.fascinated.monitor.config.MonitorAlertProperties;
 
@@ -11,6 +12,11 @@ public enum AlertDestination {
             (alerts, target) -> DiscordMessages.payloads(alerts).forEach(target::postJson),
             DiscordMessages::validateWebhookUrl,
             DiscordMessages::maskWebhookUrl
+    ),
+    WEBHOOK(
+            (alerts, target) -> target.postJson(WebhookMessages.payload(alerts)),
+            WebhookMessages::validateUrl,
+            WebhookMessages::maskUrl
     );
 
     private final AlertSender sender;

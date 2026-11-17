@@ -6,6 +6,7 @@ import cc.fascinated.monitor.model.persistance.AlertRuleRow;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Set;
 
 /** Immutable view of a rule, safe to share with the ingest threads. */
 public record RuleSnapshot(
@@ -17,11 +18,11 @@ public record RuleSnapshot(
         RuleSpec spec,
         AlertSeverity severity,
         @Nullable Integer repeatIntervalSeconds,
-        @Nullable Long destinationId
+        Set<Long> destinationIds
 ) {
 
-    /** {@code destinationId} is the destination of the rule's group. */
-    public static RuleSnapshot from(AlertRuleRow row, @Nullable Long destinationId) {
+    /** {@code destinationIds} are the destinations of the rule's group. */
+    public static RuleSnapshot from(AlertRuleRow row, Set<Long> destinationIds) {
         return new RuleSnapshot(
                 row.getId(),
                 row.getUserId(),
@@ -31,7 +32,7 @@ public record RuleSnapshot(
                 new RuleSpec(row.getOperator(), row.getThreshold(), row.getRecoveryThreshold(), row.getWindowSeconds()),
                 row.getSeverity(),
                 row.getRepeatIntervalSeconds(),
-                destinationId
+                destinationIds
         );
     }
 

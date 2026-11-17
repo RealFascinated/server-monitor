@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -61,15 +62,15 @@ public class AlertRuleCache {
             return new ServerRules(serverId, "", now, Map.of());
         }
         String serverName = this.serverRepository.findById(serverId).map(ServerRow::getServerName).orElse("Server " + serverId);
-        Map<Long, Long> destinations = new HashMap<>();
+        Map<Long, Set<Long>> destinations = new HashMap<>();
         for (AlertGroupRow group : this.groupRepository.findAllById(rows.stream().map(AlertRuleRow::getGroupId).collect(Collectors.toSet()))) {
-            destinations.put(group.getId(), group.getDestinationId());
+            destinations.put(group.getId(), Set.copyOf(group.getDestinationIds()));
         }
         Map<String, List<RuleSnapshot>> grouped = new HashMap<>();
         for (AlertRuleRow row : rows) {
             if (row.isEnabled()) {
                 grouped.computeIfAbsent(row.getMetric(), ignored -> new ArrayList<>())
-                        .add(RuleSnapshot.from(row, destinations.get(row.getGroupId())));
+                        .add(RuleSnapshot.from(row, destinations.getOrDefault(row.getGroupId(), Set.of())));
             }
         }
         Map<String, RuleSnapshot[]> byMetric = new HashMap<>(grouped.size());

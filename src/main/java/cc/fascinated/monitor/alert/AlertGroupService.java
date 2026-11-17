@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -88,7 +87,7 @@ public class AlertGroupService {
         AlertGroupRow row = new AlertGroupRow(user.getId(), request.name().trim(),
                 Boolean.TRUE.equals(request.autoAddServers()), Instant.now());
         row.getServerIds().addAll(requireServers(user, request.serverIds()));
-        row.setDestinationId(requireDestination(user, request.destinationId()));
+        row.getDestinationIds().addAll(requireDestinations(user, request.destinationIds()));
         AlertGroupRow saved = this.groupRepository.save(row);
         if (addDefaults) {
             this.defaultRuleService.addTo(user.getId(), saved.getId());
@@ -109,8 +108,10 @@ public class AlertGroupService {
         if (request.serverIds() != null) {
             replaceServers(user, row, requireServers(user, request.serverIds()));
         }
-        if (request.destinationId() != null || Boolean.TRUE.equals(request.clearDestination())) {
-            row.setDestinationId(requireDestination(user, request.destinationId()));
+        if (request.destinationIds() != null) {
+            Set<Long> destinations = requireDestinations(user, request.destinationIds());
+            row.getDestinationIds().retainAll(destinations);
+            row.getDestinationIds().addAll(destinations);
             this.stateService.invalidateServers(row.getServerIds());
         }
         if (request.enabled() != null && request.enabled() != row.isEnabled()) {
@@ -160,13 +161,16 @@ public class AlertGroupService {
         this.stateService.invalidateServers(added);
     }
 
-    @Nullable
-    private Long requireDestination(UserRow user, @Nullable Long destinationId) {
-        if (destinationId == null) {
-            return null;
+    /** Every destination must belong to the caller. */
+    private Set<Long> requireDestinations(UserRow user, @Nullable Collection<Long> destinationIds) {
+        Set<Long> result = new HashSet<>();
+        if (destinationIds != null) {
+            for (Long destinationId : destinationIds) {
+                result.add(this.destinationRepository.findByIdAndUserId(destinationId, user.getId())
+                        .orElseThrow(() -> new BadRequestException("Choose one of your own alert destinations")).getId());
+            }
         }
-        return this.destinationRepository.findByIdAndUserId(destinationId, user.getId())
-                .orElseThrow(() -> new BadRequestException("Choose one of your own alert destinations")).getId();
+        return result;
     }
 
     /** Every server must be one the caller can view metrics for. */
@@ -191,7 +195,7 @@ public class AlertGroupService {
         }
         Map<Long, String> destinationNames = new HashMap<>();
         for (AlertDestinationRow destination : this.destinationRepository.findAllById(groups.stream()
-                .map(AlertGroupRow::getDestinationId).filter(Objects::nonNull).collect(Collectors.toSet()))) {
+                .flatMap(group -> group.getDestinationIds().stream()).collect(Collectors.toSet()))) {
             destinationNames.put(destination.getId(), destination.getName());
         }
         List<AlertRuleRow> rules = groups.stream()
@@ -211,7 +215,12 @@ public class AlertGroupService {
                     .map(id -> new AlertGroupResponse.GroupServer(id, serverNames.get(id)))
                     .sorted(Comparator.comparing(AlertGroupResponse.GroupServer::name, String.CASE_INSENSITIVE_ORDER))
                     .toList();
-            return AlertGroupResponse.from(group, destinationNames.get(group.getDestinationId()), servers,
+            List<AlertGroupResponse.GroupDestination> destinations = group.getDestinationIds().stream()
+                    .filter(destinationNames::containsKey)
+                    .map(id -> new AlertGroupResponse.GroupDestination(id, destinationNames.get(id)))
+                    .sorted(Comparator.comparing(AlertGroupResponse.GroupDestination::name, String.CASE_INSENSITIVE_ORDER))
+                    .toList();
+            return AlertGroupResponse.from(group, destinations, servers,
                     groupRules.size(), firing);
         }).toList();
     }

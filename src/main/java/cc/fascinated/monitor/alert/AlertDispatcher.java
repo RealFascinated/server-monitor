@@ -20,9 +20,11 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -136,21 +138,32 @@ public class AlertDispatcher {
         Map<Long, List<Pending>> byDestination = new HashMap<>();
         for (AlertSignal signal : batch) {
             Optional<AlertEventRow> event = this.eventService.apply(signal);
-            if (event.isEmpty() || signal.notification() == null || signal.destinationId() == null) {
+            if (event.isEmpty() || signal.notification() == null) {
                 continue;
             }
-            byDestination.computeIfAbsent(signal.destinationId(), ignored -> new ArrayList<>())
-                    .add(new Pending(signal.notification(), event.get().getId()));
+            for (Long destinationId : signal.destinationIds()) {
+                byDestination.computeIfAbsent(destinationId, ignored -> new ArrayList<>())
+                        .add(new Pending(signal.notification(), event.get().getId()));
+            }
         }
-        byDestination.forEach(this::deliver);
+        Set<Long> sent = new HashSet<>();
+        Map<Long, String> failed = new HashMap<>();
+        byDestination.forEach((destinationId, pending) -> deliver(destinationId, pending, sent, failed));
+        if (!sent.isEmpty()) {
+            this.eventService.markNotified(sent, Instant.now());
+        }
+        // after the successes, so an event that reached one destination but not another still shows the error
+        Map<String, List<Long>> byError = new HashMap<>();
+        failed.forEach((eventId, error) -> byError.computeIfAbsent(error, ignored -> new ArrayList<>()).add(eventId));
+        byError.forEach((error, eventIds) -> this.eventService.markFailed(eventIds, error));
     }
 
-    private void deliver(long destinationId, List<Pending> pending) {
+    private void deliver(long destinationId, List<Pending> pending, Set<Long> sent, Map<Long, String> failed) {
         List<Long> eventIds = pending.stream().map(Pending::eventId).distinct().toList();
         Optional<AlertDestinationRow> destination = this.destinationRepository.findById(destinationId);
         if (destination.isEmpty()) {
             this.recorder.recordAlertNotification("failed");
-            this.eventService.markFailed(eventIds, "Destination no longer exists");
+            eventIds.forEach(id -> failed.put(id, "Destination no longer exists"));
             return;
         }
         List<AlertNotification> notifications = pending.stream().map(Pending::notification).toList();
@@ -158,15 +171,15 @@ public class AlertDispatcher {
             AlertDestinationTarget target = targetFor(destination.get());
             sendWithRetry(destination.get(), notifications, target);
             this.recorder.recordAlertNotification("sent");
-            this.eventService.markNotified(eventIds, Instant.now());
+            sent.addAll(eventIds);
         } catch (AlertDeliveryException ex) {
             log.warn("Alert delivery to destination {} failed: {}", destinationId, ex.getMessage());
             this.recorder.recordAlertNotification("failed");
-            this.eventService.markFailed(eventIds, ex.getMessage());
+            eventIds.forEach(id -> failed.put(id, ex.getMessage()));
         } catch (RuntimeException ex) {
             log.error("Alert delivery to destination {} failed unexpectedly", destinationId, ex);
             this.recorder.recordAlertNotification("failed");
-            this.eventService.markFailed(eventIds, "Unexpected error: " + ex.getMessage());
+            eventIds.forEach(id -> failed.put(id, "Unexpected error: " + ex.getMessage()));
         }
     }
 

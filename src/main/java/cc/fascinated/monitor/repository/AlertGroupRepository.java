@@ -19,13 +19,20 @@ public interface AlertGroupRepository extends JpaRepository<AlertGroupRow, Long>
 
     List<AlertGroupRow> findByUserIdAndAutoAddServersTrue(long userId);
 
-    long countByDestinationId(long destinationId);
+    @Query("SELECT COUNT(g) FROM AlertGroupRow g WHERE :destinationId MEMBER OF g.destinationIds")
+    long countByDestinationId(@Param("destinationId") long destinationId);
 
-    List<AlertGroupRow> findByDestinationId(long destinationId);
+    @Query("SELECT g FROM AlertGroupRow g WHERE :destinationId MEMBER OF g.destinationIds")
+    List<AlertGroupRow> findByDestinationId(@Param("destinationId") long destinationId);
 
-    /** Points every group of the user that notifies nobody at the destination. */
+    /** Adds the destination to every group of the user that notifies nobody. */
     @Modifying(flushAutomatically = true, clearAutomatically = true)
-    @Query("UPDATE AlertGroupRow g SET g.destinationId = :destinationId WHERE g.userId = :userId AND g.destinationId IS NULL")
+    @Query(value = """
+            INSERT INTO alert_group_destinations (group_id, destination_id)
+            SELECT g.id, :destinationId FROM alert_groups g
+            WHERE g.user_id = :userId
+              AND NOT EXISTS (SELECT 1 FROM alert_group_destinations d WHERE d.group_id = g.id)
+            """, nativeQuery = true)
     int attachDestination(@Param("userId") long userId, @Param("destinationId") long destinationId);
 
     /** Users who lack the default group, e.g. accounts that predate alerting. */

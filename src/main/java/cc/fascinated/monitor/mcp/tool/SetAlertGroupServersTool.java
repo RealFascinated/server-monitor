@@ -57,6 +57,6 @@ public class SetAlertGroupServersTool {
             serverIds.removeAll(remove);
         }
         return McpJson.write(this.groupService.update(user, groupId,
-                new AlertGroupUpdateRequest(null, null, null, null, null, List.copyOf(serverIds))));
+                new AlertGroupUpdateRequest(null, null, null, null, List.copyOf(serverIds))));
     }
 }

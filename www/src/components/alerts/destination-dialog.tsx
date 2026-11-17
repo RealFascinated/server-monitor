@@ -19,7 +19,10 @@ import {
   useCreateAlertDestination,
   useUpdateAlertDestination,
 } from "@/hooks/use-alert-destinations"
-import type { AlertDestination } from "@/lib/api/user/alerts"
+import type {
+  AlertDestination,
+  AlertDestinationType,
+} from "@/lib/api/user/alerts"
 
 type DestinationDialogProps = {
   /** Editing when set, creating otherwise. */
@@ -49,6 +52,9 @@ function DestinationDialog({
   const editing = destination != null
   const [open, setOpen] = useState(false)
   const [name, setName] = useState(destination?.name ?? "")
+  const [type, setType] = useState<AlertDestinationType>(
+    destination?.type ?? "DISCORD_WEBHOOK"
+  )
   const [url, setUrl] = useState("")
   const [errors, setErrors] = useState<{ name?: string; url?: string }>({})
 
@@ -58,6 +64,7 @@ function DestinationDialog({
 
   function reset() {
     setName(destination?.name ?? "")
+    setType(destination?.type ?? "DISCORD_WEBHOOK")
     setUrl("")
     setErrors({})
   }
@@ -93,7 +100,7 @@ function DestinationDialog({
     }
 
     create.mutate(
-      { name: name.trim(), type: "DISCORD_WEBHOOK", config: url.trim() },
+      { name: name.trim(), type, config: url.trim() },
       {
         onSuccess: (created) => {
           setOpen(false)
@@ -120,12 +127,29 @@ function DestinationDialog({
               {editing ? "Edit destination" : "Add destination"}
             </DialogTitle>
             <DialogDescription>
-              Alerts are posted to a Discord channel through a webhook. Create
-              one under Channel settings, Integrations, Webhooks.
+              {type === "WEBHOOK"
+                ? "Alerts are sent as JSON in a POST request to your URL."
+                : "Alerts are posted to a Discord channel through a webhook. Create one under Channel settings, Integrations, Webhooks."}
             </DialogDescription>
           </DialogHeader>
 
           <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="destination-type">Type</Label>
+              <select
+                id="destination-type"
+                value={type}
+                onChange={(event) =>
+                  setType(event.target.value as AlertDestinationType)
+                }
+                disabled={pending || editing}
+                className="h-9 rounded-md border border-input bg-transparent px-3 text-sm"
+              >
+                <option value="DISCORD_WEBHOOK">Discord webhook</option>
+                <option value="WEBHOOK">Custom webhook (JSON)</option>
+              </select>
+            </div>
+
             <div className="flex flex-col gap-2">
               <Label htmlFor="destination-name">Name</Label>
               <Input
@@ -141,7 +165,9 @@ function DestinationDialog({
             </div>
 
             <div className="flex flex-col gap-2">
-              <Label htmlFor="destination-url">Discord webhook URL</Label>
+              <Label htmlFor="destination-url">
+                {type === "WEBHOOK" ? "Webhook URL" : "Discord webhook URL"}
+              </Label>
               <Input
                 id="destination-url"
                 type="url"
@@ -153,7 +179,9 @@ function DestinationDialog({
                 placeholder={
                   editing
                     ? `${destination.maskedUrl} (leave blank to keep)`
-                    : "https://discord.com/api/webhooks/…"
+                    : type === "WEBHOOK"
+                      ? "https://example.com/hooks/alerts"
+                      : "https://discord.com/api/webhooks/…"
                 }
               />
               <FormFieldError error={errors.url} />
