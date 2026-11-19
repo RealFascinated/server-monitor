@@ -46,7 +46,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-crypto")
 
     implementation("com.github.ua-parser:uap-java:1.6.1")
-    implementation("com.maxmind.geoip2:geoip2:5.2.0")
+    implementation("com.maxmind.geoip2:geoip2:5.3.0")
     implementation("org.apache.commons:commons-compress:1.28.0")
 
     compileOnly("org.jetbrains:annotations:26.1.0")
