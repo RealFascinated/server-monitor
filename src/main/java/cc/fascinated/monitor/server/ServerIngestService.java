@@ -10,6 +10,7 @@ import cc.fascinated.monitor.metrics.server.series.DiskSeries;
 import cc.fascinated.monitor.metrics.server.series.DockerSeries;
 import cc.fascinated.monitor.metrics.server.series.GpuSeries;
 import cc.fascinated.monitor.metrics.server.series.HostSeries;
+import cc.fascinated.monitor.metrics.server.series.MdArraySeries;
 import cc.fascinated.monitor.metrics.server.series.NetworkSeries;
 import cc.fascinated.monitor.metrics.server.series.PsiSeries;
 import cc.fascinated.monitor.metrics.server.series.ServerStatusSeries;
@@ -211,6 +212,7 @@ public class ServerIngestService {
             PsiSeries.write(ctx, metrics.psiMetrics());
         }
         Utils.forEach(metrics.zfsPoolMetrics(), pool -> ZfsPoolSeries.write(ctx, pool));
+        Utils.forEach(metrics.mdArrayMetrics(), array -> MdArraySeries.write(ctx, array));
         Utils.forEach(metrics.dockerContainers(), container -> DockerSeries.write(ctx, container));
         Utils.forEach(metrics.tcpConnectionMetrics(), tcp -> TcpConnectionSeries.write(ctx, tcp));
         Utils.forEach(metrics.smartMetrics(), disk -> SmartSeries.write(ctx, disk));

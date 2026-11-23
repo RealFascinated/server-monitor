@@ -5,6 +5,7 @@ import cc.fascinated.monitor.metrics.server.series.ServerStatusSeries;
 import cc.fascinated.monitor.metrics.server.series.DockerSeries;
 import cc.fascinated.monitor.metrics.server.series.DiskSeries;
 import cc.fascinated.monitor.metrics.server.series.HostSeries;
+import cc.fascinated.monitor.metrics.server.series.MdArraySeries;
 import cc.fascinated.monitor.metrics.server.series.PsiSeries;
 import cc.fascinated.monitor.metrics.server.series.SmartSeries;
 import cc.fascinated.monitor.metrics.server.series.TemperatureSeries;
@@ -61,6 +62,29 @@ class VmMetricCatalogTest {
         assertEquals("enduranceUsedPercent", VmMetricCatalog.fieldName(SmartSeries.ENDURANCE_USED_PERCENT));
         assertEquals("smartDevices", MetricFamily.SMART.section().jsonKey());
         assertEquals(List.of("device"), List.of(MetricFamily.SMART.groupingLabels()));
+    }
+
+    @Test
+    void mdArraySeries_mapToMdArraysSectionFields() {
+        assertEquals(MetricFamily.MD_ARRAY, VmMetricCatalog.familyOf(MdArraySeries.DEGRADED.metricName()));
+        assertEquals("degraded", VmMetricCatalog.fieldName(MdArraySeries.DEGRADED));
+        assertEquals("disksActive", VmMetricCatalog.fieldName(MdArraySeries.DISKS_ACTIVE));
+        assertEquals("disksFailed", VmMetricCatalog.fieldName(MdArraySeries.DISKS_FAILED));
+        assertEquals("syncPercent", VmMetricCatalog.fieldName(MdArraySeries.SYNC_PERCENT));
+        assertEquals("syncSpeedKbps", VmMetricCatalog.fieldName(MdArraySeries.SYNC_SPEED_KBPS));
+        assertEquals("mdArrays", MetricFamily.MD_ARRAY.section().jsonKey());
+        assertEquals(List.of("array"), List.of(MetricFamily.MD_ARRAY.groupingLabels()));
+        assertTrue(VmMetricCatalog.alertable().containsKey(MdArraySeries.DEGRADED.metricName()));
+        assertTrue(VmMetricCatalog.alertable().containsKey(MdArraySeries.DISKS_FAILED.metricName()));
+        assertFalse(VmMetricCatalog.alertable().containsKey(MdArraySeries.DISKS_TOTAL.metricName()));
+    }
+
+    @Test
+    void memoryDirtyAndWritebackSeries_mapToHostSectionFields() {
+        assertEquals("memDirtyBytes", VmMetricCatalog.fieldName(HostSeries.MEM_DIRTY_BYTES));
+        assertEquals("memWritebackBytes", VmMetricCatalog.fieldName(HostSeries.MEM_WRITEBACK_BYTES));
+        assertTrue(VmMetricCatalog.alertable().containsKey(HostSeries.MEM_DIRTY_BYTES.metricName()));
+        assertTrue(VmMetricCatalog.alertable().containsKey(HostSeries.MEM_WRITEBACK_BYTES.metricName()));
     }
 
     @Test

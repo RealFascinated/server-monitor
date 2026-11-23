@@ -150,6 +150,17 @@ class ServerIngestIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
+    void ingestAcceptsMdArraysAndMemoryWriteback() throws Exception {
+        var server = this.auth.createServer(this.bearerToken, "md-array-host");
+
+        this.mockMvc.perform(post("/v1/servers/ingest")
+                        .header("Authorization", TestAuthSupport.bearer(server.ingestToken().toString()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestFixtures.ingestPayloadWithMdArrays()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void ingestAcceptsAgentMetrics() throws Exception {
         var server = this.auth.createServer(this.bearerToken, "agent-metrics-host");
 

@@ -39,6 +39,10 @@ public enum HostSeries implements VmMetricFamily {
             AlertInfo.of("CPU steal", AlertUnit.PERCENT, AlertOperator.MORE_THAN, 20)),
     MEM_BUFFERS("monitor_host_mem_buffers"),
     MEM_CACHED("monitor_host_mem_cached"),
+    MEM_DIRTY_BYTES("monitor_host_mem_dirty_bytes",
+            AlertInfo.of("Dirty memory", AlertUnit.BYTES, AlertOperator.MORE_THAN, 268435456)),
+    MEM_WRITEBACK_BYTES("monitor_host_mem_writeback_bytes",
+            AlertInfo.of("Memory writeback", AlertUnit.BYTES, AlertOperator.MORE_THAN, 536870912)),
     SWAP_USED("monitor_host_swap_used",
             AlertInfo.of("Swap used", AlertUnit.BYTES, AlertOperator.MORE_THAN, 1073741824)),
     SWAP_TOTAL("monitor_host_swap_total"),
@@ -116,6 +120,8 @@ public enum HostSeries implements VmMetricFamily {
         CPU_STEAL_PCT.writeNullable(ctx, metrics.cpuStealPercent());
         MEM_BUFFERS.writeNullable(ctx, metrics.memoryBuffers());
         MEM_CACHED.writeNullable(ctx, metrics.memoryCached());
+        MEM_DIRTY_BYTES.writeNullable(ctx, metrics.memoryDirtyBytes());
+        MEM_WRITEBACK_BYTES.writeNullable(ctx, metrics.memoryWritebackBytes());
         SWAP_USED.writeNullable(ctx, metrics.swapUsed());
         SWAP_TOTAL.writeNullable(ctx, metrics.swapTotal());
         PROCESS_COUNT.writeNullable(ctx, metrics.processCount());

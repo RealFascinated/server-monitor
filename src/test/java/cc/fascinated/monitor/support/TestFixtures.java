@@ -59,6 +59,19 @@ public final class TestFixtures {
                         + "\"dataWrittenBytes\": 1024000000, \"dataReadBytes\": 512000000}]");
     }
 
+    public static String ingestPayloadWithMdArrays() {
+        return minimalIngestPayload()
+                .replace("\"memoryTotal\": 8192",
+                        "\"memoryTotal\": 8192, \"memoryDirtyBytes\": 1048576, \"memoryWritebackBytes\": 524288")
+                .replace("\"diskMetrics\": []",
+                        "\"diskMetrics\": [], \"mdArrayMetrics\": ["
+                                + "{\"name\": \"md0\", \"level\": \"raid1\", \"disksTotal\": 2, \"disksActive\": 1, "
+                                + "\"disksFailed\": 1, \"degraded\": true, \"syncAction\": \"resync\", "
+                                + "\"syncPercent\": 42.5, \"syncSpeedKBps\": 2048, \"syncFinishMinutes\": 12.5},"
+                                + "{\"name\": \"md1\", \"level\": \"raid5\", \"disksTotal\": 4, \"disksActive\": 4, "
+                                + "\"disksFailed\": 0, \"degraded\": false, \"syncAction\": \"idle\"}]");
+    }
+
     /** A sample as the agent's push buffer would send it: the normal payload plus its own timestamp. */
     public static String ingestPayloadAt(long timestamp) {
         return minimalIngestPayload().replaceFirst("\"agentVersion\": \"1.0.0\",",

@@ -8,6 +8,7 @@ import cc.fascinated.monitor.metrics.server.series.SmartSeries;
 import cc.fascinated.monitor.metrics.server.series.DockerSeries;
 import cc.fascinated.monitor.metrics.server.series.GpuSeries;
 import cc.fascinated.monitor.metrics.server.series.HostSeries;
+import cc.fascinated.monitor.metrics.server.series.MdArraySeries;
 import cc.fascinated.monitor.metrics.server.series.NetworkSeries;
 import cc.fascinated.monitor.metrics.server.series.PsiSeries;
 import cc.fascinated.monitor.metrics.server.series.AgentSeries;
@@ -107,6 +108,7 @@ public class VmMetricCatalog {
         addFamily(metrics, TemperatureSeries.values());
         addFamily(metrics, ZfsArcSeries.values());
         addFamily(metrics, ZfsPoolSeries.values());
+        addFamily(metrics, MdArraySeries.values());
         addFamily(metrics, TcpConnectionSeries.values());
         addFamily(metrics, SmartSeries.values());
         return metrics.toArray(VmMetricFamily[]::new);

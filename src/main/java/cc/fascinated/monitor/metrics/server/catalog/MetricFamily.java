@@ -17,6 +17,7 @@ public enum MetricFamily {
     TEMPERATURE(MetricSection.TEMPERATURES, new String[]{"sensor"}),
     ZFS_ARC(MetricSection.ZFS_ARC, new String[0]),
     ZFS_POOL(MetricSection.ZFS_POOLS, new String[]{"pool", "health", "scan_state"}),
+    MD_ARRAY(MetricSection.MD_ARRAYS, new String[]{"array", "level", "sync_action"}, new String[]{"array"}),
     TCP(MetricSection.TCP_CONNECTIONS, new String[]{"state"}),
     SMART(MetricSection.SMART_DEVICES, new String[]{"device", "model"}, new String[]{"device"});
 

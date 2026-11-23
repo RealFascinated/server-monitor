@@ -16,6 +16,7 @@ public enum MetricSection {
     TEMPERATURES("temperatures", false),
     ZFS_ARC("zfsArc", true),
     ZFS_POOLS("zfsPools", false),
+    MD_ARRAYS("mdArrays", false),
     TCP_CONNECTIONS("tcpConnections", false),
     SMART_DEVICES("smartDevices", false);
 

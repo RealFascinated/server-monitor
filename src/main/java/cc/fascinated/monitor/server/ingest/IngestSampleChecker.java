@@ -7,6 +7,7 @@ import cc.fascinated.monitor.model.dto.request.server.ingest.data.DiskMetric;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.DockerContainerMetric;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.GpuMetric;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.InterfaceMetrics;
+import cc.fascinated.monitor.model.dto.request.server.ingest.data.MdArrayMetric;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.SmartMetric;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.TcpConnectionMetric;
 import cc.fascinated.monitor.model.dto.request.server.ingest.data.TemperatureMetric;
@@ -44,6 +45,7 @@ public class IngestSampleChecker {
         int limit = this.properties.getMaxListItems();
         if (tooLong(sample.interfaceMetrics(), limit) || tooLong(sample.diskMetrics(), limit)
                 || tooLong(sample.gpuMetrics(), limit) || tooLong(sample.zfsPoolMetrics(), limit)
+                || tooLong(sample.mdArrayMetrics(), limit)
                 || tooLong(sample.dockerContainers(), limit) || tooLong(sample.tcpConnectionMetrics(), limit)
                 || tooLong(sample.smartMetrics(), limit)
                 || tooLong(serverMetrics.cpuCoreMetrics(), limit) || tooLong(serverMetrics.temperatureMetrics(), limit)) {
@@ -58,6 +60,9 @@ public class IngestSampleChecker {
                 || !labelsValid(sample.zfsPoolMetrics(), ZfsPoolMetric::poolName)
                 || !labelsValid(sample.zfsPoolMetrics(), ZfsPoolMetric::health)
                 || !labelsValid(sample.zfsPoolMetrics(), ZfsPoolMetric::scanState)
+                || !labelsValid(sample.mdArrayMetrics(), MdArrayMetric::name)
+                || !labelsValid(sample.mdArrayMetrics(), MdArrayMetric::level)
+                || !optionalLabelsValid(sample.mdArrayMetrics(), MdArrayMetric::syncAction)
                 || !labelsValid(sample.dockerContainers(), DockerContainerMetric::containerName)
                 || !labelsValid(sample.tcpConnectionMetrics(), TcpConnectionMetric::state)
                 || !labelsValid(sample.smartMetrics(), SmartMetric::device)
@@ -79,6 +84,22 @@ public class IngestSampleChecker {
         }
         for (T item : items) {
             if (item == null || !labelValid(label.apply(item))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private <T> boolean optionalLabelsValid(List<T> items, Function<T, String> label) {
+        if (items == null) {
+            return true;
+        }
+        for (T item : items) {
+            if (item == null) {
+                return false;
+            }
+            String value = label.apply(item);
+            if (value != null && !labelValid(value)) {
                 return false;
             }
         }

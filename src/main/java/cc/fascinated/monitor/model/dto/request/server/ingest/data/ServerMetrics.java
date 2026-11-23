@@ -18,6 +18,8 @@ public record ServerMetrics(
         Double cpuStealPercent,
         Long memoryBuffers,
         Long memoryCached,
+        Long memoryDirtyBytes,
+        Long memoryWritebackBytes,
         Long swapUsed,
         Long swapTotal,
         Long processCount,
