@@ -10,5 +10,7 @@ public record InterfaceMetrics(
         Long rxPacketsPerSecond,
         Long txPacketsPerSecond,
         Long rxErrorsPerSecond,
-        Long txErrorsPerSecond
+        Long txErrorsPerSecond,
+        Long rxDropsPerSecond,
+        Long txDropsPerSecond
 ) {}

@@ -20,6 +20,18 @@ public final class TestFixtures {
                         + "\"bufferDroppedTotal\": 0}");
     }
 
+    public static String ingestPayloadWithTcpQuality() {
+        return minimalIngestPayload()
+                .replace("\"memoryTotal\": 8192",
+                        "\"memoryTotal\": 8192, \"tcpRetransSegmentsPerSecond\": 3.5, "
+                                + "\"tcpListenOverflowsPerSecond\": 0.0, \"tcpListenDropsPerSecond\": 0.0, "
+                                + "\"conntrackEntries\": 512, \"conntrackMax\": 65536, "
+                                + "\"conntrackUsagePercent\": 0.78, \"rebootRequired\": true")
+                .replace("\"interfaceMetrics\": []",
+                        "\"interfaceMetrics\": [{\"interfaceName\": \"eth0\", \"rxBytesPerSecond\": 1024, "
+                                + "\"txBytesPerSecond\": 512, \"rxDropsPerSecond\": 2, \"txDropsPerSecond\": 1}]");
+    }
+
     public static String ingestPayloadWithClockAndContainerIo() {
         return minimalIngestPayload()
                 .replace("\"memoryTotal\": 8192",

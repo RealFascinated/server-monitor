@@ -82,6 +82,24 @@ class VmMetricCatalogTest {
     }
 
     @Test
+    void rebootRequired_mapsToHostSectionField() {
+        assertEquals(MetricFamily.HOST, VmMetricCatalog.familyOf(HostSeries.REBOOT_REQUIRED.metricName()));
+        assertEquals("rebootRequired", VmMetricCatalog.fieldName(HostSeries.REBOOT_REQUIRED));
+        assertTrue(VmMetricCatalog.alertable().containsKey(HostSeries.REBOOT_REQUIRED.metricName()));
+    }
+
+    @Test
+    void tcpQualityAndConntrackSeriesAreAlertable() {
+        assertEquals("tcpRetransSegmentsPerSecond", VmMetricCatalog.fieldName(HostSeries.TCP_RETRANS_SEGMENTS_PER_SECOND));
+        assertEquals("conntrackUsagePercent", VmMetricCatalog.fieldName(HostSeries.CONNTRACK_USAGE_PERCENT));
+        assertTrue(VmMetricCatalog.alertable().containsKey(HostSeries.TCP_RETRANS_SEGMENTS_PER_SECOND.metricName()));
+        assertTrue(VmMetricCatalog.alertable().containsKey(HostSeries.TCP_LISTEN_OVERFLOWS_PER_SECOND.metricName()));
+        assertTrue(VmMetricCatalog.alertable().containsKey(HostSeries.TCP_LISTEN_DROPS_PER_SECOND.metricName()));
+        assertTrue(VmMetricCatalog.alertable().containsKey(HostSeries.CONNTRACK_USAGE_PERCENT.metricName()));
+        assertFalse(VmMetricCatalog.alertable().containsKey(HostSeries.CONNTRACK_ENTRIES.metricName()));
+    }
+
+    @Test
     void selectorForServer_selectsByServerAndExcludesAgentAndStatusSeries() {
         assertEquals(
                 "{server_id=\"42\",__name__!~\"monitor_agent_.*|monitor_server_up\"}",

@@ -23,7 +23,11 @@ public enum NetworkSeries implements VmMetricFamily {
     RX_ERRORS_PER_SECOND("monitor_net_rx_errors_per_second",
             AlertInfo.of("Network receive errors", AlertUnit.COUNT, AlertOperator.MORE_THAN, 0)),
     TX_ERRORS_PER_SECOND("monitor_net_tx_errors_per_second",
-            AlertInfo.of("Network transmit errors", AlertUnit.COUNT, AlertOperator.MORE_THAN, 0));
+            AlertInfo.of("Network transmit errors", AlertUnit.COUNT, AlertOperator.MORE_THAN, 0)),
+    RX_DROPS_PER_SECOND("monitor_net_rx_drops_per_second",
+            AlertInfo.of("Network receive drops", AlertUnit.COUNT, AlertOperator.MORE_THAN, 0)),
+    TX_DROPS_PER_SECOND("monitor_net_tx_drops_per_second",
+            AlertInfo.of("Network transmit drops", AlertUnit.COUNT, AlertOperator.MORE_THAN, 0));
 
     private final String metricName;
     @Nullable
@@ -56,5 +60,7 @@ public enum NetworkSeries implements VmMetricFamily {
         TX_PACKETS_PER_SECOND.writeNullable(labeled, iface.txPacketsPerSecond());
         RX_ERRORS_PER_SECOND.writeNullable(labeled, iface.rxErrorsPerSecond());
         TX_ERRORS_PER_SECOND.writeNullable(labeled, iface.txErrorsPerSecond());
+        RX_DROPS_PER_SECOND.writeNullable(labeled, iface.rxDropsPerSecond());
+        TX_DROPS_PER_SECOND.writeNullable(labeled, iface.txDropsPerSecond());
     }
 }

@@ -53,6 +53,16 @@ public enum HostSeries implements VmMetricFamily {
     OOM_KILLS_TOTAL("monitor_host_oom_kills_total"),
     OOM_KILLS_PER_SECOND("monitor_host_oom_kills_per_second",
             AlertInfo.of("Out-of-memory kills", AlertUnit.COUNT, AlertOperator.MORE_THAN, 0).asDefault(0, AlertSeverity.WARNING)),
+    TCP_RETRANS_SEGMENTS_PER_SECOND("monitor_host_tcp_retrans_segments_per_second",
+            AlertInfo.of("TCP retransmits", AlertUnit.COUNT, AlertOperator.MORE_THAN, 0)),
+    TCP_LISTEN_OVERFLOWS_PER_SECOND("monitor_host_tcp_listen_overflows_per_second",
+            AlertInfo.of("TCP listen queue overflows", AlertUnit.COUNT, AlertOperator.MORE_THAN, 0)),
+    TCP_LISTEN_DROPS_PER_SECOND("monitor_host_tcp_listen_drops_per_second",
+            AlertInfo.of("TCP listen queue drops", AlertUnit.COUNT, AlertOperator.MORE_THAN, 0)),
+    CONNTRACK_ENTRIES("monitor_host_conntrack_entries"),
+    CONNTRACK_MAX("monitor_host_conntrack_max"),
+    CONNTRACK_USAGE_PERCENT("monitor_host_conntrack_usage_percent",
+            AlertInfo.of("Conntrack table usage", AlertUnit.PERCENT, AlertOperator.MORE_THAN, 90)),
     CPU_CLOCK_MHZ("monitor_host_cpu_clock_mhz"),
     CPU_POWER_WATTS("monitor_host_cpu_power_watts",
             AlertInfo.of("CPU power", AlertUnit.WATTS, AlertOperator.MORE_THAN, 150)),
@@ -62,7 +72,9 @@ public enum HostSeries implements VmMetricFamily {
             AlertInfo.of("Clock synchronisation", AlertUnit.STATE, AlertOperator.LESS_THAN, 1)),
     CLOCK_ERROR_MS("monitor_host_clock_error_ms",
             AlertInfo.of("Clock error", AlertUnit.MILLISECONDS, AlertOperator.MORE_THAN, 500)),
-    CLOCK_OFFSET_MS("monitor_host_clock_offset_ms");
+    CLOCK_OFFSET_MS("monitor_host_clock_offset_ms"),
+    REBOOT_REQUIRED("monitor_host_reboot_required",
+            AlertInfo.of("Reboot required", AlertUnit.COUNT, AlertOperator.MORE_THAN, 0));
 
     private final String metricName;
     @Nullable
@@ -115,11 +127,18 @@ public enum HostSeries implements VmMetricFamily {
         FD_USAGE_PCT.writeNullable(ctx, metrics.fdUsagePercent());
         OOM_KILLS_TOTAL.writeNullable(ctx, metrics.oomKillsTotal());
         OOM_KILLS_PER_SECOND.writeNullable(ctx, metrics.oomKillsPerSecond());
+        TCP_RETRANS_SEGMENTS_PER_SECOND.writeNullable(ctx, metrics.tcpRetransSegmentsPerSecond());
+        TCP_LISTEN_OVERFLOWS_PER_SECOND.writeNullable(ctx, metrics.tcpListenOverflowsPerSecond());
+        TCP_LISTEN_DROPS_PER_SECOND.writeNullable(ctx, metrics.tcpListenDropsPerSecond());
+        CONNTRACK_ENTRIES.writeNullable(ctx, metrics.conntrackEntries());
+        CONNTRACK_MAX.writeNullable(ctx, metrics.conntrackMax());
+        CONNTRACK_USAGE_PERCENT.writeNullable(ctx, metrics.conntrackUsagePercent());
         CPU_CLOCK_MHZ.writeNullable(ctx, details.cpuClockMhz());
         CPU_POWER_WATTS.writeNullable(ctx, metrics.cpuPowerWatts());
         BATTERY_PCT.writeNullable(ctx, metrics.batteryPercent());
         CLOCK_SYNCED.writeNullable(ctx, metrics.clockSynced() == null ? null : (metrics.clockSynced() ? 1L : 0L));
         CLOCK_ERROR_MS.writeNullable(ctx, metrics.clockErrorMs());
         CLOCK_OFFSET_MS.writeNullable(ctx, metrics.clockOffsetMs());
+        REBOOT_REQUIRED.writeNullable(ctx, metrics.rebootRequired() == null ? null : (metrics.rebootRequired() ? 1L : 0L));
     }
 }

@@ -116,6 +116,17 @@ class ServerIngestIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
+    void ingestAcceptsTcpQualityConntrackAndRebootRequired() throws Exception {
+        var server = this.auth.createServer(this.bearerToken, "quality-reboot-host");
+
+        this.mockMvc.perform(post("/v1/servers/ingest")
+                        .header("Authorization", TestAuthSupport.bearer(server.ingestToken().toString()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestFixtures.ingestPayloadWithTcpQuality()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void ingestAcceptsSmartMetrics() throws Exception {
         var server = this.auth.createServer(this.bearerToken, "smart-host");
 
