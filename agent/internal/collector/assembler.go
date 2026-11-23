@@ -14,6 +14,7 @@ type FastSnapshot struct {
 	DiskMetrics      []ingest.DiskMetric
 	ZfsArcMetrics    *ingest.ZFSArcMetrics
 	PsiMetrics       *ingest.PsiMetrics
+	MdArrayMetrics   []ingest.MdArrayMetric
 }
 
 // SlowSnapshot holds metrics updated on each slow refresh.
@@ -42,6 +43,9 @@ func cloneFastSnapshot(f FastSnapshot) FastSnapshot {
 	if f.ZfsArcMetrics != nil {
 		arc := *f.ZfsArcMetrics
 		out.ZfsArcMetrics = &arc
+	}
+	if f.MdArrayMetrics != nil {
+		out.MdArrayMetrics = append([]ingest.MdArrayMetric(nil), f.MdArrayMetrics...)
 	}
 	return out
 }
@@ -86,6 +90,7 @@ func Assemble(fast FastSnapshot, slow SlowSnapshot) Result {
 		DiskMetrics:          fast.DiskMetrics,
 		ZfsArcMetrics:        fast.ZfsArcMetrics,
 		PsiMetrics:           fast.PsiMetrics,
+		MdArrayMetrics:       fast.MdArrayMetrics,
 		ZfsPoolMetrics:       slow.ZfsPoolMetrics,
 		DockerContainers:     slow.DockerContainers,
 		GPUMetrics:           slow.GPUMetrics,

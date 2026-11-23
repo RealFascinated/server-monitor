@@ -4,6 +4,7 @@ import "fascinated.cc/monitor/agent/internal/ingest"
 
 type Extras struct {
 	Buffers, Cached, SwapUsed, SwapTotal int64
+	Dirty, Writeback                     *int64
 }
 
 type Snapshot struct {
@@ -17,6 +18,8 @@ func ApplyTo(metrics *ingest.ServerMetrics, s Snapshot) {
 	metrics.MemoryAvailable = s.Available
 	metrics.MemoryBuffers = s.Extras.Buffers
 	metrics.MemoryCached = s.Extras.Cached
+	metrics.MemoryDirtyBytes = s.Extras.Dirty
+	metrics.MemoryWritebackBytes = s.Extras.Writeback
 	metrics.SwapUsed = s.Extras.SwapUsed
 	metrics.SwapTotal = s.Extras.SwapTotal
 }

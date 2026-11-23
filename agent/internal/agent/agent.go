@@ -319,6 +319,7 @@ func buildIngestData(version string, details ingest.ServerDetails, sample collec
 		InterfaceMetrics:     sample.InterfaceMetrics,
 		DiskMetrics:          sample.DiskMetrics,
 		ZfsPoolMetrics:       sample.ZfsPoolMetrics,
+		MdArrayMetrics:       sample.MdArrayMetrics,
 		DockerContainers:     sample.DockerContainers,
 		GPUMetrics:           sample.GPUMetrics,
 		TCPConnectionMetrics: sample.TCPConnectionMetrics,

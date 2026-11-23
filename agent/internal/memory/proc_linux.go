@@ -40,6 +40,10 @@ func readMeminfo() Snapshot {
 			snap.Extras.Buffers = valueBytes
 		case "Cached:":
 			snap.Extras.Cached = valueBytes
+		case "Dirty:":
+			snap.Extras.Dirty = &valueBytes
+		case "Writeback:":
+			snap.Extras.Writeback = &valueBytes
 		case "SwapTotal:":
 			swapTotal = linux.ParseUint64(fields[1]) * 1024
 		case "SwapFree:":

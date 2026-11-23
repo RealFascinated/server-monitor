@@ -16,6 +16,7 @@ import (
 	"fascinated.cc/monitor/agent/internal/ingest"
 	"fascinated.cc/monitor/agent/internal/linux"
 	"fascinated.cc/monitor/agent/internal/loadavg"
+	"fascinated.cc/monitor/agent/internal/mdraid"
 	"fascinated.cc/monitor/agent/internal/memory"
 	"fascinated.cc/monitor/agent/internal/network"
 	"fascinated.cc/monitor/agent/internal/oom"
@@ -230,6 +231,7 @@ func (b *linuxBackend) Tick(ready bool) (TickUpdate, error) {
 	}
 
 	update.InterfaceMetrics = network.ComputeMetrics(prev.netBefore, netAfter, elapsed)
+	update.MdArrayMetrics = mdraid.Read()
 
 	mounts := b.shared.loadMounts()
 	if len(mounts) == 0 {

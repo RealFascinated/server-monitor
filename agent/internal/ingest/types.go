@@ -11,6 +11,7 @@ type Data struct {
 	ZfsArcMetrics        *ZFSArcMetrics          `json:"zfsArcMetrics,omitempty"`
 	PsiMetrics           *PsiMetrics             `json:"psiMetrics,omitempty"`
 	ZfsPoolMetrics       []ZfsPoolMetric         `json:"zfsPoolMetrics,omitempty"`
+	MdArrayMetrics       []MdArrayMetric         `json:"mdArrayMetrics,omitempty"`
 	DockerContainers     []DockerContainerMetric `json:"dockerContainers,omitempty"`
 	GPUMetrics           []GPUMetric             `json:"gpuMetrics,omitempty"`
 	TCPConnectionMetrics []TCPConnectionMetric   `json:"tcpConnectionMetrics,omitempty"`
@@ -128,6 +129,8 @@ type ServerMetrics struct {
 	CPUPowerWatts               float64             `json:"cpuPowerWatts,omitempty"`
 	MemoryBuffers               int64               `json:"memoryBuffers"`
 	MemoryCached                int64               `json:"memoryCached"`
+	MemoryDirtyBytes            *int64              `json:"memoryDirtyBytes,omitempty"`
+	MemoryWritebackBytes        *int64              `json:"memoryWritebackBytes,omitempty"`
 	SwapUsed                    int64               `json:"swapUsed"`
 	SwapTotal                   int64               `json:"swapTotal"`
 	ProcessCount                int64               `json:"processCount"`
@@ -226,6 +229,20 @@ type ZfsPoolMetric struct {
 	ReadIops             int64   `json:"readIops"`
 	WriteIops            int64   `json:"writeIops"`
 	ChecksumErrors       int64   `json:"checksumErrors"`
+}
+
+// MdArrayMetric is one Linux software RAID (mdadm) array from /proc/mdstat.
+type MdArrayMetric struct {
+	Name              string   `json:"name"`
+	Level             string   `json:"level"`
+	DisksTotal        int64    `json:"disksTotal"`
+	DisksActive       int64    `json:"disksActive"`
+	DisksFailed       int64    `json:"disksFailed"`
+	Degraded          bool     `json:"degraded"`
+	SyncAction        string   `json:"syncAction"`
+	SyncPercent       *float64 `json:"syncPercent,omitempty"`
+	SyncSpeedKBps     *int64   `json:"syncSpeedKBps,omitempty"`
+	SyncFinishMinutes *float64 `json:"syncFinishMinutes,omitempty"`
 }
 
 type DockerContainerMetric struct {

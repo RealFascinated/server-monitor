@@ -5,7 +5,8 @@ import "fascinated.cc/monitor/agent/internal/ingest"
 // Result is the assembled metric snapshot returned by Sampler.Snapshot.
 //
 // Field ownership:
-//   - Fast (tick): ServerMetrics (rate fields), InterfaceMetrics, DiskMetrics IO rates, ZfsArcMetrics, PsiMetrics
+//   - Fast (tick): ServerMetrics (rate fields), InterfaceMetrics, DiskMetrics IO rates, ZfsArcMetrics, PsiMetrics,
+//     MdArrayMetrics
 //   - Slow (refreshSlow): ZfsPoolMetrics, DockerContainers, GPUMetrics, TCPConnectionMetrics,
 //     SmartMetrics, TemperatureMetrics, DiskMetrics capacity fields
 //     (used/total/inodes)
@@ -15,6 +16,7 @@ type Result struct {
 	DiskMetrics          []ingest.DiskMetric
 	ZfsArcMetrics        *ingest.ZFSArcMetrics
 	PsiMetrics           *ingest.PsiMetrics
+	MdArrayMetrics       []ingest.MdArrayMetric
 	ZfsPoolMetrics       []ingest.ZfsPoolMetric
 	DockerContainers     []ingest.DockerContainerMetric
 	GPUMetrics           []ingest.GPUMetric
