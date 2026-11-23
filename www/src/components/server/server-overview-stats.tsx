@@ -4,6 +4,7 @@ import { MetricStatCard } from "@/components/metrics/metric-stat-card"
 import { useUserServer } from "@/hooks/use-user-server"
 import { userServerSparklineQueryOptions } from "@/lib/api/user/sparklines.queries"
 import type { ServerResponse } from "@/lib/api/user/servers"
+import type { MetricValues } from "@/lib/api/user/metrics"
 import {
   formatCpuInventoryTooltip,
   formatMemoryBytes,
@@ -11,6 +12,7 @@ import {
   memoryUsagePercent,
 } from "@/lib/formatter"
 import { percentLevelColorClass } from "@/lib/metrics/percent-level"
+import { getLatestValue } from "@/lib/metrics/series"
 
 function serverOverviewHasData(
   server: Pick<ServerResponse, "cpu" | "memory" | "disk"> | undefined
@@ -24,9 +26,13 @@ function serverOverviewHasData(
 
 type ServerOverviewStatsProps = {
   serverId: number
+  rebootRequired?: MetricValues
 }
 
-function ServerOverviewStats({ serverId }: ServerOverviewStatsProps) {
+function ServerOverviewStats({
+  serverId,
+  rebootRequired: rebootRequiredSeries,
+}: ServerOverviewStatsProps) {
   const { data: server } = useUserServer(serverId)
   const { data: sparklines } = useQuery({
     ...userServerSparklineQueryOptions(serverId),
@@ -47,6 +53,8 @@ function ServerOverviewStats({ serverId }: ServerOverviewStatsProps) {
   const diskUsage = server.disk?.usage ?? null
   const diskTotal = server.disk?.max ?? null
   const diskPercent = memoryUsagePercent(diskUsage, diskTotal)
+
+  const rebootRequired = getLatestValue(rebootRequiredSeries)
 
   const stats = [
     cpuUsage != null ? (
@@ -97,6 +105,23 @@ function ServerOverviewStats({ serverId }: ServerOverviewStatsProps) {
         }
         valueClassName={percentLevelColorClass(diskPercent)}
         progress={diskPercent}
+      />
+    ) : null,
+    rebootRequired != null ? (
+      <MetricStatCard
+        key="reboot-required"
+        title="Reboot required"
+        value={rebootRequired}
+        formatValue={(value) => (value >= 0.5 ? "Yes" : "No")}
+        detail={
+          rebootRequired >= 0.5 ? "Restart to finish updating" : undefined
+        }
+        valueClassName={
+          rebootRequired >= 0.5
+            ? "text-warning-700 dark:text-warning-300"
+            : undefined
+        }
+        animate={false}
       />
     ) : null,
   ].filter(Boolean)

@@ -92,6 +92,7 @@ function ServerMetricsView({
 
   const rangeLabel = formatMetricTimeWindowDescription(timeWindow)
   const hasCurrentMetrics = serverOverviewHasData(server)
+  const showOverviewStats = hasCurrentMetrics || metrics.host?.rebootRequired != null
 
   return (
     <div className="flex flex-col gap-6">
@@ -111,8 +112,11 @@ function ServerMetricsView({
           </p>
         </Callout>
       ) : null}
-      {serverOverviewHasData(server) ? (
-        <ServerOverviewStats serverId={metrics.id} />
+      {showOverviewStats ? (
+        <ServerOverviewStats
+          serverId={metrics.id}
+          rebootRequired={metrics.host?.rebootRequired}
+        />
       ) : null}
       {sections.length > 0 ? (
         <MetricsChartAnnotationsProvider spans={incidentSpans}>

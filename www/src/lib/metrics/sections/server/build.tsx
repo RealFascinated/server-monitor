@@ -28,6 +28,8 @@ import {
   hostHardwareCharts,
   hostMemoryCharts,
   hostSystemCharts,
+  hostConntrackCharts,
+  hostTcpQualityCharts,
   networkCharts,
   psiCharts,
   smartCharts,
@@ -135,6 +137,20 @@ function buildServerMetricSections(
         title: "TCP",
         icon: Cable,
         charts: tcpCharts(metrics.tcpConnections),
+        timeGrid,
+      })
+
+      addChartSection(group, {
+        title: "TCP quality",
+        icon: Cable,
+        charts: hostTcpQualityCharts(host),
+        timeGrid,
+      })
+
+      addChartSection(group, {
+        title: "Connection tracking",
+        icon: Network,
+        charts: hostConntrackCharts(host),
         timeGrid,
       })
     }

@@ -185,6 +185,16 @@ function networkCharts(network: NetworkMetrics): MetricChartConfig[] {
       ],
       valueFormatter: formatCount,
     },
+    {
+      title: "Drops",
+      description:
+        "Packets dropped per second on receive and transmit. Drops usually mean a full queue, a saturated link, or a host that cannot keep up.",
+      series: [
+        chartSeries("RX", network.rxDropsPerSecond),
+        chartSeries("TX", network.txDropsPerSecond),
+      ],
+      valueFormatter: formatCount,
+    },
   ]
 }
 
@@ -750,6 +760,52 @@ function hostSystemCharts(
   ]
 }
 
+function hostTcpQualityCharts(
+  host: NonNullable<ServerMetricsResponse["host"]>
+): MetricChartConfig[] {
+  return [
+    {
+      title: "Retransmits",
+      description:
+        "TCP segments retransmitted per second. Sustained retransmits mean packets are being lost somewhere on the path, so throughput drops while the link still looks busy.",
+      series: [chartSeries("Retransmits/s", host.tcpRetransSegmentsPerSecond)],
+      valueFormatter: formatCount,
+      seriesFormatters: [(value) => `${formatCount(value)}/s`],
+    },
+    {
+      title: "Listen queue",
+      description:
+        "New connections that overflowed or were dropped from a listening socket queue per second. Anything above zero means the host accepted more connections than the application could take.",
+      series: [
+        chartSeries("Overflows/s", host.tcpListenOverflowsPerSecond),
+        chartSeries("Drops/s", host.tcpListenDropsPerSecond),
+      ],
+      valueFormatter: formatCount,
+      seriesFormatters: [(value) => `${formatCount(value)}/s`],
+    },
+  ]
+}
+
+function hostConntrackCharts(
+  host: NonNullable<ServerMetricsResponse["host"]>
+): MetricChartConfig[] {
+  return [
+    {
+      title: "Conntrack table",
+      description:
+        "Entries in the kernel connection tracking table vs its maximum. A full table drops new connections, so usage near the limit is what to watch.",
+      series: [
+        chartSeries("Entries", host.conntrackEntries),
+        chartSeries("Max", host.conntrackMax),
+        percentSeries("Usage", host.conntrackUsagePercent),
+      ],
+      valueFormatter: formatCount,
+      seriesFormatters: [formatCount, formatCount, formatPercentValue],
+      ...PERCENT_RIGHT_AXIS,
+    },
+  ]
+}
+
 function hostHardwareCharts(
   host: NonNullable<ServerMetricsResponse["host"]>,
   temperatures: TemperatureMetrics[] | null | undefined,
@@ -809,6 +865,8 @@ export {
   hostHardwareCharts,
   hostMemoryCharts,
   hostSystemCharts,
+  hostTcpQualityCharts,
+  hostConntrackCharts,
   networkCharts,
   psiCharts,
   smartCharts,

@@ -32,6 +32,13 @@ export type HostMetrics = {
   fdUsagePct?: MetricValues
   oomKillsTotal?: MetricValues
   oomKillsPerSecond?: MetricValues
+  tcpRetransSegmentsPerSecond?: MetricValues
+  tcpListenOverflowsPerSecond?: MetricValues
+  tcpListenDropsPerSecond?: MetricValues
+  conntrackEntries?: MetricValues
+  conntrackMax?: MetricValues
+  conntrackUsagePercent?: MetricValues
+  rebootRequired?: MetricValues
   cpuClockMhz?: MetricValues
   cpuPowerWatts?: MetricValues
   batteryPct?: MetricValues
@@ -105,6 +112,8 @@ export type NetworkMetrics = {
   txPacketsPerSecond?: MetricValues
   rxErrorsPerSecond?: MetricValues
   txErrorsPerSecond?: MetricValues
+  rxDropsPerSecond?: MetricValues
+  txDropsPerSecond?: MetricValues
 }
 
 export type GpuMetrics = {
