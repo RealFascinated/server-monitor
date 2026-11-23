@@ -17,10 +17,12 @@ import (
 	"fascinated.cc/monitor/agent/internal/linux"
 	"fascinated.cc/monitor/agent/internal/loadavg"
 	"fascinated.cc/monitor/agent/internal/memory"
-	"fascinated.cc/monitor/agent/internal/oom"
 	"fascinated.cc/monitor/agent/internal/network"
+	"fascinated.cc/monitor/agent/internal/oom"
 	"fascinated.cc/monitor/agent/internal/psi"
+	"fascinated.cc/monitor/agent/internal/reboot"
 	"fascinated.cc/monitor/agent/internal/smart"
+	"fascinated.cc/monitor/agent/internal/tcpstats"
 	"fascinated.cc/monitor/agent/internal/thermal"
 	"fascinated.cc/monitor/agent/internal/timesync"
 	"fascinated.cc/monitor/agent/internal/zfs"
@@ -45,6 +47,9 @@ type linuxTickState struct {
 
 	oomKillsBefore uint64
 	hasOomBefore   bool
+
+	tcpBefore    tcpstats.Snapshot
+	hasTCPBefore bool
 }
 
 type linuxBackend struct {
@@ -140,6 +145,7 @@ func (b *linuxBackend) Tick(ready bool) (TickUpdate, error) {
 	if b.opts.HasZFS {
 		zfsIOAfter = zfs.ReadPoolIOSnapshots()
 	}
+	tcpAfter := tcpstats.Read()
 
 	now := time.Now()
 	if !b.initialized {
@@ -155,6 +161,8 @@ func (b *linuxBackend) Tick(ready bool) (TickUpdate, error) {
 			hasPowerBefore:  hasPowerAfter,
 			netBefore:       netAfter,
 			zfsIOBefore:     zfsIOAfter,
+			tcpBefore:       tcpAfter,
+			hasTCPBefore:    true,
 		}
 		if b.opts.HasZFS {
 			b.state.arcBefore, b.state.hasArcBefore = zfs.ReadArcSnapshot()
@@ -214,6 +222,9 @@ func (b *linuxBackend) Tick(ready bool) (TickUpdate, error) {
 	if hasOom {
 		oom.ApplyRate(&metrics, prev.oomKillsBefore, oomAfter, prev.hasOomBefore, elapsed)
 	}
+	tcpstats.Apply(&metrics, prev.tcpBefore, tcpAfter, prev.hasTCPBefore, elapsed)
+	rebootRequired := reboot.Required()
+	metrics.RebootRequired = &rebootRequired
 	if !b.lxc {
 		update.PsiMetrics = psi.Read()
 	}
@@ -275,6 +286,8 @@ func (b *linuxBackend) Tick(ready bool) (TickUpdate, error) {
 		hasPowerBefore:  hasPowerAfter,
 		netBefore:       netAfter,
 		zfsIOBefore:     zfsIOAfter,
+		tcpBefore:       tcpAfter,
+		hasTCPBefore:    true,
 	}
 	if hasOom {
 		b.state.oomKillsBefore = oomAfter

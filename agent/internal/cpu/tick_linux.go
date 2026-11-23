@@ -12,14 +12,14 @@ import (
 )
 
 type LinuxTickInput struct {
-	PrevProc, CurrProc       linux.ProcStatSnapshot
-	PrevPower, CurrPower     uint64
-	PrevPowerMax, CurrPowerMax uint64
+	PrevProc, CurrProc            linux.ProcStatSnapshot
+	PrevPower, CurrPower          uint64
+	PrevPowerMax, CurrPowerMax    uint64
 	HasPowerBefore, HasPowerAfter bool
-	PrevCgroupCPU            uint64
-	HasCgroupCPU             bool
-	Cgroup                   string
-	Elapsed                  time.Duration
+	PrevCgroupCPU                 uint64
+	HasCgroupCPU                  bool
+	Cgroup                        string
+	Elapsed                       time.Duration
 }
 
 func ComputeLinuxTick(in LinuxTickInput) ingest.ServerMetrics {

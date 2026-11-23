@@ -7,7 +7,8 @@ import "fascinated.cc/monitor/agent/internal/ingest"
 // Field ownership:
 //   - Fast (tick): ServerMetrics (rate fields), InterfaceMetrics, DiskMetrics IO rates, ZfsArcMetrics, PsiMetrics
 //   - Slow (refreshSlow): ZfsPoolMetrics, DockerContainers, GPUMetrics, TCPConnectionMetrics,
-//     TemperatureMetrics, DiskMetrics capacity fields (used/total/inodes)
+//     SmartMetrics, TemperatureMetrics, DiskMetrics capacity fields
+//     (used/total/inodes)
 type Result struct {
 	ServerMetrics        ingest.ServerMetrics
 	InterfaceMetrics     []ingest.InterfaceMetrics

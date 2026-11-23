@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"fascinated.cc/monitor/agent/internal/counters"
 	"fascinated.cc/monitor/agent/internal/battery"
+	"fascinated.cc/monitor/agent/internal/counters"
 	cpupkg "fascinated.cc/monitor/agent/internal/cpu"
 	"fascinated.cc/monitor/agent/internal/disk"
 	"fascinated.cc/monitor/agent/internal/docker"
@@ -18,6 +18,7 @@ import (
 	"fascinated.cc/monitor/agent/internal/loadavg"
 	"fascinated.cc/monitor/agent/internal/memory"
 	"fascinated.cc/monitor/agent/internal/network"
+	"fascinated.cc/monitor/agent/internal/reboot"
 	"fascinated.cc/monitor/agent/internal/thermal"
 	"fascinated.cc/monitor/agent/internal/timesync"
 	"fascinated.cc/monitor/agent/internal/zfs"
@@ -147,6 +148,8 @@ func (b *windowsBackend) Tick(ready bool) (TickUpdate, error) {
 	metrics.Load1 = avg.Load1
 	metrics.Load5 = avg.Load5
 	metrics.Load15 = avg.Load15
+	rebootRequired := reboot.Required()
+	metrics.RebootRequired = &rebootRequired
 
 	mounts := b.shared.loadMounts()
 	if len(mounts) == 0 {

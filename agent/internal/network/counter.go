@@ -8,4 +8,6 @@ type Counter struct {
 	PacketsSent uint64
 	Errin       uint64
 	Errout      uint64
+	Dropin      uint64
+	Dropout     uint64
 }

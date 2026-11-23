@@ -9,25 +9,25 @@ import (
 )
 
 type serverMetricsJSON struct {
-	CPUTotalPercent *float64            `json:"cpuTotalPercent"`
-	CPUPowerWatts   *float64            `json:"cpuPowerWatts"`
-	Cores           []coreMetricJSON    `json:"cores"`
-	Memory          memoryMetricJSON    `json:"memory"`
-	Temperatures    []temperatureJSON   `json:"temperatures"`
-	GPUs            []gpuMetricJSON     `json:"gpus"`
+	CPUTotalPercent *float64          `json:"cpuTotalPercent"`
+	CPUPowerWatts   *float64          `json:"cpuPowerWatts"`
+	Cores           []coreMetricJSON  `json:"cores"`
+	Memory          memoryMetricJSON  `json:"memory"`
+	Temperatures    []temperatureJSON `json:"temperatures"`
+	GPUs            []gpuMetricJSON   `json:"gpus"`
 }
 
 type gpuMetricJSON struct {
-	DeviceID              string   `json:"deviceId"`
-	Name                  string   `json:"name"`
-	Vendor                string   `json:"vendor"`
-	UsagePercent          *float64 `json:"usagePercent"`
-	EncoderUsagePercent   *float64 `json:"encoderUsagePercent"`
-	DecoderUsagePercent   *float64 `json:"decoderUsagePercent"`
-	MemoryUsedBytes       *int64   `json:"memoryUsedBytes"`
-	MemoryTotalBytes      *int64   `json:"memoryTotalBytes"`
-	TemperatureCelsius    *float64 `json:"temperatureCelsius"`
-	PowerWatts            *float64 `json:"powerWatts"`
+	DeviceID            string   `json:"deviceId"`
+	Name                string   `json:"name"`
+	Vendor              string   `json:"vendor"`
+	UsagePercent        *float64 `json:"usagePercent"`
+	EncoderUsagePercent *float64 `json:"encoderUsagePercent"`
+	DecoderUsagePercent *float64 `json:"decoderUsagePercent"`
+	MemoryUsedBytes     *int64   `json:"memoryUsedBytes"`
+	MemoryTotalBytes    *int64   `json:"memoryTotalBytes"`
+	TemperatureCelsius  *float64 `json:"temperatureCelsius"`
+	PowerWatts          *float64 `json:"powerWatts"`
 }
 
 type coreMetricJSON struct {

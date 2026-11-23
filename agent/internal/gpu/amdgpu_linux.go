@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
-
 )
 
 const amdgpuIDsPath = "/usr/share/libdrm/amdgpu.ids"

@@ -4,6 +4,7 @@ package network
 
 import (
 	"bufio"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -15,9 +16,14 @@ func ReadCounters() ([]Counter, error) {
 		return nil, err
 	}
 	defer file.Close()
+	return parseProcNetDev(file)
+}
 
+// parseProcNetDev reads the two header lines and one row per interface. Each row has 16
+// columns: receive bytes, packets, errs, drop, ... then transmit bytes, packets, errs, drop.
+func parseProcNetDev(r io.Reader) ([]Counter, error) {
 	counters := make([]Counter, 0, 8)
-	scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(r)
 	lineNum := 0
 	for scanner.Scan() {
 		lineNum++
@@ -46,9 +52,11 @@ func ReadCounters() ([]Counter, error) {
 			BytesRecv:   parseUint(fields[0]),
 			PacketsRecv: parseUint(fields[1]),
 			Errin:       parseUint(fields[2]),
+			Dropin:      parseUint(fields[3]),
 			BytesSent:   parseUint(fields[8]),
 			PacketsSent: parseUint(fields[9]),
 			Errout:      parseUint(fields[10]),
+			Dropout:     parseUint(fields[11]),
 		})
 	}
 

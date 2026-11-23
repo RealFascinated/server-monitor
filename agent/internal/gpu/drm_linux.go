@@ -19,8 +19,8 @@ const (
 )
 
 var (
-	cardDirPattern  = regexp.MustCompile(`^card\d+$`)
-	pciSlotPattern  = regexp.MustCompile(`^[0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\.[0-7]$`)
+	cardDirPattern = regexp.MustCompile(`^card\d+$`)
+	pciSlotPattern = regexp.MustCompile(`^[0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\.[0-7]$`)
 )
 
 func collectDRM() []ingest.GPUMetric {

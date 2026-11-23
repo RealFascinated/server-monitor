@@ -29,7 +29,7 @@ func TestMdDeviceHasDiskstatsIO(t *testing.T) {
 	t.Parallel()
 
 	stats := map[string]DiskstatsEntry{
-		"md0": {Reads: 10},
+		"md0":   {Reads: 10},
 		"md3p1": {},
 	}
 	if !mdDeviceHasDiskstatsIO("md0", stats) {

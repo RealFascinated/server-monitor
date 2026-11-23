@@ -20,6 +20,8 @@ func ReadCounters() ([]Counter, error) {
 			PacketsSent: stat.PacketsSent,
 			Errin:       stat.Errin,
 			Errout:      stat.Errout,
+			Dropin:      stat.Dropin,
+			Dropout:     stat.Dropout,
 		}
 	}
 	return counters, nil

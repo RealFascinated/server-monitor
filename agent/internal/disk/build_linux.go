@@ -123,9 +123,9 @@ func lookupZFSPoolVdevDiskStats(pool string, before, after map[string]linux.Disk
 	return Rates{
 		IoUsagePercent:     maxUsage,
 		IoWaitMilliseconds: maxWait,
-		ReadIops:             totalReadIops,
-		WriteIops:            totalWriteIops,
-		ReadLatencyMs:        int64(readLatency + 0.5),
-		WriteLatencyMs:       int64(writeLatency + 0.5),
+		ReadIops:           totalReadIops,
+		WriteIops:          totalWriteIops,
+		ReadLatencyMs:      int64(readLatency + 0.5),
+		WriteLatencyMs:     int64(writeLatency + 0.5),
 	}, true
 }

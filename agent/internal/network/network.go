@@ -47,13 +47,15 @@ func ComputeMetrics(before, after []Counter, elapsed time.Duration) []ingest.Int
 		}
 
 		metrics = append(metrics, ingest.InterfaceMetrics{
-			InterfaceName:       name,
-			RxBytesPerSecond:    rxBps,
-			TxBytesPerSecond:    txBps,
-			RxPacketsPerSecond:  iostats.PerSecond(delta.Uint64(counter.PacketsRecv, previous.PacketsRecv), elapsed),
-			TxPacketsPerSecond:  iostats.PerSecond(delta.Uint64(counter.PacketsSent, previous.PacketsSent), elapsed),
-			RxErrorsPerSecond:   iostats.PerSecond(delta.Uint64(counter.Errin, previous.Errin), elapsed),
-			TxErrorsPerSecond:   iostats.PerSecond(delta.Uint64(counter.Errout, previous.Errout), elapsed),
+			InterfaceName:      name,
+			RxBytesPerSecond:   rxBps,
+			TxBytesPerSecond:   txBps,
+			RxPacketsPerSecond: iostats.PerSecond(delta.Uint64(counter.PacketsRecv, previous.PacketsRecv), elapsed),
+			TxPacketsPerSecond: iostats.PerSecond(delta.Uint64(counter.PacketsSent, previous.PacketsSent), elapsed),
+			RxErrorsPerSecond:  iostats.PerSecond(delta.Uint64(counter.Errin, previous.Errin), elapsed),
+			TxErrorsPerSecond:  iostats.PerSecond(delta.Uint64(counter.Errout, previous.Errout), elapsed),
+			RxDropsPerSecond:   iostats.PerSecond(delta.Uint64(counter.Dropin, previous.Dropin), elapsed),
+			TxDropsPerSecond:   iostats.PerSecond(delta.Uint64(counter.Dropout, previous.Dropout), elapsed),
 		})
 	}
 	return metrics

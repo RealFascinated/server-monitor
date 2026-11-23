@@ -1,16 +1,16 @@
 package ingest
 
 type Data struct {
-	AgentVersion     string                  `json:"agentVersion"`
+	AgentVersion string `json:"agentVersion"`
 	// Timestamp is when the sample was collected (unix seconds). Buffered samples are replayed with it.
-	Timestamp        int64                   `json:"timestamp,omitempty"`
-	ServerDetails    ServerDetails           `json:"serverDetails"`
-	ServerMetrics    ServerMetrics           `json:"serverMetrics"`
-	InterfaceMetrics []InterfaceMetrics      `json:"interfaceMetrics"`
-	DiskMetrics      []DiskMetric            `json:"diskMetrics"`
-	ZfsArcMetrics    *ZFSArcMetrics          `json:"zfsArcMetrics,omitempty"`
+	Timestamp            int64                   `json:"timestamp,omitempty"`
+	ServerDetails        ServerDetails           `json:"serverDetails"`
+	ServerMetrics        ServerMetrics           `json:"serverMetrics"`
+	InterfaceMetrics     []InterfaceMetrics      `json:"interfaceMetrics"`
+	DiskMetrics          []DiskMetric            `json:"diskMetrics"`
+	ZfsArcMetrics        *ZFSArcMetrics          `json:"zfsArcMetrics,omitempty"`
 	PsiMetrics           *PsiMetrics             `json:"psiMetrics,omitempty"`
-	ZfsPoolMetrics   []ZfsPoolMetric         `json:"zfsPoolMetrics,omitempty"`
+	ZfsPoolMetrics       []ZfsPoolMetric         `json:"zfsPoolMetrics,omitempty"`
 	DockerContainers     []DockerContainerMetric `json:"dockerContainers,omitempty"`
 	GPUMetrics           []GPUMetric             `json:"gpuMetrics,omitempty"`
 	TCPConnectionMetrics []TCPConnectionMetric   `json:"tcpConnectionMetrics,omitempty"`
@@ -69,16 +69,16 @@ type AgentMetrics struct {
 }
 
 type GPUMetric struct {
-	DeviceID              string  `json:"deviceId"`
-	Name                  string  `json:"name"`
-	Vendor                string  `json:"vendor"`
-	UsagePercent          float64  `json:"usagePercent"`
-	EncoderUsagePercent   *float64 `json:"encoderUsagePercent,omitempty"`
-	DecoderUsagePercent   *float64 `json:"decoderUsagePercent,omitempty"`
-	MemoryUsedBytes       int64   `json:"memoryUsedBytes"`
-	MemoryTotalBytes      int64   `json:"memoryTotalBytes"`
-	TemperatureCelsius    float64 `json:"temperatureCelsius"`
-	PowerWatts            float64  `json:"powerWatts"`
+	DeviceID            string   `json:"deviceId"`
+	Name                string   `json:"name"`
+	Vendor              string   `json:"vendor"`
+	UsagePercent        float64  `json:"usagePercent"`
+	EncoderUsagePercent *float64 `json:"encoderUsagePercent,omitempty"`
+	DecoderUsagePercent *float64 `json:"decoderUsagePercent,omitempty"`
+	MemoryUsedBytes     int64    `json:"memoryUsedBytes"`
+	MemoryTotalBytes    int64    `json:"memoryTotalBytes"`
+	TemperatureCelsius  float64  `json:"temperatureCelsius"`
+	PowerWatts          float64  `json:"powerWatts"`
 }
 
 func FloatPtr(v float64) *float64 {
@@ -114,37 +114,44 @@ type TCPConnectionMetric struct {
 }
 
 type ServerMetrics struct {
-	CPUUsage                 float64 `json:"cpuUsage"`
-	MemoryUsage              float64 `json:"memoryUsage"`
-	MemoryAvailable          float64 `json:"memoryAvailable"`
-	MemoryTotal              float64 `json:"memoryTotal"`
-	Load1                    float64 `json:"load1"`
-	Load5                    float64 `json:"load5"`
-	Load15                   float64 `json:"load15"`
-	CPUUserPercent           float64 `json:"cpuUserPercent"`
-	CPUSystemPercent         float64 `json:"cpuSystemPercent"`
-	CPUIowaitPercent         float64 `json:"cpuIowaitPercent"`
-	CPUStealPercent          float64 `json:"cpuStealPercent"`
-	CPUPowerWatts            float64 `json:"cpuPowerWatts,omitempty"`
-	MemoryBuffers            int64   `json:"memoryBuffers"`
-	MemoryCached             int64   `json:"memoryCached"`
-	SwapUsed                 int64   `json:"swapUsed"`
-	SwapTotal                int64   `json:"swapTotal"`
-	ProcessCount             int64   `json:"processCount"`
-	RunningProcesses         int64   `json:"runningProcesses"`
-	ContextSwitchesPerSecond int64   `json:"contextSwitchesPerSecond"`
-	InterruptsPerSecond      int64   `json:"interruptsPerSecond"`
-	FdOpen                   int64   `json:"fdOpen"`
-	FdMax                    int64   `json:"fdMax,omitempty"`
-	FdUsagePercent           float64 `json:"fdUsagePercent,omitempty"`
-	BatteryPercent           *float64 `json:"batteryPercent,omitempty"`
-	OomKillsTotal            int64   `json:"oomKillsTotal"`
-	OomKillsPerSecond        int64   `json:"oomKillsPerSecond"`
-	ClockSynced              *bool    `json:"clockSynced,omitempty"`
-	ClockErrorMs             *float64 `json:"clockErrorMs,omitempty"`
-	ClockOffsetMs            *float64 `json:"clockOffsetMs,omitempty"`
-	CPUCoreMetrics           []CPUCoreMetric      `json:"cpuCoreMetrics,omitempty"`
-	TemperatureMetrics       []TemperatureMetric  `json:"temperatureMetrics,omitempty"`
+	CPUUsage                    float64             `json:"cpuUsage"`
+	MemoryUsage                 float64             `json:"memoryUsage"`
+	MemoryAvailable             float64             `json:"memoryAvailable"`
+	MemoryTotal                 float64             `json:"memoryTotal"`
+	Load1                       float64             `json:"load1"`
+	Load5                       float64             `json:"load5"`
+	Load15                      float64             `json:"load15"`
+	CPUUserPercent              float64             `json:"cpuUserPercent"`
+	CPUSystemPercent            float64             `json:"cpuSystemPercent"`
+	CPUIowaitPercent            float64             `json:"cpuIowaitPercent"`
+	CPUStealPercent             float64             `json:"cpuStealPercent"`
+	CPUPowerWatts               float64             `json:"cpuPowerWatts,omitempty"`
+	MemoryBuffers               int64               `json:"memoryBuffers"`
+	MemoryCached                int64               `json:"memoryCached"`
+	SwapUsed                    int64               `json:"swapUsed"`
+	SwapTotal                   int64               `json:"swapTotal"`
+	ProcessCount                int64               `json:"processCount"`
+	RunningProcesses            int64               `json:"runningProcesses"`
+	ContextSwitchesPerSecond    int64               `json:"contextSwitchesPerSecond"`
+	InterruptsPerSecond         int64               `json:"interruptsPerSecond"`
+	FdOpen                      int64               `json:"fdOpen"`
+	FdMax                       int64               `json:"fdMax,omitempty"`
+	FdUsagePercent              float64             `json:"fdUsagePercent,omitempty"`
+	BatteryPercent              *float64            `json:"batteryPercent,omitempty"`
+	OomKillsTotal               int64               `json:"oomKillsTotal"`
+	OomKillsPerSecond           int64               `json:"oomKillsPerSecond"`
+	TCPRetransSegmentsPerSecond *int64              `json:"tcpRetransSegmentsPerSecond,omitempty"`
+	TCPListenOverflowsPerSecond *int64              `json:"tcpListenOverflowsPerSecond,omitempty"`
+	TCPListenDropsPerSecond     *int64              `json:"tcpListenDropsPerSecond,omitempty"`
+	ConntrackEntries            *int64              `json:"conntrackEntries,omitempty"`
+	ConntrackMax                *int64              `json:"conntrackMax,omitempty"`
+	ConntrackUsagePercent       *float64            `json:"conntrackUsagePercent,omitempty"`
+	ClockSynced                 *bool               `json:"clockSynced,omitempty"`
+	ClockErrorMs                *float64            `json:"clockErrorMs,omitempty"`
+	ClockOffsetMs               *float64            `json:"clockOffsetMs,omitempty"`
+	RebootRequired              *bool               `json:"rebootRequired,omitempty"`
+	CPUCoreMetrics              []CPUCoreMetric     `json:"cpuCoreMetrics,omitempty"`
+	TemperatureMetrics          []TemperatureMetric `json:"temperatureMetrics,omitempty"`
 }
 
 type ZFSArcMetrics struct {
@@ -166,14 +173,14 @@ type ZFSArcMetrics struct {
 // Unset when PSI is unavailable (no CONFIG_PSI, or PSI disabled on the kernel command line), and
 // full is unset for CPU on kernels that export only a some line for it.
 type PsiMetrics struct {
-	CPUSomeAvg10Pct   *float64 `json:"cpuSomeAvg10Pct,omitempty"`
-	CPUSomeAvg60Pct   *float64 `json:"cpuSomeAvg60Pct,omitempty"`
-	CPUSomeAvg300Pct  *float64 `json:"cpuSomeAvg300Pct,omitempty"`
-	CPUSomeTotalMs    *float64 `json:"cpuSomeTotalMs,omitempty"`
-	CPUFullAvg10Pct   *float64 `json:"cpuFullAvg10Pct,omitempty"`
-	CPUFullAvg60Pct   *float64 `json:"cpuFullAvg60Pct,omitempty"`
-	CPUFullAvg300Pct  *float64 `json:"cpuFullAvg300Pct,omitempty"`
-	CPUFullTotalMs    *float64 `json:"cpuFullTotalMs,omitempty"`
+	CPUSomeAvg10Pct     *float64 `json:"cpuSomeAvg10Pct,omitempty"`
+	CPUSomeAvg60Pct     *float64 `json:"cpuSomeAvg60Pct,omitempty"`
+	CPUSomeAvg300Pct    *float64 `json:"cpuSomeAvg300Pct,omitempty"`
+	CPUSomeTotalMs      *float64 `json:"cpuSomeTotalMs,omitempty"`
+	CPUFullAvg10Pct     *float64 `json:"cpuFullAvg10Pct,omitempty"`
+	CPUFullAvg60Pct     *float64 `json:"cpuFullAvg60Pct,omitempty"`
+	CPUFullAvg300Pct    *float64 `json:"cpuFullAvg300Pct,omitempty"`
+	CPUFullTotalMs      *float64 `json:"cpuFullTotalMs,omitempty"`
 	MemorySomeAvg10Pct  *float64 `json:"memorySomeAvg10Pct,omitempty"`
 	MemorySomeAvg60Pct  *float64 `json:"memorySomeAvg60Pct,omitempty"`
 	MemorySomeAvg300Pct *float64 `json:"memorySomeAvg300Pct,omitempty"`
@@ -200,6 +207,8 @@ type InterfaceMetrics struct {
 	TxPacketsPerSecond int64  `json:"txPacketsPerSecond"`
 	RxErrorsPerSecond  int64  `json:"rxErrorsPerSecond"`
 	TxErrorsPerSecond  int64  `json:"txErrorsPerSecond"`
+	RxDropsPerSecond   int64  `json:"rxDropsPerSecond"`
+	TxDropsPerSecond   int64  `json:"txDropsPerSecond"`
 }
 
 type ZfsPoolMetric struct {

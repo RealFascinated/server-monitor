@@ -21,8 +21,14 @@ func TestIsCommonInterface(t *testing.T) {
 	}
 	if runtime.GOOS == "linux" {
 		tests = append(tests,
-			struct{ name string; want bool }{"veth123", false},
-			struct{ name string; want bool }{"docker0", false},
+			struct {
+				name string
+				want bool
+			}{"veth123", false},
+			struct {
+				name string
+				want bool
+			}{"docker0", false},
 		)
 	}
 	for _, tc := range tests {
@@ -54,5 +60,18 @@ func TestComputeMetricsScalesElapsed(t *testing.T) {
 	}
 	if metrics[0].RxBytesPerSecond != 1000 {
 		t.Fatalf("expected 1000 B/s, got %d", metrics[0].RxBytesPerSecond)
+	}
+}
+
+func TestComputeMetricsDrops(t *testing.T) {
+	before := []Counter{{Name: "eth0", Dropin: 10, Dropout: 20}}
+	after := []Counter{{Name: "eth0", Dropin: 30, Dropout: 25}}
+
+	metrics := ComputeMetrics(before, after, 2_000_000_000) // 2s
+	if len(metrics) != 1 {
+		t.Fatalf("expected 1 metric, got %d", len(metrics))
+	}
+	if metrics[0].RxDropsPerSecond != 10 || metrics[0].TxDropsPerSecond != 2 {
+		t.Fatalf("drops = %d/%d, want 10/2", metrics[0].RxDropsPerSecond, metrics[0].TxDropsPerSecond)
 	}
 }

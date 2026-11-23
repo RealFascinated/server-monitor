@@ -30,8 +30,8 @@ type cgroupCPUState struct {
 }
 
 var cgroupCollector struct {
-	mu    sync.Mutex
-	prev  map[string]cgroupCPUState
+	mu     sync.Mutex
+	prev   map[string]cgroupCPUState
 	prevAt time.Time
 }
 

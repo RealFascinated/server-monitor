@@ -60,6 +60,10 @@ Optional `config.yml` (see `config-example.yml`). Environment variables override
 - **Clock sync:** whether the kernel considers the clock synchronised and its own error estimate on Linux, plus the measured offset when `chronyc` is available (an agent in a container only sees it if `chronyc` is in the image); `w32tm` on Windows. No network requests are made.
 - **Container network and disk I/O:** disk throughput is read from each container's cgroup. Network traffic is read through the container's first process, so a containerised agent needs `pid: host`; containers on host networking are skipped because their counters are the host's.
 
+### Reboot required
+
+The agent reports whether the host is waiting for a reboot. On Linux that is the presence of `/run/reboot-required` (or `/var/run/reboot-required`), mapped through `MONITOR_HOST_ROOT` so a container sees the host's flag. On Windows it checks the Windows Update and Component Based Servicing reboot-pending registry keys. Other platforms omit the field.
+
 ### Stall pressure
 
 CPU, memory and I/O stall pressure (Linux Pressure Stall Information) is read from `/proc/pressure`, so it needs a kernel with PSI available: `CONFIG_PSI=y`, and on distributions that compile it in but leave it off, `psi=1` on the kernel command line. Nothing is reported when the files are missing. Inside an LXC container the family is skipped, because those files describe the host rather than the container.
