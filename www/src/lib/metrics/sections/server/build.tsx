@@ -30,6 +30,7 @@ import {
   hostSystemCharts,
   hostConntrackCharts,
   hostTcpQualityCharts,
+  mdArrayCharts,
   networkCharts,
   psiCharts,
   smartCharts,
@@ -266,6 +267,27 @@ function buildServerMetricSections(
           }
         }
       )
+    }
+  )
+
+  builder.group(
+    { id: "raid", title: "RAID", icon: Database, showChildCount: false },
+    (raid) => {
+      for (const array of metrics.mdArrays ?? []) {
+        const sync = array.syncAction
+        addChartSection(raid, {
+          id: metricSectionId(`md-array-${array.array}`),
+          sectionKind: "RAID array",
+          title: array.array,
+          navLabel: array.array,
+          icon: Database,
+          description: sync
+            ? `Level: ${array.level} · Sync: ${sync}`
+            : `Level: ${array.level}`,
+          charts: mdArrayCharts(array),
+          timeGrid,
+        })
+      }
     }
   )
 

@@ -1,6 +1,7 @@
 import type {
   DiskMetrics,
   GpuMetrics,
+  MdArrayMetrics,
   MetricValues,
   NetworkMetrics,
   PsiMetrics,
@@ -527,6 +528,45 @@ function zfsPoolCharts(pool: ZfsPoolMetrics): MetricChartConfig[] {
   ]
 }
 
+function mdArrayCharts(array: MdArrayMetrics): MetricChartConfig[] {
+  return [
+    {
+      title: "Disks",
+      description: "Active disks compared to the array's total disk count.",
+      series: [
+        chartSeries("Active", array.disksActive),
+        chartSeries("Total", array.disksTotal),
+      ],
+      valueFormatter: formatCount,
+    },
+    {
+      title: "Array state",
+      description:
+        "Degraded state (1 = degraded) and the number of failed disks.",
+      series: [
+        chartSeries("Degraded", array.degraded),
+        chartSeries("Failed", array.disksFailed),
+      ],
+      valueFormatter: formatCount,
+    },
+    {
+      title: "Sync progress",
+      description:
+        "Progress and speed of a resync, recovery, check, or reshape.",
+      series: [
+        chartSeries("Progress", array.syncPercent),
+        chartSeries("Speed", array.syncSpeedKbps, { axis: "right" }),
+      ],
+      valueFormatter: formatPercentValue,
+      seriesFormatters: [
+        formatPercentValue,
+        (value) => `${formatCount(value)} KB/s`,
+      ],
+      rightValueFormatter: (value) => `${formatCount(value)} KB/s`,
+    },
+  ]
+}
+
 function hostCpuCharts(
   host: NonNullable<ServerMetricsResponse["host"]>,
   cpuCores: ServerMetricsResponse["cpuCores"]
@@ -607,6 +647,16 @@ function hostMemoryCharts(
       series: [
         chartSeries("Buffers", host.memBuffers),
         chartSeries("Cached", host.memCached),
+      ],
+      valueFormatter: formatMemoryBytes,
+    },
+    {
+      title: "Dirty & writeback",
+      description:
+        "Pages waiting to be written to disk, and pages currently under writeback.",
+      series: [
+        chartSeries("Dirty", host.memDirtyBytes),
+        chartSeries("Writeback", host.memWritebackBytes),
       ],
       valueFormatter: formatMemoryBytes,
     },
@@ -867,6 +917,7 @@ export {
   hostSystemCharts,
   hostTcpQualityCharts,
   hostConntrackCharts,
+  mdArrayCharts,
   networkCharts,
   psiCharts,
   smartCharts,

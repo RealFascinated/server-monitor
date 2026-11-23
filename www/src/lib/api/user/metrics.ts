@@ -21,6 +21,8 @@ export type HostMetrics = {
   cpuStealPct?: MetricValues
   memBuffers?: MetricValues
   memCached?: MetricValues
+  memDirtyBytes?: MetricValues
+  memWritebackBytes?: MetricValues
   swapUsed?: MetricValues
   swapTotal?: MetricValues
   processCount?: MetricValues
@@ -201,6 +203,19 @@ export type ZfsPoolMetrics = {
   checksumErrors?: MetricValues
 }
 
+export type MdArrayMetrics = {
+  array: string
+  level: string
+  syncAction?: string
+  degraded?: MetricValues
+  disksTotal?: MetricValues
+  disksActive?: MetricValues
+  disksFailed?: MetricValues
+  syncPercent?: MetricValues
+  syncSpeedKbps?: MetricValues
+  syncFinishMinutes?: MetricValues
+}
+
 export type TcpConnectionMetrics = {
   state: string
   connections?: MetricValues
@@ -223,6 +238,7 @@ export type ServerMetricsResponse = {
   temperatures?: TemperatureMetrics[] | null
   zfsArc?: ZfsArcMetrics | null
   zfsPools?: ZfsPoolMetrics[] | null
+  mdArrays?: MdArrayMetrics[] | null
   tcpConnections?: TcpConnectionMetrics[] | null
 }
 
